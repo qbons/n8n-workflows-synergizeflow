@@ -1,0 +1,16 @@
+{
+  "id": "UNcEOCawQV9ZsxYR",
+  "name": "SynergizeFlow",
+  "icon": {
+    "type": "icon",
+    "value": "layers"
+  },
+  "description": "SaaS marketing apps",
+  "type": "team",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "variableStubs": []
+}

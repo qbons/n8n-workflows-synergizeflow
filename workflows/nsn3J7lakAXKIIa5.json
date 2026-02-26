@@ -1,0 +1,2254 @@
+{
+  "id": "nsn3J7lakAXKIIa5",
+  "name": "SF - Chat RAG",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cc48725e-a61d-4dae-b859-0ad9aafc6057",
+              "name": "website",
+              "value": "={{ $json.body.domain_name }}",
+              "type": "string"
+            },
+            {
+              "id": "3fb748b3-ffed-49a4-8410-05c82ee2862c",
+              "name": "code",
+              "value": "={{ $json.body.license_key }}",
+              "type": "string"
+            },
+            {
+              "id": "db301c01-bebe-4fac-a55c-942fe8c10776",
+              "name": "chatInput",
+              "value": "={{ $json.body.content }}",
+              "type": "string"
+            },
+            {
+              "id": "dd7f2d1c-1662-4971-96e6-f997d54a2b96",
+              "name": "type",
+              "value": "={{ $json.body.type }}",
+              "type": "string"
+            },
+            {
+              "id": "0d0ac0eb-33ab-4464-aafb-bd9e5f90718e",
+              "name": "sessionId",
+              "value": "={{ $json.body.license_key }}-{{ $json.body.ipAddress }}",
+              "type": "string"
+            },
+            {
+              "id": "5a3e7ff5-3d03-47ec-b858-fd41647ec496",
+              "name": "agentName",
+              "value": "={{ $json.body.agent_name }}",
+              "type": "string"
+            },
+            {
+              "id": "41381ea6-f372-442f-86a9-ca53b2ed226c",
+              "name": "websiteName",
+              "value": "={{ $json.body.website_name }}",
+              "type": "string"
+            },
+            {
+              "id": "b1afbc43-ab60-4c44-961b-bd64eb0b4c36",
+              "name": "ipAddress",
+              "value": "={{ $json.body.ipAddress }}",
+              "type": "string"
+            },
+            {
+              "id": "2833edcb-675d-4534-8f08-6373be46b54d",
+              "name": "hasCTA",
+              "value": "={{ $json.body.hasCTA }}",
+              "type": "boolean"
+            },
+            {
+              "id": "15368258-8166-435c-91f3-fa91a041422d",
+              "name": "agentLang",
+              "value": "={{ $json.body.agent_lang }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1728,
+        2448
+      ],
+      "id": "05758e5e-e9de-4d41-b32e-f1ef2c0a39c2",
+      "name": "Prepare data"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Prepare data').item.json.type }}",
+                    "rightValue": "audio",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "fba5dce1-d07f-4605-9bd8-8fb53007724a"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "df319588-bdd4-4204-8959-da702e1a3dc1",
+                    "leftValue": "={{ $('Prepare data').item.json.type }}",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a2fa2834-35c7-41e1-9fbc-7a684f67984d",
+                    "leftValue": "={{ $('Prepare data').item.json.type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -1552,
+        2432
+      ],
+      "id": "8e9106b0-47d2-4357-bb50-ee264583357d",
+      "name": "Type check"
+    },
+    {
+      "parameters": {
+        "projectId": {
+          "__rl": true,
+          "value": "synergizeflow-480314",
+          "mode": "list",
+          "cachedResultName": "Synergizeflow"
+        },
+        "modelName": "gemini-2.5-pro",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleVertex",
+      "typeVersion": 1,
+      "position": [
+        -464,
+        2656
+      ],
+      "id": "e5dc6f09-0d5f-4526-9533-f5b92f17d3a3",
+      "name": "Google Vertex Chat Model",
+      "credentials": {
+        "googleApi": {
+          "id": "USHSJ16CtFdpn2AS",
+          "name": "Vertex API Service Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Prepare data').item.json.sessionId }}",
+        "tableName": "chat_agent_histories",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        -336,
+        2784
+      ],
+      "id": "5f02dfab-b42a-4989-93b8-fa59d4901ef7",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "Op8teegA8CnWpahB",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "projectId": {
+          "__rl": true,
+          "value": "synergizeflow-480314",
+          "mode": "list",
+          "cachedResultName": "Synergizeflow"
+        },
+        "modelName": "gemini-2.5-pro",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleVertex",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        2656
+      ],
+      "id": "f3f3cb06-a4e5-4b8b-b55a-a830f562d1e8",
+      "name": "Google Vertex Chat Model1",
+      "credentials": {
+        "googleApi": {
+          "id": "USHSJ16CtFdpn2AS",
+          "name": "Vertex API Service Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        560,
+        2448
+      ],
+      "id": "1ea7fe3d-447e-463e-ae8d-095949c741a1",
+      "name": "Agent Response"
+    },
+    {
+      "parameters": {
+        "jsCode": "const outputTextLength = $input.first().json.output.length;\nconst inputTextLength = $('System message builder').first().json.systemMessage.length + $('System message builder').first().json.emailSystemMessage.length\n\nreturn {\n  content: $input.first().json.output,\n  type: \"text\",\n  ipaddress: $('Prepare data').first().json.ipAddress,\n  tokenUsage: {\n    completionTokens: Math.ceil(outputTextLength / 4),\n    promptTokens: Math.ceil(inputTextLength / 4)\n  }\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        336,
+        2448
+      ],
+      "id": "55dd5896-9932-43a2-b05f-a45928ad95b0",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c095f203-b2ee-4f2c-83b3-b47f7e736458",
+              "name": "data",
+              "value": "={{ $('Prepare data').item.json.chatInput }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1296,
+        2272
+      ],
+      "id": "d0646f32-d27b-48c5-a702-088967f57fa2",
+      "name": "Audio Format"
+    },
+    {
+      "parameters": {
+        "jsCode": "var string = $input.first().json.data;\nstring = string.replace('data:audio/webm;base64,', '');\nreturn {string:string}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1072,
+        2272
+      ],
+      "id": "faee88a1-1716-4c48-af3c-8310475463d1",
+      "name": "Code audio format"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [{\n    \"parts\":[\n      {\"text\": \"Transcribe attached audio file\"},\n      {\n        \"inline_data\": {\n          \"mime_type\": \"audio/webm\",\n          \"data\": \"{{ $json.string }}\"\n        }\n      }\n    ]\n  }]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -832,
+        2272
+      ],
+      "id": "4cf1c7ee-2452-4293-893e-1ab733db0e3c",
+      "name": "Transcribe the audio",
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "hptNBXvanvBFJC4C",
+          "name": "Gemini Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6a3d7fca-2651-4440-b285-8d02d8e6666c",
+              "name": "chatInput",
+              "value": "={{ $('Prepare data').item.json.chatInput }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1008,
+        2464
+      ],
+      "id": "1adf1191-2f5a-4d10-b819-03da66ebc16f",
+      "name": "Session Format"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  chatInput: $input.first().json.candidates[0].content.parts[0].text\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -624,
+        2272
+      ],
+      "id": "33e673b3-c99d-4183-8220-3233d294ee93",
+      "name": "Session Format1"
+    },
+    {
+      "parameters": {
+        "content": "chat with agent",
+        "height": 1152,
+        "width": 2992,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1952,
+        2000
+      ],
+      "id": "2e4b854a-fca0-469a-a423-cfa76ea4d7ef",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        2784
+      ],
+      "id": "88d2ea6d-21d6-4361-8d8a-e0ea22532044",
+      "name": "Embeddings Google Gemini1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "6Qmz74fv62ASqbfV",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', ``, 'string') }}",
+        "model": "gemini-2.5-pro",
+        "enableUrlContext": true,
+        "restrictUrls": "={{ $('Prepare data').item.json.website }}",
+        "enableOrganizationContext": true,
+        "organization": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Organization_Context', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-gemini-search.geminiSearchToolTool",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        2320
+      ],
+      "id": "0293768f-ee71-4642-8379-f561a371b840",
+      "name": "Gemini Search Tool",
+      "credentials": {
+        "geminiSearchApi": {
+          "id": "uXioxrB1KI7dFyPA",
+          "name": "Gemini Credentials account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "rag/chat",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1904,
+        2448
+      ],
+      "id": "6a2f6cbc-86bb-450f-b209-ccceb8538f93",
+      "name": "Start Chat",
+      "webhookId": "c0328f0b-c7be-4d4f-ac73-a38cbf9c7703"
+    },
+    {
+      "parameters": {
+        "jsCode": "const chatInput = $input.first().json.chatInput;\n\nlet systemMessage = `\n## Persona\nYou are ${$('Prepare data').first().json.agentName}, a helpful Customer-Service Specialist for ${$('Prepare data').first().json.websiteName}.\nKeep replies short, clear, professional (1-3 sentences) and speak as “we/our/us”.\n\n## Language Rules\n1. Default language is ${$('Prepare data').first().json.agentLang}.\n2. If the users language is clearly identifiable, then reply in that language.\n3. Do not mix languages in one reply.\n\n## Available Tools\n1. Knowledge Store – internal docs (products, policies, etc.).  \n2. Gemini Search – public web (only if Knowledge Store gives nothing).  \n`;\n\nif ($('Prepare data').first().json.hasCTA) {\n  systemMessage += `\n3. CTA configuration – detects user intent and collects required fields.\n   - You MUST use this tool whenever the user shows an intent that semantically matches any CTA goal.\n   - If confidence > 0.75, call the tool immediately; do NOT ask extra questions beforehand.\n   - Keep email destination from CTA configuration and use it on email agent tool.\n   - If no CTA matches, continue answering normally.\n\n4. Email Agent – sends the internal report after CTA tool returns the fields.\n`;\n}\n\nsystemMessage += `\n## Answer Flow\n1. Try Knowledge Store first.\n2. If empty/no answer → Gemini Search.\n3. If still no answer → guide user to support channel listed in docs.\n`;\n\nif ($('Prepare data').first().json.hasCTA) {\n  systemMessage += `\n## Examples\nUser: “I want to join the beta program.”  \n→ semantic match → call CTA tool straight away.\n\nUser: “How much is shipping?”  \n→ no CTA match → answer with knowledge/search.\n`;\n}\n\nlet emailSystemMessage = '';\nif ($('Prepare data').first().json.hasCTA) {\n  emailSystemMessage = `\nYou are an e-mail formatter.\nInput: collect fields.\nDestination: You must find it from CTA Configuration tool\n1. Loop over fields: write one HTML line per key\n   \"<strong>{{key}}:</strong> {{value}}<br>\"\n2. Add line: \"<strong>Destination:</strong> {{destination}}<br>\"\n3. Call send_email with:\n   - destination → parameter \"toEmail\"\n   - the HTML string → parameter \"Message\"\n4. Answer only: \"Email sent successfully.\"\n`;\n}\n\nreturn { chatInput, systemMessage, emailSystemMessage };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -384,
+        2448
+      ],
+      "id": "c00cec74-66ce-489d-8bc3-f43bae327181",
+      "name": "System message builder"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Send an internal report e-mail to the address supplied by the CTA tool.",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Prompt__User_Message_', ``, 'string') }}",
+        "options": {
+          "systemMessage": "={{ $('System message builder').item.json.emailSystemMessage }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 2.2,
+      "position": [
+        144,
+        2256
+      ],
+      "id": "1247872b-4a2c-436c-b28b-8d2986a21779",
+      "name": "Email Agent"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "={{ $json.systemMessage }}"
+        }
+      },
+      "id": "06c1ee3a-2e02-4f9e-b1f8-0375c27c6c98",
+      "name": "Main Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.6,
+      "position": [
+        -32,
+        2448
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        144,
+        2080
+      ],
+      "id": "cbcf18f6-88e2-4cf4-b130-bee9a7d1fe78",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "6Qmz74fv62ASqbfV",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Upload document to vector database",
+        "height": 816,
+        "width": 3952,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1920,
+        800
+      ],
+      "id": "c38e3699-5a17-4495-a0f2-96030576d1e8",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "={{ $('Required data').item.json.code }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.3,
+      "position": [
+        1536,
+        1072
+      ],
+      "id": "7e465be0-7cac-49eb-944b-1210c06ee61f",
+      "name": "Qdrant Vector Store",
+      "credentials": {
+        "qdrantApi": {
+          "id": "0oO13FmsdPElBNrF",
+          "name": "QdrantApi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1456,
+        1264
+      ],
+      "id": "1f4adda7-40fa-4480-a9b2-41ef913d5424",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "6Qmz74fv62ASqbfV",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "textSplittingMode": "custom",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        1664,
+        1280
+      ],
+      "id": "0f0b030d-b24f-4772-a8b3-368c5fd53262",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "chunkSize": 750,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        1664,
+        1456
+      ],
+      "id": "de301f93-3579-4b76-bed9-11706d740eb1",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "operation": "collectionExists",
+        "collectionName": "={{ $('Required data').item.json.code }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-qdrant.qdrant",
+      "typeVersion": 1,
+      "position": [
+        -1008,
+        1040
+      ],
+      "id": "07cf0298-1c1c-4ec1-906c-478b678f0549",
+      "name": "Check If Collection Exists",
+      "credentials": {
+        "qdrantRestApi": {
+          "id": "Ky9zq5gndxQO48S6",
+          "name": "Qdrant account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a57760c3-3a24-43a9-bc83-e707219ca79e",
+              "leftValue": "={{ $json.result.exists }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -816,
+        1040
+      ],
+      "id": "9c5f6492-0baa-4712-af77-f91f85719bb0",
+      "name": "If collection exists"
+    },
+    {
+      "parameters": {
+        "operation": "deleteCollection",
+        "collectionName": {
+          "__rl": true,
+          "value": "={{ $('Required data').item.json.code }}",
+          "mode": "name"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-qdrant.qdrant",
+      "typeVersion": 1,
+      "position": [
+        -608,
+        896
+      ],
+      "id": "a8d96644-dfd0-46ef-bc86-4b9c6189d22d",
+      "name": "Delete Collection",
+      "credentials": {
+        "qdrantRestApi": {
+          "id": "Ky9zq5gndxQO48S6",
+          "name": "Qdrant account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cc48725e-a61d-4dae-b859-0ad9aafc6057",
+              "name": "website",
+              "value": "={{ $json.body.domain_name }}",
+              "type": "string"
+            },
+            {
+              "id": "3fb748b3-ffed-49a4-8410-05c82ee2862c",
+              "name": "code",
+              "value": "={{ $json.body.license_key }}",
+              "type": "string"
+            },
+            {
+              "id": "8e003702-f40d-4102-9356-a7917924b6d5",
+              "name": "with_file",
+              "value": "={{ $json.body.with_file }}",
+              "type": "boolean"
+            },
+            {
+              "id": "25871d39-5e7c-4d77-b64b-49087c8312f8",
+              "name": "backend",
+              "value": "={{ $json.body.backend }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1616,
+        1040
+      ],
+      "id": "7b831da5-b29c-4929-bda6-c3960ec07a4e",
+      "name": "Required data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.website }}/wp-json/synergize/v1/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "code",
+              "value": "={{ $json.code }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1424,
+        1040
+      ],
+      "id": "0c88dbb6-0fad-4df4-8b5e-32b93386cd02",
+      "name": "Check license"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c496ee6c-fcf8-4ca6-abba-248a31bd754b",
+              "leftValue": "={{ $json.is_valid }}",
+              "rightValue": "yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1232,
+        1040
+      ],
+      "id": "be9e3240-66c0-49a7-8923-2b1ea60f2951",
+      "name": "if valid"
+    },
+    {
+      "parameters": {
+        "errorMessage": "An error occurred!"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -1008,
+        1248
+      ],
+      "id": "1c2cc0e3-4e5f-4221-919d-556ca9786cf5",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Required data').item.json.backend }}/api/chat-agent/onboarding",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "license_key",
+              "value": "={{ $('Required data').item.json.code }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -400,
+        1040
+      ],
+      "id": "c816b2d5-5bdd-4cc6-8b9d-2471c04e96b1",
+      "name": "Get onboarding data"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b74432d3-95ea-4327-bfee-763623807a4e",
+              "leftValue": "={{ $('Required data').item.json.with_file }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -16,
+        1040
+      ],
+      "id": "711a7765-e978-42a5-aa75-5ec5a6749ad7",
+      "name": "If use pdf"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Required data').item.json.backend }}/api/chat-agent/file/{{ $('Required data').item.json.code }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        240,
+        864
+      ],
+      "id": "00216bad-0ba5-44bc-a6d6-08ea1bc3312b",
+      "name": "Get the file"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\n\nfunction jsonToMarkdown(data) {\n  const bullet = arr => arr.map(i => `- ${i}`).join('\\n');\n\n  return `\n**Website:** ${data.website_name}  \n*Niche:* ${data.website_niche}\n\n**Target Audience:**  \n${data.target_audience}\n\n**Purpose:**  \n${data.purpose}\n\n**Features:**  \n${bullet(data.features)}\n\n**Categories:**  \n${bullet(data.categories)}\n\n**Keywords:**  \n${bullet(data.keywords)}\n  `.trim();\n}\n\nreturn {\n  htmlMarkdown: jsonToMarkdown(item)\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -192,
+        1040
+      ],
+      "id": "79132223-6dae-4fc7-ad28-c1ba2ebc4a10",
+      "name": "Website data"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        448,
+        864
+      ],
+      "id": "f21790f4-911d-4013-ac82-d30e7b025382",
+      "name": "Transform to base"
+    },
+    {
+      "parameters": {
+        "jsCode": "const textWebiste = $('Website data').first().json.htmlMarkdown;\nconst textDocument = $input.first().json.candidates[0].content.parts[0].text;\n\nreturn {\n  text: `${textWebiste}\\n\\n${textDocument}`\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        848,
+        864
+      ],
+      "id": "87bccc69-eca9-49b0-bd6b-71b402761643",
+      "name": "Combine Text"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "81ee4640-4949-4da5-8413-aebf30ff6cc9",
+              "name": "text",
+              "value": "={{ $('Website data').item.json.htmlMarkdown }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        848,
+        1056
+      ],
+      "id": "285ef338-de56-45a5-bb59-1761cace8be6",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1312,
+        1056
+      ],
+      "id": "5f0664c9-3158-4997-abcb-c29f36c74f7d",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [{\n    \"parts\":[\n      {\"text\": \"Extract ALL the information and text from this PDF and output it without any additional text. Also extract text on images!\"},\n      {\n        \"inline_data\": {\n          \"mime_type\": \"application/pdf\",\n          \"data\": \"{{ $json.data }}\"\n        }\n      }\n    ]\n  }]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        640,
+        864
+      ],
+      "id": "10df0237-d118-4982-9bd1-5c1732fbc92b",
+      "name": "Extract PDF Content Using Gemini Vision",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "hptNBXvanvBFJC4C",
+          "name": "Gemini Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "rag/upload-file",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1808,
+        1040
+      ],
+      "id": "473bcca5-bdf1-4c2b-aa84-2e031ebe1cd0",
+      "name": "Webhook",
+      "webhookId": "61120366-a870-4e3e-b7f2-b6455eff0bb9"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "rag/create-cta",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1776,
+        160
+      ],
+      "id": "a4a09764-bd6f-4d3c-8427-d854c3bfba4e",
+      "name": "Webhook1",
+      "webhookId": "d80320f8-0554-4d3a-aac7-34f8cc26bae1"
+    },
+    {
+      "parameters": {
+        "operation": "collectionExists",
+        "collectionName": "=cta-{{ $('Required data1').item.json.code }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-qdrant.qdrant",
+      "typeVersion": 1,
+      "position": [
+        -944,
+        160
+      ],
+      "id": "50a06876-db7d-4002-bdc1-342471dd8367",
+      "name": "Check If Collection Exists1",
+      "credentials": {
+        "qdrantRestApi": {
+          "id": "Ky9zq5gndxQO48S6",
+          "name": "Qdrant account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a57760c3-3a24-43a9-bc83-e707219ca79e",
+              "leftValue": "={{ $json.result.exists }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -736,
+        160
+      ],
+      "id": "6085abee-3f70-4c3c-bd84-2e1ba248419c",
+      "name": "If collection exists1"
+    },
+    {
+      "parameters": {
+        "operation": "deleteCollection",
+        "collectionName": {
+          "__rl": true,
+          "value": "=cta-{{ $('Required data1').item.json.code }}",
+          "mode": "name"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-qdrant.qdrant",
+      "typeVersion": 1,
+      "position": [
+        -528,
+        16
+      ],
+      "id": "2f2bebe3-ca30-4660-abc1-54eedc39cb7d",
+      "name": "Delete Collection1",
+      "credentials": {
+        "qdrantRestApi": {
+          "id": "Ky9zq5gndxQO48S6",
+          "name": "Qdrant account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.website }}/wp-json/synergize/v1/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "code",
+              "value": "={{ $json.code }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1360,
+        160
+      ],
+      "id": "0f15ce22-bba8-4047-9251-095081900083",
+      "name": "Check license1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c496ee6c-fcf8-4ca6-abba-248a31bd754b",
+              "leftValue": "={{ $json.is_valid }}",
+              "rightValue": "yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1168,
+        160
+      ],
+      "id": "851f7afa-8983-4c4d-88a3-b741f807109a",
+      "name": "if valid1"
+    },
+    {
+      "parameters": {
+        "errorMessage": "An error occurred!"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -944,
+        368
+      ],
+      "id": "8f684dbf-0b8e-41ff-bdfe-dfe7c014c370",
+      "name": "Stop and Error1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctas = $('Required data1').first().json.ctas || [];\nlet md = '';\n\nctas.forEach((cta, idx) => {\n  md += `## CTA-${idx + 1}\\n`;\n  md += `**Goal:** ${cta.goal_prompt || '-'}\\n`;\n  md += `**Destination:** ${cta.destination || '-'}\\n\\n`;\n\n  if (Array.isArray(cta.collect_fields) && cta.collect_fields.length) {\n    md += '**Fields to collect:**\\n';\n    cta.collect_fields.forEach(f => {\n      md += `- ${f.label}${f.required ? ' *(required)*' : ''}\\n`;\n    });\n  } else {\n    md += '_No fields to collect_';\n  }\n  md += '\\n\\n';\n});\n\nreturn { text: md.trim() };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -208,
+        160
+      ],
+      "id": "92ac7d03-674a-43be-93ec-199a357c35e7",
+      "name": "cta markdown"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f17f88fd-2e5b-4284-b559-8dfc2b52aeec",
+              "name": "website",
+              "value": "={{ $json.body.domain_name }}",
+              "type": "string"
+            },
+            {
+              "id": "5931de7b-cd2b-41d7-9ac2-d1ff7a74acca",
+              "name": "code",
+              "value": "={{ $json.body.license_key }}",
+              "type": "string"
+            },
+            {
+              "id": "ec875150-d162-4eb7-935e-43737ffa74c5",
+              "name": "backend",
+              "value": "={{ $json.body.backend }}",
+              "type": "string"
+            },
+            {
+              "id": "792853ce-c455-4ba1-be6e-32623020983a",
+              "name": "ctas",
+              "value": "={{ $json.body.ctas }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1568,
+        160
+      ],
+      "id": "591db937-13ab-4f2e-a98b-3e24d3ef1a3d",
+      "name": "Required data1"
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        160
+      ],
+      "id": "617cb655-9113-4958-b536-df780771850e",
+      "name": "Convert to File1"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "=cta-{{ $('Required data1').item.json.code }}",
+          "mode": "id"
+        },
+        "embeddingBatchSize": 10,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.3,
+      "position": [
+        176,
+        160
+      ],
+      "id": "192dc5cd-e077-40bd-ae5d-be61269a2d70",
+      "name": "Qdrant Vector Store2",
+      "credentials": {
+        "qdrantApi": {
+          "id": "0oO13FmsdPElBNrF",
+          "name": "QdrantApi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        96,
+        352
+      ],
+      "id": "558ebfc2-a7ff-4e98-8256-73140c322da9",
+      "name": "Embeddings Google Gemini2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "6Qmz74fv62ASqbfV",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "textSplittingMode": "custom",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        304,
+        368
+      ],
+      "id": "1e412d84-86a9-4a2f-9465-bf48c9f129e7",
+      "name": "Default Data Loader1"
+    },
+    {
+      "parameters": {
+        "chunkSize": 350,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        304,
+        544
+      ],
+      "id": "0cab5c88-9cfe-4dbc-bd85-bb681dd81084",
+      "name": "Recursive Character Text Splitter1"
+    },
+    {
+      "parameters": {
+        "description": "Searches the internal knowledge base for company-related documents, including policies, product information, and organizational data.",
+        "topK": 3
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1.1,
+      "position": [
+        -32,
+        2656
+      ],
+      "id": "3f8ae514-c4d8-420f-afc0-563c8fa64f8b",
+      "name": "Knowledge Store Tool"
+    },
+    {
+      "parameters": {
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "={{ $('Prepare data').item.json.code }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        2832
+      ],
+      "id": "4ccd4a4d-ca20-408e-9409-1f9a627f0558",
+      "name": "Knowledge vector store",
+      "credentials": {
+        "qdrantApi": {
+          "id": "0oO13FmsdPElBNrF",
+          "name": "QdrantApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "projectId": {
+          "__rl": true,
+          "value": "synergizeflow-480314",
+          "mode": "list",
+          "cachedResultName": "Synergizeflow"
+        },
+        "modelName": "gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleVertex",
+      "typeVersion": 1,
+      "position": [
+        288,
+        2672
+      ],
+      "id": "615901f1-cb32-449a-b563-989c9638a478",
+      "name": "CTA model 2.5-flash-lite",
+      "credentials": {
+        "googleApi": {
+          "id": "USHSJ16CtFdpn2AS",
+          "name": "Vertex API Service Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "=cta-{{ $('Prepare data').item.json.code }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.3,
+      "position": [
+        416,
+        2832
+      ],
+      "id": "568d8f40-2762-49df-9698-721bc6abdf9f",
+      "name": "Qdrant Vector Store1",
+      "credentials": {
+        "qdrantApi": {
+          "id": "0oO13FmsdPElBNrF",
+          "name": "QdrantApi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        288,
+        2832
+      ],
+      "id": "e265d680-8902-435f-a493-f5f6b8acc2cf",
+      "name": "CTA embedding",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "6Qmz74fv62ASqbfV",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "Call-to-action configurations for customer support workflows, including CTA-goal, CTA-destination, and Fields to collect",
+        "topK": 2
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1.1,
+      "position": [
+        432,
+        2656
+      ],
+      "id": "b559d420-7cc2-4d16-804d-e15812746a38",
+      "name": "CTA configuration"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Send a message in Gmail if you already get the information.",
+        "authentication": "serviceAccount",
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', `Collect email destination from CTA Configuration Tool`, 'string') }}",
+        "subject": "={{ $('Prepare data').item.json.websiteName }} User Inquiry",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "={{ $('Prepare data').item.json.agentName }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        1168,
+        2160
+      ],
+      "id": "7d03c01c-d021-46ba-84dc-30a0322c9fc4",
+      "name": "send email2",
+      "webhookId": "37686f13-26d5-40c7-98a3-8b6e4612cea0",
+      "credentials": {
+        "googleApi": {
+          "id": "USHSJ16CtFdpn2AS",
+          "name": "Vertex API Service Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Send an email message if you already get the information.",
+        "method": "POST",
+        "url": "https://wizards.synergizeflow.com/webhook/util/send-email",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "jRCK@H_62U]%{K9SjLUim-VjBi8_7/"
+            },
+            {
+              "name": "senderName",
+              "value": "SynergizeFlow"
+            },
+            {
+              "name": "fromEmail",
+              "value": "noreply@synergizeflow.com"
+            },
+            {
+              "name": "replyTo",
+              "value": "noreply@synergizeflow.com"
+            },
+            {
+              "name": "toEmail",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters4_Value', `Collect email destination from CTA Configuration Tool`, 'string') }}"
+            },
+            {
+              "name": "subject",
+              "value": "={{ $('Prepare data').item.json.websiteName }} User Inquiry"
+            },
+            {
+              "name": "htmlBody",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters6_Value', `put the generated HTML string here`, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        352,
+        2080
+      ],
+      "id": "e795a711-03ad-4159-aee2-70abc809dcfd",
+      "name": "send email"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1888,
+        3344
+      ],
+      "id": "aca76da3-cd01-4dfa-8dac-c442fe0a4eec",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "https://apiv2.synergizeflow.com/api/chat-agent/history",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1712,
+        3344
+      ],
+      "id": "bf0e08ea-df11-491b-a156-511009caccae",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "content": "chat history remove scheduler",
+        "height": 208,
+        "width": 464
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1952,
+        3312
+      ],
+      "id": "6c5418ce-9f3c-40eb-bcc7-21a942bb6b78",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-pro",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -336,
+        2656
+      ],
+      "id": "c8ef799b-144b-429d-b30f-b72def96fc35",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "6Qmz74fv62ASqbfV",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Prepare data": {
+      "main": [
+        [
+          {
+            "node": "Type check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Type check": {
+      "main": [
+        [
+          {
+            "node": "Audio Format",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [
+          {
+            "node": "Session Format",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Vertex Chat Model": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Main Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Vertex Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Knowledge Store Tool",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Agent Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audio Format": {
+      "main": [
+        [
+          {
+            "node": "Code audio format",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code audio format": {
+      "main": [
+        [
+          {
+            "node": "Transcribe the audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe the audio": {
+      "main": [
+        [
+          {
+            "node": "Session Format1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Session Format": {
+      "main": [
+        [
+          {
+            "node": "System message builder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Session Format1": {
+      "main": [
+        [
+          {
+            "node": "System message builder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Knowledge vector store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Search Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Main Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Chat": {
+      "main": [
+        [
+          {
+            "node": "Prepare data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "System message builder": {
+      "main": [
+        [
+          {
+            "node": "Main Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "Main Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Main Agent": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Collection Exists": {
+      "main": [
+        [
+          {
+            "node": "If collection exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If collection exists": {
+      "main": [
+        [
+          {
+            "node": "Delete Collection",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get onboarding data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Collection": {
+      "main": [
+        [
+          {
+            "node": "Get onboarding data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Required data": {
+      "main": [
+        [
+          {
+            "node": "Check license",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check license": {
+      "main": [
+        [
+          {
+            "node": "if valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if valid": {
+      "main": [
+        [
+          {
+            "node": "Check If Collection Exists",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get onboarding data": {
+      "main": [
+        [
+          {
+            "node": "Website data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If use pdf": {
+      "main": [
+        [
+          {
+            "node": "Get the file",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get the file": {
+      "main": [
+        [
+          {
+            "node": "Transform to base",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Website data": {
+      "main": [
+        [
+          {
+            "node": "If use pdf",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform to base": {
+      "main": [
+        [
+          {
+            "node": "Extract PDF Content Using Gemini Vision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Text": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract PDF Content Using Gemini Vision": {
+      "main": [
+        [
+          {
+            "node": "Combine Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Required data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Required data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Collection Exists1": {
+      "main": [
+        [
+          {
+            "node": "If collection exists1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If collection exists1": {
+      "main": [
+        [
+          {
+            "node": "Delete Collection1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "cta markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Collection1": {
+      "main": [
+        [
+          {
+            "node": "cta markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check license1": {
+      "main": [
+        [
+          {
+            "node": "if valid1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if valid1": {
+      "main": [
+        [
+          {
+            "node": "Check If Collection Exists1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "cta markdown": {
+      "main": [
+        [
+          {
+            "node": "Convert to File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Required data1": {
+      "main": [
+        [
+          {
+            "node": "Check license1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File1": {
+      "main": [
+        [
+          {
+            "node": "Qdrant Vector Store2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store2",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader1": {
+      "ai_document": [
+        [
+          {
+            "node": "Qdrant Vector Store2",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter1": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader1",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Knowledge Store Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Main Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Knowledge vector store": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Knowledge Store Tool",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CTA model 2.5-flash-lite": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "CTA configuration",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant Vector Store1": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "CTA configuration",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CTA embedding": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CTA configuration": {
+      "ai_tool": [
+        [
+          {
+            "node": "Main Agent",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "Email Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "send email": {
+      "ai_tool": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Main Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "FfOIxnXYC00WoM2o"
+  },
+  "triggerCount": 4,
+  "versionId": "8da7c7d8-8e3d-4b7e-9e0a-012acf26db42",
+  "owner": {
+    "type": "personal",
+    "projectId": "ZvP1yE48ZEo7zgpC",
+    "projectName": "Synergize Flow Team <info@mantab.one>",
+    "personalEmail": "info@mantab.one"
+  },
+  "parentFolderId": "W6kfCfNZPfSqIn2i",
+  "isArchived": false
+}

@@ -1,0 +1,18 @@
+{
+  "id": "USHSJ16CtFdpn2AS",
+  "name": "Vertex API Service Account",
+  "type": "googleApi",
+  "data": {
+    "email": "",
+    "privateKey": "",
+    "httpNode": true,
+    "scopes": ""
+  },
+  "ownedBy": {
+    "type": "personal",
+    "projectId": "ZvP1yE48ZEo7zgpC",
+    "projectName": "Synergize Flow Team <info@mantab.one>",
+    "personalEmail": "info@mantab.one"
+  },
+  "isGlobal": false
+}

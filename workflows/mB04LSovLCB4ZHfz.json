@@ -1,0 +1,328 @@
+{
+  "id": "mB04LSovLCB4ZHfz",
+  "name": "SF - Publish Instagram",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "social/publish-instagram",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -80,
+        -80
+      ],
+      "id": "0cf4dfc6-58ce-4a7d-9baf-aaa15b5750f2",
+      "name": "Webhook",
+      "webhookId": "ce945c5a-d809-4c50-ae3b-94890d6cc214"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "454a0159-a56c-4055-a07f-9f36edf56cb6",
+              "name": "file",
+              "value": "={{ $json.body.file }}",
+              "type": "string"
+            },
+            {
+              "id": "6ef18411-cb10-4169-96b8-47d7e7d5a821",
+              "name": "caption",
+              "value": "={{ $json.body.caption }}",
+              "type": "string"
+            },
+            {
+              "id": "4a7c5c80-53b5-494b-903d-a3e5e9ddaf53",
+              "name": "instagram_id",
+              "value": "={{ $json.body.instagram_id }}",
+              "type": "string"
+            },
+            {
+              "id": "5c26c150-cf7d-493c-a398-6420d04dc5b6",
+              "name": "instagram_token",
+              "value": "={{ $json.body.instagram_token }}",
+              "type": "string"
+            },
+            {
+              "id": "e0d80256-4903-4bed-aea3-369b7efe0b25",
+              "name": "content_id",
+              "value": "={{ $json.body.content_id }}",
+              "type": "number"
+            },
+            {
+              "id": "0efeb594-9c96-4bd3-a68d-21fc3fdd8fe4",
+              "name": "backend",
+              "value": "={{ $json.body.backend }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        96,
+        -80
+      ],
+      "id": "d13b565c-357c-48df-8c94-7b9ed9567c33",
+      "name": "Prepare data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.instagram.com/v23.0/{{ $json.instagram_id }}/media",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "video_url",
+              "value": "={{ $json.file }}"
+            },
+            {
+              "name": "caption",
+              "value": "={{ $json.caption }}"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $json.instagram_token }}"
+            },
+            {
+              "name": "media_type",
+              "value": "REELS"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        272,
+        -80
+      ],
+      "id": "3dd7fbbd-6661-416f-8c65-154b7416ff15",
+      "name": "Create container",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "amount": 90
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        -80
+      ],
+      "id": "ad624ff8-0de5-4e9c-b136-7f3f829bfd32",
+      "name": "Wait",
+      "webhookId": "af6714b2-4f7d-4446-bbda-f194fe8d2e24"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.instagram.com/v23.0/{{ $('Prepare data').item.json.instagram_id }}/media_publish",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "creation_id",
+              "value": "={{ $json.body.id }}"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $('Prepare data').item.json.instagram_token }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        640,
+        -80
+      ],
+      "id": "9c3d1283-1266-4b33-9048-a475a20df156",
+      "name": "Post to IG",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare data').item.json.backend}}/api/instagram/published",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content_id",
+              "value": "={{ $('Prepare data').item.json.content_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        800,
+        -80
+      ],
+      "id": "99c60824-7298-41d0-9079-460e467def37",
+      "name": "Callback publish"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare data').item.json.backend}}/api/social-content/fail",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content_id",
+              "value": "={{ $('Prepare data').item.json.content_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        272,
+        176
+      ],
+      "id": "78180896-b82f-4714-a978-25bf081061e9",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "errorMessage": "An error occurred!"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        656,
+        176
+      ],
+      "id": "9f1537c0-f1b6-4e38-b8a4-09c1eb9c0000",
+      "name": "Stop and Error"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Prepare data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare data": {
+      "main": [
+        [
+          {
+            "node": "Create container",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create container": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Post to IG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to IG": {
+      "main": [
+        [
+          {
+            "node": "Callback publish",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "FfOIxnXYC00WoM2o",
+    "saveDataSuccessExecution": "all"
+  },
+  "triggerCount": 1,
+  "versionId": "d4ed09d9-f8c2-422c-8c57-68a2e5804045",
+  "owner": {
+    "type": "personal",
+    "projectId": "ZvP1yE48ZEo7zgpC",
+    "projectName": "Synergize Flow Team <info@mantab.one>",
+    "personalEmail": "info@mantab.one"
+  },
+  "parentFolderId": "W6kfCfNZPfSqIn2i",
+  "isArchived": false
+}

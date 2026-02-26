@@ -1,0 +1,213 @@
+{
+  "id": "cUMG89YsrfR90v8L",
+  "name": "SF - Error Monitoring Cleanup Message",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "eff",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -96,
+        80
+      ],
+      "id": "ce39532c-5119-4781-8206-a23649ff84e3",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "path": "0d3eb3a1-49f6-4612-beea-8ff82c8c9ffb",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -320,
+        80
+      ],
+      "id": "c48d7544-762b-4200-aa88-5ec0bff55d75",
+      "name": "Webhook",
+      "webhookId": "0d3eb3a1-49f6-4612-beea-8ff82c8c9ffb"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        -144
+      ],
+      "id": "65ffcb96-4335-4da7-b731-cd80e8f4ce67",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "search",
+        "query": "message",
+        "options": {
+          "searchChannel": [
+            "sf-error-monitoring"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        -96,
+        -144
+      ],
+      "id": "756676c5-765e-4384-97dc-329fa6ab43cb",
+      "name": "Search for messages",
+      "webhookId": "f7090056-0c2e-4cfc-946e-7769d246ee2b",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "iLZqqxwgcoZeMZek",
+          "name": "Slack oAuth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "ts",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        128,
+        -144
+      ],
+      "id": "be39776a-edc4-4b36-a6af-46000012ec55",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        352,
+        -144
+      ],
+      "id": "b0310f61-79e4-4d2b-a89d-569b7e6f65e5",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0A81N03JKS",
+          "mode": "list",
+          "cachedResultName": "sf-error-monitoring"
+        },
+        "timestamp": "={{ $json.ts }}"
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        576,
+        -144
+      ],
+      "id": "5d8a96fc-a2a0-4986-bed3-7401b92f8039",
+      "name": "Delete a message",
+      "webhookId": "7b322572-97d2-489b-901f-6bc264d5c52d",
+      "credentials": {
+        "slackApi": {
+          "id": "h11lcNdxoCauEGMO",
+          "name": "SF Bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Search for messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search for messages": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Delete a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete a message": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "FfOIxnXYC00WoM2o"
+  },
+  "triggerCount": 1,
+  "versionId": "8fdc5565-f6e3-4d5a-b412-73970f75498e",
+  "owner": {
+    "type": "personal",
+    "projectId": "ZvP1yE48ZEo7zgpC",
+    "projectName": "Synergize Flow Team <info@mantab.one>",
+    "personalEmail": "info@mantab.one"
+  },
+  "parentFolderId": "W6kfCfNZPfSqIn2i",
+  "isArchived": false
+}

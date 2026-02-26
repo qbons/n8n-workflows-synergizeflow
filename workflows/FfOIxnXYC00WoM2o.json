@@ -1,0 +1,135 @@
+{
+  "id": "FfOIxnXYC00WoM2o",
+  "name": "SF - Error monitoring",
+  "nodes": [
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0A81N03JKS",
+          "mode": "list",
+          "cachedResultName": "sf-error-monitoring"
+        },
+        "text": "=*Environtment:* n8n Production\n*Workflow:* {{ $json.workflow }}\n*Execution:* {{ $json.execution_url }}\n*Node:* {{ $json.node }}\n*Time:* {{ $json.timestamp.toDateTime('ms') }}\n*Message:* {{ $json.error_message }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false,
+          "mrkdwn": true
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        384,
+        -96
+      ],
+      "id": "893f1cbe-2820-4ae7-aed5-d2c56941b692",
+      "name": "Send a message",
+      "webhookId": "88b03bcb-f4b4-40e2-86dc-382fbe8c85d3",
+      "credentials": {
+        "slackApi": {
+          "id": "h11lcNdxoCauEGMO",
+          "name": "SF Bot"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        -96
+      ],
+      "id": "0bf80db4-e718-485c-b395-948b20d9f9b1",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "616f4e60-54aa-4077-a339-8a776e6ba59c",
+              "name": "workflow",
+              "value": "={{ $json.workflow.name }}",
+              "type": "string"
+            },
+            {
+              "id": "07418314-6460-4bd2-af6a-4280e09b72b2",
+              "name": "execution_url",
+              "value": "={{ $json.execution.url }}",
+              "type": "string"
+            },
+            {
+              "id": "a7fcafa3-7537-49f2-9510-219f4bd01756",
+              "name": "error_message",
+              "value": "={{ $json.execution.error.message }}",
+              "type": "string"
+            },
+            {
+              "id": "07f4efe3-56ff-4f64-a474-2060616f6733",
+              "name": "node",
+              "value": "={{ $json.execution.lastNodeExecuted }}",
+              "type": "string"
+            },
+            {
+              "id": "2122584f-c32e-4bef-aa0a-25c0b225171e",
+              "name": "timestamp",
+              "value": "={{ $json.execution.error.timestamp }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        160,
+        -96
+      ],
+      "id": "1a5cf7cb-033c-4a22-884c-cd01d3cb1c5a",
+      "name": "Edit Fields"
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "FfOIxnXYC00WoM2o"
+  },
+  "triggerCount": 0,
+  "versionId": "5b2168e7-62ee-4f1f-9392-bd425bb1c083",
+  "owner": {
+    "type": "personal",
+    "projectId": "ZvP1yE48ZEo7zgpC",
+    "projectName": "Synergize Flow Team <info@mantab.one>",
+    "personalEmail": "info@mantab.one"
+  },
+  "parentFolderId": "W6kfCfNZPfSqIn2i",
+  "isArchived": false
+}

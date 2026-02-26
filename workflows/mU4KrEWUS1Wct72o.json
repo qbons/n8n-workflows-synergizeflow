@@ -1,0 +1,176 @@
+{
+  "id": "mU4KrEWUS1Wct72o",
+  "name": "SF - App Error Monitoring",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "util/error-monitoring",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -752,
+        0
+      ],
+      "id": "a8101f82-1094-4d1d-aad9-7263ecc1ba2d",
+      "name": "Webhook",
+      "webhookId": "86088c49-6c35-4fca-9a67-adcae63c5ea8"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "616f4e60-54aa-4077-a339-8a776e6ba59c",
+              "name": "environtment",
+              "value": "={{ $json.body.environtment }}",
+              "type": "string"
+            },
+            {
+              "id": "07418314-6460-4bd2-af6a-4280e09b72b2",
+              "name": "process",
+              "value": "={{ $json.body.process }}",
+              "type": "string"
+            },
+            {
+              "id": "a7fcafa3-7537-49f2-9510-219f4bd01756",
+              "name": "error_message",
+              "value": "={{ $json.body.message }}",
+              "type": "string"
+            },
+            {
+              "id": "2122584f-c32e-4bef-aa0a-25c0b225171e",
+              "name": "token",
+              "value": "={{ $json.body.token }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -496,
+        0
+      ],
+      "id": "1b376af8-0b8e-4629-bf91-c08efe73f45b",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "060827e5-c886-4657-8fef-eb1fad4f6c84",
+              "leftValue": "={{ $json.token }}",
+              "rightValue": "b0d06b50ee07c14ab12b509c330d175b",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -288,
+        0
+      ],
+      "id": "94da77d6-ed14-481f-ad07-209ec894fe77",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0A81N03JKS",
+          "mode": "list",
+          "cachedResultName": "sf-error-monitoring"
+        },
+        "text": "=*Environtment:* {{ $json.environtment }}\n*Process:* {{ $json.process }}\n*Time:* {{ $now.toDateTime('ms') }}\n*Message:* {{ $json.error_message }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false,
+          "mrkdwn": true
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        -64,
+        -32
+      ],
+      "id": "92f85363-4db7-4f78-9f3b-9aad91ab6439",
+      "name": "Send a message",
+      "webhookId": "88b03bcb-f4b4-40e2-86dc-382fbe8c85d3",
+      "credentials": {
+        "slackApi": {
+          "id": "h11lcNdxoCauEGMO",
+          "name": "SF Bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "triggerCount": 1,
+  "versionId": "b52ce58b-ffb6-42df-8b1b-5669f70ce71b",
+  "owner": {
+    "type": "personal",
+    "projectId": "ZvP1yE48ZEo7zgpC",
+    "projectName": "Synergize Flow Team <info@mantab.one>",
+    "personalEmail": "info@mantab.one"
+  },
+  "parentFolderId": "W6kfCfNZPfSqIn2i",
+  "isArchived": false
+}

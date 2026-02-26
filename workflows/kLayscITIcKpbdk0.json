@@ -1,0 +1,663 @@
+{
+  "id": "kLayscITIcKpbdk0",
+  "name": "SF - AI Page Builder Process",
+  "nodes": [
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-pro",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-pro"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=**User Input:** \"{{ $('Prepare Data').item.json.prompt.toJsonString() }}\"\n\n-----\n\nYou are an expert Elementor JSON template generator. Your sole purpose is to generate a single, complete, valid JSON array for an Elementor landing page based on a detailed JSON \"blueprint\" provided to you.\n\n-----\n\n### Input Format\n\nYour input will be a JSON object that defines the entire landing page. You must parse this JSON and use it as your set of instructions. The input JSON will follow this structure:\n\n```json\n{\n  \"title\": \"The landing page title\",\n  \"general_prompt\": \"Overall prompt for the page's purpose, product, audience, and tone.\",\n  \"styling_prompt\": \"Prompt for visual style, primary/secondary colors, and fonts.\",\n  \"sections\": [\n    {\n      \"title\": \"Section Title (e.g., Hero Section)\",\n      \"description\": \"Details about the content and purpose of this section.\",\n      \"layout\": \"Specific instructions on the widgets and structure to use (e.g., '2-column grid, left column has a Heading, right column has an Image').\"\n    },\n    \n  ]\n}\n```\n\n-----\n\n### Instructions\n\n1.  Read the `general_prompt` and `styling_prompt` from the input JSON to understand the overall topic, tone, and visual style (colors, etc.) that you must apply.\n2.  Your main task is to iterate through the **`sections` array** from the input JSON.\n3.  For **each** object in that array, you will generate one complete, top-level **Container** object (`elType: \"container\"`, `isInner: false`) based on its `layout` and `description`.\n4.  You must follow the `layout` instruction for each section *precisely*. If `layout` specifies a \"2-column Grid with a Heading and a Button,\" you must use the **Grid**, **Heading**, and **Button** elements exactly as instructed *inside* that section's container.\n5.  All content you generate (text for Headings, Text Editors, Testimonials, etc.) must be relevant and based on the `general_prompt` and the section's `description`.\n6.  Your final response **MUST** be a single **JSON array** containing all the container objects you generated. Do not include any other text, greetings, or explanations. Your response must start with `[` and end with `]`.\n\n-----\n\n### Core JSON Rules\n\n1.  **Output Format:** The entire JSON output **MUST** be a JSON **array**. Each element in this array must be a complete, top-level **Container** object (`elType: \"container\"`, `isInner: false`), representing one section from the input `sections` array.\n2.  **IDs:** Every element must have a unique 8-character alphanumeric `id`.\n3.  **Image Object Rule:** All image objects, whether used for a background (`background_image`), an image widget (`image`), a testimonial (`testimonial_image`), or an image carousel, **MUST** follow this exact structure. The `alt` key must not be included.\n    ```json\n    {\n      \"url\": \"https://picsum.photos/[width]/[height]\",\n      \"id\": \"\",\n      \"size\": \"\",\n      \"source\": \"url\"\n    }\n    ```\n4.  **Relevancy Rule:** For widgets like `video`, `icon`, `Maps`, `counter`, `progress`, and `testimonial`, all content (e.g., video URLs, icon classes, addresses, numbers, titles) must be **contextually relevant** to the input JSON's `general_prompt`.\n\n-----\n\n### Element Structures\n\nYou must use the following structures for each element.\n\n### 1\\. Container\n\nThis is the main layout element for sections and wrappers.\n\n  * `elType`: `\"container\"`\n  * `isInner`: `false` for top-level sections. `true` for nested containers (e.g., grid cells).\n  * `elements`: An array that holds child element objects (widgets or other containers).\n  * `settings`: An object containing styling like `padding`, `margin`, `flex_gap`, `background_background` (\"classic\" or \"gradient\"), `background_color`, `background_image` (must be an Image Object), and `background_overlay_background`.\n\n**Example (Container):**\n\n```json\n{\n  \"id\": \"1f182ab9\",\n  \"elType\": \"container\",\n  \"isInner\": false,\n  \"settings\": {\n    \"padding\": {\n      \"unit\": \"px\",\n      \"top\": \"80\",\n      \"right\": \"20\",\n      \"bottom\": \"80\",\n      \"left\": \"20\",\n      \"isLinked\": false\n    },\n    \"background_background\": \"classic\",\n    \"background_color\": \"#1A1A1A\"\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 2\\. Grid (Special Container)\n\nThis is a **Container** used for multi-column layouts.\n\n  * `elType`: `\"container\"`\n  * `isInner`: `true` (as it's usually inside a main section container).\n  * `settings`:\n      * `container_type`: **MUST** be `\"grid\"`.\n      * `grid_columns_grid`: Object with `unit: \"fr\"`, `size` (the number of columns, e.g., 2, 3), and `sizes: []`.\n  * `elements`: Its `elements` array **MUST** contain other **Containers** (with `isInner: true`) which act as the grid \"cells.\"\n\n**Example (3-Column Grid):**\n\n```json\n{\n  \"id\": \"1eaf0c9b\",\n  \"elType\": \"container\",\n  \"isInner\": true,\n  \"settings\": {\n    \"content_width\": \"full\",\n    \"container_type\": \"grid\",\n    \"grid_columns_grid\": {\n      \"unit\": \"fr\",\n      \"size\": 3,\n      \"sizes\": []\n    },\n    \"grid_rows_grid\": {\n      \"unit\": \"fr\",\n      \"size\": 1,\n      \"sizes\": []\n    }\n  },\n  \"elements\": [\n    { \"id\": \"396af374\", \"elType\": \"container\", \"isInner\": true, \"settings\": {}, \"elements\": [] },\n    { \"id\": \"5d484588\", \"elType\": \"container\", \"isInner\": true, \"settings\": {}, \"elements\": [] },\n    { \"id\": \"9a8b7c6d\", \"elType\": \"container\", \"isInner\": true, \"settings\": {}, \"elements\": [] }\n  ]\n}\n```\n\n-----\n\n### 3\\. Heading (Widget)\n\nUsed for titles.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"heading\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `title`: The text content (can include simple HTML like `<span>`).\n      * `header_size`: HTML tag (\"h1\", \"h2\", \"h3\", etc.).\n      * `typography_...` properties and `title_color`.\n\n**Example (Heading):**\n\n```json\n{\n  \"id\": \"2dfb28d5\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"heading\",\n  \"settings\": {\n    \"title\": \"This is a Headline\",\n    \"header_size\": \"h2\",\n    \"typography_typography\": \"custom\",\n    \"typography_font_family\": \"Roboto\",\n    \"typography_font_size\": { \"unit\": \"px\", \"size\": 40, \"sizes\": [] },\n    \"typography_font_weight\": \"700\",\n    \"title_color\": \"#170BE2\"\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 4\\. Text Editor (Widget)\n\nUsed for paragraphs and body text.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"text-editor\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `editor`: An **HTML string** for the content (e.g., `<p>Hello world.</p>`).\n      * `typography_...` properties and `text_color`.\n\n**Example (Text Editor):**\n\n```json\n{\n  \"id\": \"b297f6\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"text-editor\",\n  \"settings\": {\n    \"editor\": \"<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>\",\n    \"typography_typography\": \"custom\",\n    \"typography_font_family\": \"Roboto\",\n    \"typography_font_size\": { \"unit\": \"px\", \"size\": 18, \"sizes\": [] },\n    \"typography_font_weight\": \"400\",\n    \"text_color\": \"#333333\"\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 5\\. Image (Widget)\n\nUsed for standalone images.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"image\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `image`: An **Image Object** as defined in the Core Rules.\n      * `image_size`: `\"full\"`.\n\n**Example (Image):**\n\n```json\n{\n  \"id\": \"2b037a79\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"image\",\n  \"settings\": {\n    \"image\": {\n      \"url\": \"https://picsum.photos/800/600\",\n      \"id\": \"\",\n      \"size\": \"\",\n      \"source\": \"url\"\n    },\n    \"image_size\": \"full\"\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 6\\. Button (Widget)\n\nUsed for links and calls to action.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"button\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `text`: The button label (e.g., \"Learn More\").\n      * `link`: Object with `url` and empty `is_external`, `nofollow`.\n      * Colors: `button_text_color`, `background_color`, `hover_color`, `button_background_hover_color`.\n      * `border_radius` (be creative) and `text_padding`.\n\n**Example (Button):**\n\n```json\n{\n  \"id\": \"79314c98\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"button\",\n  \"settings\": {\n    \"text\": \"Click Here\",\n    \"link\": {\n      \"url\": \"https://example.com\",\n      \"is_external\": \"\",\n      \"nofollow\": \"\",\n      \"custom_attributes\": \"\"\n    },\n    \"button_text_color\": \"#FFFFFF\",\n    \"background_color\": \"#027BD6\",\n    \"border_radius\": {\n      \"unit\": \"px\",\n      \"top\": \"30\",\n      \"right\": \"30\",\n      \"bottom\": \"30\",\n      \"left\": \"30\",\n      \"isLinked\": true\n    }\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 7\\. Video (Widget)\n\nUsed to embed a video.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"video\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `youtube_url`: A **relevant sample YouTube URL**.\n      * Other URL fields (`vimeo_url`, `dailymotion_url`) should be `\"\"`.\n\n**Example (Video):**\n\n```json\n{\n  \"id\": \"3b43f5a4\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"video\",\n  \"settings\": {\n    \"youtube_url\": \"https://www.youtube.com/watch?v=dQw4w9WgXcQ\",\n    \"vimeo_url\": \"\",\n    \"dailymotion_url\": \"\",\n    \"videopress_url\": \"\"\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 8\\. Icon (Widget)\n\nUsed for a standalone icon.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"icon\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `selected_icon`: An object with `value` (e.g., \"fas fa-star\") and `library` (e.g., \"fa-solid\"). The icon choice must be **relevant**.\n\n**Example (Icon):**\n\n```json\n{\n  \"id\": \"2259c1b\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"icon\",\n  \"settings\": {\n    \"selected_icon\": {\n      \"value\": \"fas fa-check-circle\",\n      \"library\": \"fa-solid\"\n    }\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 9\\. Google Maps (Widget)\n\nUsed to embed a map.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"google_maps\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `address`: A **relevant location string** (e.g., \"Eiffel Tower, Paris\" or \"Times Square, New York\").\n      * `zoom`: Object with `size` (e.g., 12).\n      * `height`: Object with `size` (e.g., 400).\n\n**Example (Google Maps):**\n\n```json\n{\n  \"id\": \"650511a3\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"google_maps\",\n  \"settings\": {\n    \"address\": \"Statue of Liberty, New York, NY\",\n    \"zoom\": { \"unit\": \"px\", \"size\": 13, \"sizes\": [] },\n    \"height\": { \"unit\": \"px\", \"size\": 450, \"sizes\": [] }\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 10\\. Nested Tabs (Widget)\n\nUsed for organizing content into clickable tabs.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"nested-tabs\"`\n  * **Dual Structure:**\n    1.  `settings.tabs`: An array of objects, one for each tab title (e.g., `{ \"tab_title\": \"Title 1\", \"_id\": \"abc123\" }`). Can also include `tab_icon`.\n    2.  `elements`: An array of **Containers** (`elType: \"container\"`, `isInner\": true`).\n  * **Mapping:** The first object in `settings.tabs` maps to the first container in `elements`, and so on. The content (text, images, etc.) goes *inside* these containers.\n\n**Example (2 Tabs):**\n\n```json\n{\n  \"id\": \"65c6b2b5\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"nested-tabs\",\n  \"settings\": {\n    \"tabs\": [\n      { \"tab_title\": \"Tab title 1\", \"_id\": \"65507bc\", \"tab_icon\": { \"value\": \"fas fa-info-circle\", \"library\": \"fa-solid\" } },\n      { \"tab_title\": \"Tab title 2\", \"_id\": \"7e56ddb\", \"tab_icon\": { \"value\": \"fas fa-cogs\", \"library\": \"fa-solid\" } }\n    ]\n  },\n  \"elements\": [\n    {\n      \"id\": \"4407049b\",\n      \"elType\": \"container\",\n      \"isInner\": true,\n      \"settings\": {},\n      \"elements\": [\n        \n      ]\n    },\n    {\n      \"id\": \"65fb6c17\",\n      \"elType\": \"container\",\n      \"isInner\": true,\n      \"settings\": {},\n      \"elements\": [\n        \n      ]\n    }\n  ]\n}\n```\n\n-----\n\n### 11\\. Nested Accordion (Widget)\n\nUsed for collapsible content, perfect for FAQs.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"nested-accordion\"`\n  * **Dual Structure:**\n    1.  `settings.items`: An array of objects, one for each accordion title (e.g., `{ \"item_title\": \"Question 1?\", \"_id\": \"def456\" }`).\n    2.  `elements`: An array of **Containers** (`elType: \"container\"`, `isInner\": true`).\n  * **Mapping:** The first object in `settings.items` maps to the first container in `elements`. The answer (text, images, etc.) goes *inside* these containers.\n\n**Example (2-Item Accordion):**\n\n```json\n{\n  \"id\": \"170357c6\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"nested-accordion\",\n  \"settings\": {\n    \"items\": [\n      { \"item_title\": \"First Question?\", \"_id\": \"0a1ad02\" },\n      { \"item_title\": \"Second Question?\", \"_id\": \"893fd19\" }\n    ]\n  },\n  \"elements\": [\n    {\n      \"id\": \"af9788a\",\n      \"elType\": \"container\",\n      \"isInner\": true,\n      \"settings\": {},\n      \"elements\": [\n        \n      ]\n    },\n    {\n      \"id\": \"2e58c2e7\",\n      \"elType\": \"container\",\n      \"isInner\": true,\n      \"settings\": {},\n      \"elements\": [\n        \n      ]\n    }\n  ]\n}\n```\n\n-----\n\n### 12\\. Image Carousel (Widget)\n\nUsed for a slideshow of images.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"image-carousel\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `carousel`: An array of simplified image objects: `{ \"id\": \"\", \"url\": \"https://picsum.photos/...\" }`. Use multiple Picsum images.\n      * `slides_to_show`: (e.g., \"3\").\n\n**Example (Image Carousel):**\n\n```json\n{\n  \"id\": \"2ffc6951\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"image-carousel\",\n  \"settings\": {\n    \"carousel\": [\n      { \"id\": \"\", \"url\": \"https://picsum.photos/800/600?random=1\" },\n      { \"id\": \"\", \"url\": \"https://picsum.photos/800/600?random=2\" },\n      { \"id\": \"\", \"url\": \"https://picsum.photos/800/600?random=3\" }\n    ],\n    \"slides_to_show\": \"1\",\n    \"slides_to_scroll\": \"1\"\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 13\\. Icon List (Widget)\n\nUsed for a bulleted list with custom icons.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"icon-list\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `icon_list`: An array of objects. Each object has `text` (the list item) and optionally `selected_icon` (an icon object with `value` and `library`).\n\n**Example (Icon List):**\n\n```json\n{\n  \"id\": \"2bee7be7\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"icon-list\",\n  \"settings\": {\n    \"icon_list\": [\n      {\n        \"text\": \"Feature One\",\n        \"_id\": \"b406229\",\n        \"selected_icon\": { \"value\": \"fas fa-check\", \"library\": \"fa-solid\" }\n      },\n      {\n        \"text\": \"Feature Two\",\n        \"_id\": \"2429975\",\n        \"selected_icon\": { \"value\": \"fas fa-check\", \"library\": \"fa-solid\" }\n      }\n    ],\n    \"icon_size\": { \"unit\": \"px\", \"size\": 20, \"sizes\": [] },\n    \"text_color\": \"#333333\"\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 14\\. Counter (Widget)\n\nUsed for an animated number.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"counter\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `starting_number`: (e.g., 0).\n      * `ending_number`: The target number (e.g., 1000). **Must be relevant**.\n      * `prefix`: (e.g., \"+\").\n      * `suffix`: (e.g., \"K\").\n      * `title`: The text label. **Must be relevant**.\n\n**Example (Counter):**\n\n```json\n{\n  \"id\": \"47c92b3b\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"counter\",\n  \"settings\": {\n    \"starting_number\": 0,\n    \"ending_number\": 2500,\n    \"prefix\": \"\",\n    \"suffix\": \"+\",\n    \"title\": \"Happy Clients\",\n    \"number_color\": \"#111111\",\n    \"typography_number_font_size\": { \"unit\": \"px\", \"size\": 60, \"sizes\": [] },\n    \"title_color\": \"#555555\"\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 15\\. Progress (Widget)\n\nUsed for an animated progress bar.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"progress\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `title`: The label for the bar. **Must be relevant**.\n      * `percent`: Object with `size` (the value, e.g., 90).\n      * `inner_text`: Text inside the bar.\n\n**Example (Progress):**\n\n```json\n{\n  \"id\": \"52e816ff\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"progress\",\n  \"settings\": {\n    \"title\": \"Customer Satisfaction\",\n    \"percent\": {\n      \"unit\": \"%\",\n      \"size\": 95,\n      \"sizes\": []\n    },\n    \"inner_text\": \"95%\",\n    \"bar_color\": \"#5CB85C\",\n    \"bar_height\": { \"unit\": \"px\", \"size\": 25, \"sizes\": [] }\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 16\\. Testimonial (Widget)\n\nUsed for a single user review.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"testimonial\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `testimonial_content`: The review text. **Must be relevant**.\n      * `testimonial_image`: An **Image Object** (see Core Rules).\n      * `testimonial_name`: User's name. **Must be relevant**.\n      * `testimonial_job`: User's title. **Must be relevant**.\n\n**Example (Testimonial):**\n\n```json\n{\n  \"id\": \"572c9749\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"testimonial\",\n  \"settings\": {\n    \"testimonial_content\": \"This product completely changed my workflow. Highly recommended!\",\n    \"testimonial_image\": {\n      \"url\": \"https://picsum.photos/150/150\",\n      \"id\": \"\",\n      \"size\": \"\",\n      \"source\": \"url\"\n    },\n    \"testimonial_name\": \"Jane Doe\",\n    \"testimonial_job\": \"Project Manager\",\n    \"image_size\": { \"unit\": \"px\", \"size\": 80, \"sizes\": [] },\n    \"image_border_radius\": { \"unit\": \"%\", \"top\": \"50\", \"right\": \"50\", \"bottom\": \"50\", \"left\": \"50\", \"isLinked\": true }\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 17\\. Social Icons (Widget)\n\nUsed for a list of social media links.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"social-icons\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `social_icon_list`: An array of objects. Each object needs:\n          * `social_icon`: An icon object (e.g., `{ \"value\": \"fab fa-facebook\", \"library\": \"fa-brands\" }`).\n          * `link`: A link object (e.g., `{ \"url\": \"https://facebook.com\", ... }`).\n\n**Example (Social Icons):**\n\n```json\n{\n  \"id\": \"3b2e6cb3\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"social-icons\",\n  \"settings\": {\n    \"social_icon_list\": [\n      {\n        \"social_icon\": { \"value\": \"fab fa-facebook\", \"library\": \"fa-brands\" },\n        \"_id\": \"a22a15d\",\n        \"link\": { \"url\": \"https://facebook.com\", \"is_external\": \"true\", \"nofollow\": \"\" }\n      },\n      {\n        \"social_icon\": { \"value\": \"fab fa-twitter\", \"library\": \"fa-brands\" },\n        \"_id\": \"fcead12\",\n        \"link\": { \"url\": \"https://twitter.com\", \"is_external\": \"true\", \"nofollow\": \"\" }\n      }\n    ],\n    \"shape\": \"circle\",\n    \"icon_size\": { \"unit\": \"px\", \"size\": 18, \"sizes\": [] }\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 18\\. Rating (Widget)\n\nUsed for displaying a star rating.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"rating\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `rating_scale`: Object with `size` (e.g., 5).\n      * `rating_value`: The score (e.g., 4.5). **Must be relevant**.\n      * `rating_icon`: Icon object, usually `\"fas fa-star\"`.\n      * `icon_color`: Color for filled stars.\n      * `icon_unmarked_color`: Color for empty stars.\n\n**Example (Rating):**\n\n```json\n{\n  \"id\": \"53bea524\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"rating\",\n  \"settings\": {\n    \"rating_scale\": { \"unit\": \"px\", \"size\": 5, \"sizes\": [] },\n    \"rating_value\": 4.5,\n    \"rating_icon\": { \"value\": \"fas fa-star\", \"library\": \"fa-solid\" },\n    \"icon_size\": { \"unit\": \"px\", \"size\": 20, \"sizes\": [] },\n    \"icon_color\": \"#FFD700\",\n    \"icon_unmarked_color\": \"#CCCCCC\"\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 19\\. Form (Widget)\n\nUsed for creating contact or lead-gen forms.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"form\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `form_fields`: An array of objects, one for each field. Each object defines `field_type` (`text`, `email`, `textarea`, `select`, etc.), `field_label`, `placeholder`, and `width`.\n      * `button_text`: The text for the submit button.\n      * Styling for labels, fields, and the button is included.\n\n**Example (Form):**\n\n```json\n{\n  \"id\": \"41ab6718\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"form\",\n  \"settings\": {\n    \"form_name\": \"New Form\",\n    \"form_fields\": [\n      {\n        \"custom_id\": \"name\",\n        \"field_label\": \"Name\",\n        \"placeholder\": \"Your Name\",\n        \"width\": \"100\",\n        \"_id\": \"3726c54\",\n        \"required\": \"true\"\n      },\n      {\n        \"custom_id\": \"email\",\n        \"field_type\": \"email\",\n        \"required\": \"true\",\n        \"field_label\": \"Email\",\n        \"placeholder\": \"Your Email\",\n        \"width\": \"100\",\n        \"_id\": \"7a07d35\"\n      },\n      {\n        \"custom_id\": \"message\",\n        \"field_type\": \"textarea\",\n        \"field_label\": \"Message\",\n        \"placeholder\": \"Your Message\",\n        \"width\": \"100\",\n        \"_id\": \"317daef\"\n      }\n    ],\n    \"button_text\": \"Send\",\n    \"success_message\": \"Your submission was successful.\",\n    \"button_background_color\": \"#027BD6\",\n    \"button_text_color\": \"#FFFFFF\"\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 20\\. Slides (Widget)\n\nA self-contained slideshow where each slide has a background, title, text, and button.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"slides\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `slides`: An array of objects. Each object is a slide with properties for `heading`, `description`, `button_text`, and `background_image` or `background_color`.\n      * `background_image` must be an **Image Object**.\n      * Global settings control `slides_height`, navigation (arrows/dots), and default typography/button styles.\n\n**Example (Slides):**\n\n```json\n{\n  \"id\": \"6df91871\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"slides\",\n  \"settings\": {\n    \"slides\": [\n      {\n        \"heading\": \"Slide Title 1\",\n        \"description\": \"This is a description for the first slide.\",\n        \"button_text\": \"Learn More\",\n        \"background_image\": {\n          \"url\": \"https://picsum.photos/1200/500?random=1\",\n          \"id\": \"\",\n          \"size\": \"\",\n          \"source\": \"url\"\n        },\n        \"_id\": \"fd17634\",\n        \"background_overlay\": \"yes\"\n      },\n      {\n        \"heading\": \"Slide Title 2\",\n        \"description\": \"This is a description for the second slide.\",\n        \"button_text\": \"Get Started\",\n        \"background_color\": \"#D3277E\",\n        \"_id\": \"d7c7abd\"\n      }\n    ],\n    \"slides_height\": { \"unit\": \"px\", \"size\": 500, \"sizes\": [] },\n    \"heading_color\": \"#FFFFFF\",\n    \"description_color\": \"#FFFFFF\",\n    \"button_text_color\": \"#FFFFFF\",\n    \"button_background_color\": \"#003BFF\"\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 21\\. Price List (Widget)\n\nUsed for creating a list of items with prices, perfect for menus.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"price-list\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `price_list`: An array of objects. Each object is a list item with `title`, `item_description`, `price`, and an optional `image`.\n      * `image` must be an **Image Object**.\n      * Global settings control typography and colors for title, price, description, and the separator style.\n\n**Example (Price List):**\n\n```json\n{\n  \"id\": \"ac9a988\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"price-list\",\n  \"settings\": {\n    \"price_list\": [\n      {\n        \"title\": \"Item One\",\n        \"item_description\": \"Description for the first item on the list.\",\n        \"price\": \"$12.50\",\n        \"_id\": \"d1a0d09\",\n        \"image\": {\n          \"url\": \"https://picsum.photos/150/150?random=1\",\n          \"id\": \"\",\n          \"size\": \"\",\n          \"source\": \"url\"\n        }\n      },\n      {\n        \"title\": \"Item Two\",\n        \"item_description\": \"Description for the second item on the list.\",\n        \"price\": \"$9.00\",\n        \"_id\": \"ea12373\"\n      }\n    ],\n    \"heading_color\": \"#000000\",\n    \"price_color\": \"#EE0000\",\n    \"description_color\": \"#2E0A0A\",\n    \"separator_style\": \"dashed\"\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 22\\. Price Table (Widget)\n\nA single, comprehensive pricing column or tier. (Use 2-3 in a Grid for a full pricing section).\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"price-table\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * **Header:** `heading` (e.g., \"Pro Plan\"), `sub_heading`.\n      * **Pricing:** `price`, `currency_symbol`, `period`.\n      * **Sale:** `sale: \"yes\"` and `original_price` (to show a discount).\n      * **Features:** `features_list` (an array of items, same as `icon-list`).\n      * **Footer:** `button_text` and `footer_additional_info`.\n      * **Ribbon:** `ribbon_title` (e.g., \"Most Popular\").\n\n**Example (Price Table):**\n\n```json\n{\n  \"id\": \"76a922b2\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"price-table\",\n  \"settings\": {\n    \"heading\": \"Pro Plan\",\n    \"sub_heading\": \"Best for growing teams\",\n    \"price\": \"49.99\",\n    \"period\": \"Monthly\",\n    \"features_list\": [\n      {\n        \"item_text\": \"All Core Features\",\n        \"selected_item_icon\": { \"value\": \"fas fa-check\", \"library\": \"fa-solid\" },\n        \"_id\": \"01d7b02\"\n      },\n      {\n        \"item_text\": \"100GB Storage\",\n        \"selected_item_icon\": { \"value\": \"fas fa-check\", \"library\": \"fa-solid\" },\n        \"_id\": \"41306a6\"\n      },\n      {\n        \"item_text\": \"Priority Support\",\n        \"selected_item_icon\": { \"value\": \"fas fa-check\", \"library\": \"fa-solid\" },\n        \"_id\": \"faaa957\"\n      }\n    ],\n    \"button_text\": \"Choose Plan\",\n    \"header_bg_color\": \"#000000\",\n    \"heading_color\": \"#FFFFFF\",\n    \"price_color\": \"#000000\",\n    \"features_list_bg_color\": \"#FFFFFF\",\n    \"button_background_color\": \"#027BD6\",\n    \"button_text_color\": \"#FFFFFF\"\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 23\\. Testimonial Carousel (Widget)\n\nA slideshow of testimonials.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"testimonial-carousel\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `slides`: An array of objects. Each object is a testimonial with `content`, `name`, `title` (job), and `image`.\n      * `image` must be an **Image Object**.\n      * Global settings control carousel behavior (`slides_per_view`) and styling for text and images.\n\n**Example (Testimonial Carousel):**\n\n```json\n{\n          \"id\": \"47612fb1\",\n          \"settings\": {\n            \"slides_name\": \"Testimonial\",\n            \"slides\": [\n              {\n                \"content\": \"Content for testimonial 1\",\n                \"name\": \"Sergio\",\n                \"title\": \"COO\",\n                 \"image\": {\n                        \"url\": \"https://picsum.photos/150/150?random=1\",\n                        \"id\": \"\",\n                        \"size\": \"\",\n                        \"source\": \"url\"\n                      },\n                \"_id\": \"b48f234\"\n              },\n              {\n                \"content\": \"Content for testimonial 2\",\n                \"name\": \"Raoul\",\n                \"title\": \"CEO\",\n                 \"image\": {\n                        \"url\": \"https://picsum.photos/150/150?random=1\",\n                        \"id\": \"\",\n                        \"size\": \"\",\n                        \"source\": \"url\"\n                      },\n                \"_id\": \"8421754\"\n              }\n            ],\n            \"skin\": \"bubble\",\n            \"alignment\": \"left\",\n            \"slides_per_view\": \"1\",\n            \"slides_to_scroll\": \"1\",\n            \"width\": {\n              \"unit\": \"%\",\n              \"size\": 50,\n              \"sizes\": []\n            },\n            \"space_between\": {\n              \"unit\": \"px\",\n              \"size\": 5,\n              \"sizes\": []\n            },\n            \"slide_background_color\": \"#FFE5E5\",\n            \"slide_border_size\": {\n              \"unit\": \"px\",\n              \"top\": \"2\",\n              \"right\": \"2\",\n              \"bottom\": \"2\",\n              \"left\": \"2\",\n              \"isLinked\": true\n            },\n            \"slide_border_radius\": {\n              \"unit\": \"px\",\n              \"size\": 10,\n              \"sizes\": []\n            },\n            \"slide_border_color\": \"#FF7979\",\n            \"slide_padding\": {\n              \"unit\": \"px\",\n              \"top\": \"30\",\n              \"right\": \"30\",\n              \"bottom\": \"30\",\n              \"left\": \"30\",\n              \"isLinked\": true\n            },\n            \"content_gap\": {\n              \"unit\": \"px\",\n              \"size\": 30,\n              \"sizes\": []\n            },\n            \"content_color\": \"#000000\",\n            \"content_typography_typography\": \"custom\",\n            \"content_typography_font_family\": \"Open Sans\",\n            \"content_typography_font_size\": {\n              \"unit\": \"px\",\n              \"size\": 16,\n              \"sizes\": []\n            },\n            \"content_typography_font_weight\": \"400\",\n            \"content_typography_font_style\": \"italic\",\n            \"name_color\": \"#FF0000\",\n            \"name_typography_typography\": \"custom\",\n            \"name_typography_font_family\": \"Roboto\",\n            \"name_typography_font_size\": {\n              \"unit\": \"px\",\n              \"size\": 16,\n              \"sizes\": []\n            },\n            \"name_typography_font_weight\": \"600\",\n            \"title_color\": \"#0E00FF\",\n            \"title_typography_typography\": \"custom\",\n            \"title_typography_font_family\": \"Open Sans\",\n            \"title_typography_font_size\": {\n              \"unit\": \"px\",\n              \"size\": 14,\n              \"sizes\": []\n            },\n            \"image_size\": {\n              \"unit\": \"px\",\n              \"size\": 60,\n              \"sizes\": []\n            },\n            \"image_gap\": {\n              \"unit\": \"px\",\n              \"size\": 20,\n              \"sizes\": []\n            },\n            \"image_border\": \"yes\",\n            \"image_border_color\": \"#FFFFFF\",\n            \"image_border_width\": {\n              \"unit\": \"px\",\n              \"size\": 1,\n              \"sizes\": []\n            },\n            \"image_border_radius\": {\n              \"unit\": \"px\",\n              \"size\": 50,\n              \"sizes\": []\n            },\n            \"arrows_size\": {\n              \"unit\": \"px\",\n              \"size\": 30,\n              \"sizes\": []\n            },\n            \"arrows_color\": \"#0A0000\",\n            \"pagination_gap\": {\n              \"unit\": \"px\",\n              \"size\": 5,\n              \"sizes\": []\n            },\n            \"pagination_size\": {\n              \"unit\": \"px\",\n              \"size\": 10,\n              \"sizes\": []\n            },\n            \"pagination_color_inactive\": \"#EC6262\",\n            \"pagination_color\": \"#FC0000\",\n            \"background_color\": \"#D1D1D1\",\n            \"text_padding\": {\n              \"unit\": \"px\",\n              \"top\": \"30\",\n              \"right\": \"30\",\n              \"bottom\": \"30\",\n              \"left\": \"30\",\n              \"isLinked\": true\n            },\n            \"border_radius\": {\n              \"unit\": \"px\",\n              \"top\": \"10\",\n              \"right\": \"10\",\n              \"bottom\": \"10\",\n              \"left\": \"10\",\n              \"isLinked\": true\n            }\n          },\n          \"elements\": [],\n          \"isInner\": false,\n          \"widgetType\": \"testimonial-carousel\",\n          \"elType\": \"widget\"\n}\n```\n\n-----\n\n### 7\\. Video (Widget)\n\nUsed to embed a video.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"video\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `youtube_url`: A **relevant sample YouTube URL**.\n      * Other URL fields (`vimeo_url`, `dailymotion_url`) should be `\"\"`.\n\n**Example (Video):**\n\n```json\n{\n  \"id\": \"3b43f5a4\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"video\",\n  \"settings\": {\n    \"youtube_url\": \"https://www.youtube.com/watch?v=dQw4w9WgXcQ\",\n    \"vimeo_url\": \"\",\n    \"dailymotion_url\": \"\",\n    \"videopress_url\": \"\"\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 8\\. Icon (Widget)\n\nUsed for a standalone icon.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"icon\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `selected_icon`: An object with `value` (e.g., \"fas fa-star\") and `library` (e.g., \"fa-solid\"). The icon choice must be **relevant**.\n\n**Example (Icon):**\n\n```json\n{\n  \"id\": \"2259c1b\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"icon\",\n  \"settings\": {\n    \"selected_icon\": {\n      \"value\": \"fas fa-check-circle\",\n      \"library\": \"fa-solid\"\n    }\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 9\\. Google Maps (Widget)\n\nUsed to embed a map.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"google_maps\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `address`: A **relevant location string** (e.g., \"Eiffel Tower, Paris\" or \"Times Square, New York\").\n      * `zoom`: Object with `size` (e.g., 12).\n      * `height`: Object with `size` (e.g., 400).\n\n**Example (Google Maps):**\n\n```json\n{\n  \"id\": \"650511a3\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"google_maps\",\n  \"settings\": {\n    \"address\": \"Statue of Liberty, New York, NY\",\n    \"zoom\": { \"unit\": \"px\", \"size\": 13, \"sizes\": [] },\n    \"height\": { \"unit\": \"px\", \"size\": 450, \"sizes\": [] }\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 10\\. Nested Tabs (Widget)\n\nUsed for organizing content into clickable tabs.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"nested-tabs\"`\n  * **Dual Structure:**\n    1.  `settings.tabs`: An array of objects, one for each tab title (e.g., `{ \"tab_title\": \"Title 1\", \"_id\": \"abc123\" }`). Can also include `tab_icon`.\n    2.  `elements`: An array of **Containers** (`elType: \"container\"`, `isInner\": true`).\n  * **Mapping:** The first object in `settings.tabs` maps to the first container in `elements`, and so on. The content (text, images, etc.) goes *inside* these containers.\n\n**Example (2 Tabs):**\n\n```json\n{\n  \"id\": \"65c6b2b5\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"nested-tabs\",\n  \"settings\": {\n    \"tabs\": [\n      { \"tab_title\": \"Tab title 1\", \"_id\": \"65507bc\", \"tab_icon\": { \"value\": \"fas fa-info-circle\", \"library\": \"fa-solid\" } },\n      { \"tab_title\": \"Tab title 2\", \"_id\": \"7e56ddb\", \"tab_icon\": { \"value\": \"fas fa-cogs\", \"library\": \"fa-solid\" } }\n    ]\n  },\n  \"elements\": [\n    {\n      \"id\": \"4407049b\",\n      \"elType\": \"container\",\n      \"isInner\": true,\n      \"settings\": {},\n      \"elements\": [\n        \n      ]\n    },\n    {\n      \"id\": \"65fb6c17\",\n      \"elType\": \"container\",\n      \"isInner\": true,\n      \"settings\": {},\n      \"elements\": [\n        \n      ]\n    }\n  ]\n}\n```\n\n-----\n\n### 11\\. Nested Accordion (Widget)\n\nUsed for collapsible content, perfect for FAQs.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"nested-accordion\"`\n  * **Dual Structure:**\n    1.  `settings.items`: An array of objects, one for each accordion title (e.g., `{ \"item_title\": \"Question 1?\", \"_id\": \"def456\" }`).\n    2.  `elements`: An array of **Containers** (`elType: \"container\"`, `isInner\": true`).\n  * **Mapping:** The first object in `settings.items` maps to the first container in `elements`. The answer (text, images, etc.) goes *inside* these containers.\n\n**Example (2-Item Accordion):**\n\n```json\n{\n  \"id\": \"170357c6\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"nested-accordion\",\n  \"settings\": {\n    \"items\": [\n      { \"item_title\": \"First Question?\", \"_id\": \"0a1ad02\" },\n      { \"item_title\": \"Second Question?\", \"_id\": \"893fd19\" }\n    ]\n  },\n  \"elements\": [\n    {\n      \"id\": \"af9788a\",\n      \"elType\": \"container\",\n      \"isInner\": true,\n      \"settings\": {},\n      \"elements\": [\n        \n      ]\n    },\n    {\n      \"id\": \"2e58c2e7\",\n      \"elType\": \"container\",\n      \"isInner\": true,\n      \"settings\": {},\n      \"elements\": [\n        \n      ]\n    }\n  ]\n}\n```\n\n-----\n\n### 12\\. Image Carousel (Widget)\n\nUsed for a slideshow of images.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"image-carousel\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `carousel`: An array of simplified image objects: `{ \"id\": \"\", \"url\": \"https://picsum.photos/...\" }`. Use multiple Picsum images.\n      * `slides_to_show`: (e.g., \"3\").\n\n**Example (Image Carousel):**\n\n```json\n{\n  \"id\": \"2ffc6951\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"image-carousel\",\n  \"settings\": {\n    \"carousel\": [\n      { \"id\": \"\", \"url\": \"https://picsum.photos/800/600?random=1\" },\n      { \"id\": \"\", \"url\": \"https://picsum.photos/800/600?random=2\" },\n      { \"id\": \"\", \"url\": \"https://picsum.photos/800/600?random=3\" }\n    ],\n    \"slides_to_show\": \"1\",\n    \"slides_to_scroll\": \"1\"\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 13\\. Icon List (Widget)\n\nUsed for a bulleted list with custom icons.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"icon-list\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `icon_list`: An array of objects. Each object has `text` (the list item) and optionally `selected_icon` (an icon object with `value` and `library`).\n\n**Example (Icon List):**\n\n```json\n{\n  \"id\": \"2bee7be7\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"icon-list\",\n  \"settings\": {\n    \"icon_list\": [\n      {\n        \"text\": \"Feature One\",\n        \"_id\": \"b406229\",\n        \"selected_icon\": { \"value\": \"fas fa-check\", \"library\": \"fa-solid\" }\n      },\n      {\n        \"text\": \"Feature Two\",\n        \"_id\": \"2429975\",\n        \"selected_icon\": { \"value\": \"fas fa-check\", \"library\": \"fa-solid\" }\n      }\n    ],\n    \"icon_size\": { \"unit\": \"px\", \"size\": 20, \"sizes\": [] },\n    \"text_color\": \"#333333\"\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 14\\. Counter (Widget)\n\nUsed for an animated number.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"counter\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `starting_number`: (e.g., 0).\n      * `ending_number`: The target number (e.g., 1000). **Must be relevant**.\n      * `prefix`: (e.g., \"+\").\n      * `suffix`: (e.g., \"K\").\n      * `title`: The text label. **Must be relevant**.\n\n**Example (Counter):**\n\n```json\n{\n  \"id\": \"47c92b3b\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"counter\",\n  \"settings\": {\n    \"starting_number\": 0,\n    \"ending_number\": 2500,\n    \"prefix\": \"\",\n    \"suffix\": \"+\",\n    \"title\": \"Happy Clients\",\n    \"number_color\": \"#111111\",\n    \"typography_number_font_size\": { \"unit\": \"px\", \"size\": 60, \"sizes\": [] },\n    \"title_color\": \"#555555\"\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 15\\. Progress (Widget)\n\nUsed for an animated progress bar.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"progress\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `title`: The label for the bar. **Must be relevant**.\n      * `percent`: Object with `size` (the value, e.g., 90).\n      * `inner_text`: Text inside the bar.\n\n**Example (Progress):**\n\n```json\n{\n  \"id\": \"52e816ff\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"progress\",\n  \"settings\": {\n    \"title\": \"Customer Satisfaction\",\n    \"percent\": {\n      \"unit\": \"%\",\n      \"size\": 95,\n      \"sizes\": []\n    },\n    \"inner_text\": \"95%\",\n    \"bar_color\": \"#5CB85C\",\n    \"bar_height\": { \"unit\": \"px\", \"size\": 25, \"sizes\": [] }\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 16\\. Testimonial (Widget)\n\nUsed for a single user review.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"testimonial\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `testimonial_content`: The review text. **Must be relevant**.\n      * `testimonial_image`: An **Image Object** (see Core Rules).\n      * `testimonial_name`: User's name. **Must be relevant**.\n      * `testimonial_job`: User's title. **Must be relevant**.\n\n**Example (Testimonial):**\n\n```json\n{\n  \"id\": \"572c9749\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"testimonial\",\n  \"settings\": {\n    \"testimonial_content\": \"This product completely changed my workflow. Highly recommended!\",\n    \"testimonial_image\": {\n      \"url\": \"https://picsum.photos/150/150\",\n      \"id\": \"\",\n      \"size\": \"\",\n      \"source\": \"url\"\n    },\n    \"testimonial_name\": \"Jane Doe\",\n    \"testimonial_job\": \"Project Manager\",\n    \"image_size\": { \"unit\": \"px\", \"size\": 80, \"sizes\": [] },\n    \"image_border_radius\": { \"unit\": \"%\", \"top\": \"50\", \"right\": \"50\", \"bottom\": \"50\", \"left\": \"50\", \"isLinked\": true }\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 17\\. Social Icons (Widget)\n\nUsed for a list of social media links.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"social-icons\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `social_icon_list`: An array of objects. Each object needs:\n          * `social_icon`: An icon object (e.g., `{ \"value\": \"fab fa-facebook\", \"library\": \"fa-brands\" }`).\n          * `link`: A link object (e.g., `{ \"url\": \"https://facebook.com\", ... }`).\n\n**Example (Social Icons):**\n\n```json\n{\n  \"id\": \"3b2e6cb3\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"social-icons\",\n  \"settings\": {\n    \"social_icon_list\": [\n      {\n        \"social_icon\": { \"value\": \"fab fa-facebook\", \"library\": \"fa-brands\" },\n        \"_id\": \"a22a15d\",\n        \"link\": { \"url\": \"https://facebook.com\", \"is_external\": \"true\", \"nofollow\": \"\" }\n      },\n      {\n        \"social_icon\": { \"value\": \"fab fa-twitter\", \"library\": \"fa-brands\" },\n        \"_id\": \"fcead12\",\n        \"link\": { \"url\": \"https://twitter.com\", \"is_external\": \"true\", \"nofollow\": \"\" }\n      }\n    ],\n    \"shape\": \"circle\",\n    \"icon_size\": { \"unit\": \"px\", \"size\": 18, \"sizes\": [] }\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 18\\. Rating (Widget)\n\nUsed for displaying a star rating.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"rating\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `rating_scale`: Object with `size` (e.g., 5).\n      * `rating_value`: The score (e.g., 4.5). **Must be relevant**.\n      * `rating_icon`: Icon object, usually `\"fas fa-star\"`.\n      * `icon_color`: Color for filled stars.\n      * `icon_unmarked_color`: Color for empty stars.\n\n**Example (Rating):**\n\n```json\n{\n  \"id\": \"53bea524\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"rating\",\n  \"settings\": {\n    \"rating_scale\": { \"unit\": \"px\", \"size\": 5, \"sizes\": [] },\n    \"rating_value\": 4.5,\n    \"rating_icon\": { \"value\": \"fas fa-star\", \"library\": \"fa-solid\" },\n    \"icon_size\": { \"unit\": \"px\", \"size\": 20, \"sizes\": [] },\n    \"icon_color\": \"#FFD700\",\n    \"icon_unmarked_color\": \"#CCCCCC\"\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 19\\. Form (Widget)\n\nUsed for creating contact or lead-gen forms.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"form\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `form_fields`: An array of objects, one for each field. Each object defines `field_type` (`text`, `email`, `textarea`, `select`, etc.), `field_label`, `placeholder`, and `width`.\n      * `button_text`: The text for the submit button.\n      * Styling for labels, fields, and the button is included.\n\n**Example (Form):**\n\n```json\n{\n  \"id\": \"41ab6718\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"form\",\n  \"settings\": {\n    \"form_name\": \"New Form\",\n    \"form_fields\": [\n      {\n        \"custom_id\": \"name\",\n        \"field_label\": \"Name\",\n        \"placeholder\": \"Your Name\",\n        \"width\": \"100\",\n        \"_id\": \"3726c54\",\n        \"required\": \"true\"\n      },\n      {\n        \"custom_id\": \"email\",\n        \"field_type\": \"email\",\n        \"required\": \"true\",\n        \"field_label\": \"Email\",\n        \"placeholder\": \"Your Email\",\n        \"width\": \"100\",\n        \"_id\": \"7a07d35\"\n      },\n      {\n        \"custom_id\": \"message\",\n        \"field_type\": \"textarea\",\n        \"field_label\": \"Message\",\n        \"placeholder\": \"Your Message\",\n        \"width\": \"100\",\n        \"_id\": \"317daef\"\n      }\n    ],\n    \"button_text\": \"Send\",\n    \"success_message\": \"Your submission was successful.\",\n    \"button_background_color\": \"#027BD6\",\n    \"button_text_color\": \"#FFFFFF\"\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 20\\. Slides (Widget)\n\nA self-contained slideshow where each slide has a background, title, text, and button.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"slides\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `slides`: An array of objects. Each object is a slide with properties for `heading`, `description`, `button_text`, and `background_image` or `background_color`.\n      * `background_image` must be an **Image Object**.\n      * Global settings control `slides_height`, navigation (arrows/dots), and default typography/button styles.\n\n**Example (Slides):**\n\n```json\n{\n  \"id\": \"6df91871\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"slides\",\n  \"settings\": {\n    \"slides\": [\n      {\n        \"heading\": \"Slide Title 1\",\n        \"description\": \"This is a description for the first slide.\",\n        \"button_text\": \"Learn More\",\n        \"background_image\": {\n          \"url\": \"https://picsum.photos/1200/500?random=1\",\n          \"id\": \"\",\n          \"size\": \"\",\n          \"source\": \"url\"\n        },\n        \"_id\": \"fd17634\",\n        \"background_overlay\": \"yes\"\n      },\n      {\n        \"heading\": \"Slide Title 2\",\n        \"description\": \"This is a description for the second slide.\",\n        \"button_text\": \"Get Started\",\n        \"background_color\": \"#D3277E\",\n        \"_id\": \"d7c7abd\"\n      }\n    ],\n    \"slides_height\": { \"unit\": \"px\", \"size\": 500, \"sizes\": [] },\n    \"heading_color\": \"#FFFFFF\",\n    \"description_color\": \"#FFFFFF\",\n    \"button_text_color\": \"#FFFFFF\",\n    \"button_background_color\": \"#003BFF\"\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 21\\. Price List (Widget)\n\nUsed for creating a list of items with prices, perfect for menus.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"price-list\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `price_list`: An array of objects. Each object is a list item with `title`, `item_description`, `price`, and an optional `image`.\n      * `image` must be an **Image Object**.\n      * Global settings control typography and colors for title, price, description, and the separator style.\n\n**Example (Price List):**\n\n```json\n{\n  \"id\": \"ac9a988\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"price-list\",\n  \"settings\": {\n    \"price_list\": [\n      {\n        \"title\": \"Item One\",\n        \"item_description\": \"Description for the first item on the list.\",\n        \"price\": \"$12.50\",\n        \"_id\": \"d1a0d09\",\n        \"image\": {\n          \"url\": \"https://picsum.photos/150/150?random=1\",\n          \"id\": \"\",\n          \"size\": \"\",\n          \"source\": \"url\"\n        }\n      },\n      {\n        \"title\": \"Item Two\",\n        \"item_description\": \"Description for the second item on the list.\",\n        \"price\": \"$9.00\",\n        \"_id\": \"ea12373\"\n      }\n    ],\n    \"heading_color\": \"#000000\",\n    \"price_color\": \"#EE0000\",\n    \"description_color\": \"#2E0A0A\",\n    \"separator_style\": \"dashed\"\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 22\\. Price Table (Widget)\n\nA single, comprehensive pricing column or tier. (Use 2-3 in a Grid for a full pricing section).\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"price-table\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * **Header:** `heading` (e.g., \"Pro Plan\"), `sub_heading`.\n      * **Pricing:** `price`, `currency_symbol`, `period`.\n      * **Sale:** `sale: \"yes\"` and `original_price` (to show a discount).\n      * **Features:** `features_list` (an array of items, same as `icon-list`).\n      * **Footer:** `button_text` and `footer_additional_info`.\n      * **Ribbon:** `ribbon_title` (e.g., \"Most Popular\").\n\n**Example (Price Table):**\n\n```json\n{\n  \"id\": \"76a922b2\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"price-table\",\n  \"settings\": {\n    \"heading\": \"Pro Plan\",\n    \"sub_heading\": \"Best for growing teams\",\n    \"price\": \"49.99\",\n    \"period\": \"Monthly\",\n    \"features_list\": [\n      {\n        \"item_text\": \"All Core Features\",\n        \"selected_item_icon\": { \"value\": \"fas fa-check\", \"library\": \"fa-solid\" },\n        \"_id\": \"01d7b02\"\n      },\n      {\n        \"item_text\": \"100GB Storage\",\n        \"selected_item_icon\": { \"value\": \"fas fa-check\", \"library\": \"fa-solid\" },\n        \"_id\": \"41306a6\"\n      },\n      {\n        \"item_text\": \"Priority Support\",\n        \"selected_item_icon\": { \"value\": \"fas fa-check\", \"library\": \"fa-solid\" },\n        \"_id\": \"faaa957\"\n      }\n    ],\n    \"button_text\": \"Choose Plan\",\n    \"header_bg_color\": \"#000000\",\n    \"heading_color\": \"#FFFFFF\",\n    \"price_color\": \"#000000\",\n    \"features_list_bg_color\": \"#FFFFFF\",\n    \"button_background_color\": \"#027BD6\",\n    \"button_text_color\": \"#FFFFFF\"\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 23\\. Testimonial Carousel (Widget)\n\nA slideshow of testimonials.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"testimonial-carousel\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `slides`: An array of objects. Each object is a testimonial with `content`, `name`, `title` (job), and `image`.\n      * `image` must be an **Image Object**.\n      * Global settings control carousel behavior (`slides_per_view`) and styling for text and images.\n\n**Example (Testimonial Carousel):**\n\n```json\n{\n  \"id\": \"47612fb1\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"testimonial-carousel\",\n  \"settings\": {\n    \"slides\": [\n      {\n        \"content\": \"This is a fantastic product! Highly recommended.\",\n        \"name\": \"Jane Doe\",\n        \"title\": \"CEO, Example Inc.\",\n        \"image\": {\n          \"url\": \"https://picsum.photos/150/150?random=1\",\n          \"id\": \"\",\n          \"size\": \"\",\n          \"source\": \"url\"\n        },\n        \"_id\": \"b48f234\"\n      },\n      {\n        \"content\": \"A game-changer for our entire team.\",\n        \"name\": \"John Smith\",\n        \"title\": \"Project Manager\",\n        \"image\": {\n          \"url\": \"https://picsum.photos/150/150?random=2\",\n          \"id\": \"\",\n          \"size\": \"\",\n          \"source\": \"url\"\n        },\n        \"_id\": \"8421754\"\n      }\n    ],\n    \"slides_per_view\": \"1\",\n    \"content_color\": \"#000000\",\n    \"name_color\": \"#FF0000\",\n    \"title_color\": \"#0E00FF\",\n    \"image_border_radius\": { \"unit\": \"%\", \"size\": 50, \"sizes\": [] }\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 24\\. Image Box (Widget)\n\nA self-contained block combining an image, title, and description.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"image-box\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `image`: An **Image Object**.\n      * `title_text`: The string for the title.\n      * `description_text`: The string for the body text.\n      * Global settings for alignment, image size, and typography/colors.\n\n**Example (Image Box):**\n\n```json\n{\n  \"id\": \"2b41b844\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"image-box\",\n  \"settings\": {\n    \"image\": {\n      \"url\": \"https://picsum.photos/600/400\",\n      \"id\": \"\",\n      \"size\": \"\",\n      \"source\": \"url\"\n    },\n    \"title_text\": \"This is an Image Box\",\n    \"description_text\": \"A short description of the content goes here.\",\n    \"text_align\": \"center\",\n    \"title_color\": \"#111111\",\n    \"description_color\": \"#555555\"\n  },\n  \"elements\": []\n}\n```\n\n-----\n\n### 25\\. Icon Box (Widget)\n\nA self-contained block combining an icon, title, and description.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"icon-box\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `selected_icon`: An **Icon Object** (e.g., `{ \"value\": \"fas fa-shield-alt\", ... }`).\n      * `title_text`: The string for the title.\n      * `description_text`: The string for the body text.\n      * Global settings for alignment, icon size, and typography/colors.\n\n**Example (Icon Box):**\n\n```json\n{\n  \"id\": \"146272e6\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"icon-box\",\n  \"settings\": {\n    \"selected_icon\": {\n      \"value\": \"fas fa-shield-alt\",\n      \"library\": \"fa-solid\"\n    },\n    \"title_text\": \"Secure & Reliable\",\n    \"description_text\": \"A short description of the feature goes here.\",\n    \"text_align\": \"center\",\n    \"primary_color\": \"#027BD6\",\n    \"title_color\": \"#111111\",\n    \"description_color\": \"#555555\"\n  },\n  \"elements\": []\n}\n```"
+            }
+          ]
+        },
+        "options": {
+          "systemMessage": "Use `Gemini Search Tool` for searching design idea and content idea.",
+          "maxToolsIterations": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        176,
+        -160
+      ],
+      "id": "ddf9d547-ca6c-40bf-8162-a396b0cebaac",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "6Qmz74fv62ASqbfV",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use this tool for searching information.",
+        "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', ``, 'string') }}",
+        "enableUrlContext": "=",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Items_per_Batch', ``, 'number') }}",
+              "batchInterval": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Batch_Interval__ms_', ``, 'number') }}"
+            }
+          },
+          "systemInstruction": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Custom_System_Instruction', ``, 'string') }}",
+          "returnFullResponse": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_Full_Response', ``, 'boolean') }}"
+        }
+      },
+      "type": "n8n-nodes-gemini-search.geminiSearchToolTool",
+      "typeVersion": 1,
+      "position": [
+        240,
+        64
+      ],
+      "id": "be81c50e-dcf4-44a2-b6b8-b5a5b0b51a35",
+      "name": "Gemini Search Tool",
+      "credentials": {
+        "geminiSearchApi": {
+          "id": "uXioxrB1KI7dFyPA",
+          "name": "Gemini Credentials account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "/* Your getValidJsonObject function is good. \n  It correctly handles bad strings by returning null.\n  No changes are needed here.\n*/\nfunction getValidJsonObject(rawText) {\n\n    if (typeof rawText !== 'string' || rawText.trim() === '') {\n        console.error(\"Invalid input or empty text field.\");\n        return null;\n    }\n\n    let jsonString = rawText.trim();\n\n    // 2. Check for and remove the markdown JSON block fences.\n    const markdownRegex = /^```json\\s*([\\s\\S]*?)\\s*```$/;\n    const match = jsonString.match(markdownRegex);\n\n    if (match) {\n        jsonString = match[1];\n    }\n\n    // 3. Parse the cleaned string into a JSON object.\n    try {\n        return JSON.parse(jsonString);\n    } catch (error) {\n        // This is expected for parts that aren't JSON, like \"```\"\n        // console.error(\"Failed to parse JSON string:\", error); \n        // console.error(\"Problematic string:\", jsonString);\n        return null; // Returning null is key\n    }\n}\n\n// === NEW LOGIC ===\n\n// 1. Get the array of all parts\nconst allParts = $input.first().json.content.parts;\n\n// 2. Map each part to a parse attempt.\n//    - If part.text is valid JSON, we get the object.\n//    - If part.text is \"```\" or other non-JSON, getValidJsonObject returns null.\nconst parsedData = allParts\n    .map(part => getValidJsonObject(part.text))\n    .filter(result => result !== null); // 3. Filter out all the nulls\n\n// `parsedData` is now an array of all successfully parsed JSON objects.\n// In your example, it will be: [ [ { id: \"h3f8e9a1\", ... } ] ]\nreturn { data: parsedData };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        528,
+        -64
+      ],
+      "id": "0a83f56f-ea8b-47de-8205-13ff1eae8c0e",
+      "name": "Code2",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "function getValidJsonObject(rawText) {\n\n    if (typeof rawText !== 'string' || rawText.trim() === '') {\n        console.error(\"Invalid input or empty text field.\");\n        return null;\n    }\n\n    let jsonString = rawText.trim();\n\n    // 2. Check for and remove the markdown JSON block fences.\n    // This regex is robust and handles variations in whitespace.\n    const markdownRegex = /^```json\\s*([\\s\\S]*?)\\s*```$/;\n    const match = jsonString.match(markdownRegex);\n\n    if (match) {\n        // If it's a match, the actual JSON string is in the first capture group.\n        jsonString = match[1];\n    }\n\n    // 3. Parse the cleaned string into a JSON object.\n    try {\n        return JSON.parse(jsonString);\n    } catch (error) {\n        console.error(\"Failed to parse JSON string:\", error);\n        console.error(\"Problematic string:\", jsonString);\n        return null;\n    }\n}\n\n\n\nreturn {data: getValidJsonObject($('Webhook').first().json.body.data)};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -720,
+        192
+      ],
+      "id": "f91e191b-a72b-4fcc-949d-ff1c98628b3c",
+      "name": "Code",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c73591ae-fe3f-4543-b5c6-ad8c52d48711",
+              "name": "title",
+              "value": "={{ $json.data.title }}",
+              "type": "string"
+            },
+            {
+              "id": "29f1fecc-8405-437d-a216-3c9d51805fec",
+              "name": "prompt",
+              "value": "={{ $json.data }}",
+              "type": "object"
+            },
+            {
+              "id": "c7ba4878-3950-4101-a4f0-733a034c25d8",
+              "name": "license_key",
+              "value": "={{ $('Webhook').item.json.body.license_key }}",
+              "type": "string"
+            },
+            {
+              "id": "1116259d-7200-4c68-b59c-1115dcd931c5",
+              "name": "builder_id",
+              "value": "={{ $('Webhook').item.json.body.builder_id }}",
+              "type": "number"
+            },
+            {
+              "id": "6bdc6098-b90b-4fa5-b908-0907426d01c3",
+              "name": "webhook",
+              "value": "={{ $('Webhook').item.json.body.webhook }}",
+              "type": "string"
+            },
+            {
+              "id": "5e7a14b4-c2ff-4f5a-9f42-75595271667d",
+              "name": "domain_name",
+              "value": "={{ $('Webhook').item.json.body.domain_name }}",
+              "type": "string"
+            },
+            {
+              "id": "cbba82ca-7ab6-438a-940f-e92ba74b44ce",
+              "name": "session_id",
+              "value": "={{ $('Webhook').item.json.body.session_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -496,
+        96
+      ],
+      "id": "80f7ae09-704a-481d-a54c-c926934c84b1",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.domain_name }}wp-json/synergize/v1/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "code",
+              "value": "={{ $json.license_key }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -272,
+        96
+      ],
+      "id": "e8e0acdc-e1cb-4d3c-92ca-b2b010892216",
+      "name": "Check if license is valid"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "60458c94-986c-49cd-8b69-4b5616163eb3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f910b52-842c-4b6a-a862-e6914c883764",
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -48,
+        96
+      ],
+      "id": "23bfaa50-6a1d-426f-b31f-fa2672fcfbc8",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "fail"
+            },
+            {
+              "name": "msg",
+              "value": "invalid_license"
+            },
+            {
+              "name": "builder_id",
+              "value": "={{ $('Prepare Data').item.json.builder_id }}"
+            },
+            {
+              "name": "session_id",
+              "value": "={{ $('Prepare Data').item.json.session_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        240,
+        240
+      ],
+      "id": "045d3809-632c-42b2-822d-fa2b087fc332",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "fail"
+            },
+            {
+              "name": "msg",
+              "value": "error_parsing"
+            },
+            {
+              "name": "builder_id",
+              "value": "={{ $('Prepare Data').item.json.builder_id }}"
+            },
+            {
+              "name": "session_id",
+              "value": "={{ $('Prepare Data').item.json.session_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        752,
+        48
+      ],
+      "id": "b95ad8e2-a2df-427f-9b37-723d2ebe5a11",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.domain_name }}wp-json/synergize/v1/submit-builder-elementor/",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "title",
+              "value": "={{ $('Prepare Data').item.json.title }}"
+            },
+            {
+              "name": "data",
+              "value": "={{ $json.data }}"
+            },
+            {
+              "name": "code",
+              "value": "={{ $('Prepare Data').item.json.license_key }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        752,
+        -160
+      ],
+      "id": "228dde04-8ce7-4833-993f-7634621ea5b8",
+      "name": "Submit Elementor Builder"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "builder_id",
+              "value": "={{ $('Prepare Data').item.json.builder_id }}"
+            },
+            {
+              "name": "status",
+              "value": "ok"
+            },
+            {
+              "name": "template_id",
+              "value": "={{ $json.template_id }}"
+            },
+            {
+              "name": "session_id",
+              "value": "={{ $('Prepare Data').item.json.session_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        976,
+        -160
+      ],
+      "id": "c056d517-ea85-408a-b0cf-405f2c8c2d96",
+      "name": "Send data to Webhook"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.body.webhook }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "builder_id",
+              "value": "={{ $json.body.builder_id }}"
+            },
+            {
+              "name": "status",
+              "value": "processing"
+            },
+            {
+              "name": "session_id",
+              "value": "={{ $json.body.session_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -944,
+        192
+      ],
+      "id": "8a52a915-518e-4810-bdb3-0fda34a1a0cb",
+      "name": "Send data to Webhook1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').item.json.body.webhook }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "builder_id",
+              "value": "={{ $json.body.builder_id }}"
+            },
+            {
+              "name": "status",
+              "value": "error_parsing"
+            },
+            {
+              "name": "session_id",
+              "value": "={{ $json.body.session_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -496,
+        288
+      ],
+      "id": "ee60cc86-0add-4d06-b7f6-7b648825117f",
+      "name": "Send data to Webhook2"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "page-builder/process",
+        "options": {
+          "responseData": "Processing the landing page. You can leave this page for now."
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1168,
+        192
+      ],
+      "id": "45d293c1-f67a-4b0d-86e3-f63a73ae6b12",
+      "name": "Webhook",
+      "webhookId": "1f0f06b3-e021-494a-8fc6-e8e7d7fc1cb4"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "fail"
+            },
+            {
+              "name": "msg",
+              "value": "error_model"
+            },
+            {
+              "name": "builder_id",
+              "value": "={{ $('Prepare Data').item.json.builder_id }}"
+            },
+            {
+              "name": "session_id",
+              "value": "={{ $('Prepare Data').item.json.session_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        544,
+        224
+      ],
+      "id": "5f81fb1a-93a4-49db-b35d-68eadf52d522",
+      "name": "HTTP Request"
+    }
+  ],
+  "connections": {
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Search Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Message a model",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Submit Elementor Builder",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send data to Webhook2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if license is valid": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Submit Elementor Builder": {
+      "main": [
+        [
+          {
+            "node": "Send data to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send data to Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send data to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "FfOIxnXYC00WoM2o"
+  },
+  "triggerCount": 1,
+  "versionId": "7c7ffedf-33ae-4757-a1a6-7057d3ad0101",
+  "owner": {
+    "type": "personal",
+    "projectId": "ZvP1yE48ZEo7zgpC",
+    "projectName": "Synergize Flow Team <info@mantab.one>",
+    "personalEmail": "info@mantab.one"
+  },
+  "parentFolderId": "W6kfCfNZPfSqIn2i",
+  "isArchived": false
+}

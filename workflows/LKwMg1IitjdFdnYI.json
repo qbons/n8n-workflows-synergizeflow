@@ -1,0 +1,203 @@
+{
+  "id": "LKwMg1IitjdFdnYI",
+  "name": "SF - Mailing",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://gmail.googleapis.com/gmail/v1/users/me/messages/send",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "gmailOAuth2",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "raw",
+              "value": "={{ $json.encoded_message }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "71389174-1316-4fe1-82b1-0d65f721c114",
+      "name": "Send Gmail as Alias",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        128,
+        -80
+      ],
+      "executeOnce": true,
+      "typeVersion": 4.2,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "zxeGzpJSiMcaHRDV",
+          "name": "Synergizeflow"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ===========================\n// FIELD VALIDATION\n// ===========================\n// Define which fields are absolutely required for sending an email\nconst requiredFields = ['fromEmail', 'toEmail', 'subject', 'htmlBody'];\nconst inputData = $input.first().json.body;\nconst missingFields = [];\n\n// Check each required field to ensure it exists and has a value\nrequiredFields.forEach(field => {\n if (!inputData[field]) {\n   missingFields.push(field);\n }\n});\n\n// If any required fields are missing, throw an error immediately\nif (missingFields.length > 0) {\n throw new Error(`Missing required fields: ${missingFields.join(', ')}`);\n}\n\n// ===========================\n// EMAIL CONFIGURATION SETUP\n// ===========================\n// Build email configuration object with required fields and optional fields\n// Optional fields will be null if not provided, required fields are guaranteed to exist\nconst emailConfig = {\n senderName: inputData.senderName || null,    // Optional: Display name for sender\n fromEmail: inputData.fromEmail,              // Required: Email address to send from (must be verified alias)\n replyTo: inputData.replyTo || null,          // Optional: Different reply-to address\n toEmail: inputData.toEmail,                  // Required: Recipient email address\n subject: inputData.subject,                  // Required: Email subject line\n htmlBody: inputData.htmlBody                 // Required: HTML content of the email\n};\n\n// ===========================\n// DEBUG LOGGING\n// ===========================\n// Log all available data to help troubleshoot issues\nconsole.log('Available data:', JSON.stringify($input.all(), null, 2));\nconsole.log('Binary keys:', Object.keys($binary || {}));\nconsole.log('Binary data:', $binary);\n\n// ===========================\n// ATTACHMENT PROCESSING\n// ===========================\n// Get all binary data keys from the previous node (files to attach)\nconst binaryKeys = Object.keys($binary || {});\nconst attachments = [];\n\n// Process each binary file found in the $binary object\nbinaryKeys.forEach(key => {\n const binaryFile = $binary[key];\n console.log(`Processing binary key: ${key}`, binaryFile);\n \n // Only add files that have actual data\n if (binaryFile && binaryFile.data) {\n   attachments.push({\n     data: binaryFile.data,                                    // Base64 encoded file data\n     fileName: binaryFile.fileName || `${key}.pdf`,           // Use original filename or create one\n     mimeType: binaryFile.mimeType || 'application/pdf'       // Use detected MIME type or default to PDF\n   });\n }\n});\n\nconsole.log('Processed attachments:', attachments.length);\n\n// ===========================\n// FALLBACK ATTACHMENT DETECTION\n// ===========================\n// If no attachments found using $binary, try alternative approach\n// Some nodes might store binary data in item.binary instead\nif (attachments.length === 0) {\n console.log('No attachments found in $binary, trying alternative approach...');\n \n // Try accessing the data property directly from the input item\n const item = $input.first();\n if (item.binary && Object.keys(item.binary).length > 0) {\n   console.log('Found binary data in item.binary');\n   \n   Object.keys(item.binary).forEach(key => {\n     const binaryFile = item.binary[key];\n     attachments.push({\n       data: binaryFile.data,\n       fileName: binaryFile.fileName || `${key}.pdf`,\n       mimeType: binaryFile.mimeType || 'application/pdf'\n     });\n   });\n }\n}\n\n// ===========================\n// HTML BODY PROCESSING\n// ===========================\n// Replace any {{FILE_COUNT}} placeholder in the HTML with actual attachment count\nconst updatedHtmlBody = emailConfig.htmlBody.replace('{{FILE_COUNT}}', attachments.length);\n\n// ===========================\n// MIME MESSAGE CONSTRUCTION\n// ===========================\n// Generate a unique boundary string for the multipart MIME message\n// This separates different parts of the email (body, attachments, etc.)\nconst boundary = `----=_Part_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;\n\n// ===========================\n// EMAIL HEADERS AND STRUCTURE\n// ===========================\n// Build the complete email message in RFC2822 format\n// Start with headers and basic structure\nlet emailMessage = `From: ${emailConfig.senderName ? `\"${emailConfig.senderName}\" <${emailConfig.fromEmail}>` : emailConfig.fromEmail}\nTo: ${emailConfig.toEmail}${emailConfig.replyTo ? `\\nReply-To: ${emailConfig.replyTo}` : ''}\nSubject: ${emailConfig.subject}\nMIME-Version: 1.0\nContent-Type: multipart/mixed; boundary=\"${boundary}\"\n\n--${boundary}\nContent-Type: text/html; charset=utf-8\nContent-Transfer-Encoding: 7bit\n\n${updatedHtmlBody}\n\n`;\n\n// ===========================\n// ATTACHMENT ADDITION\n// ===========================\n// Add each attachment as a separate MIME part\nattachments.forEach(attachment => {\n console.log(`Adding attachment: ${attachment.fileName}`);\n \n emailMessage += `--${boundary}\nContent-Type: ${attachment.mimeType}; name=\"${attachment.fileName}\"\nContent-Disposition: attachment; filename=\"${attachment.fileName}\"\nContent-Transfer-Encoding: base64\n\n${attachment.data}\n\n`;\n});\n\n// ===========================\n// MIME MESSAGE FINALIZATION\n// ===========================\n// Close the multipart message with the final boundary\nemailMessage += `--${boundary}--`;\n\n// ===========================\n// GMAIL API ENCODING\n// ===========================\n// Gmail API requires the entire message to be base64url encoded\n// Base64url is like base64 but uses - instead of + and _ instead of /\n// and removes padding (=) characters\nconst encodedMessage = Buffer.from(emailMessage, 'utf8')\n .toString('base64')           // Convert to base64\n .replace(/\\+/g, '-')          // Replace + with -\n .replace(/\\//g, '_')          // Replace / with _\n .replace(/=/g, '');           // Remove padding\n\n// ===========================\n// RETURN RESULTS\n// ===========================\n// Return the encoded message for the Gmail API and debug information\nreturn {\n encoded_message: encodedMessage,              // This goes to the Gmail API\n debug_info: {                                 // This helps with troubleshooting\n   attachments_count: attachments.length,\n   attachment_names: attachments.map(a => a.fileName),\n   binary_keys_found: binaryKeys,\n   has_binary: !!$binary,\n   input_keys: Object.keys($input.first() || {}),\n   email_config: {\n     has_sender_name: !!emailConfig.senderName,\n     has_reply_to: !!emailConfig.replyTo,\n     from: emailConfig.fromEmail,\n     to: emailConfig.toEmail,\n     subject: emailConfig.subject\n   }\n }\n};"
+      },
+      "id": "fc12777e-9203-4a25-a7f9-9ca02b1dbf92",
+      "name": "Format Email Payload",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        -96,
+        -80
+      ],
+      "executeOnce": true,
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "util/send-email",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "bd3f051a-d147-4551-8d9c-cec5b6cb707e",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "position": [
+        -544,
+        16
+      ],
+      "webhookId": "7e1d9448-a8f4-4db1-929a-4032602841f8",
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4900d7df-a847-4dde-bb80-30857ef7a5f8",
+              "leftValue": "={{ $json.body.key }}",
+              "rightValue": "jRCK@H_62U]%{K9SjLUim-VjBi8_7/",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -320,
+        16
+      ],
+      "id": "d62a7322-81c2-43d8-b074-828b9ec125c8",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseCode": 400,
+          "responseKey": "invalid"
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -96,
+        112
+      ],
+      "id": "fe2d4f9f-3a2d-4e67-8cb9-fd20e5391569",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        352,
+        -80
+      ],
+      "id": "17c56081-536e-47b1-89c0-ef2cdb3aead3",
+      "name": "Respond to Webhook1"
+    }
+  ],
+  "connections": {
+    "Send Gmail as Alias": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Email Payload": {
+      "main": [
+        [
+          {
+            "node": "Send Gmail as Alias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Format Email Payload",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "FfOIxnXYC00WoM2o"
+  },
+  "triggerCount": 1,
+  "versionId": "76ce7ca4-a183-4b44-b3e3-0e80725d66ff",
+  "owner": {
+    "type": "personal",
+    "projectId": "ZvP1yE48ZEo7zgpC",
+    "projectName": "Synergize Flow Team <info@mantab.one>",
+    "personalEmail": "info@mantab.one"
+  },
+  "parentFolderId": "W6kfCfNZPfSqIn2i",
+  "isArchived": false
+}

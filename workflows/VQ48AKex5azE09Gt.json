@@ -1,0 +1,1133 @@
+{
+  "id": "VQ48AKex5azE09Gt",
+  "name": "SF - Social Media Video",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.website }}/wp-json/synergize/v1/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "code",
+              "value": "={{ $json.code }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -704,
+        256
+      ],
+      "id": "40018661-1418-4c8d-81ee-56a06985a4a9",
+      "name": "Check if license is valid"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7a5f7d9a-28cc-49e8-a1d2-e3e25ed8cd75",
+              "name": "website",
+              "value": "={{ $json.body.domain_name }}",
+              "type": "string"
+            },
+            {
+              "id": "8df36920-3df2-4c4e-bc18-4c85cf59b60e",
+              "name": "code",
+              "value": "={{ $json.body.license_key }}",
+              "type": "string"
+            },
+            {
+              "id": "38888392-860c-4b85-967b-323486ab102e",
+              "name": "post_id",
+              "value": "={{ $json.body.post_id }}",
+              "type": "array"
+            },
+            {
+              "id": "4b238cc8-df21-45e0-9be8-7a0398b08a76",
+              "name": "suffix",
+              "value": "={{ $json.body.suffix }}",
+              "type": "string"
+            },
+            {
+              "id": "23e73e41-a63d-4064-9c6b-f54a1bbbe3d3",
+              "name": "voice",
+              "value": "={{ $json.body.voice }}",
+              "type": "string"
+            },
+            {
+              "id": "2ce077fe-47f8-4e65-9185-210bb8f4b36d",
+              "name": "language",
+              "value": "={{ $json.body.language }}",
+              "type": "string"
+            },
+            {
+              "id": "f14a2552-d1a1-4c74-95ac-3cb5d0596ddb",
+              "name": "model",
+              "value": "={{ $json.body.model }}",
+              "type": "string"
+            },
+            {
+              "id": "041eafc1-c58d-487b-98d7-9c3ac3cc66bf",
+              "name": "prompt",
+              "value": "={{ $json.body.prompt }}",
+              "type": "string"
+            },
+            {
+              "id": "a1ba336e-c7b8-40c5-998a-ae0171709908",
+              "name": "backend",
+              "value": "={{ $json.body.backend }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -912,
+        256
+      ],
+      "id": "7f422fe2-5c13-4c23-8be8-9f99c285c04a",
+      "name": "Prepare data"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "social/generate-video",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1104,
+        256
+      ],
+      "id": "5875dc3c-8ed6-4c8b-9479-cc051cf20649",
+      "name": "Webhook",
+      "webhookId": "a60747c5-7d02-449c-aebf-9a0ffd5c95e9"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "60458c94-986c-49cd-8b69-4b5616163eb3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f910b52-842c-4b6a-a862-e6914c883764",
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -528,
+        256
+      ],
+      "id": "c561bd53-9dfd-4a38-8348-4b22d3e5799e",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "42309d5f-a011-44ea-b2ec-66ced157a5d0",
+              "name": "status",
+              "value": "fail",
+              "type": "string"
+            },
+            {
+              "id": "14198afc-aa4e-433e-942a-ae418e817293",
+              "name": "msg",
+              "value": "invalid_license",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -320,
+        416
+      ],
+      "id": "5ede2242-f437-40ea-be05-a18b99b8e5c9",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -128,
+        416
+      ],
+      "id": "38285716-35d3-4f18-a552-e8d34e83b752",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "batchSize": "={{ $('format array posts').all().length }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -144,
+        112
+      ],
+      "id": "c6bec4f4-e8ae-40fb-b28f-62626d063ea3",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "jsCode": "var posts = $('Prepare data').first().json.post_id.map(postId => {\n  return { json: { id: postId } };\n});\n\nreturn posts;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        112
+      ],
+      "id": "04dd11ca-a8f7-4088-83b8-8e8f6ec596f4",
+      "name": "format array posts"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').item.json.body.domain_name }}/wp-json/synergize/v1/get-single-post",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "code",
+              "value": "={{ $('Webhook').item.json.body.license_key }}"
+            },
+            {
+              "name": "=id",
+              "value": "={{ $json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        80,
+        112
+      ],
+      "id": "84032228-cf53-498e-bba4-bbb226cb9794",
+      "name": "Get post content"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2edddd94-6d56-4737-93ee-c66624919873",
+              "name": "id",
+              "value": "={{ $('format array posts').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "3b34b29c-c4a7-48bf-a81f-75d8f4d52c8b",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "cf5bcc4a-907e-4d4b-873d-2c11f5305f18",
+              "name": "content",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "20633dc1-fa4b-407d-907e-bbb00045df61",
+              "name": "img",
+              "value": "={{ $json.image }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        112
+      ],
+      "id": "6af31f90-60af-48d7-bfc9-e2429297717c",
+      "name": "Data Blog"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "adbaa001-7b5b-46d4-b649-5819bbf14593",
+              "name": "img_desc",
+              "value": "={{ $json.content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        112
+      ],
+      "id": "fc00454f-ba59-42bd-a98d-334fd465efe3",
+      "name": "Img Desc"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-pro",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-pro"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={\n\"title\": {{ $('Data Blog').item.json.title.toJsonString() }},\n\"content\": {{ $('Data Blog').item.json.content.toJsonString() }},\n\"language\": {{ $('Prepare data').item.json.language.toJsonString() }},\n\"img_desc\": {{ $json.img_desc.toJsonString() }}\n}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "systemMessage": "=You are an expert content strategist and scriptwriter AI. Your primary goal is to transform a detailed article on **any given topic** into a concise video script and a single, comprehensive video generation prompt that visually represents that script.\n\nYou will be given a JSON object as input containing the keys: `title`, `content`, `img_desc`, and `language`.\n\nYour task is to follow these instructions precisely:\n\n1.  **Analyze the Content:** Read and understand the input from the `title` and `content` fields to identify the core message and key concepts of the given subject.\n2.  **Synthesize Key Takeaways:** From the analysis, distill the information into **5 distinct and actionable key takeaways** relevant to the topic.\n3.  **Write the Video Script:**\n    *   The script must be written in the language specified by the `language` input, which will be a `BCP-47` language code.\n    *   The script must begin with a single, concise introductory hook derived from the `title`.\n    *   Immediately following the hook, the script must list the 5 key takeaways, starting each with words like \"First,\" \"Second,\" etc., in the specified language.\n    *   The total word count of the entire script must be approximately **70 words**.\n    *   The script must be a **single string of text** containing **only the spoken words**.\n4.  **Generate a Single, Narrative Video Prompt from the Script:**\n    *   You will generate **only one prompt as a single string of text, which must be in English.**\n    *   This prompt must describe a **continuous visual micro-narrative** that is a direct and creative visualization of the generated `script`.\n    *   You must use the inputs as follows:\n        *   **`script` (Primary Source):** The prompt's content, actions, and objects must be a direct visual translation of the nouns, verbs, and concepts mentioned in the script.\n        *   **`img_desc` (Stylistic Guide):** The prompt's visual aesthetic—including the environment, lighting, color palette, and character style—must be strictly defined by the `img_desc`.\n    *   The prompt must be framed for a **9:16 vertical aspect ratio** and describe an evolving, continuous shot.\n    *   The prompt's internal structure must flow logically through three phases based on the script's narrative:\n        *   **The Establishing Shot:** It must begin by visually interpreting the script's **introductory hook and first key takeaway(s)**.\n        *   **The Development:** It must then seamlessly transition to a dynamic action that visualizes the **central key takeaways** from the script.\n        *   **The Resolution:** It must conclude with a powerful final image that captures the **outcome or impact described in the last key takeaway(s)**.\n5.  **Format the Output:**\n    *   Your final output **must be a single, valid JSON object and nothing else.**\n    *   Do not include any introductory text, explanations, or markdown formatting like ```json before or after the object.\n    *   The JSON object must adhere strictly to the following structure:\n        ```json\n        {\n          \"script\": \"The 70-word script in the specified language as a single string, starting with the dynamic intro hook.\",\n          \"prompt\": \"A single, detailed prompt string in English that combines the establishing, development, and resolution phases into one continuous shot for a 9:16 aspect ratio, based directly on the script's content.\"\n        }\n        ```"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        720,
+        112
+      ],
+      "id": "0545c47a-57b9-4860-88bb-0a371f450494",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "6Qmz74fv62ASqbfV",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "imageUrls": "={{ $json.img }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        384,
+        112
+      ],
+      "id": "48b8b4dc-ffcb-4eab-a0b8-16611bef2357",
+      "name": "Analyze image",
+      "retryOnFail": true,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "6Qmz74fv62ASqbfV",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://texttospeech.googleapis.com/v1/text:synthesize",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"input\": {\n    \"prompt\": {{ $('Prepare data').item.json.prompt.toJsonString() }},\n    \"text\": {{ $json.script.toJsonString() }}\n  },\n  \"voice\": {\n    \"languageCode\": {{ $('Prepare data').item.json.language.toJsonString() }},\n    \"name\": {{ $('Prepare data').item.json.voice.toJsonString() }},\n    \"model_name\": \"gemini-2.5-flash-preview-tts\"\n  },\n  \"audioConfig\": {\n    \"audioEncoding\": \"MP3\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1184,
+        112
+      ],
+      "id": "5e6dc50a-9947-45eb-bec3-bdb57cc45987",
+      "name": "Text to speech",
+      "credentials": {
+        "googleApi": {
+          "id": "USHSJ16CtFdpn2AS",
+          "name": "Vertex API Service Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-pro",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-pro"
+        },
+        "text": "=**SYSTEM DIRECTIVE: RAW DATA OUTPUT MODE**\n\nYou are a specialized audio-to-subtitle parsing engine. Your only function is to convert an audio file into a raw `.ass` subtitle string suitable for programmatic parsing. Your output is consumed directly by an automated system, which will fail if any extraneous characters or formatting are present.\n\n**INPUT:**\nAn audio file will be provided.\n\n**OUTPUT PROTOCOL:**\n1.  Your entire response MUST be a single, raw `.ass` script string.\n2.  There must be absolutely no extraneous characters, whitespace, or newlines before the `[Script Info]` header or after the final `Dialogue` line.\n3.  **CRITICAL:** Do not include Markdown fences. The string ` ``` ` is forbidden in your output. Do not output any explanatory text. The response must be the `.ass` script and nothing else.\n\n**`.ass` SCRIPT REQUIREMENTS:**\n1.  **Header:** The string must begin with the exact `.ass` header block.\n2.  **Events:** After the header, generate a `Dialogue` event for every single word in the audio.\n3.  **Word-by-Word Timing:** Each `Dialogue` line must contain only one word, timed precisely to its start and end in the audio (`h:mm:ss.cs`). Punctuation must be appended to the word it follows.\n\n**EXAMPLE OF THE REQUIRED RAW OUTPUT:**\n[Script Info]\nTitle: Default Aegisub file\nScriptType: v4.00+\nWrapStyle: 0\nScaledBorderAndShadow: yes\nYCbCr Matrix: None\n\n[Aegisub Advanced SSA/ASS Style V4+]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\nStyle: Default,Arial,28,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1\n\n[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\nDialogue: 0,0:00:00.30,0:00:00.55,Default,,0,0,0,,Stop\nDialogue: 0,0:00:00.55,0:00:01.05,Default,,0,0,0,,searching\nDialogue: 0,0:00:01.05,0:00:01.30,Default,,0,0,0,,for\n\nExecute this directive. Failure to adhere to the raw output protocol will result in system error.",
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        112
+      ],
+      "id": "b530d520-474e-4529-9d4c-b3efa5ded8fb",
+      "name": "Analyze audio",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "6Qmz74fv62ASqbfV",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "var obj = JSON.parse($input.first().json.content.parts[0].text)\n\nobj.script = obj.script + ' ' + $('Prepare data').first().json.suffix;\nreturn obj;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1024,
+        112
+      ],
+      "id": "56cb77f8-8898-42ed-8911-80f99f6ab1ad",
+      "name": "Text speech"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ca5b28fe-fc75-40f5-8f40-65d58483503b",
+              "name": "subtitle",
+              "value": "={{ $json.content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1696,
+        112
+      ],
+      "id": "a67ad2d0-d4b0-4c3f-8316-f3faf933c639",
+      "name": "Speech text"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "audioContent",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1360,
+        112
+      ],
+      "id": "331384c4-e7be-475b-9b9e-3add4e6a40ec",
+      "name": "Convert base64 to File",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "subtitle",
+        "binaryPropertyName": "subtitle_file",
+        "options": {
+          "encoding": "utf8",
+          "fileName": "subtitle.ass"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1872,
+        112
+      ],
+      "id": "d1c64a89-b3a4-441a-9155-7cd73f6b9ec5",
+      "name": "Convert to File",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "binaryPropertyName": "subtitle_file",
+        "destinationKey": "subtitle_base",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        2048,
+        112
+      ],
+      "id": "f0808c7d-afeb-46a6-83e9-747aa9f9f4a3",
+      "name": "Extract from File",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "amount": 30
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2752,
+        112
+      ],
+      "id": "587ecdb6-191d-4d3e-beab-32ac02b022e1",
+      "name": "Wait",
+      "webhookId": "9d62d507-1d35-4c77-b603-c06866518118"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare data').item.json.backend }}/api/social-agent/prepare",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "task_id",
+              "value": "={{ $json.data.taskId }}"
+            },
+            {
+              "name": "audio",
+              "value": "={{ $('Text to speech').item.json.audioContent }}"
+            },
+            {
+              "name": "subtitle",
+              "value": "={{ $('Extract from File').item.json.subtitle_base }}"
+            },
+            {
+              "name": "blog_id",
+              "value": "={{ $('Data Blog').item.json.id }}"
+            },
+            {
+              "name": "license_key",
+              "value": "={{ $('Webhook').item.json.body.license_key }}"
+            },
+            {
+              "name": "voice",
+              "value": "={{ $('Webhook').item.json.body.voice }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2560,
+        112
+      ],
+      "id": "4ae7e79d-37bb-4c38-8c43-b21be02055d7",
+      "name": "Callback prepared url"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.config.toJsonString() }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2400,
+        112
+      ],
+      "id": "94f71802-51d8-49cb-b118-606aae51b72e",
+      "name": "Generate video",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "HuRFdzaG8jXchBN0",
+          "name": "kie AI Auth"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare data').item.json.backend }}/api/social-content/fail",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "post_id",
+              "value": "={{ $('Data Blog').item.json.id }}"
+            },
+            {
+              "name": "license_key",
+              "value": "={{ $('Webhook').item.json.body.license_key }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        192,
+        416
+      ],
+      "id": "d8a1b537-e4b3-44db-9cc2-96e7c1b04f84",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "errorMessage": "An error occurred!"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        464,
+        416
+      ],
+      "id": "87bbe062-171c-43ca-9b37-d1ea0b827e68",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "jsCode": "const model =  $('Prepare data').first().json.model;\nconst callback = $('Prepare data').first().json.backend + '/api/social-agent/process';\nconst prompt = $('Text speech').item.json.prompt;\n\nif(model == 'veo3_fast'){\n  return {\n    \"url\": \"https://api.kie.ai/api/v1/veo/generate\",\n    \"config\": {\n      \"prompt\": prompt,\n      \"model\": model,\n      \"callBackUrl\": callback,\n      \"aspectRatio\": \"9:16\",\n      \"imageUrls\": [\n        $('Data Blog').first().json.img\n      ]\n    } \n  }\n}else if(model == 'runway-duration-10-generate'){\n  return {\n    \"url\": \"https://api.kie.ai/api/v1/runway/generate\",\n    \"config\": {\n      \"prompt\": prompt,\n      \"model\": model,\n      \"callBackUrl\": callback,\n      \"aspectRatio\": \"9:16\",\n      \"quality\": \"720p\",\n      \"duration\": \"10\",\n      \"imageUrl\": $('Data Blog').first().json.img\n    } \n  }\n   \n}else if(model == 'sora-2-text-to-video'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      //\"model\": model,\n      \"model\": \"sora-2-image-to-video\",\n      \"callBackUrl\": callback,\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_urls\": [$('Data Blog').first().json.img],\n        \"aspect_ratio\": \"portrait\",\n        \"n_frames\": \"15\",\n        \"remove_watermark\": true\n      }\n    }\n  }\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2240,
+        112
+      ],
+      "id": "beeab084-d5d2-4b2a-9479-72ef9d71405f",
+      "name": "Format model"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -592,
+        960
+      ],
+      "id": "389500ce-b4e9-4a6a-bcb5-573304871aad",
+      "name": "Schedule Trigger",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://apiv2.synergizeflow.com/api/social-content/failed",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -384,
+        960
+      ],
+      "id": "1422428a-8d25-4815-8d0f-0790abc6d903",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "url": "https://api.kie.ai/api/v1/veo/record-info",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "taskId",
+              "value": "5fadd1f1e12a3df4a5630ff582291d94"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1568,
+        688
+      ],
+      "id": "129e60da-16be-46f4-8797-458beea8be2b",
+      "name": "Kie AI video status check",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "HuRFdzaG8jXchBN0",
+          "name": "kie AI Auth"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        688
+      ],
+      "id": "b4c4a221-ecee-4507-8059-809bf18c06d2",
+      "name": "When clicking ‘Execute workflow’"
+    }
+  ],
+  "connections": {
+    "Check if license is valid": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare data": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Prepare data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "format array posts",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Get post content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "format array posts": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get post content": {
+      "main": [
+        [
+          {
+            "node": "Data Blog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data Blog": {
+      "main": [
+        [
+          {
+            "node": "Analyze image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Img Desc": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Text speech",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze image": {
+      "main": [
+        [
+          {
+            "node": "Img Desc",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text to speech": {
+      "main": [
+        [
+          {
+            "node": "Convert base64 to File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze audio": {
+      "main": [
+        [
+          {
+            "node": "Speech text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text speech": {
+      "main": [
+        [
+          {
+            "node": "Text to speech",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Speech text": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert base64 to File": {
+      "main": [
+        [
+          {
+            "node": "Analyze audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Format model",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Callback prepared url": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate video": {
+      "main": [
+        [
+          {
+            "node": "Callback prepared url",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format model": {
+      "main": [
+        [
+          {
+            "node": "Generate video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Kie AI video status check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "FfOIxnXYC00WoM2o",
+    "saveDataSuccessExecution": "all"
+  },
+  "triggerCount": 2,
+  "versionId": "3267fff1-ba83-4d9f-a9c4-61fee6455917",
+  "owner": {
+    "type": "personal",
+    "projectId": "ZvP1yE48ZEo7zgpC",
+    "projectName": "Synergize Flow Team <info@mantab.one>",
+    "personalEmail": "info@mantab.one"
+  },
+  "parentFolderId": "W6kfCfNZPfSqIn2i",
+  "isArchived": false
+}

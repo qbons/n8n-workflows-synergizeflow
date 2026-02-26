@@ -1,0 +1,2354 @@
+{
+  "id": "nwuwh4hPyJ4N0s8y",
+  "name": "SF - Publish LinkedIn",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Configuration post settings').item.json.backend}}/api/linkedin/published",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content_id",
+              "value": "={{ $('Configuration post settings').item.json.content_id }}"
+            },
+            {
+              "name": "social_type",
+              "value": "linkedin"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1696,
+        1136
+      ],
+      "id": "0f1a5c7e-d55b-4015-978a-09df821a449d",
+      "name": "Callback publish"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c50b9bbf-23df-4e76-a102-0e0b996483aa",
+              "name": "domain_name",
+              "value": "={{ $json.body.domain_name }}",
+              "type": "string"
+            },
+            {
+              "id": "2aec08f4-958a-4f84-982a-9e745570a46a",
+              "name": "code",
+              "value": "={{ $json.body.code }}",
+              "type": "string"
+            },
+            {
+              "id": "1e2b22f0-560b-4038-b28f-b16013ca3508",
+              "name": "access_token",
+              "value": "={{ $json.body.access_token }}",
+              "type": "string"
+            },
+            {
+              "id": "4d73c33f-9aef-4d6f-b867-a14dc8765ba9",
+              "name": "linkedin_id",
+              "value": "={{ $json.body.linkedin_id }}",
+              "type": "string"
+            },
+            {
+              "id": "cd1de20f-cbd3-496f-8b69-965f9ac53cfc",
+              "name": "backend",
+              "value": "={{ $json.body.backend }}",
+              "type": "string"
+            },
+            {
+              "id": "b9c21123-2ee5-4e31-b236-33db6bb291e1",
+              "name": "content_type",
+              "value": "={{ $json.body.content_type }}",
+              "type": "string"
+            },
+            {
+              "id": "49bdf0b0-de1f-468d-950a-8642cf6e3645",
+              "name": "content_visibility",
+              "value": "={{ $json.body.content_visibility }}",
+              "type": "string"
+            },
+            {
+              "id": "ec8391b3-6251-45ef-92ae-b17e7e906885",
+              "name": "content_id",
+              "value": "={{ $json.body.content_id }}",
+              "type": "string"
+            },
+            {
+              "id": "9c0c153c-2aa0-420d-af77-d77ed93342b5",
+              "name": "video_url",
+              "value": "={{ $json.body.video_url }}",
+              "type": "string"
+            },
+            {
+              "id": "731b3149-314b-4df3-8562-26fa0d7c678d",
+              "name": "image_url",
+              "value": "={{ $json.body.image_url }}",
+              "type": "string"
+            },
+            {
+              "id": "e4f495d8-eb9b-44d2-bd99-4783dcbd0e4b",
+              "name": "text",
+              "value": "={{ $json.body.text }}",
+              "type": "string"
+            },
+            {
+              "id": "fccc5265-d0db-4d13-b449-6a9f77bb9398",
+              "name": "article_id",
+              "value": "={{ $json.body.article_id }}",
+              "type": "string"
+            },
+            {
+              "id": "6d0d2f94-229b-4013-b64d-95f1030a007f",
+              "name": "language",
+              "value": "={{ $json.body.language || 'English' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2400,
+        896
+      ],
+      "id": "85de9f82-88f5-43e1-b765-6db4865f523e",
+      "name": "Configuration post settings"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "social/linkedin-publish",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2576,
+        896
+      ],
+      "id": "d361de7e-d307-4f9e-9045-d1ddf55d3447",
+      "name": "Publish receiver",
+      "webhookId": "0f16cebd-602c-45db-b81d-9d2c5888c6ab"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.linkedin.com/v2/ugcPosts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Restli-Protocol-Version",
+              "value": "2.0.0"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Configuration post settings').item.json.access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"author\": \"urn:li:person:{{ $('Configuration post settings').item.json.linkedin_id }}\",\n  \"lifecycleState\": \"PUBLISHED\",\n  \"specificContent\": {\n    \"com.linkedin.ugc.ShareContent\": {\n      \"shareCommentary\": {\n        \"text\": {{ JSON.stringify($('Configuration post settings').item.json.text) }}\n      },\n      \"shareMediaCategory\": \"NONE\"\n    }\n  },\n  \"visibility\": {\n    \"com.linkedin.ugc.MemberNetworkVisibility\": \"{{ $('Configuration post settings').item.json.content_visibility }}\"\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -528,
+        -208
+      ],
+      "id": "6e1a6fa6-397f-4592-9c73-cb428c260b77",
+      "name": "Share content text"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.linkedin.com/v2/assets?action=registerUpload",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"registerUploadRequest\": {\n        \"recipes\": [\n            \"urn:li:digitalmediaRecipe:feedshare-image\"\n        ],\n        \"owner\": \"urn:li:person:{{ $json.linkedin_id }}\",\n        \"serviceRelationships\": [\n            {\n                \"relationshipType\": \"OWNER\",\n                \"identifier\": \"urn:li:userGeneratedContent\"\n            }\n        ]\n    }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -880,
+        -32
+      ],
+      "id": "d6f1147c-954e-4a99-ae24-99b0a47ee106",
+      "name": "Generate image upload url"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Configuration post settings').item.json.image_url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -624,
+        -32
+      ],
+      "id": "b654585c-8dcc-4cf4-8b32-f1e78cc68945",
+      "name": "Download image"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.value.uploadMechanism['com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest'].uploadUrl }}",
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -384,
+        -32
+      ],
+      "id": "75884e9e-a95b-459d-810c-ba3a309f729f",
+      "name": "Upload image"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.linkedin.com/v2/ugcPosts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Restli-Protocol-Version",
+              "value": "2.0.0"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Configuration post settings').item.json.access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -144,
+        368
+      ],
+      "id": "721dd67e-c577-4317-adf7-99ce0172a075",
+      "name": "Share content article"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.linkedin.com/v2/ugcPosts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Restli-Protocol-Version",
+              "value": "2.0.0"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Configuration post settings').item.json.access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"author\": \"urn:li:person:{{ $('Configuration post settings').item.json.linkedin_id }}\",\n    \"lifecycleState\": \"PUBLISHED\",\n    \"specificContent\": {\n        \"com.linkedin.ugc.ShareContent\": {\n            \"shareCommentary\": {\n                \"text\": {{ JSON.stringify($('Configuration post settings').item.json.text) }}\n            },\n            \"shareMediaCategory\": \"IMAGE\",\n            \"media\": [\n                {\n                    \"status\": \"READY\",\n                    \"description\": {\n                        \"text\": \"uploaded from synergizeflow\"\n                    },\n                    \"media\": {{ JSON.stringify($('Generate image upload url').item.json.value.asset) }}\n                }\n            ]\n        }\n    },\n    \"visibility\": {\n        \"com.linkedin.ugc.MemberNetworkVisibility\": \"{{ $('Configuration post settings').item.json.content_visibility }}\"\n    }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -144,
+        -32
+      ],
+      "id": "f261d1c7-bab8-41b8-9299-c52d4ad582e8",
+      "name": "Share content image"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.linkedin.com/v2/assets?action=registerUpload",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"registerUploadRequest\": {\n        \"recipes\": [\n            \"urn:li:digitalmediaRecipe:feedshare-video\"\n        ],\n        \"owner\": \"urn:li:person:{{ $json.linkedin_id }}\",\n        \"serviceRelationships\": [\n            {\n                \"relationshipType\": \"OWNER\",\n                \"identifier\": \"urn:li:userGeneratedContent\"\n            }\n        ]\n    }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -880,
+        176
+      ],
+      "id": "d99b11c7-ffd7-4acf-b67f-fe39ea8cb556",
+      "name": "Generate video upload url"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Configuration post settings').item.json.video_url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -624,
+        176
+      ],
+      "id": "eb191295-b384-427b-b29a-f649d4c7f5ff",
+      "name": "Download video"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.value.uploadMechanism['com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest'].uploadUrl }}",
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -384,
+        176
+      ],
+      "id": "09ae8269-e16d-40fc-bff7-71b490d11638",
+      "name": "Upload video"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.linkedin.com/v2/ugcPosts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Restli-Protocol-Version",
+              "value": "2.0.0"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Configuration post settings').item.json.access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"author\": \"urn:li:person:{{ $('Configuration post settings').item.json.linkedin_id }}\",\n    \"lifecycleState\": \"PUBLISHED\",\n    \"specificContent\": {\n        \"com.linkedin.ugc.ShareContent\": {\n            \"shareCommentary\": {\n                \"text\": {{ JSON.stringify($('Configuration post settings').item.json.text) }}\n            },\n            \"shareMediaCategory\": \"VIDEO\",\n            \"media\": [\n                {\n                    \"status\": \"READY\",\n                    \"description\": {\n                        \"text\": \"uploaded from synergizeflow\"\n                    },\n                    \"media\": {{ JSON.stringify($('Generate video upload url').item.json.value.asset) }}\n                }\n            ]\n        }\n    },\n    \"visibility\": {\n        \"com.linkedin.ugc.MemberNetworkVisibility\": \"{{ $('Configuration post settings').item.json.content_visibility }}\"\n    }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -144,
+        176
+      ],
+      "id": "f01ddd19-4b49-4a6b-bfea-82289a678efd",
+      "name": "Share content video"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -3680,
+        -304
+      ],
+      "id": "7efd0ebd-4e21-4b4e-a1c4-cac18d223525",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "modelId": {
+          "__rl": true,
+          "value": "models/imagen-4.0-fast-generate-001",
+          "mode": "list",
+          "cachedResultName": "models/imagen-4.0-fast-generate-001"
+        },
+        "prompt": "={{ $json.description }}",
+        "options": {
+          "sampleCount": 1,
+          "binaryPropertyOutput": "file"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -3232,
+        -544
+      ],
+      "id": "1c25936a-de6d-4c51-ab43-3e89308f29cc",
+      "name": "Generate an image",
+      "retryOnFail": true,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "6Qmz74fv62ASqbfV",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://neutral-barnacle-magnetic.ngrok-free.app/api/linkedin-agent/generated-image",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "file",
+              "value": "={{ $json.file }}"
+            },
+            {
+              "name": "userId",
+              "value": "={{ $('Configuration image settings').item.json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -2832,
+        -544
+      ],
+      "id": "a8843ac2-6a7c-4c45-bc47-6960007ea030",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "binaryPropertyName": "file",
+        "destinationKey": "file",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -3024,
+        -544
+      ],
+      "id": "fef9ad35-8238-4702-93d2-0bd3fa451750",
+      "name": "Transform to base"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "0575d44e-efb5-40f1-b6b8-9e503254b8bd",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -3680,
+        -544
+      ],
+      "id": "3b6ba76d-e224-416b-b7ba-b0959a166276",
+      "name": "Image Generator Reciever",
+      "webhookId": "0575d44e-efb5-40f1-b6b8-9e503254b8bd"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b893897c-727c-4a9e-9b3c-ce9a82a84b82",
+              "name": "description",
+              "value": "={{ $json.body.description }}",
+              "type": "string"
+            },
+            {
+              "id": "e9af33c1-9e50-444c-9434-64c58f35826b",
+              "name": "id",
+              "value": "={{ $json.body.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3456,
+        -544
+      ],
+      "id": "37af7bdb-6211-4e60-bf11-43b98f2c82fd",
+      "name": "Configuration image settings"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"imageUrl\": {{ JSON.stringify($json.url) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -2624,
+        -544
+      ],
+      "id": "a03de12d-d713-45e0-a99a-95a54e52ca88",
+      "name": "Image generator responder"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.domain_name }}/wp-json/synergize/v1/get-single-post",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "=code",
+              "value": "={{ $json.code }}"
+            },
+            {
+              "name": "=id",
+              "value": "={{ $('Configuration post settings').item.json.article_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -880,
+        368
+      ],
+      "id": "59c5b848-b104-49ed-85ff-3c74dd415090",
+      "name": "Get post content"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.content }}",
+        "options": {
+          "systemMessage": "=You are an expert LinkedIn ghostwriter.\n\nI will give you a blog post. Your task is to write a short, engaging LinkedIn caption (max 1500 characters) that feels natural, professional, and human-written. You MUST use {{ $('Configuration post settings').item.json.language }} only. Do not mix languages.\n\nStrict formatting & tone rules:\n- Output plain text only (no markdown, no bold, no italics, no quotation-based emphasis)\n- Do NOT use ** **, * *, underscores, or any markdown-style formatting\n- Do NOT overuse emojis: maximum 2 emojis total in the entire caption\n- Emojis must support the message, not decorate every paragraph\n- Use simple bullet points with hyphens (-), not symbols or emoji bullets\n- Avoid putting technical terms in bold, quotes, or emphasized formats\n- Do NOT use excessive hype language or marketing buzzwords\n- Keep sentences short, clear, and conversational\n- Professional tone suitable for LinkedIn (smart, calm, confident)\n\nContent rules:\n- Start with a strong but natural hook (no clickbait)\n- Explain ideas simply, without sounding like documentation\n- Bullets should be clean and readable, no labels with formatting\n- Include a smooth Call to Action encouraging readers to read the full article\n- Do NOT mention links, URLs, or “link in comments/bio”\n- Use a maximum of 3 relevant hashtags at the end (optional)\n- Do NOT add any extra explanation, notes, or commentary\n\nOutput ONLY the final LinkedIn caption."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -672,
+        544
+      ],
+      "id": "97965d19-fcb4-4642-9670-7f6a0af75fdd",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "projectId": {
+          "__rl": true,
+          "value": "synergizeflow-480314",
+          "mode": "list",
+          "cachedResultName": "Synergizeflow"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleVertex",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        752
+      ],
+      "id": "6838ba47-18d4-4c76-9d36-ac8ad984d28d",
+      "name": "Google Vertex Chat Model",
+      "credentials": {
+        "googleApi": {
+          "id": "USHSJ16CtFdpn2AS",
+          "name": "Vertex API Service Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.domain_name }}/wp-json/synergize/v1/get-single-post",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "=code",
+              "value": "={{ $json.code }}"
+            },
+            {
+              "name": "=id",
+              "value": "={{ $('Configuration post settings').item.json.article_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -880,
+        544
+      ],
+      "id": "3b549ea1-f618-426f-aec0-e6b96f63f3cc",
+      "name": "Get internal post content"
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = {\n  status: \"READY\",\n  originalUrl: $input.first().json.link,\n  title: {\n    text: $input.first().json.title\n  },\n};\n\nif ($input.first().json.image !== false) {\n  payload['thumbnails'] = [{\n    url:  $input.first().json.image\n  }]\n}\n\nreturn [\n  {\n    json: {\n      author: \"urn:li:person:\" + $('Configuration post settings').first().json.linkedin_id,\n      lifecycleState: \"PUBLISHED\",\n      specificContent: {\n        \"com.linkedin.ugc.ShareContent\": {\n            \"shareCommentary\": {\n                \"text\": $('Configuration post settings').first().json.text\n            },\n            \"shareMediaCategory\": \"ARTICLE\",\n            \"media\": [\n                payload\n            ]\n        }\n    },\n    \"visibility\": {\n        \"com.linkedin.ugc.MemberNetworkVisibility\": $('Configuration post settings').first().json.content_visibility\n    }\n}\n  },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -544,
+        368
+      ],
+      "id": "f6335abe-cb29-4065-bcc7-3c0d1df5c9ef",
+      "name": "Article payload formater"
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = {\n  status: \"READY\",\n  originalUrl: $('Get internal post content').first().json.link,\n  title: {\n    text: $('Get internal post content').first().json.title\n  },\n};\n\nif ($('Get internal post content').first().json.image !== false) {\n  payload['thumbnails'] = [{\n    url:  $('Get internal post content').first().json.image\n  }]\n}\n\nreturn [\n  {\n    json: {\n      author: \"urn:li:person:\" + $('Configuration post settings').first().json.linkedin_id,\n      lifecycleState: \"PUBLISHED\",\n      specificContent: {\n        \"com.linkedin.ugc.ShareContent\": {\n            \"shareCommentary\": {\n                \"text\": $input.first().json.output\n            },\n            \"shareMediaCategory\": \"ARTICLE\",\n            \"media\": [\n                payload\n            ]\n        }\n    },\n    \"visibility\": {\n        \"com.linkedin.ugc.MemberNetworkVisibility\": $('Configuration post settings').first().json.content_visibility\n    }\n}\n  },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -352,
+        544
+      ],
+      "id": "9b106fbe-82b2-4549-aedf-fd0a9f069eeb",
+      "name": "Internal article payload formater"
+    },
+    {
+      "parameters": {
+        "content": "### Publish to personal account",
+        "height": 1120,
+        "width": 1024
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -960,
+        -240
+      ],
+      "typeVersion": 1,
+      "id": "5d66ba6e-6951-42b1-9fcd-d199a87d7ff4",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "00db86c9-d331-45a6-af8e-5c8cf00994c6"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3e1609ee-eea7-433d-8d11-d8818a1df2ae",
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "fff43af6-462c-448c-a229-922761b25ddc",
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "video",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "video"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "28e6d99a-0f44-4529-8e75-2d11034b7a77",
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "article",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "article"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "e11ad2d0-36a6-4ed5-8d3b-2af73387b8ce",
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "internal_article",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "internal_article"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "d1bf548c-efd3-495d-be20-608ee976e95a",
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "business_text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "business_text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f3ee65a0-f088-4236-9f5e-6152aa40309f",
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "business_image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "business_image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ea030cee-0af7-4a8b-9862-8f8d1f492fdf",
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "business_video",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "business_video"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "8f1af964-1b17-459e-9b95-fff419779ef9",
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "business_article",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "business_article"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2e01d0c7-c6a5-440b-bb8b-7ef2fbbad9ad",
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "business_internal_article",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "business_internal_article"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -2256,
+        896
+      ],
+      "id": "69a0e1e6-28dc-4707-9789-2b9756767ce2",
+      "name": "Content router"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.linkedin.com/rest/posts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Restli-Protocol-Version",
+              "value": "2.0.0"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Configuration post settings').item.json.access_token }}"
+            },
+            {
+              "name": "Linkedin-Version",
+              "value": "202509"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"author\": \"urn:li:organization:{{ $('Configuration post settings').item.json.linkedin_id }}\",\n  \"commentary\": {{ JSON.stringify($('Configuration post settings').item.json.text) }},\n  \"visibility\": \"{{ $('Configuration post settings').item.json.content_visibility }}\",\n  \"distribution\": {\n    \"feedDistribution\": \"MAIN_FEED\",\n    \"targetEntities\": [],\n    \"thirdPartyDistributionChannels\": []\n  },\n  \"lifecycleState\": \"PUBLISHED\",\n  \"isReshareDisabledByAuthor\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -160,
+        1008
+      ],
+      "id": "83f90bd4-cd3b-494e-8ac3-7b9f695e54ba",
+      "name": "Share business content text"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.linkedin.com/rest/images?action=initializeUpload",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.access_token }}"
+            },
+            {
+              "name": "X-Restli-Protocol-Version",
+              "value": "2.0.0"
+            },
+            {
+              "name": "Linkedin-Version",
+              "value": "202509"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"initializeUploadRequest\": {\n        \"owner\": \"urn:li:organization:{{ $json.linkedin_id }}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -544,
+        1216
+      ],
+      "id": "9d384c0e-9c4a-4e73-93b6-d519e2acc7ba",
+      "name": "Generate business image upload url"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Configuration post settings').item.json.image_url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -288,
+        1216
+      ],
+      "id": "2e7d1774-7570-4835-9649-f2a12bf36221",
+      "name": "Download business image"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.value.uploadUrl }}",
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -48,
+        1216
+      ],
+      "id": "66581200-9dec-495d-a17a-5ed3630b6043",
+      "name": "Upload business image"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.linkedin.com/rest/posts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Restli-Protocol-Version",
+              "value": "2.0.0"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Configuration post settings').item.json.access_token }}"
+            },
+            {
+              "name": "Linkedin-Version",
+              "value": "202509"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"author\": \"urn:li:organization:{{ $('Configuration post settings').item.json.linkedin_id }}\",\n    \"commentary\": {{ JSON.stringify($('Configuration post settings').item.json.text) }},\n    \"visibility\": \"{{ $('Configuration post settings').item.json.content_visibility }}\",\n    \"distribution\": {\n        \"feedDistribution\": \"MAIN_FEED\",\n        \"targetEntities\": [],\n        \"thirdPartyDistributionChannels\": []\n    },\n    \"content\": {\n        \"media\": {\n            \"title\": \"uploaded from synergizeflow\",\n            \"id\": {{ JSON.stringify($('Generate business image upload url').item.json.value.image) }}\n        }\n    },\n    \"lifecycleState\": \"PUBLISHED\",\n    \"isReshareDisabledByAuthor\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        192,
+        1216
+      ],
+      "id": "f5ea8a96-6914-42c4-8e96-32b4db7ca87d",
+      "name": "Share business content image"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Configuration post settings').item.json.video_url }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -848,
+        1424
+      ],
+      "id": "d9e25620-5e75-4008-a7eb-8c847da62333",
+      "name": "Download business video"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "33ffa5e6-139f-4950-aca7-305f9e5d2c1f",
+              "name": "video",
+              "value": "={{ $('Download business video').item.binary.data.data }}",
+              "type": "string"
+            },
+            {
+              "id": "845ce402-4949-4a1b-ada9-208b6a26caeb",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -656,
+        1424
+      ],
+      "id": "860e58fb-6327-48bf-89d8-8039ce039fe9",
+      "name": "Get business video binary"
+    },
+    {
+      "parameters": {
+        "jsCode": "const binaryData = $input.first().json.video;\nlet videoSize = 0;\n\n// Jika data adalah base64 string\nif (typeof binaryData === 'string') {\n  // Hitung ukuran asli dari base64\n  const base64String = binaryData;\n  const padding = (base64String.match(/=/g) || []).length;\n  videoSize = Math.floor((base64String.length * 3) / 4) - padding;\n} \n// Jika data adalah Buffer\nelse if (Buffer.isBuffer(binaryData)) {\n  videoSize = binaryData.length;\n}\n\nreturn { videoSize };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -448,
+        1424
+      ],
+      "id": "c1dfa977-ab0d-40ba-b1b1-cfd865d180e1",
+      "name": "Get video size"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.linkedin.com/rest/videos?action=initializeUpload",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Configuration post settings').first().json.access_token }}"
+            },
+            {
+              "name": "X-Restli-Protocol-Version",
+              "value": "2.0.0"
+            },
+            {
+              "name": "Linkedin-Version",
+              "value": "202509"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"initializeUploadRequest\": {\n        \"owner\": \"urn:li:organization:{{ $('Configuration post settings').first().json.linkedin_id }}\",\n        \"fileSizeBytes\": {{ $json.videoSize }},\n        \"uploadCaptions\": false,\n        \"uploadThumbnail\": false\n    }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -256,
+        1424
+      ],
+      "id": "cfb92422-c09f-4e0f-93ff-cae37f68af2f",
+      "name": "Generate business video upload url"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "09ccdb22-cc82-4af7-b4b2-149724e3d977",
+              "name": "data",
+              "value": "={{ $('Download business video').item.binary.data }}",
+              "type": "binary"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -64,
+        1424
+      ],
+      "id": "3d02ea12-6d49-4722-929d-72574b9b4a7b",
+      "name": "Prepare video binary"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Generate business video upload url').first().json.value.uploadInstructions[0].uploadUrl }}",
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        128,
+        1424
+      ],
+      "id": "31a4759c-a137-4e0f-8f6d-06e7c48589b2",
+      "name": "Upload business video"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.linkedin.com/rest/videos?action=finalizeUpload",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Configuration post settings').first().json.access_token }}"
+            },
+            {
+              "name": "X-Restli-Protocol-Version",
+              "value": "2.0.0"
+            },
+            {
+              "name": "Linkedin-Version",
+              "value": "202509"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"finalizeUploadRequest\": {\n        \"video\": \"{{ $('Generate business video upload url').item.json.value.video }}\",\n        \"uploadToken\": \"\",\n        \"uploadedPartIds\": [\"{{ $json.headers.etag }}\"]\n    }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        304,
+        1424
+      ],
+      "id": "dc44967e-9014-4c64-b80f-fce6ce85e6a3",
+      "name": "Finalize Video Upload"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.linkedin.com/rest/posts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Restli-Protocol-Version",
+              "value": "2.0.0"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Configuration post settings').item.json.access_token }}"
+            },
+            {
+              "name": "Linkedin-Version",
+              "value": "202509"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"author\": \"urn:li:organization:{{ $('Configuration post settings').item.json.linkedin_id }}\",\n    \"commentary\": {{ JSON.stringify($('Configuration post settings').item.json.text) }},\n    \"visibility\": \"{{ $('Configuration post settings').item.json.content_visibility }}\",\n    \"distribution\": {\n        \"feedDistribution\": \"MAIN_FEED\",\n        \"targetEntities\": [],\n        \"thirdPartyDistributionChannels\": []\n    },\n    \"content\": {\n        \"media\": {\n            \"title\": \"uploaded from synergizeflow\",\n            \"id\": {{ JSON.stringify($('Generate business video upload url').item.json.value.video) }}\n        }\n    },\n    \"lifecycleState\": \"PUBLISHED\",\n    \"isReshareDisabledByAuthor\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        496,
+        1424
+      ],
+      "id": "0b6e645c-e2fb-43e8-b671-b146bb2e6d62",
+      "name": "Share business content video"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.content }}",
+        "options": {
+          "systemMessage": "=You are an expert LinkedIn ghostwriter.\n\nI will give you a blog post. Your task is to write a short, engaging LinkedIn caption (max 1500 characters) that feels natural, professional, and human-written. You MUST use {{ $('Configuration post settings').item.json.language }} only. Do not mix languages.\n\nStrict formatting & tone rules:\n- Output plain text only (no markdown, no bold, no italics, no quotation-based emphasis)\n- Do NOT use ** **, * *, underscores, or any markdown-style formatting\n- Do NOT overuse emojis: maximum 2 emojis total in the entire caption\n- Emojis must support the message, not decorate every paragraph\n- Use simple bullet points with hyphens (-), not symbols or emoji bullets\n- Avoid putting technical terms in bold, quotes, or emphasized formats\n- Do NOT use excessive hype language or marketing buzzwords\n- Keep sentences short, clear, and conversational\n- Professional tone suitable for LinkedIn (smart, calm, confident)\n\nContent rules:\n- Start with a strong but natural hook (no clickbait)\n- Explain ideas simply, without sounding like documentation\n- Bullets should be clean and readable, no labels with formatting\n- Include a smooth Call to Action encouraging readers to read the full article\n- Do NOT mention links, URLs, or “link in comments/bio”\n- Use a maximum of 3 relevant hashtags at the end (optional)\n- Do NOT add any extra explanation, notes, or commentary\n\nOutput ONLY the final LinkedIn caption."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -1200,
+        1872
+      ],
+      "id": "f91cd064-3f84-4bd4-9f8a-5d40cc3d16ea",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "projectId": {
+          "__rl": true,
+          "value": "gen-lang-client-0797800029",
+          "mode": "list",
+          "cachedResultName": "Gemini API"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleVertex",
+      "typeVersion": 1,
+      "position": [
+        -1200,
+        2016
+      ],
+      "id": "c881d734-faf2-473c-be3c-b9d483b120f7",
+      "name": "Google Vertex Chat Model2",
+      "credentials": {
+        "googleApi": {
+          "id": "USHSJ16CtFdpn2AS",
+          "name": "Vertex API Service Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.domain_name }}/wp-json/synergize/v1/get-single-post",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "=code",
+              "value": "={{ $json.code }}"
+            },
+            {
+              "name": "=id",
+              "value": "={{ $('Configuration post settings').item.json.article_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1056,
+        1664
+      ],
+      "id": "5894c3cf-607c-465c-909d-2c9e2d8a6e77",
+      "name": "Get post business content"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      title: $input.first().json.title,\n      content: $input.first().json.content,\n      image: $input.first().json.image,\n      link: $input.first().json.link,\n      text: $('Configuration post settings').first().json.text\n    }\n  }\n]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -848,
+        1664
+      ],
+      "id": "73b3d780-2d00-46c8-bcfd-d5cf57ba578c",
+      "name": "Format content"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "edf03098-7c70-4ebf-8290-86fe3d3db934",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "a1e42c96-4e26-490c-b5bc-ba1f9d0db71e",
+              "name": "content",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "13f5667a-42be-4911-9fd6-1bbc8843a193",
+              "name": "image",
+              "value": "={{ $json.image }}",
+              "type": "string"
+            },
+            {
+              "id": "6baa1bc6-c370-4d39-9b6b-785f9bc7c66c",
+              "name": "link",
+              "value": "={{ $json.link }}",
+              "type": "string"
+            },
+            {
+              "id": "5a39d314-a400-479b-a6e2-2833c4c7ae0f",
+              "name": "text",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -640,
+        1664
+      ],
+      "id": "796b185c-9698-439a-9e38-b5b01efc8479",
+      "name": "Config content"
+    },
+    {
+      "parameters": {
+        "jsCode": "if ($input.first().json.image !== 'false'){\n  return [\n    {\n      json: {\n        value: true\n      }\n    }\n  ]\n} else {\n  return [\n    {\n      json: {\n        value: false\n      }\n    }\n  ]\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -448,
+        1664
+      ],
+      "id": "6ac1ebe4-9493-4356-9c96-ebb235cdb9d8",
+      "name": "Check image exist"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "37392986-fb92-4a22-bcd8-7d096056205f",
+              "leftValue": "={{ $json.value }}",
+              "rightValue": "false",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -288,
+        1664
+      ],
+      "id": "1f59056e-418e-4cfb-90c0-a2e297e7f19b",
+      "name": "If image exist"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.linkedin.com/rest/images?action=initializeUpload",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Configuration post settings').first().json.access_token }}"
+            },
+            {
+              "name": "X-Restli-Protocol-Version",
+              "value": "2.0.0"
+            },
+            {
+              "name": "Linkedin-Version",
+              "value": "202509"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"initializeUploadRequest\": {\n        \"owner\": \"urn:li:organization:{{ $('Configuration post settings').first().json.linkedin_id }}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -80,
+        1648
+      ],
+      "id": "03941a79-fb1d-4943-8c60-8332e5d10c3e",
+      "name": "Generate image article upload url",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Config content').first().json.image }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        112,
+        1648
+      ],
+      "id": "b5bb5627-f061-463c-b1d8-5cfb631175eb",
+      "name": "Download article image",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.value.uploadUrl }}",
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        288,
+        1648
+      ],
+      "id": "c3169135-a0fb-4963-8cdd-55b4b0f78183",
+      "name": "Upload article image",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      author: \"urn:li:organization:\" + $('Configuration post settings').first().json.linkedin_id,\n      commentary: $('Config content').first().json.text,\n      visibility: $('Configuration post settings').first().json.content_visibility,\n      distribution: {\n        feedDistribution: \"MAIN_FEED\",\n        targetEntities: [],\n        thirdPartyDistributionChannels: []\n      },\n      content: {\n        article: {\n          source: $('Config content').first().json.link,\n          title: $('Config content').first().json.title,\n          thumbnail: $('Generate image article upload url').first().json.value.image\n        }\n      },\n      lifecycleState: \"PUBLISHED\",\n      isReshareDisabledByAuthor: false\n    }\n  },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        1648
+      ],
+      "id": "d1ef22e0-ed36-48a5-b7ae-6934c4b22bae",
+      "name": "Article image payload formater"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.linkedin.com/rest/posts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Restli-Protocol-Version",
+              "value": "2.0.0"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Configuration post settings').item.json.access_token }}"
+            },
+            {
+              "name": "Linkedin-Version",
+              "value": "202509"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        672,
+        1648
+      ],
+      "id": "2d26ddcb-7333-4823-888b-ab27f12ca9cd",
+      "name": "Share business content article"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      author: \"urn:li:organization:\" + $('Configuration post settings').first().json.linkedin_id,\n      commentary: $('Config content').first().json.text,\n      visibility: $('Configuration post settings').first().json.content_visibility,\n      distribution: {\n        feedDistribution: \"MAIN_FEED\",\n        targetEntities: [],\n        thirdPartyDistributionChannels: []\n      },\n      content: {\n        article: {\n          source: $('Config content').first().json.link,\n          title: $('Config content').first().json.title,\n        }\n      },\n      lifecycleState: \"PUBLISHED\",\n      isReshareDisabledByAuthor: false\n    }\n  },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        192,
+        1856
+      ],
+      "id": "847f18f9-9b4b-433d-ad85-b76ebc9b0415",
+      "name": "Article without image payload formater"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      title: $('Get internal post business content').first().json.title,\n      content: $('Get internal post business content').first().json.content,\n      image: $('Get internal post business content').first().json.image,\n      link: $('Get internal post business content').first().json.link,\n      text: $input.first().json.output\n    }\n  }\n]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -848,
+        1872
+      ],
+      "id": "b2fc2bdf-7995-4d83-85ff-98f3f9bdeb86",
+      "name": "Format internat content"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.domain_name }}/wp-json/synergize/v1/get-single-post",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "=code",
+              "value": "={{ $json.code }}"
+            },
+            {
+              "name": "=id",
+              "value": "={{ $('Configuration post settings').item.json.article_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1360,
+        1872
+      ],
+      "id": "e8e9822b-f511-4faa-9e8d-a9e075ff263d",
+      "name": "Get internal post business content"
+    },
+    {
+      "parameters": {
+        "content": "### Publish to business page",
+        "height": 1152,
+        "width": 2256,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1408,
+        992
+      ],
+      "typeVersion": 1,
+      "id": "56cd0118-a63d-47d2-a2a4-0a071091f476",
+      "name": "Sticky Note1"
+    }
+  ],
+  "connections": {
+    "Configuration post settings": {
+      "main": [
+        [
+          {
+            "node": "Content router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish receiver": {
+      "main": [
+        [
+          {
+            "node": "Configuration post settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share content text": {
+      "main": [
+        [
+          {
+            "node": "Callback publish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate image upload url": {
+      "main": [
+        [
+          {
+            "node": "Download image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download image": {
+      "main": [
+        [
+          {
+            "node": "Upload image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload image": {
+      "main": [
+        [
+          {
+            "node": "Share content image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share content article": {
+      "main": [
+        [
+          {
+            "node": "Callback publish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share content image": {
+      "main": [
+        [
+          {
+            "node": "Callback publish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate video upload url": {
+      "main": [
+        [
+          {
+            "node": "Download video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download video": {
+      "main": [
+        [
+          {
+            "node": "Upload video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload video": {
+      "main": [
+        [
+          {
+            "node": "Share content video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share content video": {
+      "main": [
+        [
+          {
+            "node": "Callback publish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate an image": {
+      "main": [
+        [
+          {
+            "node": "Transform to base",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Image generator responder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform to base": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Generator Reciever": {
+      "main": [
+        [
+          {
+            "node": "Configuration image settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configuration image settings": {
+      "main": [
+        [
+          {
+            "node": "Generate an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get post content": {
+      "main": [
+        [
+          {
+            "node": "Article payload formater",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Internal article payload formater",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Vertex Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get internal post content": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Article payload formater": {
+      "main": [
+        [
+          {
+            "node": "Share content article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Internal article payload formater": {
+      "main": [
+        [
+          {
+            "node": "Share content article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content router": {
+      "main": [
+        [
+          {
+            "node": "Share content text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate image upload url",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate video upload url",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get post content",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get internal post content",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Share business content text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate business image upload url",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download business video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get post business content",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get internal post business content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate business image upload url": {
+      "main": [
+        [
+          {
+            "node": "Download business image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download business image": {
+      "main": [
+        [
+          {
+            "node": "Upload business image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload business image": {
+      "main": [
+        [
+          {
+            "node": "Share business content image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download business video": {
+      "main": [
+        [
+          {
+            "node": "Get business video binary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get business video binary": {
+      "main": [
+        [
+          {
+            "node": "Get video size",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get video size": {
+      "main": [
+        [
+          {
+            "node": "Generate business video upload url",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate business video upload url": {
+      "main": [
+        [
+          {
+            "node": "Prepare video binary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare video binary": {
+      "main": [
+        [
+          {
+            "node": "Upload business video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload business video": {
+      "main": [
+        [
+          {
+            "node": "Finalize Video Upload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Finalize Video Upload": {
+      "main": [
+        [
+          {
+            "node": "Share business content video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "Format internat content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Vertex Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get post business content": {
+      "main": [
+        [
+          {
+            "node": "Format content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format content": {
+      "main": [
+        [
+          {
+            "node": "Config content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config content": {
+      "main": [
+        [
+          {
+            "node": "Check image exist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check image exist": {
+      "main": [
+        [
+          {
+            "node": "If image exist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If image exist": {
+      "main": [
+        [
+          {
+            "node": "Generate image article upload url",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Article without image payload formater",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate image article upload url": {
+      "main": [
+        [
+          {
+            "node": "Download article image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download article image": {
+      "main": [
+        [
+          {
+            "node": "Upload article image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Article without image payload formater",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload article image": {
+      "main": [
+        [
+          {
+            "node": "Article image payload formater",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Article without image payload formater",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Article image payload formater": {
+      "main": [
+        [
+          {
+            "node": "Share business content article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Article without image payload formater": {
+      "main": [
+        [
+          {
+            "node": "Share business content article",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format internat content": {
+      "main": [
+        [
+          {
+            "node": "Config content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get internal post business content": {
+      "main": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share business content text": {
+      "main": [
+        [
+          {
+            "node": "Callback publish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share business content image": {
+      "main": [
+        [
+          {
+            "node": "Callback publish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share business content video": {
+      "main": [
+        [
+          {
+            "node": "Callback publish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share business content article": {
+      "main": [
+        [
+          {
+            "node": "Callback publish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "FfOIxnXYC00WoM2o"
+  },
+  "triggerCount": 2,
+  "versionId": "aa50ad2d-d8f5-4ce4-8c93-f33d03d57a86",
+  "owner": {
+    "type": "personal",
+    "projectId": "ZvP1yE48ZEo7zgpC",
+    "projectName": "Synergize Flow Team <info@mantab.one>",
+    "personalEmail": "info@mantab.one"
+  },
+  "parentFolderId": "W6kfCfNZPfSqIn2i",
+  "isArchived": false
+}

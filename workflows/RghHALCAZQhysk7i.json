@@ -1,0 +1,553 @@
+{
+  "id": "RghHALCAZQhysk7i",
+  "name": "SF - Image Bank",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "util/image-vault",
+        "options": {
+          "responseData": "workflow_started"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1168,
+        64
+      ],
+      "id": "7366a32e-6436-4079-b1a2-36741b49bf53",
+      "name": "Webhook",
+      "webhookId": "8c13a5fc-ec33-4fef-974a-763786970b00"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3d1ab9b0-7d1e-44f3-82c6-3b9e3f88d229",
+              "name": "license_key",
+              "value": "={{ $json.body.license_key }}",
+              "type": "string"
+            },
+            {
+              "id": "e0787359-9291-4921-ab77-7d19dd04f4a6",
+              "name": "domain_name",
+              "value": "={{ $json.body.domain_name }}",
+              "type": "string"
+            },
+            {
+              "id": "5662f0a0-dcd0-40b0-9cf6-5acb455c608e",
+              "name": "file_name",
+              "value": "={{ $json.body.filename }}",
+              "type": "string"
+            },
+            {
+              "id": "cc44044c-7290-40e2-a779-969fd6c24ca1",
+              "name": "image",
+              "value": "={{ $json.body.image }}",
+              "type": "string"
+            },
+            {
+              "id": "d934a4a0-cb9b-4e4d-a12d-a49952ae5cba",
+              "name": "webhook",
+              "value": "={{ $json.body.webhook }}",
+              "type": "string"
+            },
+            {
+              "id": "c29472ce-ccff-4077-8e8c-0dbc456bf8c9",
+              "name": "task_id",
+              "value": "={{ $json.body.task_id }}",
+              "type": "number"
+            },
+            {
+              "id": "ba64f567-618e-4040-bdb2-0e044831db7a",
+              "name": "title",
+              "value": "={{ $json.body.title }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -944,
+        64
+      ],
+      "id": "23832574-6088-4d31-83e5-39b71618bda4",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.domain_name }}wp-json/synergize/v1/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "code",
+              "value": "={{ $json.license_key }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -720,
+        64
+      ],
+      "id": "ce191b4d-cae5-4bcc-abc2-a15b78261ee9",
+      "name": "Check if license is valid"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "60458c94-986c-49cd-8b69-4b5616163eb3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f910b52-842c-4b6a-a862-e6914c883764",
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -496,
+        64
+      ],
+      "id": "676f9791-ef5b-4383-b264-1416e9dc250e",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "fail"
+            },
+            {
+              "name": "msg",
+              "value": "invalid_license"
+            },
+            {
+              "name": "task_id",
+              "value": "={{ $('Prepare Data').item.json.task_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -272,
+        160
+      ],
+      "id": "4ac35f83-fde0-4c79-927f-5ab5fe21ae67",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "image",
+        "binaryPropertyName": "image",
+        "options": {
+          "fileName": "={{ $('Prepare Data').item.json.file_name }}"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        176,
+        -32
+      ],
+      "id": "e96c1a62-eea6-454e-b4d5-c4f2b714e70c",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e9e736d9-6ec6-41bc-94d3-f364c26b5aee",
+              "name": "image",
+              "value": "={{ $('Prepare Data').item.json.image }}",
+              "type": "string"
+            },
+            {
+              "id": "402d2461-05c3-4cbb-bb46-aa6274b86025",
+              "name": "website",
+              "value": "={{ $json.data }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -48,
+        -32
+      ],
+      "id": "d72ac006-8198-4b5d-8b18-1d67da65c924",
+      "name": "Prepare Base64"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.domain_name }}wp-json/synergize/v1/get-website-data/",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "jRCK@H_62U]%{K9SjLUim-VjBi8_7/"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -272,
+        -32
+      ],
+      "id": "95a82953-a9da-4dc1-99f5-4fa92991c04e",
+      "name": "Get website data"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-3-pro-preview",
+          "mode": "list",
+          "cachedResultName": "models/gemini-3-pro-preview"
+        },
+        "text": "=This is image of {{ $('Prepare Data').item.json.title }}. Analyze the input images with great detail and precision. Describe the image directly as response without introduction text in plain text format.\n",
+        "inputType": "binary",
+        "binaryPropertyName": "image",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        400,
+        -32
+      ],
+      "id": "f26fc2be-22ee-4595-af3e-2e85abcb4824",
+      "name": "Analyze an image",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "6Qmz74fv62ASqbfV",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1503e850-868d-4748-b375-9dc451f525e7",
+              "name": "description",
+              "value": "={{ $json.content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        624,
+        -32
+      ],
+      "id": "980c6dab-f69d-4eed-b148-e0c31c9ef78a",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=  {\n    \"image_description\": {{ $json.description.toJsonString() }}\n    \"website_data\":{{ $('Prepare Base64').item.json.website.toJsonString() }}\n  } "
+            }
+          ]
+        },
+        "options": {
+          "systemMessage": "=You are a relevance analysis engine. You will receive data in a JSON format containing two primary keys: `image_description` and `website_data`.\n\n**Your Goal:**\nCompare the content described in `image_description` against the overall context, industry, products, and services found in `website_data`. Determine how relevant the image is to the website.\n\n**Scoring Criteria:**\n\n* **90-100:** The image depicts a specific product, location, or brand explicitly mentioned or sold on the website (e.g., a specific sneaker model on a Nike store page).\n* **60-89:** The image is highly relevant to the industry or theme (e.g., a generic office desk on a commercial real estate website).\n* **30-59:** The image is tangentially related or metaphorically relevant (e.g., a handshake image on a business consulting website).\n* **1-29:** The image is completely unrelated, contradictory, or belongs to a different industry entirely (e.g., a vacuum cleaner on a commercial real estate website).\n\n**Output Rule:**\n\n* You must return **only** a single integer between 1 and 100.\n* Do not include the \"%\" symbol.\n* Do not include any explanation, labels, or whitespace.\n\n---\n\n### Example Test (Mental Check) based on your data:\n\n* **Input:** Image of a **Bissell Vacuum** vs. Website about **Commercial Real Estate**.\n* **Reasoning:** A household cleaning appliance has zero semantic relationship to renting office space or commercial real estate strategy.\n* **Agent Output:** `1`"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        848,
+        -32
+      ],
+      "id": "51fcf29e-1983-4702-a780-ce4fcc105c66",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "6Qmz74fv62ASqbfV",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let relevance = $input.first().json.content.parts[0].text;\nlet level = 'high';\nif(relevance < 30){\n  level = 'low';\n}else if(relevance > 30 && relevance < 60){\n  level = 'medium';\n}else if(relevance > 60 && relevance < 89){\n  level = 'okay';\n}else{\n  level = 'high';\n}\n\nreturn {\n  data:{\n    level: level,\n  relevance: relevance,\n  description: $('Edit Fields1').first().json.description\n  }\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        -32
+      ],
+      "id": "fbe42f29-36f6-45bb-b298-0d809529161e",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "ok"
+            },
+            {
+              "name": "task_id",
+              "value": "={{ $('Prepare Data').item.json.task_id }}"
+            },
+            {
+              "name": "data",
+              "value": "={{ $json.data }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1424,
+        -32
+      ],
+      "id": "a5438c70-b3cc-4985-9185-c3d758cd8310",
+      "name": "HTTP Request1"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if license is valid": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Get website data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Analyze an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Base64": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get website data": {
+      "main": [
+        [
+          {
+            "node": "Prepare Base64",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze an image": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "FfOIxnXYC00WoM2o"
+  },
+  "triggerCount": 1,
+  "versionId": "56083837-fe5b-4dcd-9c1d-c9ca6c7ee1da",
+  "owner": {
+    "type": "personal",
+    "projectId": "ZvP1yE48ZEo7zgpC",
+    "projectName": "Synergize Flow Team <info@mantab.one>",
+    "personalEmail": "info@mantab.one"
+  },
+  "parentFolderId": "W6kfCfNZPfSqIn2i",
+  "isArchived": false
+}

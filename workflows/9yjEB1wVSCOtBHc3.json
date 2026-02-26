@@ -1,0 +1,69 @@
+{
+  "id": "9yjEB1wVSCOtBHc3",
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "1d8ac5f5-e5ab-4a2e-848e-aa5aed8cc4d1",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.kie.ai/api/v1/veo/generate",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\"prompt\":\"A 9:16 vertical aspect ratio, continuous shot in a modern, brightly lit conference room with a polished wooden table and a city skyline visible through large windows. The shot begins focused on a large, brushed metallic silver gear standing on the table, marked with 'DMAIC'. Translucent blue gears representing 'Agile speed' begin to spin and mesh with the silver gear. As they turn, abstract icons of waste and defects are visually ground away and disappear. The camera smoothly pushes in as the blue gears pulse with light in rapid sequences, like 'sprints,' causing corresponding segments of the DMAIC gear to glow in a structured cycle. The entire mechanism now spins harmoniously and projects a glowing holographic bar graph that rises sharply upwards, symbolizing rapid, sustainable results. The shot concludes by pulling back slightly to show the perfectly synchronized gears, with the subtle reflection of a collaborative team silhouette on the polished table.\",\"model\":\"veo3_fast\",\"callBackUrl\":\"https://apiv2.synergizeflow.com/api/social-agent/process\",\"aspectRatio\":\"9:16\"}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "04178c91-66d1-4f2d-b688-683d8c55b715",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "HuRFdzaG8jXchBN0",
+          "name": "kie AI Auth"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "triggerCount": 0,
+  "versionId": "32ef7ae0-d698-41f9-a5aa-b93eb6505850",
+  "owner": {
+    "type": "personal",
+    "projectId": "ZvP1yE48ZEo7zgpC",
+    "projectName": "Synergize Flow Team <info@mantab.one>",
+    "personalEmail": "info@mantab.one"
+  },
+  "parentFolderId": "p9WxrFf2f0mnC9Ge",
+  "isArchived": false
+}

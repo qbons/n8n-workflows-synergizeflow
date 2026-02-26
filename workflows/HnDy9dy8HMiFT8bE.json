@@ -1,0 +1,551 @@
+{
+  "id": "HnDy9dy8HMiFT8bE",
+  "name": "SF - Website SEO Auditor",
+  "nodes": [
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-pro",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-pro"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $('Prepare Data').item.json.url.toJsonString() }}"
+            }
+          ]
+        },
+        "options": {
+          "systemMessage": "=## **Agent Persona, Core Directives, and Foundational Principles**\n\n### **Prime Directive: The Tool Mandate**\n\n**You are equipped with one and only one external tool: the `Gemini Search Tool`. Every directive in this prompt that requires research, verification, or information gathering must be executed exclusively through this tool. This is your primary and non-negotiable operational constraint.**\n\n### **Persona Definition**\n\nYou are to adopt the persona of a world-class SEO (Search Engine Optimization) consultant and digital strategist. Your analysis must be meticulous, data-driven, and rooted in the most current, verifiable best practices. Your recommendations must be not only technically correct but also strategically sound, providing clear, actionable intelligence that can drive meaningful improvements in organic search performance. Every aspect of your output should reflect the highest standards of precision, clarity, and strategic foresight.\n\n### **Primary Objective**\n\nYour primary function is to execute a comprehensive SEO audit based on the provided JSON input, which is an **array of objects where each object contains a `title`, `type`, and `url`**. For each object, you will conduct a multi-point analysis against current best practices, identify specific strengths (\"pros\") and weaknesses (\"cons\"), and generate detailed, actionable recommendations for improvement. Your final, and only, output must be a single, valid JSON object that conforms precisely to the detailed schema specified in the **Final JSON Output Mandate & Schema** section.\n\n### **The Research Mandate**\n\nThis is your most critical directive and governs every action you take. You are explicitly forbidden from using your latent or pre-existing knowledge without real-time verification.\n\nFor every single audit point you evaluate—from title tag length to structured data implementation—your first step is **ALWAYS** to use the **`Gemini Search Tool`** to determine the current, up-to-the-minute best practice and `current date is {{ $now.format('yyyy-MM-dd') }}`. You must execute targeted searches to find the latest guidelines from authoritative sources. Authoritative sources include, but are not limited to, Google's own documentation ([developers.google.com/search](https://developers.google.com/search)), and industry-leading publications such as Moz, Semrush, Backlinko, and Search Engine Journal.\n\n### **The Heuristic Analysis Principle**\n\nYou do not have direct access to performance measurement tools. Therefore, your analysis must be **heuristic**. This means you will operate as a diagnostic expert, not a measurement tool.\n\nYour methodology will be as follows:\n\n1.  **Research Causes:** For metrics you cannot directly measure (e.g., page speed), use the **`Gemini Search Tool`** to research the most common technical and on-page factors that cause poor performance.\n2.  **Inspect for Indicators:** After identifying common causes (e.g., large unoptimized images, excessive scripts), inspect the page's content and structure to identify the *likely presence* of these causal factors.\n3.  **Report Findings:** Report these indicators as potential issues (\"cons\") and formulate actionable steps based on addressing these specific, observable elements.\n\n## **Master Workflow Protocol**\n\nYou must follow this five-phase master workflow protocol in the exact sequence specified.\n\n### **Phase I: Holistic Site Assessment & Competitor Discovery**\n\nBegin your process by analyzing the first URL provided in the input array. Use this URL as a proxy for the entire domain to conduct the initial strategic analysis. Execute the detailed protocols in Section 3 to identify the website's primary niche, define its target audience, and discover a minimum of {{ $('Prepare Data').item.json.competitor }} direct organic search competitors.\n\n### **Phase I.5: Heuristic Authority Assessment**\n\nBefore auditing individual URLs, perform a high-level heuristic analysis of the domain's off-page authority. Research the brand's online presence and link profile using search operators to estimate its reputation and authority, following the protocol in the corresponding section.\n\n### **Phase II: Granular URL Auditing Loop**\n\nAfter completing the holistic assessment, proceed to process each **object** in the input array sequentially. When auditing, use the provided `type` (e.g., 'page', 'location', 'post') as a critical piece of context. For example, a 'post' type should be evaluated for `Article` schema, while a 'location' type should be evaluated for `RealEstateListing` or `LocalBusiness` schema. Meticulously record the `pros`, `cons`, and `action` items for each URL, ensuring you carry over the original `title`, `type`, and `url` into your final analysis object.\n\n### **Phase III: Synthesis & Strategic Formulation**\n\nOnce all URLs have been individually audited, aggregate and synthesize your findings. Analyze the patterns of recurring \"pros\" and \"cons\" across all audited pages to generate the high-level `pros_summary` and `cons_summary`. Then, leveraging your findings from Phase I and II, you will formulate the `competitor` insights and the `content_suggestion`.\n\n### **Phase IV: Final JSON Assembly & Output**\n\nIn the final phase, you will construct the complete JSON object for output. Meticulously combine the strategic elements from Phase I, I.5, and III with the detailed, per-URL audit results from Phase II. Ensure the final structure precisely matches the schema defined in the **Final JSON Output Mandate & Schema** section.\n\n## **Phase I Execution Protocol: Niche & Competitor Discovery**\n\n### **Niche and Target Audience Identification**\n\nFollow these steps to accurately define the website's niche and target audience.\n\n1.  **Initial Content Analysis:** Examine the homepage's title tag, primary H1 heading, and introductory content.\n2.  **Formulate Niche Hypothesis:** Construct a specific hypothesis for the website's niche.\n3.  **Validate Niche with Search:** Use the **`Gemini Search Tool`** to validate your hypothesis.\n4.  **Define Target Audience:** Infer the target audience by analyzing the language, tone, and services offered.\n\n### **Competitor Identification**\n\nYou must identify a minimum of {{ $('Prepare Data').item.json.competitor }} direct organic search competitors using the **`Gemini Search Tool`** with the following multi-pronged methodology:\n\n1.  **Query 1: Related Site Analysis:** Execute a `related:[domain]` search.\n2.  **Query 2: Core Service Keyword Analysis:** Search for the primary \"head term\" keywords.\n3.  **Query 3: Content and Topic-Based Competitor Analysis:** Search for key informational topics the site covers.\n4.  **Query 4: Competitor Expansion:** Run `related:` searches on the top competitors you find.\n5.  **Final Selection and Curation:** Curate a final, relevant list of at least {{ $('Prepare Data').item.json.competitor }} competitors.\n\n## **Phase I.5 Execution Protocol: Heuristic Authority Assessment**\n\nYou will heuristically assess the domain's off-page authority and reputation.\n\n1.  **Brand Mention Analysis:** Use the **`Gemini Search Tool`** to search for the brand name in quotes (e.g., `\"Your Brand Name\"`) and `intitle:\"Your Brand Name\"`. Look for mentions on reputable news sites, blogs, and industry publications.\n2.  **Unlinked Mention & Link Profile Analysis:** Execute a search for the domain using the `-site:[domain]` operator (e.g., `brandname.com -site:brandname.com`). This can uncover discussions and links pointing to the site. Analyze the quality of the sites that are mentioning or linking to the target domain.\n3.  **Synthesize Findings:** Based on the volume and quality of these mentions, formulate a summary of the website's perceived authority. Note whether it appears to be a well-regarded authority or if it has a limited digital footprint.\n\n## **Phase II Execution Protocol: The Comprehensive URL Audit Checklists**\n\nFor every URL, perform the following three-part audit, remembering the **Research Mandate** for each item.\n\n### **Technical SEO Checklist**\n\n1.  **Indexability:** Use `site:[full_url]` in the **`Gemini Search Tool`**.\n2.  **Mobile-Friendliness:** Heuristically assess layout against best practices found via the **`Gemini Search Tool`**.\n3.  **Core Web Vitals (Heuristic):** Research causes for poor LCP, INP, and CLS with the **`Gemini Search Tool`** and look for indicators in the page content/structure.\n4.  **URL Structure:** Check for conciseness, use of hyphens, and logical structure.\n5.  **HTTPS Security:** Verify the URL starts with `https://`.\n6.  **Structured Data (Schema Markup):** Use the `site:[url]` operator in the **`Gemini Search Tool`** to check for rich snippets. Research appropriate schema types for the page's `type` field.\n\n### **On-Page SEO Checklist**\n\n1.  **Title Tag:** Check for length, keyword placement, and uniqueness.\n2.  **Meta Description:** Check for length, keyword inclusion, and compelling call-to-action.\n3.  **Header Hierarchy (H1, H2, H3):** Ensure one unique H1 and a logical structure for H2s/H3s.\n4.  **Image SEO:** Heuristically assess file names and likely alt text.\n5.  **Internal Linking:** Scan for contextual links with descriptive anchor text.\n\n### **Content & E-E-A-T Checklist**\n\n1.  **Search Intent Alignment:** Use the **`Gemini Search Tool`** to search for the page's primary topic and compare the content format against top-ranking results.\n2.  **Content Value and Depth:** Evaluate if the content provides unique value (\"information gain\").\n3.  **Readability and User Experience:** Assess formatting for skim-ability (short paragraphs, subheadings, lists).\n4.  **E-E-A-T Signals:** Look for author bylines, author bios, cited sources, and other trust signals.\n\n## **Phase III & IV Execution Protocol: Synthesis, Strategy, and Formatting**\n\n### **Generating High-Quality Actionable Steps**\n\nFor every \"con\" you identify, generate a corresponding action item within the `action` array for that specific URL. Each action item must be an object with a `title`, `description`, `impact`, and `effort`. The description must explain *why* the change is necessary and provide a clear, step-by-step guide or a concrete example of *how* to implement it.\n*   **`impact`**: Estimate the potential SEO impact of the action as 'High', 'Medium', or 'Low'. (e.g., Fixing a non-indexable page is 'High'; optimizing alt text on one image might be 'Low').\n*   **`effort`**: Estimate the technical or resource effort required to implement the change as 'High', 'Medium', or 'Low'. (e.g., Changing a title tag is 'Low'; addressing core web vital issues is 'High').\n\n### **Generating Competitor Insights**\n\nFor each competitor identified in Phase I, you must formulate a concise, actionable `insight`. Revisit the competitor's website and your initial analysis. Identify a single, powerful strategy they are using effectively that the audited domain is not. This could be a superior content format (e.g., interactive tools, video-first content), a clever keyword targeting approach (e.g., focusing on \"vs\" keywords), an effective use of a specific schema type, or a powerful user engagement tactic (e.g., a community forum). The `insight` must clearly state what the competitor does well and suggest how a similar strategy could be adapted.\n\n### **Crafting Strategic Summaries & Suggestions**\n\nAfter completing the per-URL audits, synthesize your findings into the top-level summary fields. The `content_suggestion` is your most strategic contribution. To formulate it, you must:\n1.  **Analyze Competitor Content:** Review the content of the top 3 competitors you identified. Note the primary topics and keywords they target.\n2.  **Identify Question-Based Keywords:** Use the **`Gemini Search Tool`** to search for the website's primary niche topic. Analyze the 'People Also Ask' and 'Related Searches' sections to identify common user questions.\n3.  **Propose Specific Topics:** Your suggestion should propose 3-5 specific article or page topics based on this gap analysis, explaining how each topic would target a valuable keyword cluster and serve a specific user intent.\n\n### **Final JSON Output Mandate & Schema**\n\nYour final and only output must be a single, raw JSON object. Do not include any explanatory text, markdown formatting, or any characters before the opening `{` or after the closing `}`. The structure of your JSON must precisely match the schema detailed below.\n\n```json\n{\n  \"pros_summary\": \"A high-level summary of the most impactful and consistent strengths found across all audited pages.\",\n  \"cons_summary\": \"A high-level summary of the most critical and recurring weaknesses that affect multiple pages site-wide.\",\n  \"authority_assessment\": \"A summary of the domain's perceived off-page authority and digital footprint based on a heuristic analysis of brand mentions and linking domains.\",\n  \"content_suggestion\": {\n    \"strategy_overview\": \"A high-level summary of the recommended content strategy, explaining the logic behind the topic choices.\",\n    \"suggested_topics\": [\n      {\n        \"title\": \"The proposed title for a new piece of content.\",\n        \"description\": \"A brief on what this content should cover and the user intent it serves.\",\n        \"target_keywords\": [\n          \"primary keyword\",\n          \"secondary keyword\",\n          \"long-tail question\"\n        ]\n      }\n    ]\n  },\n  \"competitor\": [\n    {\n      \"title\": \"The full name of the competitor's website or company.\",\n      \"url\": \"The full homepage URL of the competitor.\",\n      \"insight\": \"A concise, actionable insight detailing a specific strategy (e.g., content format, keyword targeting, user engagement tactic) that this competitor excels at and which could be adapted for your own site.\"\n    }\n  ],\n  \"analysis\": [\n    {\n      \"title\": \"The 'title' from the corresponding input object.\",\n      \"type\": \"The 'type' from the corresponding input object.\",\n      \"url\": \"The 'url' from the corresponding input object.\",\n      \"pros\": \"A string in complete sentences summarizing the specific SEO strengths of this URL.\",\n      \"cons\": \"A string in complete sentences summarizing the specific SEO weaknesses of this URL.\",\n      \"action\": [\n        {\n          \"title\": \"A short, clear title for the recommended action. Example: 'Implement Article Schema Markup'.\",\n          \"description\": \"A detailed, educational description of why the action is needed and a step-by-step guide on how to implement it.\",\n          \"impact\": \"A string indicating the potential SEO impact ('High', 'Medium', or 'Low').\",\n          \"effort\": \"A string indicating the estimated implementation effort ('High', 'Medium', or 'Low').\"\n        }\n      ]\n    }\n  ]\n}\n```",
+          "maxToolsIterations": 999
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -832,
+        64
+      ],
+      "id": "9ecabec2-bd1b-4ff6-bcf3-b2bf70ce6ec0",
+      "name": "Message a model",
+      "retryOnFail": true,
+      "alwaysOutputData": false,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "6Qmz74fv62ASqbfV",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "function getValidJsonObject(rawText) {\n    if (typeof rawText !== 'string' || rawText.trim() === '') {\n        console.log(\"Invalid input or empty text field.\");\n        return null;\n    }\n    let jsonString = rawText.trim();\n    // Extract JSON from markdown code block fences if present\n    const markdownRegex = /```(?:json)?\\s*([\\s\\S]*?)\\s*```/;\n    const match = jsonString.match(markdownRegex);\n    if (match) {\n        jsonString = match[1].trim();\n    }\n    // First attempt: try parsing as-is\n    try {\n        return JSON.parse(jsonString);\n    } catch (firstError) {\n        console.log(\"First parse attempt failed, trying to fix unescaped quotes...\");\n        \n        // Fix unescaped quotes within string values\n        // Strategy: Process character by character, tracking if we're inside a JSON string\n        let fixedString = fixUnescapedQuotes(jsonString);\n        \n        try {\n            return JSON.parse(fixedString);\n        } catch (secondError) {\n            console.log(\"All parse attempts failed:\", secondError);\n            console.log(\"Problematic string (first 500 chars):\", jsonString.substring(0, 500));\n            return null;\n        }\n    }\n}\nfunction fixUnescapedQuotes(jsonString) {\n    let result = '';\n    let inString = false;\n    let i = 0;\n    \n    while (i < jsonString.length) {\n        const char = jsonString[i];\n        const prevChar = i > 0 ? jsonString[i - 1] : '';\n        const nextChar = i < jsonString.length - 1 ? jsonString[i + 1] : '';\n        \n        if (char === '\"') {\n            if (!inString) {\n                // Opening quote of a JSON string value\n                inString = true;\n                result += char;\n            } else if (prevChar === '\\\\') {\n                // Already escaped quote inside string - keep it\n                result += char;\n            } else {\n                // We're inside a string and found an unescaped quote\n                // Check if this is the closing quote or an unescaped quote in content\n                \n                // Heuristic: If next chars look like JSON structure, it's a closing quote\n                // Look for patterns like: \", or \": or \"} or \"] or just end\n                const afterQuote = jsonString.substring(i + 1, i + 3).trim();\n                const isClosingQuote = \n                    afterQuote.startsWith(',') || \n                    afterQuote.startsWith(':') || \n                    afterQuote.startsWith('}') || \n                    afterQuote.startsWith(']') ||\n                    afterQuote === '' ||\n                    afterQuote.startsWith('\\n');\n                \n                if (isClosingQuote) {\n                    // This is the actual closing quote\n                    inString = false;\n                    result += char;\n                } else {\n                    // This is an unescaped quote inside the string - escape it\n                    result += '\\\\\"';\n                }\n            }\n        } else if (char === '\\\\' && inString && nextChar === '\"') {\n            // This is an escape sequence for quote, keep as-is\n            result += char;\n        } else {\n            result += char;\n        }\n        \n        i++;\n    }\n    \n    return result;\n}\n\n// Combine the 'text' from all parts into a single string.\nconst combinedText = $input.first().json.content.parts.map(part => part.text).join('');\n\nreturn {data: getValidJsonObject(combinedText)};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -480,
+        64
+      ],
+      "id": "e92df88b-a835-410f-aa9b-8709c4116eda",
+      "name": "Code2",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', ``, 'string') }}",
+        "enableUrlContext": "=",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Items_per_Batch', ``, 'number') }}",
+              "batchInterval": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Batch_Interval__ms_', ``, 'number') }}"
+            }
+          },
+          "systemInstruction": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Custom_System_Instruction', ``, 'string') }}",
+          "returnFullResponse": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_Full_Response', ``, 'boolean') }}"
+        }
+      },
+      "type": "n8n-nodes-gemini-search.geminiSearchToolTool",
+      "typeVersion": 1,
+      "position": [
+        -752,
+        288
+      ],
+      "id": "5168c210-ce35-4e6d-856d-804802060a7a",
+      "name": "Gemini Search Tool",
+      "credentials": {
+        "geminiSearchApi": {
+          "id": "uXioxrB1KI7dFyPA",
+          "name": "Gemini Credentials account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "blog/seo-auditor",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1728,
+        320
+      ],
+      "id": "0fe6ee70-4b59-4283-819f-dbb6d56bd45a",
+      "name": "Webhook",
+      "webhookId": "c7c056c4-5cbb-4955-b1c8-d09dd818003c"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.domain_name }}wp-json/synergize/v1/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "code",
+              "value": "={{ $json.license_key }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1280,
+        320
+      ],
+      "id": "73dbda9e-2f10-4e71-a480-fc380d1913ad",
+      "name": "Check if license is valid"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "60458c94-986c-49cd-8b69-4b5616163eb3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f910b52-842c-4b6a-a862-e6914c883764",
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -1056,
+        320
+      ],
+      "id": "639d7e20-0a35-47f9-a683-1aa84dc56f82",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "42309d5f-a011-44ea-b2ec-66ced157a5d0",
+              "name": "status",
+              "value": "fail",
+              "type": "string"
+            },
+            {
+              "id": "14198afc-aa4e-433e-942a-ae418e817293",
+              "name": "msg",
+              "value": "invalid_license",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -768,
+        512
+      ],
+      "id": "b64b8522-53d5-49bd-95f6-9fd457077502",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3d1ab9b0-7d1e-44f3-82c6-3b9e3f88d229",
+              "name": "license_key",
+              "value": "={{ $json.body.license_key }}",
+              "type": "string"
+            },
+            {
+              "id": "e0787359-9291-4921-ab77-7d19dd04f4a6",
+              "name": "domain_name",
+              "value": "={{ $json.body.domain_name }}",
+              "type": "string"
+            },
+            {
+              "id": "5662f0a0-dcd0-40b0-9cf6-5acb455c608e",
+              "name": "webhook",
+              "value": "={{ $json.body.webhook }}",
+              "type": "string"
+            },
+            {
+              "id": "cc44044c-7290-40e2-a779-969fd6c24ca1",
+              "name": "url",
+              "value": "={{ $json.body.content }}",
+              "type": "array"
+            },
+            {
+              "id": "2eb87a3f-9102-4d07-82eb-8083f122009a",
+              "name": "competitor",
+              "value": "={{ $json.body.competitor }}",
+              "type": "number"
+            },
+            {
+              "id": "214f7200-1352-490a-a746-d87f35df95d9",
+              "name": "auditor_id",
+              "value": "={{ $json.body.auditor_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1504,
+        320
+      ],
+      "id": "3ab33f1b-4bff-4fbf-8949-5155b85c387a",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "=ok"
+            },
+            {
+              "name": "data",
+              "value": "={{ $json.data }}"
+            },
+            {
+              "name": "auditor_id",
+              "value": "={{ $('Prepare Data').item.json.auditor_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -256,
+        -32
+      ],
+      "id": "5d950966-0a5f-47cb-9444-efd07e86a9cf",
+      "name": "Send Back Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "={{ $json.status }}"
+            },
+            {
+              "name": "msg",
+              "value": "={{ $json.msg }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -480,
+        512
+      ],
+      "id": "56634ab7-07d6-44e9-bc40-b0260a0d8763",
+      "name": "Send Error"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://wizards.synergizeflow.com/webhook/blog/seo-auditor",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license_key",
+              "value": "={{ $('Prepare Data').item.json.license_key }}"
+            },
+            {
+              "name": "domain_name",
+              "value": "={{ $('Prepare Data').item.json.domain_name }}"
+            },
+            {
+              "name": "webhook",
+              "value": "={{ $('Prepare Data').item.json.webhook }}"
+            },
+            {
+              "name": "content",
+              "value": "={{ $('Prepare Data').item.json.url }}"
+            },
+            {
+              "name": "auditor_id",
+              "value": "={{ $('Prepare Data').item.json.auditor_id }}"
+            },
+            {
+              "name": "competitor",
+              "value": "={{ $('Prepare Data').item.json.competitor }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -480,
+        256
+      ],
+      "id": "9251f81d-8494-4622-bbae-c461fd16860e",
+      "name": "Retry Error Model"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://wizards.synergizeflow.com/webhook/blog/seo-auditor",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license_key",
+              "value": "={{ $('Prepare Data').item.json.license_key }}"
+            },
+            {
+              "name": "domain_name",
+              "value": "={{ $('Prepare Data').item.json.domain_name }}"
+            },
+            {
+              "name": "webhook",
+              "value": "={{ $('Prepare Data').item.json.webhook }}"
+            },
+            {
+              "name": "content",
+              "value": "={{ $('Prepare Data').item.json.url }}"
+            },
+            {
+              "name": "auditor_id",
+              "value": "={{ $('Prepare Data').item.json.auditor_id }}"
+            },
+            {
+              "name": "competitor",
+              "value": "={{ $('Prepare Data').item.json.competitor }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -256,
+        160
+      ],
+      "id": "6d71d3da-1a1b-47e2-8fec-dd8d77acc179",
+      "name": "Retry Error Parsing"
+    }
+  ],
+  "connections": {
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Retry Error Model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Send Back Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Retry Error Parsing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Search Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Message a model",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if license is valid": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Send Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "FfOIxnXYC00WoM2o"
+  },
+  "triggerCount": 1,
+  "versionId": "ede73172-a6a5-48d4-9bea-b50c34c9f211",
+  "owner": {
+    "type": "personal",
+    "projectId": "ZvP1yE48ZEo7zgpC",
+    "projectName": "Synergize Flow Team <info@mantab.one>",
+    "personalEmail": "info@mantab.one"
+  },
+  "parentFolderId": "W6kfCfNZPfSqIn2i",
+  "isArchived": false
+}

@@ -1,0 +1,866 @@
+{
+  "id": "KBp8BIQB16uLPd5Q",
+  "name": "SF - Blog Optimization",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "blog/seo-optimize",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2480,
+        704
+      ],
+      "id": "8b4f2071-9d0a-41b2-93b7-217a1fccaac6",
+      "name": "Webhook",
+      "webhookId": "82cc771b-567f-4615-980c-5d9d36089bce"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3d1ab9b0-7d1e-44f3-82c6-3b9e3f88d229",
+              "name": "license_key",
+              "value": "={{ $json.body.license_key }}",
+              "type": "string"
+            },
+            {
+              "id": "e0787359-9291-4921-ab77-7d19dd04f4a6",
+              "name": "domain_name",
+              "value": "={{ $json.body.domain_name }}",
+              "type": "string"
+            },
+            {
+              "id": "5662f0a0-dcd0-40b0-9cf6-5acb455c608e",
+              "name": "provider",
+              "value": "={{ $json.body.provider }}",
+              "type": "string"
+            },
+            {
+              "id": "cc44044c-7290-40e2-a779-969fd6c24ca1",
+              "name": "blog",
+              "value": "={{ $json.body.content }}",
+              "type": "array"
+            },
+            {
+              "id": "d934a4a0-cb9b-4e4d-a12d-a49952ae5cba",
+              "name": "webhook",
+              "value": "={{ $json.body.webhook }}",
+              "type": "string"
+            },
+            {
+              "id": "c29472ce-ccff-4077-8e8c-0dbc456bf8c9",
+              "name": "optimization_id",
+              "value": "={{ $json.body.optimization_id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2256,
+        704
+      ],
+      "id": "28c0594c-a1aa-4065-bdd8-410c37b269c5",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.domain_name }}wp-json/synergize/v1/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "code",
+              "value": "={{ $json.license_key }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2032,
+        704
+      ],
+      "id": "08159d26-082d-44ab-bdb7-09b7ef28cf60",
+      "name": "Check if license is valid"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "60458c94-986c-49cd-8b69-4b5616163eb3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f910b52-842c-4b6a-a862-e6914c883764",
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -1808,
+        704
+      ],
+      "id": "146921ff-8333-4521-8c9e-1aa8761d3378",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $('Prepare Data').first().json.blog"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1584,
+        608
+      ],
+      "id": "486cf5a8-e997-44e7-a15b-fb61a03f1313",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1360,
+        608
+      ],
+      "id": "dcbe360d-5b2f-43ea-9150-f626be3208a5",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.domain_name }}wp-json/synergize/v1/prepare-blog-optimization/",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "code",
+              "value": "={{ $('Prepare Data').item.json.license_key }}"
+            },
+            {
+              "name": "id",
+              "value": "={{ $json.id }}"
+            },
+            {
+              "name": "provider",
+              "value": "={{ $('Prepare Data').item.json.provider }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1136,
+        336
+      ],
+      "id": "b9acb9ab-d733-4be4-89d6-7bba08c21751",
+      "name": "Get blog content detail"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "31a70a4e-b7e4-4a9e-97ec-e32ad3da11a5",
+              "name": "title",
+              "value": "={{ $json.blog.title }}",
+              "type": "string"
+            },
+            {
+              "id": "707d2cdb-6f24-469b-a17e-ebc404e8c26d",
+              "name": "content",
+              "value": "={{ $json.blog.content }}",
+              "type": "string"
+            },
+            {
+              "id": "d659612e-3543-4fb3-8c55-ace11936be07",
+              "name": "image_id",
+              "value": "={{ $json.blog.image_id }}",
+              "type": "string"
+            },
+            {
+              "id": "ce3ab576-a2b6-4aff-9f58-213445ad0fbf",
+              "name": "related",
+              "value": "={{ $json.related }}",
+              "type": "array"
+            },
+            {
+              "id": "c5d2adff-a863-4458-898d-8e52d4f1de43",
+              "name": "category",
+              "value": "={{ $json.blog.category }}",
+              "type": "array"
+            },
+            {
+              "id": "823d1866-a689-4a40-8e91-2d9fcaa0e0a4",
+              "name": "author",
+              "value": "={{ $json.blog.author }}",
+              "type": "string"
+            },
+            {
+              "id": "d8596016-6f26-4ab3-9156-dabb8aeb0b5c",
+              "name": "old_keyword",
+              "value": "={{ $json.old_keyword }}",
+              "type": "array"
+            },
+            {
+              "id": "89a9ab56-8bd4-41bc-bbfc-c267102a9212",
+              "name": "id",
+              "value": "={{ $json.blog.id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -912,
+        336
+      ],
+      "id": "11c8f256-0bd1-4e0e-b729-fc4f6adf1384",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Prepare Data').item.json.provider }}",
+                    "rightValue": "=yoast",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "ca71a37e-9009-41e7-94bc-18395fe1cc6e"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "yoast"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b548b240-9f5b-4754-bad4-b45ce2bd295f",
+                    "leftValue": "={{ $('Prepare Data').item.json.provider }}",
+                    "rightValue": "rankmath",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "rankmath"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -688,
+        336
+      ],
+      "id": "152fc525-6fe0-42ee-93e0-a1c0d5d80f46",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-pro",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-pro"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=**Input**\n{\n\"title\": {{ $('Edit Fields').item.json.title.toJsonString() }},\n\"content\": {{ $('Edit Fields').item.json.content.toJsonString() }},\n\"related\": {{ $('Edit Fields').item.json.related.toJsonString() }}\n\"old_keywrod\": {{ $('Edit Fields').item.json.old_keyword.toJsonString() }}\n}\n\nYou are an expert SEO Content Optimization Agent. Your mission is to transform a given blog post into a highly optimized, engaging, and authoritative article. All research and generated content must be current and relevant as of **{{$now.format('yyyy-MM-dd')}}**, but the final output must be **evergreen**, meaning it should not contain any specific dates, years, or time-sensitive language (e.g., \"this year,\" \"recently\").\n\nYou will receive a JSON object containing a `title`, `content` (in HTML format), an array of `related` articles, and an `old_keyword` array which contains previously used keywords. You have access to a powerful `Gemini Search Tool`, which you are required to use for research, enrichment, and validation.\n\nYour final output must be a single, raw JSON object with NO additional text or explanation.\n\n**Your process must follow these steps in order:**\n\n**Mandatory First Step: Initial Research**\n* Before any analysis or writing, you **MUST** use the `Gemini Search Tool` to conduct preliminary research on the core topic of the provided `content`. This is to gather the latest information, identify current trends, and understand the competitive landscape as of **{{$now.format('yyyy-MM-dd')}}**. This initial research will inform all subsequent steps.\n\n**1. Language and Topic Analysis:**\n    * **Language Detection (CRITICAL MANDATE): First, you MUST identify the language of the provided `content` (e.g., English, Dutch, Spanish). All subsequent analysis and all final output (title, content, meta_description) MUST be in this exact original language. There are no exceptions.**\n    * **Core Message & Intent: Analyze the provided `title` and `content` to understand the core topic, primary arguments, and user intent. This original message is the \"truth\" that must be preserved.**\n\n2.  **Keyword Analysis:**\n    * Analyze the provided `title` and `content` to understand the core topic and user intent.\n    * Synthesize your initial research to identify potential primary keywords.\n    * **Uniqueness Constraint:** Compare your potential keywords against the provided `old_keyword` array. You **MUST** select **one single, perfect primary keyword** that is new and significantly different from any of the keywords in the `old_keyword` list. Do not choose a close variant or synonym. The goal is to target a distinct angle. This chosen keyword will be the foundation for all subsequent optimizations.\n\n3.  **Title Optimization:**\n    * Rewrite the `title` to be compelling and SEO-friendly.\n    * The new title **MUST** begin with the exact primary keyword you identified in step 2.\n    * The title **MUST** be under 60 characters in length to ensure it is fully visible and not truncated in search engine results.\n    * The title **MUST** follow sentence case capitalization rules: the first word is capitalized, any proper nouns are capitalized, and all other words are lowercase.\n    * Ensure the title is highly relevant to the rewritten content and is evergreen.\n\n4.  **Content Optimization and Enrichment:**\n    * **Core Content Rewriting: Your primary task is to rewrite and optimize the *original* `content` in its original language (as identified in Step 1). You must preserve the core message, primary arguments, and essential essence of the original text. The enrichment and expansion you perform using the `Gemini Search Tool` must *support* and *deepen* the original's topic, not replace or contradict it. The new content must be an *optimization* of the original, not a complete departure. Ensure the tone is evergreen.**\n    * **Writing Style and Readability (Highest Priority):** The rewritten content must be engaging, sophisticated, and highly readable.\n        * **Structural and Opening Variety (ABSOLUTE, NON-NEGOTIABLE RULE):** This is the most critical mandate for writing quality. Your prose must be fluid and avoid all forms of robotic repetition.\n            * **No Consecutive Similar Openings:** You **MUST NOT** start consecutive sentences with the same word. This is a critical failure.\n            * **No Parallel Structure Repetition:** You **MUST** also avoid repetitive sentence structures across consecutive sentences. For example, constructions like *\"For foodies, it is a log... For the health-conscious, it is a record... For budget-trackers, it is a breakdown...\"* are strictly forbidden. You must rephrase such points into more varied and natural-sounding sentences.\n        * **Active Voice Mandate:** Write clearly and directly. The content **MUST** be written primarily in the active voice. The use of passive voice must be kept to an absolute minimum and **MUST constitute less than 10% of all sentences**.\n        * **Paragraph Length:** Break up long blocks of text. Each paragraph **MUST NOT** exceed 150 words.\n        * **Cohesion and Flow:** Ensure smooth transitions between sentences and paragraphs. Use appropriate transition words and phrases to connect ideas and guide the reader logically through the content.\n    * **Content Length:** The final rewritten content **MUST** be at least 1000 words. Use the `Gemini Search Tool` to gather the most recent facts, statistics, relevant examples, or deeper explanations to expand the content if the original is too short. Ensure all data is presented in an evergreen manner.\n    * **Keyword Integration:**\n        * **Frequency:** The primary keyword **MUST** be integrated naturally throughout the text at least 5 times. Distribution should feel organic; avoid unnatural keyword stuffing.\n        * **First Paragraph:** The primary keyword **MUST** appear within the first paragraph of the rewritten content.\n        * **Headings:** The content must be structured with multiple relevant subheadings (`<h2>` and `<h3>`). To ensure strong thematic focus, the primary keyword **MUST** be included in the **majority** of these subheadings. All subheadings **MUST** strictly follow sentence case capitalization.\n    * **Internal Linking:**\n        * Review the `related` JSON array. Identify one or two of the most relevant articles from the list.\n        * Naturally weave links to these articles within the body of the new content. Use descriptive anchor text. The link must be an `<a>` tag containing the `url` and a `target=\"_blank\"` attribute.\n    * **Outbound Linking:**\n        * Use the `Gemini Search Tool` to find one highly authoritative and relevant external resource (like a research study, an industry-leading article, or a statistical report published close to **{{$now.format('yyyy-MM-dd')}}**).\n        * Add one outbound link to this resource within the content. The link should feel natural and add value to the reader. It must be an `<a>` tag with a `target=\"_blank\"` attribute.\n    * **HTML Formatting:** Ensure the final `content` is well-structured with proper HTML tags (`<p>`, `<h2>`, `<h3>`, `<a>`, `<strong>`, `<ul>`, `<li>`, etc.). Crucially, there **MUST NOT** be any `<h1>` tags within the `content` field.\n\n5.  **Meta Description Generation:**\n    * Based on the **newly rewritten** title and content, create a compelling, SEO-friendly meta description.\n    * The meta description **MUST** naturally include the primary keyword identified in step 2.\n    * It must be a maximum of 140 characters.\n    * It should serve as a concise summary and entice users to click.\n\n6.  **Final Output Generation:**\n    * Assemble the results of your work into a single JSON object.\n    * The JSON object must only contain the following four keys: `title`, `content`, `keyword`, and `meta_description`.\n\n**Remember: Do not add any conversational text, introductions, or explanations. Your final response must be only the JSON object.**"
+            }
+          ]
+        },
+        "options": {
+          "systemMessage": "=Use the `Gemini Search Tool` for researching data.",
+          "maxToolsIterations": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -464,
+        80
+      ],
+      "id": "32af0076-89bd-4655-ae71-d8e5ffaf21df",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "6Qmz74fv62ASqbfV",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use this tool for searching information.",
+        "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', ``, 'string') }}",
+        "enableUrlContext": "=",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Items_per_Batch', ``, 'number') }}",
+              "batchInterval": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Batch_Interval__ms_', ``, 'number') }}"
+            }
+          },
+          "systemInstruction": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Custom_System_Instruction', ``, 'string') }}",
+          "returnFullResponse": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_Full_Response', ``, 'boolean') }}"
+        }
+      },
+      "type": "n8n-nodes-gemini-search.geminiSearchToolTool",
+      "typeVersion": 1,
+      "position": [
+        -384,
+        304
+      ],
+      "id": "2074bbdc-0328-4c49-8dcb-9dbc94045dc4",
+      "name": "Gemini Search Tool",
+      "credentials": {
+        "geminiSearchApi": {
+          "id": "uXioxrB1KI7dFyPA",
+          "name": "Gemini Credentials account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "function getValidJsonObject(rawText) {\n    if (typeof rawText !== 'string' || rawText.trim() === '') {\n        console.log(\"Invalid input or empty text field.\");\n        return null;\n    }\n    let jsonString = rawText.trim();\n    // Extract JSON from markdown code block fences if present\n    const markdownRegex = /```(?:json)?\\s*([\\s\\S]*?)\\s*```/;\n    const match = jsonString.match(markdownRegex);\n    if (match) {\n        jsonString = match[1].trim();\n    }\n    // First attempt: try parsing as-is\n    try {\n        return JSON.parse(jsonString);\n    } catch (firstError) {\n        console.log(\"First parse attempt failed, trying to fix unescaped quotes...\");\n        \n        // Fix unescaped quotes within string values\n        // Strategy: Process character by character, tracking if we're inside a JSON string\n        let fixedString = fixUnescapedQuotes(jsonString);\n        \n        try {\n            return JSON.parse(fixedString);\n        } catch (secondError) {\n            console.log(\"All parse attempts failed:\", secondError);\n            console.log(\"Problematic string (first 500 chars):\", jsonString.substring(0, 500));\n            return null;\n        }\n    }\n}\nfunction fixUnescapedQuotes(jsonString) {\n    let result = '';\n    let inString = false;\n    let i = 0;\n    \n    while (i < jsonString.length) {\n        const char = jsonString[i];\n        const prevChar = i > 0 ? jsonString[i - 1] : '';\n        const nextChar = i < jsonString.length - 1 ? jsonString[i + 1] : '';\n        \n        if (char === '\"') {\n            if (!inString) {\n                // Opening quote of a JSON string value\n                inString = true;\n                result += char;\n            } else if (prevChar === '\\\\') {\n                // Already escaped quote inside string - keep it\n                result += char;\n            } else {\n                // We're inside a string and found an unescaped quote\n                // Check if this is the closing quote or an unescaped quote in content\n                \n                // Heuristic: If next chars look like JSON structure, it's a closing quote\n                // Look for patterns like: \", or \": or \"} or \"] or just end\n                const afterQuote = jsonString.substring(i + 1, i + 3).trim();\n                const isClosingQuote = \n                    afterQuote.startsWith(',') || \n                    afterQuote.startsWith(':') || \n                    afterQuote.startsWith('}') || \n                    afterQuote.startsWith(']') ||\n                    afterQuote === '' ||\n                    afterQuote.startsWith('\\n');\n                \n                if (isClosingQuote) {\n                    // This is the actual closing quote\n                    inString = false;\n                    result += char;\n                } else {\n                    // This is an unescaped quote inside the string - escape it\n                    result += '\\\\\"';\n                }\n            }\n        } else if (char === '\\\\' && inString && nextChar === '\"') {\n            // This is an escape sequence for quote, keep as-is\n            result += char;\n        } else {\n            result += char;\n        }\n        \n        i++;\n    }\n    \n    return result;\n}\n\n// Combine the 'text' from all parts into a single string.\nconst combinedText = $input.first().json.content.parts.map(part => part.text).join('');\n\nreturn {data: getValidJsonObject(combinedText)};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -112,
+        336
+      ],
+      "id": "1e09b726-57bc-4307-9aab-cfc00c2013ee",
+      "name": "Code2",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.domain_name }}wp-json/synergize/v1/submit-blog-optimization/",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "code",
+              "value": "={{ $('Prepare Data').item.json.license_key }}"
+            },
+            {
+              "name": "title",
+              "value": "={{ $json.data.title }}"
+            },
+            {
+              "name": "content",
+              "value": "={{ $json.data.content }}"
+            },
+            {
+              "name": "keyword",
+              "value": "={{ $json.data.keyword }}"
+            },
+            {
+              "name": "meta_description",
+              "value": "={{ $json.data.meta_description }}"
+            },
+            {
+              "name": "image",
+              "value": "={{ $('Edit Fields').item.json.image_id }}"
+            },
+            {
+              "name": "category",
+              "value": "={{ $('Edit Fields').item.json.category }}"
+            },
+            {
+              "name": "provider",
+              "value": "={{ $('Prepare Data').item.json.provider }}"
+            },
+            {
+              "name": "author",
+              "value": "={{ $('Edit Fields').item.json.author }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        112,
+        240
+      ],
+      "id": "d18398e8-f025-497c-a334-3fd350ec7327",
+      "name": "Send content"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  new: {\n    id: $input.first().json.data.id,\n    title: $input.first().json.data.title\n  },\n  old: {\n    id: $('Edit Fields').first().json.id,\n    title: $('Edit Fields').first().json.title,\n  },\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        336,
+        464
+      ],
+      "id": "792cd187-1355-49ec-a307-71f56fe3559a",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -1136,
+        528
+      ],
+      "id": "681d2e3f-3bee-4575-8906-496997ec51c1",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  new: {\n    id: \"fail\",\n    title: \"fail\"\n  },\n  old: {\n    id: $('Edit Fields').first().json.id,\n    title: $('Edit Fields').first().json.title,\n  },\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        112,
+        480
+      ],
+      "id": "0bef48ba-1025-42c8-b424-4d53819b751e",
+      "name": "Code3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "fail"
+            },
+            {
+              "name": "msg",
+              "value": "invalid_license"
+            },
+            {
+              "name": "optimization_id",
+              "value": "={{ $('Prepare Data').item.json.optimization_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1584,
+        800
+      ],
+      "id": "747d714f-4070-43ac-a7e4-eda36472c153",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "ok"
+            },
+            {
+              "name": "data",
+              "value": "={{ $json.data }}"
+            },
+            {
+              "name": "optimization_id",
+              "value": "={{ $('Prepare Data').item.json.optimization_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -912,
+        528
+      ],
+      "id": "8e828830-0bd3-4d68-a212-316150c7c512",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-pro",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-pro"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=**Input**\n{\n\"title\": {{ $('Edit Fields').item.json.title.toJsonString() }},\n\"content\": {{ $('Edit Fields').item.json.content.toJsonString() }},\n\"related\": {{ $('Edit Fields').item.json.related.toJsonString() }}\n\"old_keywrod\": {{ $('Edit Fields').item.json.old_keyword.toJsonString() }}\n}\n\nYou are an expert SEO Content Optimization Agent. Your mission is to transform a given blog post into a highly optimized, engaging, and authoritative article. All research and generated content must be current and relevant as of **{{$now.format('yyyy-MM-dd')}}**, but the final output must be **evergreen**, meaning it should not contain any specific dates, years, or time-sensitive language (e.g., \"this year,\" \"recently\").\n\nYou will receive a JSON object containing a `title`, `content` (in HTML format), an array of `related` articles, and an `old_keyword` array which contains previously used keywords. You have access to a powerful `Gemini Search Tool`, which you are required to use for research, enrichment, and validation.\n\nYour final output must be a single, raw JSON object with NO additional text or explanation.\n\n**Your process must follow these steps in order:**\n\n**Mandatory First Step: Initial Research**\n* Before any analysis or writing, you **MUST** use the `Gemini Search Tool` to conduct preliminary research on the core topic of the provided `content`. This is to gather the latest information, identify current trends, and understand the competitive landscape as of **{{$now.format('yyyy-MM-dd')}}**. This initial research will inform all subsequent steps.\n\n**1. Language and Topic Analysis:**\n    * **Language Detection (CRITICAL MANDATE): First, you MUST identify the language of the provided `content` (e.g., English, Dutch, Spanish). All subsequent analysis and all final output (title, content, meta_description) MUST be in this exact original language. There are no exceptions.**\n    * **Core Message & Intent: Analyze the provided `title` and `content` to understand the core topic, primary arguments, and user intent. This original message is the \"truth\" that must be preserved.**\n\n2.  **Keyword Analysis:**\n    * Analyze the provided `title` and `content` to understand the core topic and user intent.\n    * Synthesize your initial research to identify potential primary keywords.\n    * **Uniqueness Constraint:** Compare your potential keywords against the provided `old_keyword` array. You **MUST** select **one single, perfect primary keyword** that is new and significantly different from any of the keywords in the `old_keyword` list. Do not choose a close variant or synonym. The goal is to target a distinct angle. This chosen keyword will be the foundation for all subsequent optimizations.\n\n3.  **Title Optimization:**\n    * Rewrite the `title` to be compelling and SEO-friendly.\n    * The new title **MUST** begin with the exact primary keyword you identified in step 2.\n    * The title **MUST** be under 60 characters in length to ensure it is fully visible and not truncated in search engine results.\n    * The title **MUST** follow sentence case capitalization rules: the first word is capitalized, any proper nouns are capitalized, and all other words are lowercase.\n    * Ensure the title is highly relevant to the rewritten content and is evergreen.\n\n4.  **Content Optimization and Enrichment:**\n    * **Core Content Rewriting: Your primary task is to rewrite and optimize the *original* `content` in its original language (as identified in Step 1). You must preserve the core message, primary arguments, and essential essence of the original text. The enrichment and expansion you perform using the `Gemini Search Tool` must *support* and *deepen* the original's topic, not replace or contradict it. The new content must be an *optimization* of the original, not a complete departure. Ensure the tone is evergreen.**\n    * **Writing Style and Readability (Highest Priority):** The rewritten content must be engaging, sophisticated, and highly readable.\n        * **Structural and Opening Variety (ABSOLUTE, NON-NEGOTIABLE RULE):** This is the most critical mandate for writing quality. Your prose must be fluid and avoid all forms of robotic repetition.\n            * **No Consecutive Similar Openings:** You **MUST NOT** start consecutive sentences with the same word. This is a critical failure.\n            * **No Parallel Structure Repetition:** You **MUST** also avoid repetitive sentence structures across consecutive sentences. For example, constructions like *\"For foodies, it is a log... For the health-conscious, it is a record... For budget-trackers, it is a breakdown...\"* are strictly forbidden. You must rephrase such points into more varied and natural-sounding sentences.\n        * **Active Voice Mandate:** Write clearly and directly. The content **MUST** be written primarily in the active voice. The use of passive voice must be kept to an absolute minimum and **MUST constitute less than 10% of all sentences**.\n        * **Paragraph Length:** Break up long blocks of text. Each paragraph **MUST NOT** exceed 150 words.\n        * **Cohesion and Flow:** Ensure smooth transitions between sentences and paragraphs. Use appropriate transition words and phrases to connect ideas and guide the reader logically through the content.\n    * **Content Length:** The final rewritten content **MUST** be at least 1000 words. Use the `Gemini Search Tool` to gather the most recent facts, statistics, relevant examples, or deeper explanations to expand the content if the original is too short. Ensure all data is presented in an evergreen manner.\n    * **Keyword Integration:**\n        * **Frequency:** The primary keyword **MUST** be integrated naturally throughout the text at least 5 times. Distribution should feel organic; avoid unnatural keyword stuffing.\n        * **First Paragraph:** The primary keyword **MUST** appear within the first paragraph of the rewritten content.\n        * **Headings:** The content must be structured with multiple relevant subheadings (`<h2>` and `<h3>`). To ensure strong thematic focus, the primary keyword **MUST** be included in the **majority** of these subheadings. All subheadings **MUST** strictly follow sentence case capitalization.\n    * **Internal Linking:**\n        * Review the `related` JSON array. Identify one or two of the most relevant articles from the list.\n        * Naturally weave links to these articles within the body of the new content. Use descriptive anchor text. The link must be an `<a>` tag containing the `url` and a `target=\"_blank\"` attribute.\n    * **Outbound Linking:**\n        * Use the `Gemini Search Tool` to find one highly authoritative and relevant external resource (like a research study, an industry-leading article, or a statistical report published close to **{{$now.format('yyyy-MM-dd')}}**).\n        * Add one outbound link to this resource within the content. The link should feel natural and add value to the reader. It must be an `<a>` tag with a `target=\"_blank\"` attribute.\n    * **HTML Formatting:** Ensure the final `content` is well-structured with proper HTML tags (`<p>`, `<h2>`, `<h3>`, `<a>`, `<strong>`, `<ul>`, `<li>`, etc.). Crucially, there **MUST NOT** be any `<h1>` tags within the `content` field.\n\n5.  **Meta Description Generation:**\n    * Based on the **newly rewritten** title and content, create a compelling, SEO-friendly meta description.\n    * The meta description **MUST** naturally include the primary keyword identified in step 2.\n    * It must be a maximum of 140 characters.\n    * It should serve as a concise summary and entice users to click.\n\n6.  **Final Output Generation:**\n    * Assemble the results of your work into a single JSON object.\n    * The JSON object must only contain the following four keys: `title`, `content`, `keyword`, and `meta_description`.\n\n**Remember: Do not add any conversational text, introductions, or explanations. Your final response must be only the JSON object.**"
+            }
+          ]
+        },
+        "options": {
+          "systemMessage": "=Use the `Gemini Search Tool` for researching data.",
+          "maxToolsIterations": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -464,
+        480
+      ],
+      "id": "19f5c57b-9b59-4439-a23c-cc33bc5b4cef",
+      "name": "Message a model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "6Qmz74fv62ASqbfV",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if license is valid": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get blog content detail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get blog content detail": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Search Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Message a model",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "Message a model1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Send content",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send content": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model1": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "FfOIxnXYC00WoM2o"
+  },
+  "triggerCount": 1,
+  "versionId": "7242d03f-1d51-4534-9023-b128c89ab15b",
+  "owner": {
+    "type": "personal",
+    "projectId": "ZvP1yE48ZEo7zgpC",
+    "projectName": "Synergize Flow Team <info@mantab.one>",
+    "personalEmail": "info@mantab.one"
+  },
+  "parentFolderId": "W6kfCfNZPfSqIn2i",
+  "isArchived": false
+}

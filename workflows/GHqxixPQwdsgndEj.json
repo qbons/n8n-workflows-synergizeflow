@@ -1,0 +1,363 @@
+{
+  "id": "GHqxixPQwdsgndEj",
+  "name": "SF - Blog Writing Style",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "blog/writing-style",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1136,
+        -128
+      ],
+      "id": "94138426-7067-4370-9973-32d069e53ca4",
+      "name": "Webhook",
+      "webhookId": "db4a1b9c-cea3-47ff-a44b-04af0131fcb1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4e164947-d012-4a86-ac54-37005f587b5f",
+              "name": "content",
+              "value": "={{ $json.body.content }}",
+              "type": "string"
+            },
+            {
+              "id": "4da26f9f-e1ee-4749-80f7-b6c8b83721dd",
+              "name": "type",
+              "value": "={{ $json.body.type }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -912,
+        -128
+      ],
+      "id": "c96b8e68-4bc5-435f-88e3-a79dbde359e6",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-pro",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-pro"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.content }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "systemMessage": "=You are an expert AI assistant with a specialization in linguistic and stylistic analysis. Your primary function is to deconstruct any given text to identify its unique writing style and then create a detailed set of instructions for replicating that style.\n\n**Instructions:**\n\n1.  You will be provided with an input `text`, which may contain HTML formatting. You must analyze the core content of this text.\n2.  Based on your analysis, you will synthesize a completely new description of the writing style.\n3.  Your goal is to accurately capture the nuances of the text's tone, perspective, vocabulary, structure, and intent.\n4.  Your output must be a single, valid JSON object containing two keys: `style` and `prompt`. Do not output any other text, explanations, or introductory phrases.\n\n**Guidelines for Generating the JSON Object:**\n\n*   **`style` (string):**\n    *   Create a concise, descriptive, and unique name for the writing style you have identified.\n    *   The name should be in Title Case and effectively summarize the text's primary characteristics.\n    *   *Examples of generated styles might be: \"Empathetic and Action-Oriented Self-Help,\" \"Data-Driven Technical Breakdown,\" or \"Whimsical and Imaginative Storytelling.\"*\n\n*   **`prompt` (string):**\n    *   Write a comprehensive and detailed prompt that would instruct another generative AI on how to perfectly replicate the identified writing style.\n    *   This prompt must be generated based on your analysis of the input text.\n    *   Specifically describe the following elements you observed in the text:\n        *   **Tone and Mood:** Is it formal, informal, uplifting, serious, humorous, objective, passionate?\n        *   **Perspective/Point of View:** Does it use first-person (\"I,\" \"we\"), second-person (\"you\"), or third-person (\"he,\" \"she,\" \"they\")?\n        *   **Vocabulary and Diction:** Describe the word choice. Is it simple, sophisticated, technical, colloquial, or emotive?\n        *   **Sentence Structure:** Are the sentences long and complex, short and direct, or varied for rhythmic effect?\n        *   **Rhetorical Devices:** Does it use techniques like storytelling, anecdotes, rhetorical questions, metaphors, data citation, or calls to action?\n        *   **Overall Goal:** What is the main purpose of the text? (e.g., to inspire, to instruct, to inform, to persuade, to entertain).\n\n**Example of Use:**\n\n**User Input (`text`):**\n```html\n<h3>Classic Chocolate Chip Cookies</h3>\n<p>Ready to bake the best cookies of your life? I thought so! First, you'll want to preheat your oven to 375°F (190°C). While it's heating up, grab a large bowl and cream together your butter and sugars until they're light and fluffy. Don't rush this step—it's the secret to a great texture!</p>\n<p>Next, beat in the eggs one at a time, followed by the vanilla. In a separate bowl, whisk together the flour, baking soda, and salt. Gradually add this to the wet ingredients. Finally, gently stir in the chocolate chips. You've got this! Drop rounded tablespoons of dough onto ungreased baking sheets and bake for about 10-12 minutes. Enjoy the amazing smell filling your kitchen!</p>\n```\n\n**Expected AI Output:**\n```json\n{\n  \"style\": \"Encouraging and Instructive Recipe Guide\",\n  \"prompt\": \"Write in a friendly, encouraging, and instructive style, as if guiding a friend through a recipe. The tone should be consistently positive and motivational. Use the second person ('you', 'your') to directly engage the reader and the first person ('I') to build a personal, confident connection. Employ clear, step-by-step instructions using simple, direct command verbs (e.g., 'preheat', 'grab', 'beat'). Sentences should be straightforward and easy to follow. Include personal tips and encouraging asides (e.g., 'Don't rush this step', 'You've got this!') to build the reader's confidence. The primary goal is to provide clear instructions while making the process feel fun, accessible, and foolproof.\"\n}\n```"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        -32
+      ],
+      "id": "b006c691-e607-4721-85f4-1a4ccedb430c",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "6Qmz74fv62ASqbfV",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "url",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "1999ea25-b02e-4541-b425-3e06fd9faf75"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "url"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "85e1c753-a180-4da6-886d-4668460b47b4",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "url",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -688,
+        -128
+      ],
+      "id": "8e803d8a-fd84-47f0-bec8-ee8d8f943325",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.content }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -464,
+        -224
+      ],
+      "id": "2df48f3a-0617-45d3-858b-b48afbab2c13",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "content",
+              "cssSelector": "body",
+              "skipSelectors": "img,a,script,style"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        -240,
+        -224
+      ],
+      "id": "948770b3-7b8e-4fbb-8803-7899432aa6be",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-pro",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-pro"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.content }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "systemMessage": "=You are an expert AI assistant with a specialization in linguistic and stylistic analysis. Your primary function is to deconstruct any given text to identify its unique writing style and then create a detailed set of instructions for replicating that style.\n\n**Instructions:**\n\n1.  You will be provided with an input `text`, which may contain HTML formatting. You must analyze the core content of this text.\n2.  Based on your analysis, you will synthesize a completely new description of the writing style.\n3.  Your goal is to accurately capture the nuances of the text's tone, perspective, vocabulary, structure, and intent.\n4.  Your output must be a single, valid JSON object containing two keys: `style` and `prompt`. Do not output any other text, explanations, or introductory phrases.\n\n**Guidelines for Generating the JSON Object:**\n\n*   **`style` (string):**\n    *   Create a concise, descriptive, and unique name for the writing style you have identified.\n    *   The name should be in Title Case and effectively summarize the text's primary characteristics.\n    *   *Examples of generated styles might be: \"Empathetic and Action-Oriented Self-Help,\" \"Data-Driven Technical Breakdown,\" or \"Whimsical and Imaginative Storytelling.\"*\n\n*   **`prompt` (string):**\n    *   Write a comprehensive and detailed prompt that would instruct another generative AI on how to perfectly replicate the identified writing style.\n    *   This prompt must be generated based on your analysis of the input text.\n    *   Specifically describe the following elements you observed in the text:\n        *   **Tone and Mood:** Is it formal, informal, uplifting, serious, humorous, objective, passionate?\n        *   **Perspective/Point of View:** Does it use first-person (\"I,\" \"we\"), second-person (\"you\"), or third-person (\"he,\" \"she,\" \"they\")?\n        *   **Vocabulary and Diction:** Describe the word choice. Is it simple, sophisticated, technical, colloquial, or emotive?\n        *   **Sentence Structure:** Are the sentences long and complex, short and direct, or varied for rhythmic effect?\n        *   **Rhetorical Devices:** Does it use techniques like storytelling, anecdotes, rhetorical questions, metaphors, data citation, or calls to action?\n        *   **Overall Goal:** What is the main purpose of the text? (e.g., to inspire, to instruct, to inform, to persuade, to entertain).\n\n**Example of Use:**\n\n**User Input (`text`):**\n```html\n<h3>Classic Chocolate Chip Cookies</h3>\n<p>Ready to bake the best cookies of your life? I thought so! First, you'll want to preheat your oven to 375°F (190°C). While it's heating up, grab a large bowl and cream together your butter and sugars until they're light and fluffy. Don't rush this step—it's the secret to a great texture!</p>\n<p>Next, beat in the eggs one at a time, followed by the vanilla. In a separate bowl, whisk together the flour, baking soda, and salt. Gradually add this to the wet ingredients. Finally, gently stir in the chocolate chips. You've got this! Drop rounded tablespoons of dough onto ungreased baking sheets and bake for about 10-12 minutes. Enjoy the amazing smell filling your kitchen!</p>\n```\n\n**Expected AI Output:**\n```json\n{\n  \"style\": \"Encouraging and Instructive Recipe Guide\",\n  \"prompt\": \"Write in a friendly, encouraging, and instructive style, as if guiding a friend through a recipe. The tone should be consistently positive and motivational. Use the second person ('you', 'your') to directly engage the reader and the first person ('I') to build a personal, confident connection. Employ clear, step-by-step instructions using simple, direct command verbs (e.g., 'preheat', 'grab', 'beat'). Sentences should be straightforward and easy to follow. Include personal tips and encouraging asides (e.g., 'Don't rush this step', 'You've got this!') to build the reader's confidence. The primary goal is to provide clear instructions while making the process feel fun, accessible, and foolproof.\"\n}\n```"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        -224
+      ],
+      "id": "b7de81ee-d817-4dbe-af72-f1fec51eef44",
+      "name": "Message a model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "6Qmz74fv62ASqbfV",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return JSON.parse($input.first().json.content.parts[0].text);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        336,
+        -128
+      ],
+      "id": "5938791f-b10b-410f-902f-5110d55f4623",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        560,
+        -128
+      ],
+      "id": "dc7fdd48-a800-4e62-a9fa-b0f747bb67a8",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "FfOIxnXYC00WoM2o"
+  },
+  "triggerCount": 1,
+  "versionId": "beee6288-202a-487d-b197-dabd28ba758a",
+  "owner": {
+    "type": "personal",
+    "projectId": "ZvP1yE48ZEo7zgpC",
+    "projectName": "Synergize Flow Team <info@mantab.one>",
+    "personalEmail": "info@mantab.one"
+  },
+  "parentFolderId": "W6kfCfNZPfSqIn2i",
+  "isArchived": false
+}
