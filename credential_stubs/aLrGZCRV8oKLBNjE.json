@@ -1,10 +1,9 @@
 {
-  "id": "zgTpx63oxNLMm8az",
-  "name": "SF - DataForSEO",
-  "type": "httpBasicAuth",
+  "id": "aLrGZCRV8oKLBNjE",
+  "name": "SF - Gemini API Account",
+  "type": "googlePalmApi",
   "data": {
-    "user": "",
-    "password": ""
+    "apiKey": ""
   },
   "ownedBy": {
     "type": "team",

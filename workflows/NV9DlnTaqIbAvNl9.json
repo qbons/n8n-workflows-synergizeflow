@@ -1,0 +1,332 @@
+{
+  "id": "NV9DlnTaqIbAvNl9",
+  "name": "SF - Helper Functions",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v1/util/helper",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1328,
+        144
+      ],
+      "id": "f9582ee7-a5cc-4a3c-96df-7d16cc949af4",
+      "name": "Webhook",
+      "webhookId": "80c66329-088e-4754-aa8f-1b134d90ec95"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "60458c94-986c-49cd-8b69-4b5616163eb3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f910b52-842c-4b6a-a862-e6914c883764",
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -656,
+        144
+      ],
+      "id": "bea504d2-6152-4def-9112-acae2a8a8bdf",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.website }}wp-json/synergize/v1/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "code",
+              "value": "={{ $json.code }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -880,
+        144
+      ],
+      "id": "ddf11d13-5135-4a9e-9287-21916acc54e6",
+      "name": "Check if license is valid"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7a5f7d9a-28cc-49e8-a1d2-e3e25ed8cd75",
+              "name": "website",
+              "value": "={{ $json.body.domain_name }}",
+              "type": "string"
+            },
+            {
+              "id": "8df36920-3df2-4c4e-bc18-4c85cf59b60e",
+              "name": "code",
+              "value": "={{ $json.body.license_key }}",
+              "type": "string"
+            },
+            {
+              "id": "38888392-860c-4b85-967b-323486ab102e",
+              "name": "type",
+              "value": "={{ $json.body.type }}",
+              "type": "string"
+            },
+            {
+              "id": "ce2e4d68-60f4-4e9e-8f30-73e5d180a2c4",
+              "name": "product_id",
+              "value": "={{ $json.body.product_id == null ? 'nope' : $json.body.product_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1104,
+        144
+      ],
+      "id": "58942ddb-2768-463a-a786-b98200096636",
+      "name": "Prepare data"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -208,
+        240
+      ],
+      "id": "f428dc62-c6bf-4c12-822e-6c344ef1c7f6",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "42309d5f-a011-44ea-b2ec-66ced157a5d0",
+              "name": "status",
+              "value": "fail",
+              "type": "string"
+            },
+            {
+              "id": "14198afc-aa4e-433e-942a-ae418e817293",
+              "name": "msg",
+              "value": "invalid_license",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -432,
+        240
+      ],
+      "id": "d2676da1-39c8-4a7c-9111-751a67a71536",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare data').item.json.website }}wp-json/synergize/v1/helper-data/",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "code",
+              "value": "={{ $('Prepare data').item.json.code }}"
+            },
+            {
+              "name": "type",
+              "value": "={{ $('Prepare data').item.json.type }}"
+            },
+            {
+              "name": "product_id",
+              "value": "={{ $('Prepare data').item.json.product_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -432,
+        48
+      ],
+      "id": "9ad70548-e690-4ffa-9cf3-6641870c593c",
+      "name": "Get website data"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -208,
+        48
+      ],
+      "id": "29907b08-dc1e-4198-99d4-de34d900de54",
+      "name": "Respond to Webhook1"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Prepare data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Get website data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if license is valid": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare data": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get website data": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "4otmc6jILN7VL0Z9",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "triggerCount": 1,
+  "versionId": "90c52bc6-f1ce-476f-9cb1-df65cf953256",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "DZr615Ms0rRYsoes",
+  "isArchived": false
+}

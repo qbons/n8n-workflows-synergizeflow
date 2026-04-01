@@ -1,0 +1,809 @@
+{
+  "id": "Eq7oWlE777xmgSH2",
+  "name": "SF - Blog Automation - M2 Magefan Blog",
+  "nodes": [
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "60458c94-986c-49cd-8b69-4b5616163eb3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f910b52-842c-4b6a-a862-e6914c883764",
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -1968,
+        464
+      ],
+      "id": "3f3b61d3-2fdd-400d-83ce-4da58addfa5d",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.website }}/rest/V1/synergize/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "code",
+              "value": "={{ $json.code }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2192,
+        464
+      ],
+      "id": "7abdf7ce-deb7-4c2f-8943-a74d3351ef35",
+      "name": "Check if license is valid"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7a5f7d9a-28cc-49e8-a1d2-e3e25ed8cd75",
+              "name": "website",
+              "value": "={{ $json.body.domain_name }}",
+              "type": "string"
+            },
+            {
+              "id": "8df36920-3df2-4c4e-bc18-4c85cf59b60e",
+              "name": "code",
+              "value": "={{ $json.body.license_key }}",
+              "type": "string"
+            },
+            {
+              "id": "24362375-ace3-4eb5-8cef-04c50ac15339",
+              "name": "title",
+              "value": "={{ $json.body.title }}",
+              "type": "string"
+            },
+            {
+              "id": "94563330-c21a-4d28-86aa-9c36bca7f1ca",
+              "name": "author_id",
+              "value": "={{ $json.body.author }}",
+              "type": "number"
+            },
+            {
+              "id": "788869ff-1001-45ec-807b-b06a0b74fbe6",
+              "name": "category_ids",
+              "value": "={{ $json.body.category }}",
+              "type": "string"
+            },
+            {
+              "id": "d78143ee-3f49-4c16-bcba-08d80c7353ed",
+              "name": "store_id",
+              "value": "=[{{ $json.body.store_id }}]",
+              "type": "string"
+            },
+            {
+              "id": "1286b34a-4d01-4bc9-9f81-7394390b25c2",
+              "name": "is_active",
+              "value": "={{ $json.body.enabled }}",
+              "type": "number"
+            },
+            {
+              "id": "974cd24f-2860-42f0-bf65-1d83e25043e3",
+              "name": "=language",
+              "value": "={{  $json.body.language || 'en' }}",
+              "type": "string"
+            },
+            {
+              "id": "793181bf-0ef4-4280-8c0f-2b5b1e083695",
+              "name": "writing_style",
+              "value": "={{  $json.body.writing_style || \"Adopt the writing style of a seasoned journalist. The tone should be objective, impartial, and strictly informative. Use the inverted pyramid structure, presenting the most crucial information first. Sentences should be clear, concise, and direct, avoiding elaborate prose or personal opinion. Employ the third-person perspective exclusively. Use quotes and attribute information to sources where appropriate to build credibility. The language must be formal, precise, and free of jargon, unless the jargon itself is the topic and is clearly explained. Focus entirely on presenting facts and well-supported information.\" }}",
+              "type": "string"
+            },
+            {
+              "id": "876908de-6034-48da-a45e-a5edefbc8d0b",
+              "name": "keywords",
+              "value": "={{ $json.body.keywords }}",
+              "type": "string"
+            },
+            {
+              "id": "59f0b2f9-1b0b-47a3-91aa-230c2187a344",
+              "name": "acces_token",
+              "value": "={{ $json.body.access_token }}",
+              "type": "string"
+            },
+            {
+              "id": "36f7d150-0b6c-4075-8dde-32339e214ec4",
+              "name": "tags",
+              "value": "={{ $json.body.tags }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2416,
+        464
+      ],
+      "id": "9eb0232e-f1da-462c-8822-d142b450fa19",
+      "name": "Prepare data"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -1184,
+        560
+      ],
+      "id": "da7b0698-d1f0-4d85-a8e2-fa718220db81",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "42309d5f-a011-44ea-b2ec-66ced157a5d0",
+              "name": "status",
+              "value": "fail",
+              "type": "string"
+            },
+            {
+              "id": "14198afc-aa4e-433e-942a-ae418e817293",
+              "name": "msg",
+              "value": "invalid_license",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1472,
+        560
+      ],
+      "id": "a5d5802e-7efb-48d5-b340-15fe9a8e01a1",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_PREVIEW }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are an expert-level SEO Content Production System. Your primary function is to perform a real-time search and then generate a complete, SEO-optimized blog post package in any specified language and writing style. Your process must be executed in the precise order below.\n\n**INPUTS:**\n* Keywords: {{ $('Prepare data').item.json.keywords }}\n* Language: {{ $('Prepare data').item.json.language }} (Any valid ISO 639-1 language code)\n* Existing Titles (Exclusion List): {{ $('Prepare data').item.json.title }}\n* Writing Style Prompt: {{ $('Prepare data').item.json.writing_style }} \n\n**PROCESS:**\n\n1.  **SEARCH & ANALYZE:** You MUST begin by performing a comprehensive Google Search using the provided 'Keywords'. The search queries and analysis must be conducted in the language specified by the `Language` input. Your goal is to understand searcher intent and determine the core, evergreen aspects of the topic.\n\n2.  **GENERATE 'title' & 'content_heading':** * **Title:** Based on your search analysis, create ONE new, unique, and SEO-friendly blog title. It is CRITICAL that this title is distinct and not semantically similar to any title on the 'Existing Titles (Exclusion List)'. The title must be evergreen and not contain any time-sensitive information. The title must be written entirely in the specified `Language` and use standard sentence case capitalization.\n    * **Content Heading:** Create a compelling main heading (H1) for the page. This can be identical to the Title or a more concise version of it, written in the specified `Language`.\n\n3.  **GENERATE 'content':** Write a full blog post based on the title you just created. The entire content must be generated in the specified `Language` and formatted as a single, well-structured HTML string. The content must be evergreen and MUST NOT contain any time-specific information such as a `year`, `date`, `day`, `time`, etc.\n\n    * **CRITICAL WRITING STYLE INSTRUCTION:** You must strictly adhere to the following writing style: **{{ $('Prepare data').item.json.writing_style }}** This instruction defines the tone, voice, sentence structure, and overall approach for the entire blog post.\n    * **Introduction (150-200 words):** Start with a compelling hook that reflects the chosen writing style. Provide timeless context for the topic, explaining its relevance. Briefly preview the main points.\n    * **Main Content (6-8 Chapters):** Each chapter MUST begin with a relevant <h2> heading using standard sentence case capitalization. Each chapter must contain 300-400 words of unique and insightful content, written strictly in the specified writing style. Incorporate relevant data points from your search that are not time-sensitive.\n    * **Conclusion (200-250 words):** Summarize the key takeaways. Offer final thoughts or broader implications from a timeless perspective, maintaining the writing style through to the end. End with a strong concluding statement.\n    * **HTML Formatting Guidelines:** The entire 'content' value must be a single string of HTML. Do NOT include <html>, <head>, or <body> tags. The content must start directly with the first tag (e.g., <p>). Use <p> for paragraphs, <h2> for chapter headings, <blockquote> for quotes, and <strong> or <em> for emphasis. The content must be original. CHANGE DOUBLE QUOTE WITH &quot; if the content have double quote.\n\n4.  **GENERATE 'keywords':** From the content you wrote, identify and provide a JSON array containing exactly 5 primary and secondary SEO-friendly keywords. The keywords must be in the specified `Language` and should not be time-specific.\n\n5.  **GENERATE 'excerpt':** Create a concise, SEO-friendly summary of the content, between 110 and 160 characters. The excerpt must be written in the specified `Language` and reflect the chosen writing style. It must not contain any time-sensitive information.\n\n6.  **GENERATE 'meta_tags':**\n    * **Meta Title:** Create a highly clickable SEO title optimized for search engine results pages (SERPs). It must be under 60 characters and include the primary keyword.\n    * **Meta Description:** Create a persuasive description for search engines, between 150 and 160 characters. It should summarize the value of the post and entice the user to click.\n\n7.  **GENERATE 'image' details:** * **Prompt:** Write a detailed prompt for an image generation model in the specified `Language`. The prompt should describe a scene relevant to the blog's core message. The concept should be timeless. Specify an 'ultrarealistic' style.\n    * **Featured Image Name:** Create a filename for the image using the format: `hardcoded_text_epoch`. Since you are generating text, use a concise English slug of the topic followed by a placeholder timestamp (e.g., `topic-slug-text-1700000000`).\n\n8. **GENERATE 'url_key':** Create a concise, SEO-friendly URL key for the blog post, between 2 and 4 word separated with dash (-). The URL key must be written in the specified `Language` and reflect the chosen writing style.\n\n**EXECUTION COMMAND:**\nExecute all steps and generate the single, complete JSON object. All string values in the JSON output must be in the language specified by the `Language` input. Your output must start with { and end with }. The structure must be exactly as follows:\n{\n  \"title\": \"Generated SEO blog title [in specified language]\",\n  \"content_heading\": \"The main H1 heading for the page [in specified language]\",\n  \"content\": \"<p>Introduction text... [in specified language and writing style]</p><h2>Chapter 1... [in specified language and writing style]</h2>...\",\n  \"keywords\": [\"Keyword 1\", \"Keyword 2\", \"Keyword 3\", \"Keyword 4\", \"Keyword 5\"],\n  \"excerpt\": \"A 110 and 160 characters summary of the blog post [in specified language and writing style].\",\n  \"meta_title\": \"SEO Optimized Title (Max 60 chars) [in specified language]\",\n  \"meta_description\": \"SEO Optimized Description (Max 160 chars) [in specified language]\",\n  \"url_key\": \"Generated SEO-friendly URL key [in specified language]\",\n  \"image\": \"An ultrarealistic photo of [description relevant to the content, written in the specified language]...\",\n  \"featured_img_name\": \"topic-slug.jpg\"\n}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1328,
+        96
+      ],
+      "id": "81811428-a956-4f74-b3ca-c2e122b0ab27",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return JSON.parse($input.first().json.content.parts[0].text)"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -976,
+        96
+      ],
+      "id": "cb59d0e9-c0d1-4b9c-89be-aea6ee582265",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"id\": \"{{$json.id}}\",\n  \"title\": \"{{$json.name}}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -96,
+        -128
+      ],
+      "id": "200cb3bf-545b-42b8-9d75-cd04981a8d7b",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://us-central1-aiplatform.googleapis.com/v1/projects/{{$vars.GOOGLE_SERVICE_ACCOUNT_ID}}/locations/us-central1/publishers/google/models/{{ $vars.IMAGEN_MODEL }}:predict",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "= {\n  \"instances\": [\n    {\n      \"prompt\": {{ $json.image.toJsonString() }}\n    }\n  ],\n  \"parameters\": {\n    \"aspectRatio\": \"16:9\",\n    \"sampleCount\": 1,\n    \"personGeneration\": \"allow_all\",\n    \"outputOptions\": {\n        \"mimeType\": \"image/jpeg\",\n        \"compressionQuality\": 50\n    }\n  }\n  \n}",
+        "options": {}
+      },
+      "id": "f9688ab9-1f92-49e2-a5f7-66a41686ddbf",
+      "name": "Image Scrapper",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -752,
+        96
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "googleApi": {
+          "id": "C4Bh0vq2T0s7HIDk",
+          "name": "SF - Vertex API Service Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fa758b99-67ae-45b2-ad02-e1b704fdd403",
+              "name": "keyword",
+              "value": "={{ $('Code2').item.json.keywords }}",
+              "type": "string"
+            },
+            {
+              "id": "29c81488-142a-40dd-af9e-0eb1004b153c",
+              "name": "title",
+              "value": "={{ $('Code2').item.json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "ceda4cc6-6a23-4293-80dd-78c44c04a24c",
+              "name": "identifier",
+              "value": "={{ $('Code2').item.json.url_key }}",
+              "type": "string"
+            },
+            {
+              "id": "38bc61c4-34f8-4e5e-9b3b-70779aea7aa9",
+              "name": "content",
+              "value": "={{ $('Code2').item.json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "0b7d5b13-c05f-42a1-9e2d-0dfec25de1d3",
+              "name": "short_content",
+              "value": "={{ $('Code2').item.json.excerpt }}",
+              "type": "string"
+            },
+            {
+              "id": "1cce46d2-7d73-4cc3-b833-18876d2c952d",
+              "name": "content_heading",
+              "value": "={{ $('Code2').item.json.content_heading }}",
+              "type": "string"
+            },
+            {
+              "id": "0a8631ab-d38f-44ed-a5db-0a4a83f551ea",
+              "name": "image_name",
+              "value": "={{ $('Code2').item.json.featured_img_name }}",
+              "type": "string"
+            },
+            {
+              "id": "8ee5a866-7fe1-45be-8e1a-60a13ee3fbf8",
+              "name": "featured_img_content",
+              "value": "={{ $json.predictions[0].bytesBase64Encoded }}",
+              "type": "string"
+            },
+            {
+              "id": "23c71d05-3ca8-4f5e-b4d3-7c03d4b440c7",
+              "name": "key",
+              "value": "jRCK@H_62U]%{K9SjLUim-VjBi8_7/",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -544,
+        -32
+      ],
+      "id": "d4dbcad9-975b-4d39-99b6-b82c2d71dfbb",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "42309d5f-a011-44ea-b2ec-66ced157a5d0",
+              "name": "status",
+              "value": "fail",
+              "type": "string"
+            },
+            {
+              "id": "14198afc-aa4e-433e-942a-ae418e817293",
+              "name": "msg",
+              "value": "error_generate_image",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -544,
+        192
+      ],
+      "id": "0f247ad2-78dd-4e57-a765-7fa3c348a113",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -320,
+        192
+      ],
+      "id": "b36e1141-327e-4e39-b1d6-9d418c92611d",
+      "name": "Respond to Webhook2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare data').item.json.website }}/rest/V1/mfblog/post/create",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare data').item.json.acces_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n \"request\": {\n    \"title\": \"{{ $('Code2').item.json.title }}\",\n    \"content\": \"{{ $('Code2').item.json.content }}\",\n    \"is_active\": 1,\n    \"store_ids\": {{ $('Prepare data').item.json.store_id }},\n    \"identifier\": \"{{ $('Edit Fields3').item.json.identifier }}\",\n    \"short_content\": \"{{ $json.short_content }}\",\n    \"meta_title\": \"{{ $('Code2').item.json.meta_title }}\",\n    \"meta_keywords\": \"{{ $('Code2').item.json.keywords }}\",\n    \"meta_description\": \"{{ $('Code2').item.json.meta_description }}\",\n    \"categories\": {{ $('Prepare data').item.json.category_ids }},\n    \"tags\": {{ $('Prepare data').item.json.tags }},\n    \"author_id\": {{ $('Prepare data').item.json.author_id }},\n    \"featured_img_name\": \"{{ $('Edit Fields3').item.json.image_name }}\",\n    \"featured_img_content\": \"{{ $json.featured_img_content }}\"\n}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -320,
+        -32
+      ],
+      "id": "231e2395-61c7-4fff-a3fc-b8ba2a13bd32",
+      "name": "Insert data to website",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "42309d5f-a011-44ea-b2ec-66ced157a5d0",
+              "name": "status",
+              "value": "fail",
+              "type": "string"
+            },
+            {
+              "id": "14198afc-aa4e-433e-942a-ae418e817293",
+              "name": "msg",
+              "value": "error_insert_blog",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -96,
+        16
+      ],
+      "id": "f1aafed1-8457-4be1-9ae7-d89f7a21c0bf",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        128,
+        16
+      ],
+      "id": "718cf706-69e6-4c90-9e2c-6527ec339294",
+      "name": "Respond to Webhook3"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Prepare data').item.json.website }}/rest/V1/synergize/oauth-bearer-status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1760,
+        256
+      ],
+      "id": "6b8ab053-949d-42d7-b0ae-abccef17714b",
+      "name": "check accesstoken config"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.oauth_bearer_enabled }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "id": "36c5d467-d07a-4bb1-b9ba-4d6ea8cff172"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "35234d2f-69ab-4c7a-83f7-3f7c780ddef6",
+                    "leftValue": "={{ $json.oauth_bearer_enabled }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "false",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -1552,
+        256
+      ],
+      "id": "6301b09f-3730-43e5-b039-a0107219e231",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -1328,
+        352
+      ],
+      "id": "285a410f-0905-48d8-881d-e40779f03a83",
+      "name": "Respond to Webhook5"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "eaa988f1-3d72-47a4-9db2-73783a78b0fb",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2624,
+        464
+      ],
+      "id": "a3267549-2cb6-401b-9ca1-e336d0e71032",
+      "name": "Webhook1",
+      "webhookId": "eaa988f1-3d72-47a4-9db2-73783a78b0fb"
+    }
+  ],
+  "connections": {
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "check accesstoken config",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if license is valid": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare data": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Image Scrapper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Scrapper": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Insert data to website",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert data to website": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check accesstoken config": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Prepare data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "4otmc6jILN7VL0Z9",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "triggerCount": 0,
+  "versionId": "66f34bfc-5708-421d-979e-96e06a325c60",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "m9SlnlvWccSUBTns",
+  "isArchived": false
+}

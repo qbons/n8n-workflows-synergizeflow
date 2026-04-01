@@ -1,0 +1,2461 @@
+{
+  "id": "8OmaKZMiadc6Oyob",
+  "name": "SF - Publish Instagram",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ce945c5a-d809-4c50-ae3b-94890d6cc214",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -8831264,
+        -34888000
+      ],
+      "id": "cce07b11-efd5-48f1-87d8-b3ef7c089ce5",
+      "name": "Webhook",
+      "webhookId": "ce945c5a-d809-4c50-ae3b-94890d6cc214"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "454a0159-a56c-4055-a07f-9f36edf56cb6",
+              "name": "file",
+              "value": "={{ $json.body.file }}",
+              "type": "string"
+            },
+            {
+              "id": "6ef18411-cb10-4169-96b8-47d7e7d5a821",
+              "name": "caption",
+              "value": "={{ $json.body.caption }}",
+              "type": "string"
+            },
+            {
+              "id": "4a7c5c80-53b5-494b-903d-a3e5e9ddaf53",
+              "name": "instagram_id",
+              "value": "={{ $json.body.instagram_id }}",
+              "type": "string"
+            },
+            {
+              "id": "5c26c150-cf7d-493c-a398-6420d04dc5b6",
+              "name": "instagram_token",
+              "value": "={{ $json.body.instagram_token }}",
+              "type": "string"
+            },
+            {
+              "id": "e0d80256-4903-4bed-aea3-369b7efe0b25",
+              "name": "content_id",
+              "value": "={{ $json.body.content_id }}",
+              "type": "number"
+            },
+            {
+              "id": "0efeb594-9c96-4bd3-a68d-21fc3fdd8fe4",
+              "name": "backend",
+              "value": "={{ $json.body.backend }}",
+              "type": "string"
+            },
+            {
+              "id": "9981eb4c-5540-4c7d-b58b-78ca2dde02fd",
+              "name": "user_id",
+              "value": "={{ $json.body.user_id }}",
+              "type": "string"
+            },
+            {
+              "id": "ec5cd0f9-7fcb-4772-bbd6-2ee647b2ce5b",
+              "name": "content_type",
+              "value": "={{ $json.body.content_type ?? \"video\" }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -8831040,
+        -34888000
+      ],
+      "id": "e38d54ff-a086-498c-9c21-16b6a2a360c5",
+      "name": "Prepare data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.instagram.com/v23.0/{{ $('Prepare data').item.json.instagram_id }}/media",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.payload }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -8829472,
+        -34888000
+      ],
+      "id": "d4249b78-78bb-45b5-85ca-ca3577de9875",
+      "name": "Create container",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "amount": 90
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -8829248,
+        -34888080
+      ],
+      "id": "576852c9-15c2-4d2d-b786-14ed0183d340",
+      "name": "Wait",
+      "webhookId": "af6714b2-4f7d-4446-bbda-f194fe8d2e24"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.instagram.com/v23.0/{{ $('Prepare data').item.json.instagram_id }}/media_publish",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "creation_id",
+              "value": "={{ $json.body.id }}"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $('Prepare data').item.json.instagram_token }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -8829024,
+        -34888080
+      ],
+      "id": "5628d6b5-07c6-4465-b5ae-bc3a314cd94b",
+      "name": "Post to IG",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare data').item.json.backend}}/api/instagram/published",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content_id",
+              "value": "={{ $('Prepare data').item.json.content_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -8828800,
+        -34888128
+      ],
+      "id": "7b7cd830-d6dc-49b6-a60c-bbb7f203dc3c",
+      "name": "Callback publish"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare data').item.json.backend}}/api/social-content/fail",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content_id",
+              "value": "={{ $('Prepare data').item.json.content_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -8828800,
+        -34887904
+      ],
+      "id": "88c91c20-230b-4e90-934c-7998b53f45a8",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "errorMessage": "An error occurred!"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -8828576,
+        -34887904
+      ],
+      "id": "89e6dc2b-4210-4d8f-9e73-bb45f087df97",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.file }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -8830592,
+        -34888096
+      ],
+      "id": "4e4b7713-dda7-4ee6-8e7e-e7b53b91bbfc",
+      "name": "Download image"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "destinationKey": "file",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -8830368,
+        -34888096
+      ],
+      "id": "416911c8-37aa-46ff-9664-4a8d707f3810",
+      "name": "Transform to base"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googlePalmApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"Crop this image and adjust it\"\n        },\n        {\n          \"inline_data\": {\n            \"mime_type\": \"image/png\",\n            \"data\": {{ JSON.stringify($json.file) }}\n          }\n        }\n      ]\n    }\n  ],\n  \"generationConfig\": {\n    \"responseModalities\": [\"IMAGE\"],\n    \"imageConfig\": {\n      \"aspectRatio\": \"4:5\",\n      \"imageSize\": \"1K\"\n    }\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -8830144,
+        -34888096
+      ],
+      "id": "ca0e507a-0c4d-40f0-9e9a-4158ea9b36d9",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare data').item.json.backend }}/api/linkedin-agent/generated-image",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "=file",
+              "value": "={{ $json.candidates[0].content.parts[0].inlineData.data }}"
+            },
+            {
+              "name": "userId",
+              "value": "={{ $('Prepare data').item.json.user_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -8829920,
+        -34888096
+      ],
+      "id": "52a7884e-894e-4fce-8171-21f90f77bbcd",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "00db86c9-d331-45a6-af8e-5c8cf00994c6"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "28e6d99a-0f44-4529-8e75-2d11034b7a77",
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "article",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "article"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3e1609ee-eea7-433d-8d11-d8818a1df2ae",
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "fff43af6-462c-448c-a229-922761b25ddc",
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "video",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "video"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -8830816,
+        -34888032
+      ],
+      "id": "d5d3ae51-fb0b-415d-b3ad-88fe9b4f85a9",
+      "name": "Content router"
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = {\n  access_token: $('Prepare data').first().json.instagram_token,\n  caption: $('Prepare data').first().json.caption,\n  image_url: $input.first().json.url\n}\n\nreturn {\n  payload\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -8829696,
+        -34888096
+      ],
+      "id": "452496ed-99fd-4145-a0b8-e0c4243fac1b",
+      "name": "Image payload formater"
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = {\n  access_token: $input.first().json.instagram_token,\n  caption: $input.first().json.caption,\n  video_url: $input.first().json.file,\n  media_type: \"REELS\"\n}\n\nreturn {\n  payload\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -8829696,
+        -34887904
+      ],
+      "id": "fabf2b92-5238-416d-a15f-fbd91d0470c0",
+      "name": "Video payload formater"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ce945c5a-d809-4c50-ae3b-94890d6cc214",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -8831264,
+        -34887568
+      ],
+      "id": "53d53e9e-0912-4bd3-9071-fe89b6beb861",
+      "name": "Webhook1",
+      "webhookId": "ce945c5a-d809-4c50-ae3b-94890d6cc214"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "454a0159-a56c-4055-a07f-9f36edf56cb6",
+              "name": "file",
+              "value": "={{ $json.body.file }}",
+              "type": "string"
+            },
+            {
+              "id": "6ef18411-cb10-4169-96b8-47d7e7d5a821",
+              "name": "caption",
+              "value": "={{ $json.body.caption }}",
+              "type": "string"
+            },
+            {
+              "id": "4a7c5c80-53b5-494b-903d-a3e5e9ddaf53",
+              "name": "instagram_id",
+              "value": "={{ $json.body.instagram_id }}",
+              "type": "string"
+            },
+            {
+              "id": "5c26c150-cf7d-493c-a398-6420d04dc5b6",
+              "name": "instagram_token",
+              "value": "={{ $json.body.instagram_token }}",
+              "type": "string"
+            },
+            {
+              "id": "e0d80256-4903-4bed-aea3-369b7efe0b25",
+              "name": "content_id",
+              "value": "={{ $json.body.content_id }}",
+              "type": "number"
+            },
+            {
+              "id": "0efeb594-9c96-4bd3-a68d-21fc3fdd8fe4",
+              "name": "backend",
+              "value": "={{ $json.body.backend }}",
+              "type": "string"
+            },
+            {
+              "id": "9981eb4c-5540-4c7d-b58b-78ca2dde02fd",
+              "name": "user_id",
+              "value": "={{ $json.body.user_id }}",
+              "type": "string"
+            },
+            {
+              "id": "ec5cd0f9-7fcb-4772-bbd6-2ee647b2ce5b",
+              "name": "content_type",
+              "value": "={{ $json.body.content_type ?? \"video\" }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -8831040,
+        -34887568
+      ],
+      "id": "8a8e67ac-60c9-42c8-b3b1-2d7523428535",
+      "name": "Prepare data1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.instagram.com/v23.0/{{ $('Prepare data1').item.json.instagram_id }}/media",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.payload }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -8829472,
+        -34887568
+      ],
+      "id": "c520de71-f239-447f-8b49-19af286e4320",
+      "name": "Create container1",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "amount": 90
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -8829248,
+        -34887632
+      ],
+      "id": "a733f330-1c68-4bf2-8131-b3678fa646ad",
+      "name": "Wait1",
+      "webhookId": "af6714b2-4f7d-4446-bbda-f194fe8d2e24"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.instagram.com/v23.0/{{ $('Prepare data1').item.json.instagram_id }}/media_publish",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "creation_id",
+              "value": "={{ $json.body.id }}"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $('Prepare data1').item.json.instagram_token }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -8829024,
+        -34887632
+      ],
+      "id": "b7cd02c2-d16f-4687-90be-9e9b2d0ffa5c",
+      "name": "Post to IG1",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare data1').item.json.backend}}/api/instagram/published",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content_id",
+              "value": "={{ $('Prepare data1').item.json.content_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -8828800,
+        -34887680
+      ],
+      "id": "0d95e900-fbea-45e7-9e1d-4b98f9d99a7c",
+      "name": "Callback publish1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare data1').item.json.backend}}/api/social-content/fail",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content_id",
+              "value": "={{ $('Prepare data1').item.json.content_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -8828800,
+        -34887472
+      ],
+      "id": "6df945e7-0c84-4788-b5a7-a0b8e6f24c5b",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "errorMessage": "An error occurred!"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -8828576,
+        -34887472
+      ],
+      "id": "86c93354-966b-42f1-9281-a0f55c1a0911",
+      "name": "Stop and Error1"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.file }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -8830592,
+        -34887664
+      ],
+      "id": "8f832bdf-f26c-464e-91f4-d1f0598f8243",
+      "name": "Download image1"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "destinationKey": "file",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -8830368,
+        -34887664
+      ],
+      "id": "918c4231-fa0c-4598-a023-ee078506844e",
+      "name": "Transform to base1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googlePalmApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"Crop this image and adjust it\"\n        },\n        {\n          \"inline_data\": {\n            \"mime_type\": \"image/png\",\n            \"data\": {{ JSON.stringify($json.file) }}\n          }\n        }\n      ]\n    }\n  ],\n  \"generationConfig\": {\n    \"responseModalities\": [\"IMAGE\"],\n    \"imageConfig\": {\n      \"aspectRatio\": \"4:5\",\n      \"imageSize\": \"1K\"\n    }\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -8830144,
+        -34887664
+      ],
+      "id": "b79df0bb-a7bd-4d0e-be2f-d161f8fbcff1",
+      "name": "HTTP Request4"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare data1').item.json.backend }}/api/linkedin-agent/generated-image",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "=file",
+              "value": "={{ $json.candidates[0].content.parts[0].inlineData.data }}"
+            },
+            {
+              "name": "userId",
+              "value": "={{ $('Prepare data1').item.json.user_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -8829920,
+        -34887664
+      ],
+      "id": "4e680bd0-47a7-4898-b628-5009889286fa",
+      "name": "HTTP Request5"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "00db86c9-d331-45a6-af8e-5c8cf00994c6"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "28e6d99a-0f44-4529-8e75-2d11034b7a77",
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "article",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "article"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3e1609ee-eea7-433d-8d11-d8818a1df2ae",
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "fff43af6-462c-448c-a229-922761b25ddc",
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "video",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "video"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -8830816,
+        -34887600
+      ],
+      "id": "9dd55d62-7544-44c9-9ab4-6bc1f976949d",
+      "name": "Content router1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = {\n  access_token: $('Prepare data1').first().json.instagram_token,\n  caption: $('Prepare data1').first().json.caption,\n  image_url: $input.first().json.url\n}\n\nreturn {\n  payload\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -8829696,
+        -34887664
+      ],
+      "id": "4b13f893-52e3-4fe3-92dc-94c8a0224807",
+      "name": "Image payload formater1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = {\n  access_token: $input.first().json.instagram_token,\n  caption: $input.first().json.caption,\n  video_url: $input.first().json.file,\n  media_type: \"REELS\"\n}\n\nreturn {\n  payload\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -8829696,
+        -34887472
+      ],
+      "id": "f1d70137-ce92-462e-9d93-018fee128d52",
+      "name": "Video payload formater1"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ce945c5a-d809-4c50-ae3b-94890d6cc214",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -8831264,
+        -34888448
+      ],
+      "id": "0d522497-c7ab-46bd-b17d-16fb519c1c53",
+      "name": "Webhook2",
+      "webhookId": "ce945c5a-d809-4c50-ae3b-94890d6cc214"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "454a0159-a56c-4055-a07f-9f36edf56cb6",
+              "name": "file",
+              "value": "={{ $json.body.file }}",
+              "type": "string"
+            },
+            {
+              "id": "6ef18411-cb10-4169-96b8-47d7e7d5a821",
+              "name": "caption",
+              "value": "={{ $json.body.caption }}",
+              "type": "string"
+            },
+            {
+              "id": "4a7c5c80-53b5-494b-903d-a3e5e9ddaf53",
+              "name": "instagram_id",
+              "value": "={{ $json.body.instagram_id }}",
+              "type": "string"
+            },
+            {
+              "id": "5c26c150-cf7d-493c-a398-6420d04dc5b6",
+              "name": "instagram_token",
+              "value": "={{ $json.body.instagram_token }}",
+              "type": "string"
+            },
+            {
+              "id": "e0d80256-4903-4bed-aea3-369b7efe0b25",
+              "name": "content_id",
+              "value": "={{ $json.body.content_id }}",
+              "type": "number"
+            },
+            {
+              "id": "0efeb594-9c96-4bd3-a68d-21fc3fdd8fe4",
+              "name": "backend",
+              "value": "={{ $json.body.backend }}",
+              "type": "string"
+            },
+            {
+              "id": "9981eb4c-5540-4c7d-b58b-78ca2dde02fd",
+              "name": "user_id",
+              "value": "={{ $json.body.user_id }}",
+              "type": "string"
+            },
+            {
+              "id": "ec5cd0f9-7fcb-4772-bbd6-2ee647b2ce5b",
+              "name": "content_type",
+              "value": "={{ $json.body.content_type ?? \"video\" }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -8831040,
+        -34888448
+      ],
+      "id": "ed89017a-dcba-4a1d-a4d0-5ca60267195c",
+      "name": "Prepare data2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.instagram.com/v23.0/{{ $('Prepare data2').item.json.instagram_id }}/media",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.payload }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -8829472,
+        -34888448
+      ],
+      "id": "6618ef52-d156-485c-aa3d-b9a621916fab",
+      "name": "Create container2",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "amount": 90
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -8829248,
+        -34888512
+      ],
+      "id": "cb63a939-8e16-477e-bad5-723bb9c86969",
+      "name": "Wait2",
+      "webhookId": "af6714b2-4f7d-4446-bbda-f194fe8d2e24"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.instagram.com/v23.0/{{ $('Prepare data2').item.json.instagram_id }}/media_publish",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "creation_id",
+              "value": "={{ $json.body.id }}"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $('Prepare data2').item.json.instagram_token }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -8829024,
+        -34888512
+      ],
+      "id": "c3a8d177-30c5-4f69-a433-0b3607edd2a0",
+      "name": "Post to IG2",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare data2').item.json.backend}}/api/instagram/published",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content_id",
+              "value": "={{ $('Prepare data2').item.json.content_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -8828800,
+        -34888560
+      ],
+      "id": "e87c3cae-5d5b-4ded-9a6f-36bb816e56f1",
+      "name": "Callback publish2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare data2').item.json.backend}}/api/social-content/fail",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content_id",
+              "value": "={{ $('Prepare data2').item.json.content_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -8828800,
+        -34888352
+      ],
+      "id": "34c1b375-0199-4fd2-8b79-862988a72e21",
+      "name": "HTTP Request6"
+    },
+    {
+      "parameters": {
+        "errorMessage": "An error occurred!"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -8828576,
+        -34888352
+      ],
+      "id": "85d035da-1fd0-4263-a200-3c698d4b3e6d",
+      "name": "Stop and Error2"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.file }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -8830592,
+        -34888544
+      ],
+      "id": "25681b62-9422-4113-99a6-5c4259faf030",
+      "name": "Download image2"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "destinationKey": "file",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -8830368,
+        -34888544
+      ],
+      "id": "aef905f2-0630-4c1d-a984-bbd6fd7c9a31",
+      "name": "Transform to base2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googlePalmApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"Crop this image and adjust it\"\n        },\n        {\n          \"inline_data\": {\n            \"mime_type\": \"image/png\",\n            \"data\": {{ JSON.stringify($json.file) }}\n          }\n        }\n      ]\n    }\n  ],\n  \"generationConfig\": {\n    \"responseModalities\": [\"IMAGE\"],\n    \"imageConfig\": {\n      \"aspectRatio\": \"4:5\",\n      \"imageSize\": \"1K\"\n    }\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -8830144,
+        -34888544
+      ],
+      "id": "c7c3bea2-51a1-427c-bc56-9b30262f4372",
+      "name": "HTTP Request7"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare data2').item.json.backend }}/api/linkedin-agent/generated-image",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "=file",
+              "value": "={{ $json.candidates[0].content.parts[0].inlineData.data }}"
+            },
+            {
+              "name": "userId",
+              "value": "={{ $('Prepare data2').item.json.user_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -8829920,
+        -34888544
+      ],
+      "id": "051d73d7-d862-4b4b-a9b1-704b27fdf6ed",
+      "name": "HTTP Request8"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "00db86c9-d331-45a6-af8e-5c8cf00994c6"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "28e6d99a-0f44-4529-8e75-2d11034b7a77",
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "article",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "article"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3e1609ee-eea7-433d-8d11-d8818a1df2ae",
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "fff43af6-462c-448c-a229-922761b25ddc",
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "video",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "video"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -8830816,
+        -34888480
+      ],
+      "id": "dfe11c7b-7979-4f12-961a-a3aec330ad6a",
+      "name": "Content router2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = {\n  access_token: $('Prepare data2').first().json.instagram_token,\n  caption: $('Prepare data2').first().json.caption,\n  image_url: $input.first().json.url\n}\n\nreturn {\n  payload\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -8829696,
+        -34888544
+      ],
+      "id": "5de1c1f1-7e80-48a1-9966-f6f712ab6e16",
+      "name": "Image payload formater2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = {\n  access_token: $input.first().json.instagram_token,\n  caption: $input.first().json.caption,\n  video_url: $input.first().json.file,\n  media_type: \"REELS\"\n}\n\nreturn {\n  payload\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -8829696,
+        -34888352
+      ],
+      "id": "3301b2da-2e06-42aa-9a87-385a997ba176",
+      "name": "Video payload formater2"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ce945c5a-d809-4c50-ae3b-94890d6cc214",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -8831264,
+        -34887120
+      ],
+      "id": "55ce8f23-f2e7-46d6-b6b6-2079cdf6d452",
+      "name": "Webhook3",
+      "webhookId": "ce945c5a-d809-4c50-ae3b-94890d6cc214"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "454a0159-a56c-4055-a07f-9f36edf56cb6",
+              "name": "file",
+              "value": "={{ $json.body.file }}",
+              "type": "string"
+            },
+            {
+              "id": "6ef18411-cb10-4169-96b8-47d7e7d5a821",
+              "name": "caption",
+              "value": "={{ $json.body.caption }}",
+              "type": "string"
+            },
+            {
+              "id": "4a7c5c80-53b5-494b-903d-a3e5e9ddaf53",
+              "name": "instagram_id",
+              "value": "={{ $json.body.instagram_id }}",
+              "type": "string"
+            },
+            {
+              "id": "5c26c150-cf7d-493c-a398-6420d04dc5b6",
+              "name": "instagram_token",
+              "value": "={{ $json.body.instagram_token }}",
+              "type": "string"
+            },
+            {
+              "id": "e0d80256-4903-4bed-aea3-369b7efe0b25",
+              "name": "content_id",
+              "value": "={{ $json.body.content_id }}",
+              "type": "number"
+            },
+            {
+              "id": "0efeb594-9c96-4bd3-a68d-21fc3fdd8fe4",
+              "name": "backend",
+              "value": "={{ $json.body.backend }}",
+              "type": "string"
+            },
+            {
+              "id": "9981eb4c-5540-4c7d-b58b-78ca2dde02fd",
+              "name": "user_id",
+              "value": "={{ $json.body.user_id }}",
+              "type": "string"
+            },
+            {
+              "id": "ec5cd0f9-7fcb-4772-bbd6-2ee647b2ce5b",
+              "name": "content_type",
+              "value": "={{ $json.body.content_type ?? \"video\" }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -8831040,
+        -34887120
+      ],
+      "id": "77ffef78-dc5e-439b-a65e-150435239539",
+      "name": "Prepare data3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.instagram.com/v23.0/{{ $('Prepare data3').item.json.instagram_id }}/media",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.payload }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -8829472,
+        -34887120
+      ],
+      "id": "2db3bd18-7c4d-4d5a-8f4d-b398cfef744a",
+      "name": "Create container3",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "amount": 90
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -8829248,
+        -34887200
+      ],
+      "id": "ccb81b66-5534-4d2b-b47d-d949b9efcc99",
+      "name": "Wait3",
+      "webhookId": "af6714b2-4f7d-4446-bbda-f194fe8d2e24"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.instagram.com/v23.0/{{ $('Prepare data3').item.json.instagram_id }}/media_publish",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "creation_id",
+              "value": "={{ $json.body.id }}"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $('Prepare data3').item.json.instagram_token }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -8829024,
+        -34887200
+      ],
+      "id": "cae707b1-2905-4335-806c-3cd546b988b1",
+      "name": "Post to IG3",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare data3').item.json.backend}}/api/instagram/published",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content_id",
+              "value": "={{ $('Prepare data3').item.json.content_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -8828800,
+        -34887248
+      ],
+      "id": "939ec0ea-a3b6-4229-801c-2451c9e4f374",
+      "name": "Callback publish3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare data3').item.json.backend}}/api/social-content/fail",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content_id",
+              "value": "={{ $('Prepare data3').item.json.content_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -8828800,
+        -34887024
+      ],
+      "id": "eac1ebbd-d0e0-420a-8c82-061d58e822ce",
+      "name": "HTTP Request9"
+    },
+    {
+      "parameters": {
+        "errorMessage": "An error occurred!"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -8828576,
+        -34887024
+      ],
+      "id": "4fc2d1b6-be6d-4ae5-8ea7-6b9ca1c7493a",
+      "name": "Stop and Error3"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.file }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -8830592,
+        -34887216
+      ],
+      "id": "ef3d2bd3-5381-4a47-afd3-69c94bd4d7ce",
+      "name": "Download image3"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "destinationKey": "file",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -8830368,
+        -34887216
+      ],
+      "id": "48dca531-21a4-470e-b146-dc32d7024243",
+      "name": "Transform to base3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googlePalmApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"Crop this image and adjust it\"\n        },\n        {\n          \"inline_data\": {\n            \"mime_type\": \"image/png\",\n            \"data\": {{ JSON.stringify($json.file) }}\n          }\n        }\n      ]\n    }\n  ],\n  \"generationConfig\": {\n    \"responseModalities\": [\"IMAGE\"],\n    \"imageConfig\": {\n      \"aspectRatio\": \"4:5\",\n      \"imageSize\": \"1K\"\n    }\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -8830144,
+        -34887216
+      ],
+      "id": "97bc6a01-9ed6-47af-8c95-2f2a111cd48f",
+      "name": "HTTP Request10"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare data3').item.json.backend }}/api/linkedin-agent/generated-image",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "=file",
+              "value": "={{ $json.candidates[0].content.parts[0].inlineData.data }}"
+            },
+            {
+              "name": "userId",
+              "value": "={{ $('Prepare data3').item.json.user_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -8829920,
+        -34887216
+      ],
+      "id": "77ad8f09-05af-4616-b973-0b5f112eaf5a",
+      "name": "HTTP Request11"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "00db86c9-d331-45a6-af8e-5c8cf00994c6"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "28e6d99a-0f44-4529-8e75-2d11034b7a77",
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "article",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "article"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3e1609ee-eea7-433d-8d11-d8818a1df2ae",
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "fff43af6-462c-448c-a229-922761b25ddc",
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "video",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "video"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -8830816,
+        -34887152
+      ],
+      "id": "2826eeb3-17d8-4db9-975f-4f8e9f051f9e",
+      "name": "Content router3"
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = {\n  access_token: $('Prepare data3').first().json.instagram_token,\n  caption: $('Prepare data3').first().json.caption,\n  image_url: $input.first().json.url\n}\n\nreturn {\n  payload\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -8829696,
+        -34887216
+      ],
+      "id": "89575ef6-b373-4f71-9aa1-f6eee92f5bda",
+      "name": "Image payload formater3"
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = {\n  access_token: $input.first().json.instagram_token,\n  caption: $input.first().json.caption,\n  video_url: $input.first().json.file,\n  media_type: \"REELS\"\n}\n\nreturn {\n  payload\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -8829696,
+        -34887024
+      ],
+      "id": "5a4331bb-5f16-4b99-a27e-672be4eda318",
+      "name": "Video payload formater3"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -8829760,
+        -34887792
+      ],
+      "typeVersion": 1,
+      "id": "dcecc35b-e64b-4a0b-8648-1d6eea504cd0",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Prepare data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare data": {
+      "main": [
+        [
+          {
+            "node": "Content router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create container": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Post to IG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to IG": {
+      "main": [
+        [
+          {
+            "node": "Callback publish",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download image": {
+      "main": [
+        [
+          {
+            "node": "Transform to base",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform to base": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Image payload formater",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content router": {
+      "main": [
+        [],
+        [],
+        [
+          {
+            "node": "Download image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Video payload formater",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image payload formater": {
+      "main": [
+        [
+          {
+            "node": "Create container",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Video payload formater": {
+      "main": [
+        [
+          {
+            "node": "Create container",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Prepare data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare data1": {
+      "main": [
+        [
+          {
+            "node": "Content router1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create container1": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Post to IG1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to IG1": {
+      "main": [
+        [
+          {
+            "node": "Callback publish1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download image1": {
+      "main": [
+        [
+          {
+            "node": "Transform to base1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform to base1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request4": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request5": {
+      "main": [
+        [
+          {
+            "node": "Image payload formater1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content router1": {
+      "main": [
+        [],
+        [],
+        [
+          {
+            "node": "Download image1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Video payload formater1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image payload formater1": {
+      "main": [
+        [
+          {
+            "node": "Create container1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Video payload formater1": {
+      "main": [
+        [
+          {
+            "node": "Create container1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook2": {
+      "main": [
+        [
+          {
+            "node": "Prepare data2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare data2": {
+      "main": [
+        [
+          {
+            "node": "Content router2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create container2": {
+      "main": [
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "Post to IG2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to IG2": {
+      "main": [
+        [
+          {
+            "node": "Callback publish2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request6": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download image2": {
+      "main": [
+        [
+          {
+            "node": "Transform to base2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform to base2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request7": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request8": {
+      "main": [
+        [
+          {
+            "node": "Image payload formater2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content router2": {
+      "main": [
+        [],
+        [],
+        [
+          {
+            "node": "Download image2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Video payload formater2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image payload formater2": {
+      "main": [
+        [
+          {
+            "node": "Create container2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Video payload formater2": {
+      "main": [
+        [
+          {
+            "node": "Create container2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook3": {
+      "main": [
+        [
+          {
+            "node": "Prepare data3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare data3": {
+      "main": [
+        [
+          {
+            "node": "Content router3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create container3": {
+      "main": [
+        [
+          {
+            "node": "Wait3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait3": {
+      "main": [
+        [
+          {
+            "node": "Post to IG3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to IG3": {
+      "main": [
+        [
+          {
+            "node": "Callback publish3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request9": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download image3": {
+      "main": [
+        [
+          {
+            "node": "Transform to base3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform to base3": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request10": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request11": {
+      "main": [
+        [
+          {
+            "node": "Image payload formater3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content router3": {
+      "main": [
+        [],
+        [],
+        [
+          {
+            "node": "Download image3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Video payload formater3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image payload formater3": {
+      "main": [
+        [
+          {
+            "node": "Create container3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Video payload formater3": {
+      "main": [
+        [
+          {
+            "node": "Create container3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "triggerCount": 0,
+  "versionId": "d0b1c0c1-9acf-47fc-8b4d-5d2c828104fe",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "zGFLpL21fhsLN1Cs",
+  "isArchived": true
+}

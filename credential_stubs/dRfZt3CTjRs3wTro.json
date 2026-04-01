@@ -1,10 +1,10 @@
 {
-  "id": "zgTpx63oxNLMm8az",
-  "name": "SF - DataForSEO",
-  "type": "httpBasicAuth",
+  "id": "dRfZt3CTjRs3wTro",
+  "name": "SF - Gemini Query Auth",
+  "type": "httpQueryAuth",
   "data": {
-    "user": "",
-    "password": ""
+    "name": "",
+    "value": ""
   },
   "ownedBy": {
     "type": "team",

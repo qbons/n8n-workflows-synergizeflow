@@ -1,0 +1,971 @@
+{
+  "id": "47zdomeVBPO8taR9",
+  "name": "SF - Chat Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cc48725e-a61d-4dae-b859-0ad9aafc6057",
+              "name": "website",
+              "value": "={{ $json.body.domain_name }}",
+              "type": "string"
+            },
+            {
+              "id": "3fb748b3-ffed-49a4-8410-05c82ee2862c",
+              "name": "code",
+              "value": "={{ $json.body.license_key }}",
+              "type": "string"
+            },
+            {
+              "id": "db301c01-bebe-4fac-a55c-942fe8c10776",
+              "name": "chatInput",
+              "value": "={{ $json.body.content }}",
+              "type": "string"
+            },
+            {
+              "id": "dd7f2d1c-1662-4971-96e6-f997d54a2b96",
+              "name": "type",
+              "value": "={{ $json.body.type }}",
+              "type": "string"
+            },
+            {
+              "id": "0d0ac0eb-33ab-4464-aafb-bd9e5f90718e",
+              "name": "sessionId",
+              "value": "={{ $json.body.license_key }}-{{ $json.body.ipAddress }}",
+              "type": "string"
+            },
+            {
+              "id": "5a3e7ff5-3d03-47ec-b858-fd41647ec496",
+              "name": "agentName",
+              "value": "={{ $json.body.agent_name }}",
+              "type": "string"
+            },
+            {
+              "id": "41381ea6-f372-442f-86a9-ca53b2ed226c",
+              "name": "websiteName",
+              "value": "={{ $json.body.website_name }}",
+              "type": "string"
+            },
+            {
+              "id": "b1afbc43-ab60-4c44-961b-bd64eb0b4c36",
+              "name": "ipAddress",
+              "value": "={{ $json.body.ipAddress }}",
+              "type": "string"
+            },
+            {
+              "id": "2833edcb-675d-4534-8f08-6373be46b54d",
+              "name": "hasCTA",
+              "value": "={{ $json.body.hasCTA }}",
+              "type": "boolean"
+            },
+            {
+              "id": "7cd5015b-4095-47c1-be15-f108d757f4fd",
+              "name": "agentLang",
+              "value": "={{ $json.body.agent_lang }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1696,
+        288
+      ],
+      "id": "861e64f0-5370-48e1-84cc-d5833caba03c",
+      "name": "Prepare data"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Prepare data').item.json.type }}",
+                    "rightValue": "audio",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "fba5dce1-d07f-4605-9bd8-8fb53007724a"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "df319588-bdd4-4204-8959-da702e1a3dc1",
+                    "leftValue": "={{ $('Prepare data').item.json.type }}",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a2fa2834-35c7-41e1-9fbc-7a684f67984d",
+                    "leftValue": "={{ $('Prepare data').item.json.type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -1520,
+        272
+      ],
+      "id": "0c6d3882-7a93-4c15-a453-0a26dc29a6f9",
+      "name": "Type check"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Prepare data').item.json.sessionId }}",
+        "tableName": "chat_agent_histories",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        -304,
+        624
+      ],
+      "id": "c95fd428-b7ce-4a28-821c-67b1f21d2caa",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "mRVRKtvyFmYwF0k2",
+          "name": "SF Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        592,
+        288
+      ],
+      "id": "28fff216-5387-47a2-af20-e185b457605c",
+      "name": "Agent Response"
+    },
+    {
+      "parameters": {
+        "jsCode": "const outputTextLength = $input.first().json.output.length;\nconst inputTextLength = $('System message builder').first().json.systemMessage.length + $('System message builder').first().json.emailSystemMessage.length\n\nreturn {\n  content: $input.first().json.output,\n  type: \"text\",\n  ipaddress: $('Prepare data').first().json.ipAddress,\n  tokenUsage: {\n    completionTokens: Math.ceil(outputTextLength / 4),\n    promptTokens: Math.ceil(inputTextLength / 4)\n  }\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        368,
+        288
+      ],
+      "id": "1986c3b9-296c-4a10-96bf-1e7a3350070c",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c095f203-b2ee-4f2c-83b3-b47f7e736458",
+              "name": "data",
+              "value": "={{ $('Prepare data').item.json.chatInput }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1264,
+        112
+      ],
+      "id": "60cf57c8-3e69-4eb9-90b3-7d39f03d61bd",
+      "name": "Audio Format"
+    },
+    {
+      "parameters": {
+        "jsCode": "var string = $input.first().json.data;\nstring = string.replace('data:audio/webm;base64,', '');\nreturn {string:string}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1040,
+        112
+      ],
+      "id": "29830bc9-fe07-4f58-9c28-88d48b34329f",
+      "name": "Code audio format"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $vars.GEMINI_FLASH_TEXT }}:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [{\n    \"parts\":[\n      {\"text\": \"Transcribe attached audio file\"},\n      {\n        \"inline_data\": {\n          \"mime_type\": \"audio/webm\",\n          \"data\": \"{{ $json.string }}\"\n        }\n      }\n    ]\n  }]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -800,
+        112
+      ],
+      "id": "d48609be-b935-4ba8-8482-a66ef37d4c11",
+      "name": "Transcribe the audio",
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "dRfZt3CTjRs3wTro",
+          "name": "SF - Gemini Query Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6a3d7fca-2651-4440-b285-8d02d8e6666c",
+              "name": "chatInput",
+              "value": "={{ $('Prepare data').item.json.chatInput }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -976,
+        304
+      ],
+      "id": "64e12457-e590-4346-af26-79f1de8adc05",
+      "name": "Session Format"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  chatInput: $input.first().json.candidates[0].content.parts[0].text\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -592,
+        112
+      ],
+      "id": "6a77f151-db32-498f-a3fe-ca0c784e3933",
+      "name": "Session Format1"
+    },
+    {
+      "parameters": {
+        "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', ``, 'string') }}",
+        "model": "={{ $vars.GEMINI_PRO_PREVIEW }}",
+        "enableUrlContext": true,
+        "restrictUrls": "={{ $('Prepare data').item.json.website }}",
+        "enableOrganizationContext": true,
+        "organization": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Organization_Context', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-gemini-search.geminiSearchToolTool",
+      "typeVersion": 1,
+      "position": [
+        0,
+        160
+      ],
+      "id": "e0d5aea8-e579-433b-9d3c-e53e0a9cf50c",
+      "name": "Gemini Search Tool",
+      "credentials": {
+        "geminiSearchApi": {
+          "id": "HzOj98juqUxHGjsa",
+          "name": "SF - Gemini Search Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v1/chat-agent/chat",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1872,
+        288
+      ],
+      "id": "4f18c729-301f-4641-913f-a0d2a83148a2",
+      "name": "Start Chat",
+      "webhookId": "c0328f0b-c7be-4d4f-ac73-a38cbf9c7703"
+    },
+    {
+      "parameters": {
+        "jsCode": "const chatInput = $input.first().json.chatInput;\n\nlet systemMessage = `\n## Persona\nYou are ${$('Prepare data').first().json.agentName}, a helpful Customer-Service Specialist for ${$('Prepare data').first().json.websiteName}.\nKeep replies short, clear, professional (1-3 sentences) and speak as “we/our/us”.\n\n## Language Rules\n1. Default language is ${$('Prepare data').first().json.agentLang}.\n2. If the users language is clearly identifiable, then reply in that language.\n3. Do not mix languages in one reply.\n\n## Available Tools\n1. Knowledge Store – internal docs (products, policies, etc.).  \n2. Gemini Search – public web (only if Knowledge Store gives nothing).  \n`;\n\nif ($('Prepare data').first().json.hasCTA) {\n  systemMessage += `\n3. CTA configuration – detects user intent and collects required fields.\n   - You MUST use this tool whenever the user shows an intent that semantically matches any CTA goal.\n   - If confidence > 0.75, call the tool immediately; do NOT ask extra questions beforehand.\n   - Keep email destination from CTA configuration and use it on email agent tool.\n   - If no CTA matches, continue answering normally.\n\n4. Email Agent – sends the internal report after CTA tool returns the fields.\n`;\n}\n\nsystemMessage += `\n## Answer Flow\n1. Try Knowledge Store first.\n2. If empty/no answer → Gemini Search.\n3. If still no answer → guide user to support channel listed in docs.\n`;\n\nif ($('Prepare data').first().json.hasCTA) {\n  systemMessage += `\n## Examples\nUser: “I want to join the beta program.”  \n→ semantic match → call CTA tool straight away.\n\nUser: “How much is shipping?”  \n→ no CTA match → answer with knowledge/search.\n`;\n}\n\nlet emailSystemMessage = '';\nif ($('Prepare data').first().json.hasCTA) {\n  emailSystemMessage = `\nYou are an e-mail formatter.\nInput: collect fields.\nDestination: You must find it from CTA Configuration tool\n1. Loop over fields: write one HTML line per key\n   \"<strong>{{key}}:</strong> {{value}}<br>\"\n2. Add line: \"<strong>Destination:</strong> {{destination}}<br>\"\n3. Call send_email with:\n   - destination → parameter \"toEmail\"\n   - the HTML string → parameter \"Message\"\n4. Answer only: \"Email sent successfully.\"\n`;\n}\n\nreturn { chatInput, systemMessage, emailSystemMessage };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -352,
+        288
+      ],
+      "id": "fb50eda2-549b-424c-8e7e-74df4c829c8c",
+      "name": "System message builder"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Send an internal report e-mail to the address supplied by the CTA tool.",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Prompt__User_Message_', ``, 'string') }}",
+        "options": {
+          "systemMessage": "={{ $('System message builder').item.json.emailSystemMessage }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agentTool",
+      "typeVersion": 2.2,
+      "position": [
+        176,
+        96
+      ],
+      "id": "f9ecb513-9d94-477e-8481-7ec3adf2f0d8",
+      "name": "Email Agent"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "={{ $json.systemMessage }}"
+        }
+      },
+      "id": "f4f9e49a-ba1a-40c5-994a-36f2a17ea38d",
+      "name": "Main Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.6,
+      "position": [
+        0,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "description": "Searches the internal knowledge base for company-related documents, including policies, product information, and organizational data.",
+        "topK": 3
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        496
+      ],
+      "id": "1c98fbad-8d69-4c81-b125-639bb6e2e1cf",
+      "name": "Knowledge Store Tool"
+    },
+    {
+      "parameters": {
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "={{ $('Prepare data').item.json.code }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.3,
+      "position": [
+        32,
+        672
+      ],
+      "id": "0f81801c-71a6-4beb-a07b-065236e92e47",
+      "name": "Knowledge vector store",
+      "credentials": {
+        "qdrantApi": {
+          "id": "fKAHlOe3mnPrJuNI",
+          "name": "SF - QdrantApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "=models/{{ $vars.GEMINI_EMBEDDING }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        320,
+        672
+      ],
+      "id": "a49a5cbd-1b88-4d3a-b64b-955b0121443a",
+      "name": "CTA embedding",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "Call-to-action configurations for customer support workflows, including CTA-goal, CTA-destination, and Fields to collect",
+        "topK": 2
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1.1,
+      "position": [
+        464,
+        496
+      ],
+      "id": "a88630b1-b954-4f42-8261-eed9d9fb135f",
+      "name": "CTA configuration"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Send an email message if you already get the information.",
+        "method": "POST",
+        "url": "https://dev-wizards.synergizeflow.com/webhook/v1/util/send-email",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "={{ $vars.STATIC_TOKEN }}"
+            },
+            {
+              "name": "senderName",
+              "value": "SynergizeFlow"
+            },
+            {
+              "name": "fromEmail",
+              "value": "noreply@synergizeflow.com"
+            },
+            {
+              "name": "replyTo",
+              "value": "noreply@synergizeflow.com"
+            },
+            {
+              "name": "toEmail",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters4_Value', `Collect email destination from CTA Configuration Tool`, 'string') }}"
+            },
+            {
+              "name": "subject",
+              "value": "={{ $('Prepare data').item.json.websiteName }} User Inquiry"
+            },
+            {
+              "name": "htmlBody",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters6_Value', `put the generated HTML string here`, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        384,
+        -80
+      ],
+      "id": "7b4544c4-f4d5-43f2-ab7a-e9281ff9a676",
+      "name": "send email"
+    },
+    {
+      "parameters": {
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "=cta-{{ $('Prepare data').item.json.code }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.3,
+      "position": [
+        448,
+        672
+      ],
+      "id": "1457b721-1c05-4d86-8d37-8e11aea7a057",
+      "name": "Qdrant Vector Store",
+      "credentials": {
+        "qdrantApi": {
+          "id": "fKAHlOe3mnPrJuNI",
+          "name": "SF - QdrantApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "=models/{{ $vars.GEMINI_EMBEDDING }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -128,
+        624
+      ],
+      "id": "14ecb185-b8d4-4dd8-8389-38faf89fcaa0",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "=models/{{ $vars.GEMINI_FLASH_TEXT }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        176,
+        -80
+      ],
+      "id": "7b79a042-ab53-4e16-ba80-2ce0db30a283",
+      "name": "Google Gemini Email Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "=models/{{ $vars.GEMINI_PRO_PREVIEW }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        496
+      ],
+      "id": "0e17cbcf-d73b-40de-97e8-36d15f527b8f",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "projectId": {
+          "__rl": true,
+          "value": "gen-lang-client-0797800029",
+          "mode": "list",
+          "cachedResultName": "Gemini API"
+        },
+        "modelName": "={{ $vars.GEMINI_PRO_PREVIEW }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleVertex",
+      "typeVersion": 1,
+      "position": [
+        -128,
+        496
+      ],
+      "id": "18960785-bbc5-4f81-98a2-fecf592e9197",
+      "name": "Google Vertex Chat Model",
+      "credentials": {
+        "googleApi": {
+          "id": "C4Bh0vq2T0s7HIDk",
+          "name": "SF - Vertex API Service Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "projectId": {
+          "__rl": true,
+          "value": "synergizeflow-480314",
+          "mode": "list",
+          "cachedResultName": "Synergizeflow"
+        },
+        "modelName": "={{ $vars.GEMINI_FLASH_TEXT }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleVertex",
+      "typeVersion": 1,
+      "position": [
+        320,
+        512
+      ],
+      "id": "ae1f1410-d258-47ba-8812-04f6aed16e51",
+      "name": "CTA model",
+      "credentials": {
+        "googleApi": {
+          "id": "C4Bh0vq2T0s7HIDk",
+          "name": "SF - Vertex API Service Account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Prepare data": {
+      "main": [
+        [
+          {
+            "node": "Type check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Type check": {
+      "main": [
+        [
+          {
+            "node": "Audio Format",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [
+          {
+            "node": "Session Format",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Main Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Agent Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audio Format": {
+      "main": [
+        [
+          {
+            "node": "Code audio format",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code audio format": {
+      "main": [
+        [
+          {
+            "node": "Transcribe the audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe the audio": {
+      "main": [
+        [
+          {
+            "node": "Session Format1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Session Format": {
+      "main": [
+        [
+          {
+            "node": "System message builder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Session Format1": {
+      "main": [
+        [
+          {
+            "node": "System message builder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Search Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Main Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Chat": {
+      "main": [
+        [
+          {
+            "node": "Prepare data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "System message builder": {
+      "main": [
+        [
+          {
+            "node": "Main Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Agent": {
+      "ai_tool": [
+        [
+          {
+            "node": "Main Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Main Agent": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Knowledge Store Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Main Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Knowledge vector store": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Knowledge Store Tool",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CTA embedding": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CTA configuration": {
+      "ai_tool": [
+        [
+          {
+            "node": "Main Agent",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "Email Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "send email": {
+      "ai_tool": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant Vector Store": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "CTA configuration",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Knowledge vector store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Email Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Email Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Main Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Vertex Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Knowledge Store Tool",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CTA model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "CTA configuration",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "4otmc6jILN7VL0Z9",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "triggerCount": 1,
+  "versionId": "a7c9401a-6988-4685-bab2-45b690785ffc",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "ufNfABECZ3OXdtAU",
+  "isArchived": false
+}

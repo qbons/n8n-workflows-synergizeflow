@@ -1,9 +1,10 @@
 {
-  "id": "zgTpx63oxNLMm8az",
-  "name": "SF - DataForSEO",
-  "type": "httpBasicAuth",
+  "id": "mRVRKtvyFmYwF0k2",
+  "name": "SF Database",
+  "type": "postgres",
   "data": {
-    "user": "",
+    "host": "",
+    "database": "",
     "password": ""
   },
   "ownedBy": {

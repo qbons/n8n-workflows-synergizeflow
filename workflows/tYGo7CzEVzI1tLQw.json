@@ -1,0 +1,734 @@
+{
+  "id": "tYGo7CzEVzI1tLQw",
+  "name": "SF - Publish Instagram",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v1/social-media/publish-instagram",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -896,
+        -96
+      ],
+      "id": "2c38626c-eccd-4b6c-8a94-c79674c00882",
+      "name": "Webhook",
+      "webhookId": "ba4c0c05-33f9-48c2-858f-483d88fca95c"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "454a0159-a56c-4055-a07f-9f36edf56cb6",
+              "name": "file",
+              "value": "={{ $json.body.file }}",
+              "type": "string"
+            },
+            {
+              "id": "6ef18411-cb10-4169-96b8-47d7e7d5a821",
+              "name": "caption",
+              "value": "={{ $json.body.caption }}",
+              "type": "string"
+            },
+            {
+              "id": "4a7c5c80-53b5-494b-903d-a3e5e9ddaf53",
+              "name": "instagram_id",
+              "value": "={{ $json.body.instagram_id }}",
+              "type": "string"
+            },
+            {
+              "id": "5c26c150-cf7d-493c-a398-6420d04dc5b6",
+              "name": "instagram_token",
+              "value": "={{ $json.body.instagram_token }}",
+              "type": "string"
+            },
+            {
+              "id": "e0d80256-4903-4bed-aea3-369b7efe0b25",
+              "name": "content_id",
+              "value": "={{ $json.body.content_id }}",
+              "type": "number"
+            },
+            {
+              "id": "9981eb4c-5540-4c7d-b58b-78ca2dde02fd",
+              "name": "user_id",
+              "value": "={{ $json.body.user_id }}",
+              "type": "string"
+            },
+            {
+              "id": "ec5cd0f9-7fcb-4772-bbd6-2ee647b2ce5b",
+              "name": "content_type",
+              "value": "={{ $json.body.content_type ?? \"video\" }}",
+              "type": "string"
+            },
+            {
+              "id": "1ff6f945-9bd6-4b04-8bcd-06353886ec71",
+              "name": "blog_post",
+              "value": "={{ $json.body.blog_post }}",
+              "type": "string"
+            },
+            {
+              "id": "74de91b3-fcbc-4977-b6bb-64fcd428ca51",
+              "name": "lang_code",
+              "value": "={{ $json.body.lang_code }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -688,
+        -96
+      ],
+      "id": "25a583ad-515e-4f15-bb62-bb13103f6636",
+      "name": "Prepare data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.instagram.com/{{ $vars.INSTAGRAM_API_VERSION }}/{{ $('Prepare data').item.json.instagram_id }}/media",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.payload }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        448,
+        -96
+      ],
+      "id": "28f5c0d3-7cb3-488f-b8e2-2942518132ec",
+      "name": "Create container",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "amount": 90
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        624,
+        -96
+      ],
+      "id": "30c9eb0c-0d05-46d5-8187-e5a57f4070bc",
+      "name": "Wait",
+      "webhookId": "af6714b2-4f7d-4446-bbda-f194fe8d2e24"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.instagram.com/{{ $vars.INSTAGRAM_API_VERSION }}/{{ $('Prepare data').item.json.instagram_id }}/media_publish",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "creation_id",
+              "value": "={{ $json.body.id }}"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $('Prepare data').item.json.instagram_token }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        816,
+        -96
+      ],
+      "id": "ba3e92d9-e922-432a-98ee-6fe1931bb6fe",
+      "name": "Post to IG",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SAAS_API }}/api/instagram/published",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content_id",
+              "value": "={{ $('Prepare data').item.json.content_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        976,
+        -96
+      ],
+      "id": "5ab73071-8c3f-429f-97b9-8fbccbb79efd",
+      "name": "Callback publish"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SAAS_API }}/api/social-content/fail",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content_id",
+              "value": "={{ $('Prepare data').item.json.content_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        448,
+        160
+      ],
+      "id": "cbb201b1-b25c-4e85-8fcc-80b26014eaf2",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "errorMessage": "An error occurred!"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        832,
+        160
+      ],
+      "id": "33236e32-6206-4aa3-a4c2-d8169ca3ca7d",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Prepare data').item.json.file }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        160,
+        -352
+      ],
+      "id": "ceaa9ba0-14e4-4125-9fd4-347129ab59ee",
+      "name": "Download image"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "destinationKey": "file",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        368,
+        -352
+      ],
+      "id": "9ac588a4-c59e-47f6-ad63-936e152ea869",
+      "name": "Transform to base"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $vars.GEMINI_PRO_IMAGE }}:generateContent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googlePalmApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [\n    {\n      \"parts\": [\n        {\n          \"text\": \"Crop this image and adjust it\"\n        },\n        {\n          \"inline_data\": {\n            \"mime_type\": \"image/png\",\n            \"data\": {{ JSON.stringify($json.file) }}\n          }\n        }\n      ]\n    }\n  ],\n  \"generationConfig\": {\n    \"responseModalities\": [\"IMAGE\"],\n    \"imageConfig\": {\n      \"aspectRatio\": \"4:5\",\n      \"imageSize\": \"1K\"\n    }\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        592,
+        -352
+      ],
+      "id": "a810bc7e-f627-483b-a421-fdb0211adc11",
+      "name": "HTTP Request1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SAAS_API }}/api/linkedin-agent/generated-image",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "=file",
+              "value": "={{ $json.candidates[0].content.parts[0].inlineData.data }}"
+            },
+            {
+              "name": "userId",
+              "value": "={{ $('Prepare data').item.json.user_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        800,
+        -352
+      ],
+      "id": "008208f5-9481-49fc-bfe7-63e084807cbb",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Prepare data').item.json.content_type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "00db86c9-d331-45a6-af8e-5c8cf00994c6"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "28e6d99a-0f44-4529-8e75-2d11034b7a77",
+                    "leftValue": "={{ $('Prepare data').item.json.content_type }}",
+                    "rightValue": "article",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "article"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3e1609ee-eea7-433d-8d11-d8818a1df2ae",
+                    "leftValue": "={{ $('Prepare data').item.json.content_type }}",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "fff43af6-462c-448c-a229-922761b25ddc",
+                    "leftValue": "={{ $('Prepare data').item.json.content_type }}",
+                    "rightValue": "video",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "video"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -96,
+        -128
+      ],
+      "id": "c6d225a7-d370-4ff4-987c-717e68998504",
+      "name": "Content router"
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = {\n  access_token: $('Prepare data').first().json.instagram_token,\n  caption: $('AI Agent').first().json.output,\n  image_url: $input.first().json.url\n}\n\nreturn {\n  payload\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        976,
+        -352
+      ],
+      "id": "5bb41c3a-7be7-487c-b2a9-7d65cfc3d6f2",
+      "name": "Image payload formater"
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = {\n  access_token: $('Prepare data').first().json.instagram_token,\n  caption: $input.first().json.output,\n  video_url: $('Prepare data').first().json.file,\n  media_type: \"REELS\"\n}\n\nreturn {\n  payload\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        -16
+      ],
+      "id": "6b6093e3-cad0-4da5-afa6-d3762d5da717",
+      "name": "Video payload formater"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.blog_post }}",
+        "options": {
+          "systemMessage": "=You are an expert Instagram caption writer.\n\nI will give you a blog post. Your task is to write a short, engaging Instagram caption that feels natural, professional, and human-written. The caption must be concise and optimized for easy reading on mobile. You MUST use {{ $('Prepare data').item.json.lang_code }} only. Do not mix languages.\n\nStrict formatting & tone rules:\n- Output plain text only (no markdown, no bold, no italics)\n- Do NOT use ** **, * *, underscores, or any markdown-style formatting\n- Keep the caption concise (maximum 600 characters)\n- Maximum 3 emojis total\n- Emojis must support the message, not decorate every sentence\n- Use short lines for easy mobile reading\n- Do NOT use bullet symbols, numbered lists, or structured formatting\n- Avoid technical explanations or documentation-style writing\n- Do NOT use excessive hype language or marketing buzzwords\n- Sentences should be simple, clear, and conversational\n- Tone should feel natural and human, suitable for Instagram\n\nContent rules:\n- Start with a short hook that grabs attention\n- Explain the core idea in a simple way\n- Keep the message focused on one key insight\n- End with a soft Call to Action encouraging people to read the full article\n- Do NOT mention links, URLs, or “link in bio”\n- Add up to 5 relevant hashtags at the end\n\nOutput ONLY the final Instagram caption."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -464,
+        -96
+      ],
+      "id": "40204929-5338-4d4d-98f4-bf41b28e7632",
+      "name": "AI Agent",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "projectId": {
+          "__rl": true,
+          "value": "synergizeflow-480314",
+          "mode": "list",
+          "cachedResultName": "Synergizeflow"
+        },
+        "modelName": "={{ $vars.GEMINI_FLASH_TEXT }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleVertex",
+      "typeVersion": 1,
+      "position": [
+        -464,
+        48
+      ],
+      "id": "b0db939e-78b0-4963-9a9a-7b5e7f7bc9bf",
+      "name": "Google Vertex Chat Model",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googleApi": {
+          "id": "C4Bh0vq2T0s7HIDk",
+          "name": "SF - Vertex API Service Account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Prepare data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create container": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Post to IG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to IG": {
+      "main": [
+        [
+          {
+            "node": "Callback publish",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download image": {
+      "main": [
+        [
+          {
+            "node": "Transform to base",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform to base": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Image payload formater",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content router": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Video payload formater",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image payload formater": {
+      "main": [
+        [
+          {
+            "node": "Create container",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Video payload formater": {
+      "main": [
+        [
+          {
+            "node": "Create container",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare data": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Vertex Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Content router",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "4otmc6jILN7VL0Z9",
+    "callerPolicy": "workflowsFromSameOwner",
+    "saveDataSuccessExecution": "all"
+  },
+  "triggerCount": 1,
+  "versionId": "a141b773-f0c3-428f-9575-bf1e6ec54a3f",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "zGFLpL21fhsLN1Cs",
+  "isArchived": false
+}

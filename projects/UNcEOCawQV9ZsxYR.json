@@ -12,5 +12,102 @@
     "teamId": "UNcEOCawQV9ZsxYR",
     "teamName": "SynergizeFlow"
   },
-  "variableStubs": []
+  "variableStubs": [
+    {
+      "id": "Cczv1bxHHItzLqTb",
+      "key": "CLOUDFLARE_R2_BUCKET",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "RAWPSgcYcO8ubCqc",
+      "key": "FACEBOOK_API_VERSION",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "IXrt2B5q3Oz733Gv",
+      "key": "GEMINI_EMBEDDING",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "XU3wgjMxWI0KacrV",
+      "key": "GEMINI_FLASH_PREVIEW",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "oHO8iO5Zi074IysZ",
+      "key": "GEMINI_FLASH_TEXT",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "9eokWZ2PoolXkKHz",
+      "key": "GEMINI_PRO_IMAGE",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "HRVPYDGdcsKXRTIM",
+      "key": "GEMINI_PRO_PREVIEW",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "yDLyHSLktOEZEKPy",
+      "key": "GEMINI_PRO_TEXT",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "cszAhjTQo3JTS9yt",
+      "key": "GOOGLE_SERVICE_ACCOUNT_ID",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "aAmXFoGTfwKZGK9z",
+      "key": "IMAGEN_MODEL",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "jjAlmrQtfT9i81KT",
+      "key": "INSTAGRAM_API_VERSION",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "3KwMzDAj0PuajTMD",
+      "key": "LINKEDIN_API_VERSION",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "po6v0um40d3WCEh4",
+      "key": "N8N_URL",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "Kpf7IgSQNbwiMnmy",
+      "key": "SAAS_API",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "Wuj2JGOMtLzDB7iH",
+      "key": "SAAS_TELEGRAM_BEARER",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "cBg8N1ox5ZRJsMur",
+      "key": "STATIC_TOKEN",
+      "type": "string",
+      "value": ""
+    }
+  ]
 }

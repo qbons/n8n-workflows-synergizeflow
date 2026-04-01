@@ -1,0 +1,16 @@
+{
+  "id": "x4lyWFNp7qjYd932",
+  "name": "SF - Qdrant account",
+  "type": "qdrantRestApi",
+  "data": {
+    "apiKey": "",
+    "url": ""
+  },
+  "ownedBy": {
+    "type": "personal",
+    "projectId": "hlqx30JRHLb2L6Zu",
+    "projectName": "Synergize Flow Development <info@mantab.one>",
+    "personalEmail": "info@mantab.one"
+  },
+  "isGlobal": false
+}

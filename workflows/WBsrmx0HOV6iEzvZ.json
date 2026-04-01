@@ -1,0 +1,791 @@
+{
+  "id": "WBsrmx0HOV6iEzvZ",
+  "name": "SF - Meta Description Products Magento",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "/**\n * Converts a string of HTML into Markdown.\n * @param {string} html - The HTML content to convert.\n * @returns {string} - The converted Markdown text.\n */\nfunction htmlToMarkdown(html) {\n  if (!html) return '';\n\n  let markdown = html\n    // Handle special shortcodes by removing them\n    .replace(/\\[rank_math_breadcrumb\\]/g, '')\n    .replace(/\\[archive-location\\]/g, '')\n    // Handle headings\n    .replace(/<h1>(.*?)<\\/h1>/gi, '# $1\\n')\n    .replace(/<h2>(.*?)<\\/h2>/gi, '## $1\\n')\n    .replace(/<h3>(.*?)<\\/h3>/gi, '### $1\\n')\n    .replace(/<h4>(.*?)<\\/h4>/gi, '#### $1\\n')\n    .replace(/<h5>(.*?)<\\/h5>/gi, '##### $1\\n')\n    .replace(/<h6>(.*?)<\\/h6>/gi, '###### $1\\n')\n    // Handle paragraphs\n    .replace(/<p>(.*?)<\\/p>/gi, '$1\\n\\n')\n    // Handle links\n    .replace(/<a href=\"([^\"]+)\"[^>]*>(.*?)<\\/a>/gi, '[$2]($1)')\n    // Handle unordered lists\n    .replace(/<ul>/gi, '')\n    .replace(/<\\/ul>/gi, '')\n    .replace(/<li>(.*?)<\\/li>/gi, '- $1\\n')\n    // Handle blockquotes\n    .replace(/<blockquote>/gi, '> ')\n    .replace(/<\\/blockquote>/gi, '\\n')\n    // Handle bold and strong tags\n    .replace(/<strong>(.*?)<\\/strong>/gi, '**$1**')\n    .replace(/<b>(.*?)<\\/b>/gi, '**$1**')\n    // Handle line breaks\n    .replace(/<br\\s*\\/?>/gi, '\\n')\n    // Strip any remaining HTML tags (like divs, svgs, etc.)\n    .replace(/<[^>]+>/g, '')\n    // Decode HTML entities\n    .replace(/&amp;/g, '&')\n    .replace(/&lt;/g, '<')\n    .replace(/&gt;/g, '>')\n    .replace(/&quot;/g, '\"')\n    .replace(/&#39;/g, \"'\")\n    // Clean up extra whitespace and newlines\n    .trim();\n\n  return markdown;\n}\n\n/**\n * Converts the full JSON data structure into a formatted Markdown string.\n * @param {Array} jsonData - The JSON data array.\n * @returns {string} - The complete Markdown output.\n */\nfunction jsonToMarkdown(data) {\n    let markdown = `# ${data.name || 'Product Detail'}\\n\\n`;\n  \n    // Add SKU and Categories\n    markdown += `**SKU:** ${data.sku}\\n`;\n    if (data.categories && data.categories.length > 0) {\n      markdown += `**Categories:** ${data.categories.join(', ')}\\n`;\n    }\n    markdown += `\\n---\\n\\n`;\n  \n    // Add Descriptions\n    if (data.short_description) {\n      markdown += `### Short Description\\n${htmlToMarkdown(data.short_description)}\\n`;\n    }\n  \n    if (data.description) {\n      markdown += `### Full Description\\n ${htmlToMarkdown(data.description)}\\n`;\n    }\n  \n    return markdown;\n  }\n\nconst markdownResult = jsonToMarkdown($input.item.json);\nreturn {markdown: markdownResult}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -256,
+        0
+      ],
+      "id": "176d8aba-2be5-4c14-8175-e2ee2481b3d5",
+      "name": "Convert JSON to markdown"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {data:[JSON.parse($input.first().json.content.parts[0].text)]}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        272,
+        0
+      ],
+      "id": "b22f68e3-24a0-4efb-a722-c98842f8d9f3",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_PREVIEW }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.markdown }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "systemMessage": "=You are a Senior Digital Marketing and Content Strategist AI with 15+ years of experience in E-commerce SEO and Search Engine Marketing (SEM).\nYour task is to generate high-converting, SEO-optimized Meta Data for the product information provided below.\n\n**Instructions:**\n\n1.  Read and understand all the provided text to get a holistic view of the business.\n2.  Extract and synthesize the requested information for each field in the JSON schema.\n3.  Your final output MUST be only the raw JSON object. Do not include any explanatory text, introductory sentences, or markdown formatting (like ```json) before or after the JSON block.\n\n```json\n{\n  \"meta_title\": \"string\",\n  \"meta_keywords\": \"string\",\n  \"meta_description\": \"string\"\n}\n```\n\n**Detailed Field Instructions:**\n\n*   **`meta_title`**: Create a Title Case headline between 50 and 60 characters starting with the primary keyword that accurately reflects the business content\n*   **`meta_keywords`**: List 5 to 10 comma separated lowercase keywords found in the text including primary secondary and long tail variations\n*   **`meta_description`**: Write a 140 to 160 character active voice summary including the primary keyword and a clear call to action"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        0
+      ],
+      "id": "b64cacab-4e30-4a86-8882-57cb2bc87b78",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "43dcfa4c-b99d-41ce-8fbb-5712c0f01dd6",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2064,
+        560
+      ],
+      "id": "e797a925-908f-4892-9114-1dda218ce952",
+      "name": "Webhook",
+      "webhookId": "43dcfa4c-b99d-41ce-8fbb-5712c0f01dd6"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "60458c94-986c-49cd-8b69-4b5616163eb3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f910b52-842c-4b6a-a862-e6914c883764",
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -1392,
+        560
+      ],
+      "id": "8b9e026d-93d4-4bd9-b50b-8516383fcd17",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -736,
+        656
+      ],
+      "id": "9ba353e9-3a22-4b2d-97be-dbf67e8d53bf",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "42309d5f-a011-44ea-b2ec-66ced157a5d0",
+              "name": "status",
+              "value": "fail",
+              "type": "string"
+            },
+            {
+              "id": "14198afc-aa4e-433e-942a-ae418e817293",
+              "name": "msg",
+              "value": "invalid_license",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -960,
+        656
+      ],
+      "id": "f60ade60-04ae-4b24-ad79-a95956fd3ec1",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.website }}/rest/V1/synergize/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "code",
+              "value": "={{ $json.code }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1616,
+        560
+      ],
+      "id": "ea12e1af-1694-445b-87e0-3a00dc014b98",
+      "name": "Check if license is valid"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7a5f7d9a-28cc-49e8-a1d2-e3e25ed8cd75",
+              "name": "website",
+              "value": "={{ $json.body.domain_name }}",
+              "type": "string"
+            },
+            {
+              "id": "8df36920-3df2-4c4e-bc18-4c85cf59b60e",
+              "name": "code",
+              "value": "={{ $json.body.license_key }}",
+              "type": "string"
+            },
+            {
+              "id": "23781822-bb76-47cc-82eb-1df84caa300a",
+              "name": "sku",
+              "value": "={{ $json.body.sku }}",
+              "type": "string"
+            },
+            {
+              "id": "9f814e51-b19a-459b-96cc-e236d3167b9b",
+              "name": "store_id",
+              "value": "={{ $json.body.store_id }}",
+              "type": "string"
+            },
+            {
+              "id": "d43c1fb0-4bbd-4725-8bce-e2d5964cb163",
+              "name": "acces_token",
+              "value": "={{ $json.body.acces_token }}",
+              "type": "string"
+            },
+            {
+              "id": "e9f37114-e3e8-4e34-ac01-c5c7779c9918",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1840,
+        560
+      ],
+      "id": "dfcb1a84-e4a6-4820-8bda-8af7c55141df",
+      "name": "Prepare data"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fbd24dc4-98b3-4c0c-aeeb-a941bebdf2ca",
+              "name": "status",
+              "value": "ok",
+              "type": "string"
+            },
+            {
+              "id": "10711c5b-20bf-40b5-a710-c012bfbc91f0",
+              "name": "data",
+              "value": "={{ $json.data}}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        512,
+        0
+      ],
+      "id": "d33fdc0b-9ef8-4393-a456-a74325d3902f",
+      "name": "Prepare Response"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        928,
+        0
+      ],
+      "id": "139981f2-1276-4804-b0c3-0c332270e09a",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare data').item.json.website }}/rest/V1/synergize/product/sku-detail",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "sku",
+              "value": "={{ $('Prepare data').item.json.sku }}"
+            },
+            {
+              "name": "store_id",
+              "value": "={{ $('Prepare data').item.json.store_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -704,
+        224
+      ],
+      "id": "e9349964-d82f-4137-a947-c08885b9488d",
+      "name": "Get sku data"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "ok",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "13385bea-7a03-4758-a684-7e1be2001dbd"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "e7ce2472-8001-4cfa-9fc1-b1297e4d4928",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "fail",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -512,
+        224
+      ],
+      "id": "a3a500c4-49f6-4c0f-b353-840109ae8dcc",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6611bbbd-5e6f-45ff-8b5a-567fa1f8b83f",
+              "name": "status",
+              "value": "fail",
+              "type": "string"
+            },
+            {
+              "id": "5bb7f1de-b7c3-4d8f-ac85-6054d0aaa54c",
+              "name": "msg",
+              "value": "={{ $json.message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -304,
+        240
+      ],
+      "id": "d0f04c7b-7ef6-48c9-9368-9a4291aa9b13",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -96,
+        240
+      ],
+      "id": "8b044daa-daf7-458f-a349-66b5d240326e",
+      "name": "Respond to Webhook2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare data').item.json.website }}/rest/V1/synergize/product/metadata",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare data').item.json.acces_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "sku",
+              "value": "={{ $('Prepare data').item.json.sku }}"
+            },
+            {
+              "name": "store_id",
+              "value": "={{ $('Prepare data').item.json.store_id }}"
+            },
+            {
+              "name": "meta_title",
+              "value": "={{ $json.data[0].meta_title }}"
+            },
+            {
+              "name": "meta_keywords",
+              "value": "={{ $json.data[0].meta_keywords }}"
+            },
+            {
+              "name": "meta_description",
+              "value": "={{ $json.data[0].meta_description }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        720,
+        0
+      ],
+      "id": "d6dedcdc-6e33-47ea-bed1-34ee9a7da09c",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.oauth_bearer_enabled }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "id": "3f6f2bf7-a367-4e2e-9e36-b973c3555641"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "9ba386ac-a395-40d2-a7c7-3a15a2827f47",
+                    "leftValue": "={{ $json.oauth_bearer_enabled }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "false",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -976,
+        464
+      ],
+      "id": "17e71c02-e4c4-469f-991d-9fe0e76cc112",
+      "name": "Switch2"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -688,
+        480
+      ],
+      "id": "134ddbcd-731d-4a34-8ac1-8d615c0a398e",
+      "name": "Respond to Webhook3"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Prepare data').item.json.website }}/rest/V1/synergize/oauth-bearer-status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1184,
+        464
+      ],
+      "id": "14d21fa7-cc60-4593-9a4a-4d2739989795",
+      "name": "check accesstoken config"
+    }
+  ],
+  "connections": {
+    "Convert JSON to markdown": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Prepare Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Prepare data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "check accesstoken config",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if license is valid": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare data": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Response": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get sku data": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Convert JSON to markdown",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch2": {
+      "main": [
+        [
+          {
+            "node": "Get sku data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check accesstoken config": {
+      "main": [
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "triggerCount": 0,
+  "versionId": "240aa909-4436-4c34-89d1-eeca7681b7bc",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "DZr615Ms0rRYsoes",
+  "isArchived": false
+}

@@ -1,0 +1,734 @@
+{
+  "id": "9vFFBBh1LWB3HkQg",
+  "name": "SF - Branding Style",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v1/util/branding-style",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2576,
+        208
+      ],
+      "id": "8515c872-8b8d-4e1d-9f99-2505be8ea9b0",
+      "name": "Webhook",
+      "webhookId": "b11daa86-f61e-49f2-ad23-38ad95f5e52a"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.type }}",
+                    "rightValue": "specific",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "2114fd8e-3456-4874-9cc3-1e8007672a9b"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "specific"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a5186224-ca74-4d4c-a127-5fb69ad212b8",
+                    "leftValue": "={{ $json.body.type }}",
+                    "rightValue": "specific",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "generic"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -2352,
+        96
+      ],
+      "id": "42d123fd-efd6-46df-8edd-9624134c580f",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "eca4387d-5e99-4053-b171-4f3826fe6537",
+              "name": "title",
+              "value": "={{ $('Webhook').item.json.body.title }}",
+              "type": "string"
+            },
+            {
+              "id": "f11e2706-b86d-4c79-96c7-102eddeb32e6",
+              "name": "images",
+              "value": "={{ $('Webhook').item.json.body.images }}",
+              "type": "array"
+            },
+            {
+              "id": "9f7ca033-a78e-420e-bbc8-c46e686151ef",
+              "name": "prompt",
+              "value": "={{ $json.prompt }}",
+              "type": "string"
+            },
+            {
+              "id": "cd78b508-1c9c-4625-8ac1-3b05f99d573c",
+              "name": "license_key",
+              "value": "={{ $('Webhook').item.json.body.license_key }}",
+              "type": "string"
+            },
+            {
+              "id": "80262b3f-916a-449a-a531-7766869abfaa",
+              "name": "domain_name",
+              "value": "={{ $('Webhook').item.json.body.domain_name }}",
+              "type": "string"
+            },
+            {
+              "id": "7d9434a0-2207-49ee-97c9-aac71ea25275",
+              "name": "webhook",
+              "value": "={{ $('Webhook').item.json.body.webhook }}",
+              "type": "string"
+            },
+            {
+              "id": "3b115572-9f0d-4f24-8932-97bd3231b729",
+              "name": "task_id",
+              "value": "={{ $('Webhook').item.json.body.task_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1904,
+        96
+      ],
+      "id": "a8311ed3-43f6-4e28-aab9-b9c68c5831e9",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f15592b8-a999-4998-a041-e89a5b0fb975",
+              "name": "prompt",
+              "value": "=You are an **expert visual reconstruction analyst and scene replication system**. Your task is to analyze reference images and convert them into **precise reconstruction instructions** that allow another system, artist, or generative model to recreate the image as faithfully as possible.\n\nYour output must describe **how to reconstruct the entire visual scene**, including subjects, objects, environments, composition, lighting, color, textures, and stylistic treatment.\n\nThe goal is to produce a **complete visual blueprint** that enables near-identical reproduction of the image without direct access to the original, while avoiding sensitive identity attributes and real-world brand references.\n\n---\n\n# Core Rules\n\n### 1. Capture all visible elements\n\nIdentify and describe **all visible components of the scene**, including:\n\n* people or characters\n* objects and props\n* environmental features\n* background and foreground elements\n* surfaces, materials, and textures\n\nDo not omit elements that contribute to the visual structure of the scene.\n\nWhen describing humans or characters, refer to them using **neutral structural terms** such as *human figure, silhouette, athlete figure, or profile silhouette*.\n\nDo **not include personal physical attributes**, including:\n\n* hair style or hair characteristics\n* facial features\n* skin tone or complexion\n* body shape or body type\n* age indicators\n* clothing details tied to identity\n\nDo **not indicate gender** or gender-coded traits.\n\nHumans should only be described in terms of:\n\n* pose or movement\n* position in the scene\n* interaction with objects\n* scale relative to other elements\n\nExample transformation:\n\n* Incorrect: *a person with short curly hair wearing sunglasses*\n* Correct: *a large human profile silhouette wearing sunglasses*\n\n---\n\n### 2. Preserve spatial relationships\n\nAccurately describe **where elements are located relative to one another**.\n\nSpecify:\n\n* foreground, midground, and background placement\n* relative scale and proportions\n* alignment and orientation\n* distance relationships between elements\n* overlap and layering\n\nMaintain the original **visual hierarchy and spatial structure**.\n\n---\n\n### 3. Describe composition and framing\n\nRecreate the **exact composition style** by explaining:\n\n* camera angle and viewpoint\n* framing and cropping\n* symmetry or asymmetry\n* focal emphasis\n* use of negative space\n* rule-of-thirds or centered composition when relevant\n\n---\n\n### 4. Reconstruct lighting design\n\nExplain how lighting shapes the scene, including:\n\n* direction of light sources\n* intensity and contrast\n* soft or hard shadows\n* rim lighting or backlighting\n* ambient illumination\n* reflections and highlights\n\nLighting should be described in a way that allows the **same visual mood and dimensionality** to be recreated.\n\n---\n\n### 5. Reproduce color and tonal structure\n\nDescribe the **color palette and grading**, including:\n\n* dominant hues\n* warm vs cool bias\n* saturation levels\n* highlight and shadow coloration\n* cinematic or stylized color grading\n\nAlso describe the **tonal range**, including contrast levels, highlight rolloff, and shadow depth.\n\n---\n\n### 6. Capture materials and textures\n\nExplain how surfaces appear and interact with light.\n\nInclude details such as:\n\n* matte vs glossy surfaces\n* rough vs smooth textures\n* reflective or translucent qualities\n* visible grain, brush strokes, or digital smoothness\n\n---\n\n### 7. Identify rendering and aesthetic style\n\nDescribe the **visual rendering approach**, such as:\n\n* photorealistic photography\n* painterly illustration\n* anime-style rendering\n* cinematic still photography\n* digital painting\n* stylized 3D rendering\n\nExplain how shading, edges, gradients, and detail contribute to the final look.\n\n---\n\n### 8. Avoid real-world brands\n\nDo **not reference specific brands, trademarks, or company names**.\n\nIf branded elements appear in the image, replace them with **generic equivalents** while preserving their visual placement and function.\n\nFor example, describe them as:\n\n* generic sports brand logos\n* stylized athletic emblems\n* generic equipment branding\n\nrather than naming a real brand.\n\n---\n\n### 9. Include camera and optical characteristics\n\nWhen relevant, specify:\n\n* depth of field\n* background blur or bokeh\n* wide-angle or telephoto perspective\n* perspective distortion\n* cinematic lens characteristics\n\n---\n\n### 10. Describe atmosphere and environmental effects\n\nInclude any visible atmospheric treatments such as:\n\n* fog or haze\n* volumetric light\n* glow or bloom\n* dust, particles, or environmental diffusion\n\nThese elements should contribute to the overall mood and depth of the scene.\n\n---\n\n### 11. Avoid hallucination\n\nOnly describe **elements that are clearly visible in the image**.\n\nDo not invent hidden or implied details.\n\nIf certain aspects are visually ambiguous, describe them conservatively using neutral phrasing.\n\n---\n\n# Writing Style Requirements\n\nConvert the visual analysis into **clear reconstruction instructions**.\n\nUse directive language such as:\n\nposition, place, render, apply, illuminate, frame, maintain, emphasize, balance, simulate.\n\nWrite like an **art director, cinematographer, or visual production designer** explaining how to rebuild the scene.\n\n---\n\n# Output Requirements\n\nWrite **one cohesive instruction block between 180–300 words**.\n\nDo **not** use bullet points.\nDo **not** include headings.\nDo **not** explain your analysis.\n\nThe output must contain **only the reconstruction instruction text**.\n\nDo **not include**:\n\n* introductions\n* summaries\n* commentary\n* references to “the image” or “the original picture”\n\nThe response must function as a **direct production guide for recreating the scene**.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2128,
+        -80
+      ],
+      "id": "90b55c6e-6ea0-433a-ac1a-1378ad845260",
+      "name": "Prepare Specific Prompt"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bb8e4ccb-69b7-4830-b2ff-2517d0941b81",
+              "name": "prompt",
+              "value": "=You are an **expert visual style analyst and art direction system**. Your task is to analyze reference images and extract their **complete visual style**, then convert that analysis into a **precise styling instruction** that can be used to recreate the same aesthetic.  Your output must describe **how to apply the visual style**, not what the image contains.  The goal is to produce an instruction that allows another system, artist, or generative model to **replicate the visual style** without knowing the original image content.  ---  # Core Rules  ### 1. Never describe objects or subjects  Do **not** mention or infer any specific items, characters, environments, or scene elements.  Do not reference things such as:  * people * animals * architecture * landscapes * vehicles * clothing * food * objects of any kind  Focus exclusively on **the stylistic treatment applied to the image as a whole**.  ---  ### 2. Convert analysis into styling instructions  Your output must read as **instructions for applying a style**, not as an observation or description.  Use directive language such as:  * apply * use * render with * emphasize * incorporate * maintain * introduce * balance * create * simulate  The text should function like an **art direction guide for reproducing the visual style**.  ---  ### 3. Analyze and translate these stylistic elements  Your instruction should incorporate as many of the following aspects as possible:  **Artistic Medium & Rendering**  * digital illustration * oil painting style * watercolor diffusion * cinematic photography * 3D render aesthetics * anime-style rendering * editorial photography style  **Rendering Characteristics**  * painterly vs photorealistic finish * stylized shading * linework characteristics * smooth gradients vs textured surfaces * brush stroke behavior  **Lighting Design**  * soft diffused lighting * dramatic directional lighting * rim lighting * volumetric lighting * studio lighting setups * cinematic contrast ratios  **Color Palette**  * dominant hues * warm vs cool bias * saturation intensity * pastel, muted, neon, or earthy palettes * cinematic color grading  **Contrast & Tonal Range**  * high contrast or low contrast * matte shadows * soft highlight rolloff * HDR-like tonal range * filmic exposure balance  **Texture & Surface Detail**  * film grain * painterly brush texture * smooth digital surfaces * subtle noise * paper-like textures * halftone patterns  **Composition Style**  * minimalist or dense layout * balanced asymmetry * strong negative space * cinematic framing  **Lens & Depth Characteristics**  * shallow depth of field * soft bokeh * wide-angle perspective * telephoto compression * cinematic lens feel  **Post-Processing**  * bloom and glow * vignette * chromatic aberration * film emulation * cinematic color grading  **Atmosphere & Mood**  * dreamy * dramatic * nostalgic * futuristic * surreal * elegant * gritty * ethereal  **Aesthetic Influences**  * cinematic still photography * editorial photography * anime aesthetic * retro film style * cyberpunk grading * renaissance painting influence * contemporary digital art  ---  ### 4. Treat the style as a unified system  Explain how lighting, color, texture, rendering, and grading should work together to produce the final aesthetic.  ---  ### 5. Use professional visual terminology  Write like a **film colorist, cinematographer, or art director** giving instructions for recreating the style.  ---  # Output Requirements  * Write **one cohesive instruction block** (150–250 words). * Do **not** use bullet points. * Do **not** include headings. * Do **not** describe objects or scene content. * Do **not** explain the analysis process.  ### The output must contain **ONLY the styling instruction text**.  Do **not include**:  * introductions * summaries * phrases like “this image shows” * phrases like “the style of the image is” * any commentary outside the styling instruction.  The response must be **only the styling instruction itself**.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2128,
+        176
+      ],
+      "id": "128720a7-830d-4d84-8704-44b8a1dfe2c4",
+      "name": "Prepare Generic Prompt"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.domain_name }}wp-json/synergize/v1/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "code",
+              "value": "={{ $json.license_key }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1680,
+        96
+      ],
+      "id": "bd3f9da7-786a-4e02-ac99-24b9aae2e986",
+      "name": "Check if license is valid"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "fail"
+            },
+            {
+              "name": "msg",
+              "value": "invalid_license"
+            },
+            {
+              "name": "task_id",
+              "value": "={{ $('Prepare Data').item.json.task_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1232,
+        112
+      ],
+      "id": "f13d982e-bee4-4809-a926-051e385333c0",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "var total = $('Prepare Data').first().json.images.length;\nif(total > 1){\n  var binary = '';\n  for(var i = 0; i<total;i++){\n    binary += i == 0 ? 'image' : ',image_'+i;\n  }\n  return {\n    binary:binary,\n    images: $('Prepare Data').first().json.images\n  };\n}else{\n  return {binary:'image',images: $('Prepare Data').first().json.images };\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1232,
+        -80
+      ],
+      "id": "7e982556-7311-41c1-9d48-4283a7a37142",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "60458c94-986c-49cd-8b69-4b5616163eb3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f910b52-842c-4b6a-a862-e6914c883764",
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -1456,
+        96
+      ],
+      "id": "15750f55-2c3f-40bf-b20a-d6c7a32db277",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "images",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -1008,
+        -80
+      ],
+      "id": "d8392f7e-76c0-4aa3-94be-843b8fdfe09a",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -784,
+        -80
+      ],
+      "id": "16a01367-0777-47cb-99b7-2f3e96d20518",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1c14ce22-83cb-4090-a8c2-659be2677d9c",
+              "name": "image",
+              "value": "={{ $json.images }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -560,
+        16
+      ],
+      "id": "dcd4c338-1a3e-4ba1-a13d-d6a0c1ec64ae",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "image",
+        "binaryPropertyName": "image",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -112,
+        96
+      ],
+      "id": "4048c553-6453-43fc-a9ea-6f7ead00d18b",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "jsCode": "function removeBase64Header(base64String) {\n  if (typeof base64String !== \"string\") return base64String;\n  const commaIndex = base64String.indexOf(\",\");\n  return commaIndex !== -1 ? base64String.slice(commaIndex + 1) : base64String;\n}\nreturn {image: removeBase64Header($input.first().json.image) }"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -336,
+        16
+      ],
+      "id": "46c7dab0-610b-41e9-8e46-a95680319902",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {
+          "includeBinaries": true
+        }
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        -176
+      ],
+      "id": "c44470cd-2d71-4911-a344-fd712600a98b",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/nano-banana-pro-preview",
+          "mode": "list",
+          "cachedResultName": "models/nano-banana-pro-preview"
+        },
+        "text": "={{ $('Prepare Data').item.json.prompt }}",
+        "inputType": "binary",
+        "binaryPropertyName": "={{ $('Code in JavaScript1').item.json.binary }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -336,
+        -176
+      ],
+      "id": "97c93011-c29a-4a59-b0bc-7b1dff36a890",
+      "name": "Analyze an image",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  data:{ title: $('Prepare Data').first().json.title,\n  branding: $input.first().json.content.parts[0].text\n}}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -112,
+        -176
+      ],
+      "id": "03b0bc65-bdb0-4bf9-97d3-87e68de6c710",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "ok"
+            },
+            {
+              "name": "task_id",
+              "value": "={{ $('Prepare Data').item.json.task_id }}"
+            },
+            {
+              "name": "data",
+              "value": "={{ $json.data }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        112,
+        -176
+      ],
+      "id": "63a66b82-92bc-4494-9b72-e938ab13b57f",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "website",
+              "value": "={{ $('Webhook').item.json.body.domain_name }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        -2352,
+        288
+      ],
+      "id": "be5da2cf-f58f-4e10-a2ad-a141ea686a25",
+      "name": "Execution Data"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Prepare Specific Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Generic Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Specific Prompt": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Generic Prompt": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if license is valid": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Analyze an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze an image": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "triggerCount": 1,
+  "versionId": "a57e3ddb-2474-480d-9e8e-39ba3da60d4f",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "DZr615Ms0rRYsoes",
+  "isArchived": false
+}

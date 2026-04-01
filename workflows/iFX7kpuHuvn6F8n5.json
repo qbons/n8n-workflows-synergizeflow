@@ -1,0 +1,1688 @@
+{
+  "id": "iFX7kpuHuvn6F8n5",
+  "name": "SF - Campaign Blog Agent Optimization v.1",
+  "nodes": [
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "60458c94-986c-49cd-8b69-4b5616163eb3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f910b52-842c-4b6a-a862-e6914c883764",
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -2640,
+        240
+      ],
+      "id": "3668bf2b-9730-4b04-b23a-dfef93c0108e",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.body.domain_name }}wp-json/synergize/v1/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "code",
+              "value": "={{ $json.body.license_key }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2864,
+        240
+      ],
+      "id": "d410f2b4-f4df-42fc-bea4-ca93ff160ec4",
+      "name": "Check if license is valid"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://us-central1-aiplatform.googleapis.com/v1/projects/{{$vars.GOOGLE_SERVICE_ACCOUNT_ID}}/locations/us-central1/publishers/google/models/{{ $vars.IMAGEN_MODEL }}:predict",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "= {\n  \"instances\": [\n    {\n      \"prompt\": {{ $('Code2').item.json.image.toJsonString() }}\n    }\n  ],\n  \"parameters\": {\n    \"aspectRatio\": \"16:9\",\n    \"sampleCount\": 1,\n    \"personGeneration\": \"allow_all\",\n    \"outputOptions\": {\n        \"mimeType\": \"image/jpeg\",\n        \"compressionQuality\": 50\n    }\n  }\n  \n}",
+        "options": {}
+      },
+      "id": "98ead304-4f31-4e73-8cf4-11f3f933870c",
+      "name": "Image Scrapper",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2448,
+        240
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "googleApi": {
+          "id": "C4Bh0vq2T0s7HIDk",
+          "name": "SF - Vertex API Service Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8ee5a866-7fe1-45be-8e1a-60a13ee3fbf8",
+              "name": "image",
+              "value": "=data:image/jpeg;base64,{{ $json.predictions[0].bytesBase64Encoded }}",
+              "type": "string"
+            },
+            {
+              "id": "29c81488-142a-40dd-af9e-0eb1004b153c",
+              "name": "title",
+              "value": "={{ $('Post Data').item.json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "fa758b99-67ae-45b2-ad02-e1b704fdd403",
+              "name": "keyword",
+              "value": "={{ $('Post Data').item.json.keyword }}",
+              "type": "string"
+            },
+            {
+              "id": "38bc61c4-34f8-4e5e-9b3b-70779aea7aa9",
+              "name": "content",
+              "value": "={{ $('Post Data').item.json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "23c71d05-3ca8-4f5e-b4d3-7c03d4b440c7",
+              "name": "key",
+              "value": "={{$vars.STATIC_TOKEN}}",
+              "type": "string"
+            },
+            {
+              "id": "0b7d5b13-c05f-42a1-9e2d-0dfec25de1d3",
+              "name": "excerpt",
+              "value": "={{ $('Post Data').item.json.excerpt }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2672,
+        144
+      ],
+      "id": "956f6f7a-3910-410b-8f98-336f3ad61681",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.website }}wp-json/synergize/v1/insert-blog",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "code",
+              "value": "={{ $('Prepare Data').item.json.code }}"
+            },
+            {
+              "name": "category",
+              "value": "={{ $('Prepare Data').item.json.category }}"
+            },
+            {
+              "name": "author",
+              "value": "={{ $('Prepare Data').item.json.author }}"
+            },
+            {
+              "name": "status",
+              "value": "={{ $('Prepare Data').item.json.status }}"
+            },
+            {
+              "name": "title",
+              "value": "={{ $json.title }}"
+            },
+            {
+              "name": "content",
+              "value": "={{ $json.content }}"
+            },
+            {
+              "name": "excerpt",
+              "value": "={{ $json.excerpt }}"
+            },
+            {
+              "name": "image",
+              "value": "={{ $json.image }}"
+            },
+            {
+              "name": "keyword",
+              "value": "={{ $json.keyword }}"
+            },
+            {
+              "name": "provider",
+              "value": "={{ $('Webhook').item.json.body.provider }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2896,
+        48
+      ],
+      "id": "7d648e69-201d-412f-9d33-93275fd006a3",
+      "name": "Insert data to website",
+      "retryOnFail": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "26c0fee9-b978-42ab-8d53-fa265787ec6b",
+              "name": "prompt",
+              "value": "=You are an expert-level, brand-aware SEO Content Production System. Your primary function is to perform a real-time search and then generate a complete, SEO-optimized blog post package that is perfectly tailored to a specific website's brand, niche, and audience. Your process must be executed with absolute precision according to the order below.\n\n**INPUTS:**\n\n* Keywords: `{{ $json.candidates[0].content.parts[0].text }}`\n* Language: `{{ $('Prepare Data').item.json.language }}` (Any valid ISO 639-1 language code)\n* Existing Titles (Exclusion List): `{{ $('Prepare Data').item.json.title }}`\n* Writing Style Prompt: `{{ $('Prepare Data').item.json.writing_style }}`\n* Website Name: `{{ $('Prepare Data').item.json.website_name }}`\n* Website Niche: `{{ $('Prepare Data').item.json.website_niche }}`\n* Website Target Audience: `{{ $('Prepare Data').item.json.website_target_audience }}`\n* Website Purpose: `{{ $('Prepare Data').item.json.website_purpose }}`\n* Website Features: `{{ $('Prepare Data').item.json.website_features }}`\n* Website Topics: `{{ $('Prepare Data').item.json.website_topics }}`\n\n**PROCESS:**\n\n1. **SEARCH & ANALYZE:** You MUST begin by performing a comprehensive Google Search using the provided 'Keywords'. Your analysis must go beyond generic searcher intent. You must synthesize the search results with the provided website information (`Website Niche`, `Website Target Audience`, `Website Topics`) to identify a unique, specific angle for the article. Your goal is to determine how to address the core, evergreen aspects of the topic in a way that directly serves the `Website Target Audience` and reinforces the `Website's Purpose`.\n2. **GENERATE 'title':** Based on your context-aware search analysis, create ONE new, unique, and SEO-friendly blog title. It is CRITICAL that this title is distinct from the 'Existing Titles (Exclusion List)'. The title must be evergreen and **MUST NOT contain any specific time-related references such as years (e.g., 2024, 2025), months, or specific dates.** It must be written entirely in the specified `Language`. Most importantly, it must be crafted to attract the `Website Target Audience`.\n* **CRITICAL CAPITALIZATION RULE:** The title **MUST strictly follow sentence case capitalization**. The very first word of the title **MUST** be capitalized. Any proper nouns must also be capitalized. All other words must be lowercase. For example, `The integration of AI receipt scanning` is correct. `the integration of AI receipt scanning` and `The Integration Of AI Receipt Scanning` are strictly forbidden.\n\n\n3. **GENERATE 'content':** Write a full blog post based on the title you just created. The entire content must be generated in the specified `Language` and formatted as a single, well-structured HTML string. The content must be evergreen and **MUST NOT contain any time-related information like specific years, months, or dates.**\n* **ABSOLUTE CITATION BAN:** The generated article content **MUST NOT CONTAIN ANY CITATIONS OR REFERENCES**. This includes, but is not limited to, formats like ``, `[1]`, `[1, 2]`, or any other bracketed numbers or text. The writing must be presented as entirely original and authoritative content from the brand. **This is a non-negotiable rule.**\n* **CRITICAL WRITING STYLE INSTRUCTION:** You must strictly adhere to the following writing style: **`{{ $('Prepare Data').item.json.writing_style }}`**. This instruction defines the tone, voice, and sentence structure for the entire blog post.\n* **CONTEXTUAL INTEGRATION:** The entire article must be written *for* the `Website Target Audience`. It should align seamlessly with the `Website Niche` and `Website Topics`. Where it feels natural and adds value, you should subtly mention the `Website Name` or reference its `Website Features` as solutions to problems discussed in the article. This should be done to reinforce the brand, not as a direct advertisement.\n* **Introduction (150-200 words):** Start with a compelling hook that speaks directly to the `Website Target Audience`. Provide timeless context for the topic, explaining its relevance from the perspective of the `Website Niche`.\n* **Main Content (6-8 Chapters):** Each chapter MUST begin with a relevant `<h2>` heading. Each `<h2>` heading **must also strictly follow sentence case capitalization**, just like the main title. Each chapter must contain 300-400 words of unique and insightful content.\n* **Conclusion (200-250 words):** Summarize the key takeaways for your target reader. Offer final thoughts or broader implications that connect back to the `Website's Purpose` or niche. End with a strong concluding statement.\n* **HTML Formatting Guidelines:** The entire 'content' value must be a single string of HTML. Do NOT include `<html>`, `<head>`, or `<body>` tags. Use `<p>`, `<h2>`, `<blockquote>`, `<strong>`, and `<em>` tags appropriately.\n\n\n4. **GENERATE 'keywords':** From the content you wrote, identify and provide a JSON array containing exactly 5 primary and secondary SEO-friendly keywords.\n5. **GENERATE 'excerpt':** Create a concise, SEO-friendly summary of the content, between 30 and 60 words.\n6. **GENERATE 'image':** Write a detailed prompt for an image generation model in the specified `Language`. The prompt should describe a scene relevant to the blog's core message that would visually appeal to the `Website Target Audience`.\n\n**EXECUTION COMMAND:**\nExecute all steps and generate the single, complete JSON object. All string values in the JSON output must be in the language specified by the `Language` input. Your output must start with `{` and end with `}`. The structure must be exactly as follows:\n{\n\"title\": \"Generated SEO blog title [in specified language]\",\n\"content\": \"<p>Introduction text... [in specified language and writing style]</p><h2>Chapter 1... [in specified language and writing style]</h2>...\",\n\"keywords\": [\"Keyword 1\", \"Keyword 2\", \"Keyword 3\", \"Keyword 4\", \"Keyword 5\"],\n\"excerpt\": \"A 30-60 word summary of the blog post [in specified language and writing style].\",\n\"image\": \"An ultrarealistic photo of [description relevant to the content, written in the specified language]...\"\n}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1296,
+        48
+      ],
+      "id": "a2ff2fd0-de37-490e-be6d-a4ed90582515",
+      "name": "Prepare prompt"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "38888392-860c-4b85-967b-323486ab102e",
+              "name": "keywords",
+              "value": "={{ $('Webhook').item.json.body.keywords }}",
+              "type": "array"
+            },
+            {
+              "id": "24362375-ace3-4eb5-8cef-04c50ac15339",
+              "name": "title",
+              "value": "={{ $('Webhook').item.json.body.title }}",
+              "type": "array"
+            },
+            {
+              "id": "974cd24f-2860-42f0-bf65-1d83e25043e3",
+              "name": "=language",
+              "value": "={{ $('Webhook').item.json.body.language }}",
+              "type": "string"
+            },
+            {
+              "id": "793181bf-0ef4-4280-8c0f-2b5b1e083695",
+              "name": "writing_style",
+              "value": "={{  $('Webhook').item.json.body.writing_style || \"Adopt the writing style of a seasoned journalist. The tone should be objective, impartial, and strictly informative. Use the inverted pyramid structure, presenting the most crucial information first. Sentences should be clear, concise, and direct, avoiding elaborate prose or personal opinion. Employ the third-person perspective exclusively. Use quotes and attribute information to sources where appropriate to build credibility. The language must be formal, precise, and free of jargon, unless the jargon itself is the topic and is clearly explained. Focus entirely on presenting facts and well-supported information.\" }}",
+              "type": "string"
+            },
+            {
+              "id": "e080361d-3b8d-4c4f-9f7f-e2b6c64e6306",
+              "name": "website_name",
+              "value": "={{ $json.website_name }}",
+              "type": "string"
+            },
+            {
+              "id": "f442bb12-8ad0-4775-bbe7-2a25e070d4c8",
+              "name": "website_niche",
+              "value": "={{ $json.website_niche }}",
+              "type": "string"
+            },
+            {
+              "id": "b1e84136-a244-4263-9e1d-1b608a822e99",
+              "name": "website_target_audience",
+              "value": "={{ $json.target_audience }}",
+              "type": "string"
+            },
+            {
+              "id": "e6ed7c39-76ed-4fe0-9e60-4b4b5bae3b1b",
+              "name": "website_purpose",
+              "value": "={{ $json.purpose }}",
+              "type": "string"
+            },
+            {
+              "id": "0ca42133-d479-49b1-9eb9-b9f587dec73e",
+              "name": "website_features",
+              "value": "={{ $json.features }}",
+              "type": "array"
+            },
+            {
+              "id": "f45fb349-9d21-456f-917f-9f9e0e27799d",
+              "name": "website_topics",
+              "value": "={{ $json.categories  }}",
+              "type": "array"
+            },
+            {
+              "id": "e782e195-acb9-4435-9bee-5e80f60b4534",
+              "name": "website",
+              "value": "={{ $('Webhook').item.json.body.domain_name }}",
+              "type": "string"
+            },
+            {
+              "id": "7332da8b-4794-4950-85a4-b87b6d4352fe",
+              "name": "code",
+              "value": "={{ $('Webhook').item.json.body.license_key }}",
+              "type": "string"
+            },
+            {
+              "id": "0d09682b-142a-4682-8b7e-bbcd2435f971",
+              "name": "category",
+              "value": "={{ $('Webhook').item.json.body.category }}",
+              "type": "array"
+            },
+            {
+              "id": "ae27b6d0-40e0-48ea-b6a7-200d416384b9",
+              "name": "author",
+              "value": "={{ $('Webhook').item.json.body.author }}",
+              "type": "number"
+            },
+            {
+              "id": "d469092a-abe3-4838-95d7-233ad9a8ee97",
+              "name": "status",
+              "value": "={{ $('Webhook').item.json.body.status }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2192,
+        144
+      ],
+      "id": "a2c71feb-46a4-4e8d-a37d-e8c13c600620",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "url": "={{$vars.SAAS_API}}/api/get-onboarding/{{ $('Webhook').item.json.body.license_key }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2416,
+        144
+      ],
+      "id": "2efde892-e32d-410b-8350-ac564cec98e8",
+      "name": "Get Onboarding Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "function getValidJsonObject(rawText) {\n\n    if (typeof rawText !== 'string' || rawText.trim() === '') {\n        console.error(\"Invalid input or empty text field.\");\n        return null;\n    }\n\n    let jsonString = rawText.trim();\n\n    // 2. Check for and remove the markdown JSON block fences.\n    // This regex is robust and handles variations in whitespace.\n    const markdownRegex = /^```json\\s*([\\s\\S]*?)\\s*```$/;\n    const match = jsonString.match(markdownRegex);\n\n    if (match) {\n        // If it's a match, the actual JSON string is in the first capture group.\n        jsonString = match[1];\n    }\n\n    // 3. Parse the cleaned string into a JSON object.\n    try {\n        return JSON.parse(jsonString);\n    } catch (error) {\n        console.error(\"Failed to parse JSON string:\", error);\n        console.error(\"Problematic string:\", jsonString);\n        return null;\n    }\n}\nreturn getValidJsonObject($input.first().json.content.parts[0].text);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -720,
+        144
+      ],
+      "id": "80598aef-5b78-480f-b798-53dbaae23db3",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://us-central1-aiplatform.googleapis.com/v1/projects/{{ $vars.GOOGLE_SERVICE_ACCOUNT_ID }}/locations/us-central1/publishers/google/models/{{ $vars.GEMINI_FLASH_TEXT  }}:generateContent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [{\n    \"role\": \"user\",\n    \"parts\": [{\n      \"text\": {{ $json.prompt.toJsonString() }}\n    }]\n  }],\n  \"tools\": [{\n    \"googleSearch\": {}\n  }],\n  \"model\": \"projects/{{$vars.GOOGLE_SERVICE_ACCOUNT_ID}}/locations/us-central1/publishers/google/models/{{$vars.GEMINI_FLASH_TEXT}}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1744,
+        144
+      ],
+      "id": "cbbb3679-1544-4ba8-a2ce-44c6c4a4d931",
+      "name": "Keyword Research",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 3000,
+      "credentials": {
+        "googleApi": {
+          "id": "C4Bh0vq2T0s7HIDk",
+          "name": "SF - Vertex API Service Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "38888392-860c-4b85-967b-323486ab102e",
+              "name": "prompt",
+              "value": "=You are an expert-level, brand-aware SEO Keyword researcher, equipped with deep search capabilities. Your primary task is to conduct a thorough analysis and deep search to generate 5 new, SEO-friendly, and currently trending keywords. These keywords must be perfect and suitable expansions of the initial `Keywords` provided.\n\n**PROCESS:**\n1.  **Contextual Analysis:** First, deeply analyze all provided inputs (`Website Niche`, `Target Audience`, `Purpose`, `Topics`, etc.) to build a comprehensive understanding of the brand's context and goals.\n2.  **Deep Search & Analysis:** Next, perform a deep search on the web. Your research should focus on:\n    *   Identifying current search trends and rising queries related to the core `Keywords` and `Website Topics`.\n    *   Discovering relevant long-tail keywords that address specific user intents.\n    *   Analyzing \"People Also Ask\" sections and related search queries to uncover questions your `Website Target Audience` is actively asking.\n    *   Finding semantic variations and related concepts that expand the topic cluster.\n3.  **Keyword Generation & Filtering:** Based on your analysis and deep search, generate a list of potential keywords. From this list, select the top 5 that have the highest potential for SEO success. Ensure that none of your final 5 keywords are present in the `Existing Titles (Exclusion List)`.\n\n**INPUTS:**\n*   Keywords: `{{ $json.keywords }}`\n*   Language: `{{ $json.language }}` (Any valid ISO 639-1 language code)\n*   Existing Titles (Exclusion List): `{{ $json.title }}`\n*   Website Name: `{{ $('Prepare Data').item.json.website_name }}`\n*   Website Niche: `{{ $('Prepare Data').item.json.website_niche }}`\n*   Website Target Audience: `{{ $('Prepare Data').item.json.website_target_audience }}`\n*   Website Purpose: `{{ $('Prepare Data').item.json.website_purpose }}`\n*   Website Features: `{{ $('Prepare Data').item.json.website_features }}`\n*   Website Topics: `{{ $('Prepare Data').item.json.website_topics }}`\n\n**OUTPUT FORMAT:**\nReturn a single line of text containing 5 keywords, separated by commas without any leading intro text, only the keywords.\n\n**EXAMPLE OUTPUT:**\nnew keyword example 1, new keyword example 2, long-tail keyword example 3, trending topic example 4, audience-specific keyword 5",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1968,
+        144
+      ],
+      "id": "6826b075-c775-4399-97d6-f6560b0e1f2f",
+      "name": "Keyword Prompt"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_TEXT }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.prompt }}"
+            }
+          ]
+        },
+        "options": {
+          "systemMessage": "Use `Gemini Search Tool` to find latest data. You can search multiple time if it's needed.",
+          "maxToolsIterations": 10
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1072,
+        144
+      ],
+      "id": "17b49b67-28b9-45fb-b4cb-66b221bfae0a",
+      "name": "Message a model",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', ``, 'string') }}",
+        "model": "={{ $vars.GEMINI_FLASH_PREVIEW }}",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Items_per_Batch', ``, 'number') }}",
+              "batchInterval": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Batch_Interval__ms_', ``, 'number') }}"
+            }
+          },
+          "returnFullResponse": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_Full_Response', ``, 'boolean') }}"
+        }
+      },
+      "type": "n8n-nodes-gemini-search.geminiSearchToolTool",
+      "typeVersion": 1,
+      "position": [
+        -1008,
+        368
+      ],
+      "id": "02e65d64-4848-43f9-b897-8a167024bcea",
+      "name": "Gemini Search Tool",
+      "credentials": {
+        "geminiSearchApi": {
+          "id": "HzOj98juqUxHGjsa",
+          "name": "SF - Gemini Search Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$vars.SAAS_API}}/api/image-vault/retrieve",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license_key",
+              "value": "={{ $('Prepare Data').item.json.code }}"
+            },
+            {
+              "name": "domain_name",
+              "value": "={{ $('Prepare Data').item.json.website.replace(/\\/$/, \"\") }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        752,
+        144
+      ],
+      "id": "d508b7c0-9880-4139-89d4-07f6ced3374d",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "let parsed = $input.first().json.parsed;\nlet result = [];\nif(parsed.length){\n  for (const item of parsed) {\n    if(item.description != ''){\n      result.push(item);\n    }\n  }\n}\nif(result.length){\n  return {\n    status: 'ok',\n    data: result\n  }\n}else{\n  return {\n    status: 'fail'\n  }\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        976,
+        144
+      ],
+      "id": "a3b257e6-0fcf-40a4-8c39-c01efe3bd74e",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "ok",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "a2a0562c-2f24-446b-9cfb-bcc3eb925ce4"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "has_img"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2bb91597-46d0-452d-ae9c-03b3dc70f7d5",
+                    "leftValue": "={{ $json.status }}",
+                    "rightValue": "ok",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "no_img"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        1200,
+        144
+      ],
+      "id": "b43cf77a-e02f-4d2f-b518-8b5476c40d42",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bf1c08b9-5bf5-4ad5-bd97-76cfaf517c94",
+              "name": "parsed",
+              "value": "={{ $json.data }}",
+              "type": "array"
+            },
+            {
+              "id": "7f3ebff5-9256-4cac-bf20-1d402de31d91",
+              "name": "prompt",
+              "value": "={{ $('Code2').item.json.image }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1424,
+        -48
+      ],
+      "id": "239ce00c-a293-456c-9ac6-ed860e936477",
+      "name": "Prepare Image"
+    },
+    {
+      "parameters": {
+        "jsCode": "let description = '';\nlet n = 1;\nfor (const item of $input.first().json.parsed) {\n  description += 'Description of image '+n+':\\n\\r'+item.description+'\\n\\r';\n  n++\n}\n\nreturn {\n  desc: description+'\\n\\r'+ 'Target Prompt:\\n\\r'+$input.first().json.prompt\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1648,
+        -48
+      ],
+      "id": "e8148559-4fa7-4f8e-bfa4-0d7ee5a1c035",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_PREVIEW }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.desc }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "systemMessage": "=**Role:**\nYou are a Context-Aware Visual Synthesis Agent. Your task is to filter incoming visual data for relevance against a specific scenario and then generate a single, cohesive image generation prompt.\n\n**Input Data:**\n1.  **Image Descriptions (Map):** A set of descriptions labeled \"Description of image 1\", \"Description of image 2\", etc.\n2.  **Target Prompt (String):** A text description of the desired scene, setting, or action.\n\n**Processing Logic:**\n\n**Step 1: Contextual Relevance Analysis (The Filter)**\nAnalyze the `Target Prompt` to understand the setting, mood, and activity. Then, evaluate each `Image Description`:\n* **The Logic:** Ask, \"Does this element logically belong in the scene described by the Target Prompt?\"\n* **Subjects (People):** If the prompt mentions people (e.g., \"a team,\" \"a professional\"), the described person is **Relevant**.\n* **Brands (Logos):** If the prompt implies a corporate, commercial, or public setting, the logo is **Relevant**.\n* **Objects:** If the object contradicts the setting (e.g., a lawnmower in a boardroom), mark it as **Irrelevant**—unless the prompt explicitly connects them.\n\n**Step 2: Prompt Synthesis (The Builder)**\nCombine the `Target Prompt` with only the **Relevant** image descriptions:\n* **Anchor the Subject:** Replace generic characters in the prompt with specific physical details from relevant Image Descriptions.\n* **Place the Brand:** Insert relevant logos/text naturally into the environment.\n* **Maintain Style:** Ensure the art style matches the `Target Prompt`.\n\n**Step 3: Output Generation**\nReturn the result in the following **JSON format**:\n* `excluded_images`: An array of **integers** representing the ID numbers of the images that were ignored (e.g., if \"Description of image 3\" is excluded, output `[3]`).\n* `final_prompt`: A single string containing the synthesized image generation prompt.\n\n---\n\n### Constraints & Rules\n* **Do not** try to force an irrelevant object into the scene.\n* **Do not** hallucinate new details for the main subject; use the provided description strictly.\n* **Do not** output markdown text outside the JSON block."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        1872,
+        -48
+      ],
+      "id": "eb742ee7-b716-4f13-9c02-2b4216fd5270",
+      "name": "Message a model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const result = JSON.parse($input.first().json.content.parts[0].text);\n\nconst prompt = result.final_prompt;\n\n// Prepare the parts array with the text prompt first\nconst parts = [\n  { text: prompt }\n];\n\n// Loop through all incoming items and extract images\n// Note: If all images are in one item as different binary keys, adjust the loop.\n// This assumes multiple items (e.g., 3 separate image items).\nlet x = 1;\nfor (const item of $('Prepare Image').first().json.parsed) {\n  if (!result.excluded_images.includes(x)) {\nparts.push({\n      inlineData: {\n        mimeType: item.mime,\n        data: item.data // n8n already provides this as base64\n      }\n    });\n  }\n x++;\n}\n\n// Return the structure ready for the API\nreturn {\n  json: {\n    payload: {\n      contents: [\n        {\n          parts: parts\n        }\n      ],\n      generationConfig: {\n          responseModalities: [\"image\"],\n          topP: 0.2,\n          imageConfig:{\n               aspectRatio: \"16:9\"\n          }\n      }\n    }\n  }\n};\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2224,
+        -48
+      ],
+      "id": "191e981f-0f87-4e82-9ecb-7730c2b19c1c",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $vars.GEMINI_PRO_IMAGE }}:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.payload }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2448,
+        -48
+      ],
+      "id": "9d1e17bc-e8f3-4bd7-b883-4cdfcb9b9a2d",
+      "name": "HTTP Request1",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "tURjQrWDQUUGEoyg",
+          "name": "SF - Gemini Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8ee5a866-7fe1-45be-8e1a-60a13ee3fbf8",
+              "name": "image",
+              "value": "=data:image/{{ $json.candidates[0].content.parts[0].inlineData.mimeType == 'image/jpeg' ? 'jpeg' : 'png' }};base64,{{ $json.candidates[0].content.parts[0].inlineData.data }}",
+              "type": "string"
+            },
+            {
+              "id": "29c81488-142a-40dd-af9e-0eb1004b153c",
+              "name": "title",
+              "value": "={{ $('Post Data').item.json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "fa758b99-67ae-45b2-ad02-e1b704fdd403",
+              "name": "keyword",
+              "value": "={{ $('Post Data').item.json.keyword }}",
+              "type": "string"
+            },
+            {
+              "id": "38bc61c4-34f8-4e5e-9b3b-70779aea7aa9",
+              "name": "content",
+              "value": "={{ $('Post Data').item.json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "23c71d05-3ca8-4f5e-b4d3-7c03d4b440c7",
+              "name": "key",
+              "value": "={{$vars.STATIC_TOKEN}}",
+              "type": "string"
+            },
+            {
+              "id": "0b7d5b13-c05f-42a1-9e2d-0dfec25de1d3",
+              "name": "=excerpt",
+              "value": "={{ $('Post Data').item.json.excerpt }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2672,
+        -48
+      ],
+      "id": "6b17ae81-3eb4-4e08-9730-dc6a50eb06d5",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SAAS_API }}/api/webhook/blog-agent",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "service_id",
+              "value": "={{ $('Webhook').item.json.body.service_id }}"
+            },
+            {
+              "name": "status",
+              "value": "fail"
+            },
+            {
+              "name": "msg",
+              "value": "invalid_license"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -2416,
+        336
+      ],
+      "id": "8304a7e1-9b38-46b0-8d0f-5ebd3f74ad79",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SAAS_API }}/api/webhook/blog-agent",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "service_id",
+              "value": "={{ $('Webhook').item.json.body.service_id }}"
+            },
+            {
+              "name": "msg",
+              "value": "error_generate_image"
+            },
+            {
+              "name": "status",
+              "value": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2672,
+        336
+      ],
+      "id": "a6c07e66-eb19-4207-836b-19b96f28fa8b",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SAAS_API }}/api/webhook/blog-agent",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "service_id",
+              "value": "={{ $('Webhook').item.json.body.service_id }}"
+            },
+            {
+              "name": "msg",
+              "value": "error_insert_blog"
+            },
+            {
+              "name": "status",
+              "value": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3120,
+        144
+      ],
+      "id": "7828e0de-dd96-4bc9-bd55-d93dea6c76b6",
+      "name": "HTTP Request4"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SAAS_API }}/api/webhook/blog-agent",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "service_id",
+              "value": "={{ $('Webhook').item.json.body.service_id }}"
+            },
+            {
+              "name": "status",
+              "value": "={{ $json.status }}"
+            },
+            {
+              "name": "data",
+              "value": "={{ $json.data }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3120,
+        -48
+      ],
+      "id": "c7da47d6-3f4f-4bae-b3f1-d3e5679f7200",
+      "name": "HTTP Request5"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v1/blog/campaign-automation",
+        "options": {
+          "responseData": "running"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -3088,
+        336
+      ],
+      "id": "1073cc15-3e91-4f95-ade2-c2fca45b9fd7",
+      "name": "Webhook",
+      "webhookId": "c32e9def-c638-427d-99c3-a3a649c57f40"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Webhook').item.json.body.provider }}",
+                    "rightValue": "yoast",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "591ec8b8-e4b2-4ee5-9bba-c2e524ac3c63"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "yoast"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b64bb511-a902-4135-b77b-fdfa0a269450",
+                    "leftValue": "={{ $('Webhook').item.json.body.provider }}",
+                    "rightValue": "rankmath",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "rankmath"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -272,
+        144
+      ],
+      "id": "37b771eb-7d33-4dc0-bd05-05a69961c164",
+      "name": "Switch2"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_TEXT }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=**Input**\n{\n\"title\": {{ $('Code2').item.json.title.toJsonString() }},\n\"content\": {{ $('Code2').item.json.content.toJsonString() }},\n\"related\": {{ $json.data.toJsonString() }},\n\"old_keywrod\": {{ $('Code2').item.json.keywords.toJsonString() }}\n}\n\nYou are an expert SEO Content Optimization Agent. Your mission is to transform a given blog post into a highly optimized, engaging, and authoritative article. All research and generated content must be current and relevant as of **{{$now.format('yyyy-MM-dd')}}**, but the final output must be **evergreen**, meaning it should not contain any specific dates, years, or time-sensitive language (e.g., \"this year,\" \"recently\").\n\nYou will receive a JSON object containing a `title`, `content` (in HTML format), an array of `related` articles, and an `old_keyword` array which contains previously used keywords. You have access to a powerful `Gemini Search Tool`, which you are required to use for research, enrichment, and validation.\n\nYour final output must be a single, raw JSON object with NO additional text or explanation.\n\n**Your process must follow these steps in order:**\n\n**Mandatory First Step: Initial Research**\n* Before any analysis or writing, you **MUST** use the `Gemini Search Tool` to conduct preliminary research on the core topic of the provided `content`. This is to gather the latest information, identify current trends, and understand the competitive landscape as of **{{$now.format('yyyy-MM-dd')}}**. This initial research will inform all subsequent steps.\n\n**1. Language and Topic Analysis:**\n    * **Language Detection (CRITICAL MANDATE): First, you MUST identify the language of the provided `content` (e.g., English, Dutch, Spanish). All subsequent analysis and all final output (title, content, meta_description) MUST be in this exact original language. There are no exceptions.**\n    * **Core Message & Intent: Analyze the provided `title` and `content` to understand the core topic, primary arguments, and user intent. This original message is the \"truth\" that must be preserved.**\n\n2.  **Keyword Analysis:**\n    * Analyze the provided `title` and `content` to understand the core topic and user intent.\n    * Synthesize your initial research to identify potential primary keywords.\n    * **Uniqueness Constraint:** Compare your potential keywords against the provided `old_keyword` array. You **MUST** select **one single, perfect primary keyword** that is new and significantly different from any of the keywords in the `old_keyword` list. Do not choose a close variant or synonym. The goal is to target a distinct angle. This chosen keyword will be the foundation for all subsequent optimizations.\n\n3.  **Title Optimization:**\n    * Rewrite the `title` to be compelling and SEO-friendly.\n    * The new title **MUST** begin with the exact primary keyword you identified in step 2.\n    * The title **MUST** be under 60 characters in length to ensure it is fully visible and not truncated in search engine results.\n    * The title **MUST** follow sentence case capitalization rules: the first word is capitalized, any proper nouns are capitalized, and all other words are lowercase.\n    * Ensure the title is highly relevant to the rewritten content and is evergreen.\n\n4.  **Content Optimization and Enrichment:**\n    * **Core Content Rewriting: Your primary task is to rewrite and optimize the *original* `content` in its original language (as identified in Step 1). You must preserve the core message, primary arguments, and essential essence of the original text. The enrichment and expansion you perform using the `Gemini Search Tool` must *support* and *deepen* the original's topic, not replace or contradict it. The new content must be an *optimization* of the original, not a complete departure. Ensure the tone is evergreen.**\n    * **Writing Style and Readability (Highest Priority):** The rewritten content must be engaging, sophisticated, and highly readable.\n        * **Structural and Opening Variety (ABSOLUTE, NON-NEGOTIABLE RULE):** This is the most critical mandate for writing quality. Your prose must be fluid and avoid all forms of robotic repetition.\n            * **No Consecutive Similar Openings:** You **MUST NOT** start consecutive sentences with the same word. This is a critical failure.\n            * **No Parallel Structure Repetition:** You **MUST** also avoid repetitive sentence structures across consecutive sentences. For example, constructions like *\"For foodies, it is a log... For the health-conscious, it is a record... For budget-trackers, it is a breakdown...\"* are strictly forbidden. You must rephrase such points into more varied and natural-sounding sentences.\n        * **Active Voice Mandate:** Write clearly and directly. The content **MUST** be written primarily in the active voice. The use of passive voice must be kept to an absolute minimum and **MUST constitute less than 10% of all sentences**.\n        * **Paragraph Length:** Break up long blocks of text. Each paragraph **MUST NOT** exceed 150 words.\n        * **Cohesion and Flow:** Ensure smooth transitions between sentences and paragraphs. Use appropriate transition words and phrases to connect ideas and guide the reader logically through the content.\n    * **Content Length:** The final rewritten content **MUST** be at least 1000 words. Use the `Gemini Search Tool` to gather the most recent facts, statistics, relevant examples, or deeper explanations to expand the content if the original is too short. Ensure all data is presented in an evergreen manner.\n    * **Keyword Integration:**\n        * **Frequency:** The primary keyword **MUST** be integrated naturally throughout the text at least 5 times. Distribution should feel organic; avoid unnatural keyword stuffing.\n        * **First Paragraph:** The primary keyword **MUST** appear within the first paragraph of the rewritten content.\n        * **Headings:** The content must be structured with multiple relevant subheadings (`<h2>` and `<h3>`). To ensure strong thematic focus, the primary keyword **MUST** be included in the **majority** of these subheadings. All subheadings **MUST** strictly follow sentence case capitalization.\n    * **Internal Linking:**\n        * Review the `related` JSON array. Identify one or two of the most relevant articles from the list.\n        * Naturally weave links to these articles within the body of the new content. Use descriptive anchor text. The link must be an `<a>` tag containing the `url` and a `target=\"_blank\"` attribute.\n    * **Outbound Linking:**\n        * Use the `Gemini Search Tool` to find one highly authoritative and relevant external resource (like a research study, an industry-leading article, or a statistical report published close to **{{$now.format('yyyy-MM-dd')}}**).\n        * Add one outbound link to this resource within the content. The link should feel natural and add value to the reader. It must be an `<a>` tag with a `target=\"_blank\"` attribute.\n    * **HTML Formatting:** Ensure the final `content` is well-structured with proper HTML tags (`<p>`, `<h2>`, `<h3>`, `<a>`, `<strong>`, `<ul>`, `<li>`, etc.). Crucially, there **MUST NOT** be any `<h1>` tags within the `content` field.\n\n5.  **Meta Description Generation:**\n    * Based on the **newly rewritten** title and content, create a compelling, SEO-friendly meta description.\n    * The meta description **MUST** naturally include the primary keyword identified in step 2.\n    * It must be a maximum of 140 characters.\n    * It should serve as a concise summary and entice users to click.\n\n6.  **Final Output Generation:**\n    * Assemble the results of your work into a single JSON object.\n    * The JSON object must only contain the following four keys: `title`, `content`, `keyword`, and `meta_description`.\n\n**Remember: Do not add any conversational text, introductions, or explanations. Your final response must be only the JSON object.**"
+            }
+          ]
+        },
+        "options": {
+          "systemMessage": "=Use the `Gemini Search Tool` for researching data.",
+          "maxToolsIterations": 10
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        -112
+      ],
+      "id": "f7b3aa2e-ff34-4091-90bf-fe2ff8f5039f",
+      "name": "Message a model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use this tool for searching information.",
+        "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', ``, 'string') }}",
+        "model": "={{ $vars.GEMINI_FLASH_TEXT }}",
+        "enableUrlContext": "=",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Items_per_Batch', ``, 'number') }}",
+              "batchInterval": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Batch_Interval__ms_', ``, 'number') }}"
+            }
+          },
+          "systemInstruction": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Custom_System_Instruction', ``, 'string') }}",
+          "returnFullResponse": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_Full_Response', ``, 'boolean') }}"
+        }
+      },
+      "type": "n8n-nodes-gemini-search.geminiSearchToolTool",
+      "typeVersion": 1,
+      "position": [
+        32,
+        112
+      ],
+      "id": "c588d161-61ee-4291-8a7b-4002244e6965",
+      "name": "Gemini Search Tool1",
+      "credentials": {
+        "geminiSearchApi": {
+          "id": "HzOj98juqUxHGjsa",
+          "name": "SF - Gemini Search Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').item.json.body.domain_name }}wp-json/synergize/v1/helper-data/",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "code",
+              "value": "={{ $('Webhook').item.json.body.license_key }}"
+            },
+            {
+              "name": "type",
+              "value": "get_related_posts"
+            },
+            {
+              "name": "category",
+              "value": "={{ $('Webhook').item.json.body.category }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -496,
+        144
+      ],
+      "id": "67f1bf06-e358-4aa8-ba1b-4e6d954b1a67",
+      "name": "Get Related Posts"
+    },
+    {
+      "parameters": {
+        "jsCode": "function getValidJsonObject(rawText) {\n\n    if (typeof rawText !== 'string' || rawText.trim() === '') {\n        console.error(\"Invalid input or empty text field.\");\n        return null;\n    }\n\n    let jsonString = rawText.trim();\n\n    // 2. Check for and remove the markdown JSON block fences.\n    // This regex is robust and handles variations in whitespace.\n    const markdownRegex = /^```json\\s*([\\s\\S]*?)\\s*```$/;\n    const match = jsonString.match(markdownRegex);\n\n    if (match) {\n        // If it's a match, the actual JSON string is in the first capture group.\n        jsonString = match[1];\n    }\n\n    // 3. Parse the cleaned string into a JSON object.\n    try {\n        return JSON.parse(jsonString);\n    } catch (error) {\n        console.error(\"Failed to parse JSON string:\", error);\n        console.error(\"Problematic string:\", jsonString);\n        return null;\n    }\n}\nreturn getValidJsonObject($input.first().json.content.parts[0].text);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        304,
+        144
+      ],
+      "id": "4f5c64a2-eed1-47f5-96f0-63ff551effb6",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  title:$input.first().json.title,\n  content: $input.first().json.content,\n  keyword:  [...[$input.first().json.keyword], ...$('Code2').first().json.keywords],\n  excerpt: $input.first().json.meta_description,\n  image: $('Code2').first().json.image\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        528,
+        144
+      ],
+      "id": "aa5973a8-a3bf-4ae1-8ab8-70b61234b919",
+      "name": "Post Data"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_TEXT }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=**Input**\n{\n\"title\": {{ $('Code2').item.json.title.toJsonString() }},\n\"content\": {{ $('Code2').item.json.content.toJsonString() }},\n\"related\": {{ $json.data.toJsonString() }},\n\"old_keywrod\": {{ $('Code2').item.json.keywords.toJsonString() }}\n}\n\nYou are an expert SEO Content Optimization Agent. Your mission is to transform a given blog post into a highly optimized, engaging, and authoritative article. All research and generated content must be current and relevant as of **{{$now.format('yyyy-MM-dd')}}**, but the final output must be **evergreen**, meaning it should not contain any specific dates, years, or time-sensitive language (e.g., \"this year,\" \"recently\").\n\nYou will receive a JSON object containing a `title`, `content` (in HTML format), an array of `related` articles, and an `old_keyword` array which contains previously used keywords. You have access to a powerful `Gemini Search Tool`, which you are required to use for research, enrichment, and validation.\n\nYour final output must be a single, raw JSON object with NO additional text or explanation.\n\n**Your process must follow these steps in order:**\n\n**Mandatory First Step: Initial Research**\n* Before any analysis or writing, you **MUST** use the `Gemini Search Tool` to conduct preliminary research on the core topic of the provided `content`. This is to gather the latest information, identify current trends, and understand the competitive landscape as of **{{$now.format('yyyy-MM-dd')}}**. This initial research will inform all subsequent steps.\n\n**1. Language and Topic Analysis:**\n    * **Language Detection (CRITICAL MANDATE): First, you MUST identify the language of the provided `content` (e.g., English, Dutch, Spanish). All subsequent analysis and all final output (title, content, meta_description) MUST be in this exact original language. There are no exceptions.**\n    * **Core Message & Intent: Analyze the provided `title` and `content` to understand the core topic, primary arguments, and user intent. This original message is the \"truth\" that must be preserved.**\n\n2.  **Keyword Analysis:**\n    * Analyze the provided `title` and `content` to understand the core topic and user intent.\n    * Synthesize your initial research to identify potential primary keywords.\n    * **Uniqueness Constraint:** Compare your potential keywords against the provided `old_keyword` array. You **MUST** select **one single, perfect primary keyword** that is new and significantly different from any of the keywords in the `old_keyword` list. Do not choose a close variant or synonym. The goal is to target a distinct angle. This chosen keyword will be the foundation for all subsequent optimizations.\n\n3.  **Title Optimization:**\n    * Rewrite the `title` to be compelling and SEO-friendly.\n    * The new title **MUST** begin with the exact primary keyword you identified in step 2.\n    * The title **MUST** be under 60 characters in length to ensure it is fully visible and not truncated in search engine results.\n    * The title **MUST** follow sentence case capitalization rules: the first word is capitalized, any proper nouns are capitalized, and all other words are lowercase.\n    * Ensure the title is highly relevant to the rewritten content and is evergreen.\n\n4.  **Content Optimization and Enrichment:**\n    * **Core Content Rewriting: Your primary task is to rewrite and optimize the *original* `content` in its original language (as identified in Step 1). You must preserve the core message, primary arguments, and essential essence of the original text. The enrichment and expansion you perform using the `Gemini Search Tool` must *support* and *deepen* the original's topic, not replace or contradict it. The new content must be an *optimization* of the original, not a complete departure. Ensure the tone is evergreen.**\n    * **Writing Style and Readability (Highest Priority):** The rewritten content must be engaging, sophisticated, and highly readable.\n        * **Structural and Opening Variety (ABSOLUTE, NON-NEGOTIABLE RULE):** This is the most critical mandate for writing quality. Your prose must be fluid and avoid all forms of robotic repetition.\n            * **No Consecutive Similar Openings:** You **MUST NOT** start consecutive sentences with the same word. This is a critical failure.\n            * **No Parallel Structure Repetition:** You **MUST** also avoid repetitive sentence structures across consecutive sentences. For example, constructions like *\"For foodies, it is a log... For the health-conscious, it is a record... For budget-trackers, it is a breakdown...\"* are strictly forbidden. You must rephrase such points into more varied and natural-sounding sentences.\n        * **Active Voice Mandate:** Write clearly and directly. The content **MUST** be written primarily in the active voice. The use of passive voice must be kept to an absolute minimum and **MUST constitute less than 10% of all sentences**.\n        * **Paragraph Length:** Break up long blocks of text. Each paragraph **MUST NOT** exceed 150 words.\n        * **Cohesion and Flow:** Ensure smooth transitions between sentences and paragraphs. Use appropriate transition words and phrases to connect ideas and guide the reader logically through the content.\n    * **Content Length:** The final rewritten content **MUST** be at least 1000 words. Use the `Gemini Search Tool` to gather the most recent facts, statistics, relevant examples, or deeper explanations to expand the content if the original is too short. Ensure all data is presented in an evergreen manner.\n    * **Keyword Integration:**\n        * **Frequency:** The primary keyword **MUST** be integrated naturally throughout the text at least 5 times. Distribution should feel organic; avoid unnatural keyword stuffing.\n        * **First Paragraph:** The primary keyword **MUST** appear within the first paragraph of the rewritten content.\n        * **Headings:** The content must be structured with multiple relevant subheadings (`<h2>` and `<h3>`). To ensure strong thematic focus, the primary keyword **MUST** be included in the **majority** of these subheadings. All subheadings **MUST** strictly follow sentence case capitalization.\n    * **Internal Linking:**\n        * Review the `related` JSON array. Identify one or two of the most relevant articles from the list.\n        * Naturally weave links to these articles within the body of the new content. Use descriptive anchor text. The link must be an `<a>` tag containing the `url` and a `target=\"_blank\"` attribute.\n    * **Outbound Linking:**\n        * Use the `Gemini Search Tool` to find one highly authoritative and relevant external resource (like a research study, an industry-leading article, or a statistical report published close to **{{$now.format('yyyy-MM-dd')}}**).\n        * Add one outbound link to this resource within the content. The link should feel natural and add value to the reader. It must be an `<a>` tag with a `target=\"_blank\"` attribute.\n    * **HTML Formatting:** Ensure the final `content` is well-structured with proper HTML tags (`<p>`, `<h2>`, `<h3>`, `<a>`, `<strong>`, `<ul>`, `<li>`, etc.). Crucially, there **MUST NOT** be any `<h1>` tags within the `content` field.\n\n5.  **Meta Description Generation:**\n    * Based on the **newly rewritten** title and content, create a compelling, SEO-friendly meta description.\n    * The meta description **MUST** naturally include the primary keyword identified in step 2.\n    * It must be a maximum of 140 characters.\n    * It should serve as a concise summary and entice users to click.\n\n6.  **Final Output Generation:**\n    * Assemble the results of your work into a single JSON object.\n    * The JSON object must only contain the following four keys: `title`, `content`, `keyword`, and `meta_description`.\n\n**Remember: Do not add any conversational text, introductions, or explanations. Your final response must be only the JSON object.**"
+            }
+          ]
+        },
+        "options": {
+          "systemMessage": "=Use the `Gemini Search Tool` for researching data.",
+          "maxToolsIterations": 0
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        288
+      ],
+      "id": "94eb7d4e-862e-4e12-97e2-4798364993fd",
+      "name": "Message a model3",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "website",
+              "value": "={{ $('Webhook').item.json.body.domain_name }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        -2864,
+        432
+      ],
+      "id": "c16c4610-82d5-4886-a96d-1a25dffb142d",
+      "name": "Execution Data"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Webhook').item.json.body.branding }}",
+                    "rightValue": "none",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "2b7add8b-e8c1-4729-a55a-3f70ea007c34"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "no_branding"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "b7f86468-4737-4d2c-9a26-0faa287989f9",
+                    "leftValue": "={{ $('Webhook').item.json.body.branding }}",
+                    "rightValue": "none",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "has_branding"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -1520,
+        144
+      ],
+      "id": "931b9478-3177-47d8-9afb-ead9e6e161ba",
+      "name": "Switch3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "26c0fee9-b978-42ab-8d53-fa265787ec6b",
+              "name": "prompt",
+              "value": "=You are an expert-level, brand-aware SEO Content Production System. Your primary function is to perform a real-time search and then generate a complete, SEO-optimized blog post package that is perfectly tailored to a specific website's brand, niche, and audience. Your process must be executed with absolute precision according to the order below.\n\n---\n\n# INPUTS:\n\n* Keywords: `{{ $json.candidates[0].content.parts[0].text }}`\n* Language: `{{ $('Prepare Data').item.json.language }}` (Any valid ISO 639-1 language code)\n* Existing Titles (Exclusion List): `{{ $('Prepare Data').item.json.title }}`\n* Writing Style Prompt: `{{ $('Prepare Data').item.json.writing_style }}`\n* Image Style Prompt: `{{ $('Webhook').item.json.body.branding }}`\n* Website Name: `{{ $('Prepare Data').item.json.website_name }}`\n* Website Niche: `{{ $('Prepare Data').item.json.website_niche }}`\n* Website Target Audience: `{{ $('Prepare Data').item.json.website_target_audience }}`\n* Website Purpose: `{{ $('Prepare Data').item.json.website_purpose }}`\n* Website Features: `{{ $('Prepare Data').item.json.website_features }}`\n* Website Topics: `{{ $('Prepare Data').item.json.website_topics }}`\n\n---\n\n# PROCESS:\n\n## 1. SEARCH & ANALYZE\n\nYou MUST begin by performing a comprehensive Google Search using the provided **Keywords**.\n\nYour analysis must go beyond generic searcher intent. You must synthesize the search results with the provided website information:\n\n* Website Niche\n* Website Target Audience\n* Website Topics\n\nYour goal is to determine how to address the core, evergreen aspects of the topic in a way that:\n\n* Directly serves the **Website Target Audience**\n* Reinforces the **Website Purpose**\n\n---\n\n# 2. GENERATE 'title'\n\nBased on your context-aware search analysis, create **ONE new, unique, and SEO-friendly blog title**.\n\nThe title must:\n\n* Be distinct from the **Existing Titles (Exclusion List)**\n* Be **evergreen**\n* **MUST NOT contain any time-related references such as years, months, or dates**\n* Be written entirely in the specified **Language**\n* Be crafted to attract the **Website Target Audience**\n\n### CRITICAL CAPITALIZATION RULE\n\nThe title **MUST strictly follow sentence case capitalization**.\n\nRules:\n\n* The **first word MUST be capitalized**\n* Proper nouns **MUST be capitalized**\n* All other words **must be lowercase**\n\nExample:\n\nCorrect:\n`The integration of AI receipt scanning`\n\nForbidden:\n`the integration of AI receipt scanning`\n`The Integration Of AI Receipt Scanning`\n\n---\n\n# 3. GENERATE 'content'\n\nWrite a full blog post based on the generated title.\n\nThe entire content must:\n\n* Be generated in the specified **Language**\n* Be formatted as a **single HTML string**\n* Be **evergreen**\n* **MUST NOT contain any time-related information such as years, months, or dates**\n\n---\n\n## ABSOLUTE CITATION BAN\n\nThe generated article **MUST NOT contain any citations or references**.\n\nForbidden examples include:\n\n* `[1]`\n* `[1, 2]`\n* `[source]`\n* Footnotes\n* Any bracketed references\n\nThe writing must appear as **fully original and authoritative content from the brand**.\n\nThis rule is **non-negotiable**.\n\n---\n\n## CRITICAL WRITING STYLE INSTRUCTION\n\nYou must strictly follow this writing style for the entire article:\n\n**`{{ $('Prepare Data').item.json.writing_style }}`**\n\nThis instruction defines the:\n\n* Tone\n* Voice\n* Sentence structure\n\n---\n\n## CONTEXTUAL BRAND INTEGRATION\n\nThe article must be written **for the Website Target Audience**.\n\nIt must align naturally with:\n\n* Website Niche\n* Website Topics\n\nWhere appropriate, subtly mention:\n\n* **Website Name**\n* **Website Features**\n\nThese references should appear **naturally as helpful solutions**, not as advertisements.\n\n---\n\n# ARTICLE STRUCTURE\n\n## Introduction (150–200 words)\n\nStart with a compelling hook that speaks directly to the **Website Target Audience**.\n\nProvide timeless context explaining the relevance of the topic from the perspective of the **Website Niche**.\n\n---\n\n## Main Content (6–8 Chapters)\n\nEach chapter must:\n\n* Start with a `<h2>` heading\n* Follow **sentence case capitalization**\n* Contain **300–400 words of unique content**\n\nAllowed HTML tags:\n\n```\n<p>\n<h2>\n<strong>\n<em>\n<blockquote>\n```\n\n---\n\n## Conclusion (200–250 words)\n\nSummarize the key takeaways for the reader.\n\nOffer broader implications that connect back to the **Website Purpose** or niche.\n\nEnd with a **strong final statement**.\n\n---\n\n# HTML FORMATTING RULES\n\nThe entire **content** field must be a **single HTML string**.\n\nDo NOT include:\n\n```\n<html>\n<head>\n<body>\n```\n\nOnly use appropriate content tags.\n\n---\n\n# 4. GENERATE 'keywords'\n\nFrom the generated article, provide a JSON array containing exactly **5 SEO-friendly keywords**.\n\nThese may include:\n\n* Primary keywords\n* Secondary keywords\n\n---\n\n# 5. GENERATE 'excerpt'\n\nCreate a concise **SEO-friendly summary** of the article.\n\nLength:\n\n**30–60 words**\n\n---\n\n# 6. GENERATE 'image'\n\nWrite a **detailed prompt for an image generation model**.\n\nThe prompt must:\n\n* Be written in the specified **Language**\n* Describe a scene **visually representing the core message of the article**\n* Appeal to the **Website Target Audience**\n\n---\n\n## CRITICAL IMAGE STYLE RULE\n\nYou MUST incorporate the **Image Style Prompt** into the image description.\n\nThe **Image Style Prompt** defines the **visual branding style** that the generated image must follow.\n\nThe final image prompt must therefore combine:\n\n1. The **Image Style Prompt**\n2. A **scene relevant to the blog article**\n\nStructure example:\n\n`[Image Style Prompt] + [scene describing the article topic]`\n\nExample structure:\n\n\"Apply a traditional Japanese anime animation style with clean, dark, consistent linework and cel-shading... A young entrepreneur working on a laptop in a cozy workspace surrounded by notebooks and warm morning light...\"\n\nThis ensures the image visually aligns with the **brand's visual identity**.\n\n---\n\n**EXECUTION COMMAND:**\nExecute all steps and generate the single, complete JSON object. All string values in the JSON output must be in the language specified by the `Language` input. Your output must start with `{` and end with `}`. The structure must be exactly as follows:\n{\n\"title\": \"Generated SEO blog title [in specified language]\",\n\"content\": \"<p>Introduction text... [in specified language and writing style]</p><h2>Chapter 1... [in specified language and writing style]</h2>...\",\n\"keywords\": [\"Keyword 1\", \"Keyword 2\", \"Keyword 3\", \"Keyword 4\", \"Keyword 5\"],\n\"excerpt\": \"A 30-60 word summary of the blog post [in specified language and writing style].\",\n\"image\": \"Detailed image generation prompt including the Image Style Prompt written in the specified language\"\n}\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1296,
+        240
+      ],
+      "id": "a248e8df-a3ab-47cf-aaae-554edacfdc36",
+      "name": "Prepare prompt1"
+    }
+  ],
+  "connections": {
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Get Onboarding Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if license is valid": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Scrapper": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Insert data to website",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert data to website": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request5",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare prompt": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Keyword Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Onboarding Data": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Get Related Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Keyword Research": {
+      "main": [
+        [
+          {
+            "node": "Switch3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Keyword Prompt": {
+      "main": [
+        [
+          {
+            "node": "Keyword Research",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Search Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Message a model",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Prepare Image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Image Scrapper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Image": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields4": {
+      "main": [
+        [
+          {
+            "node": "Insert data to website",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch2": {
+      "main": [
+        [
+          {
+            "node": "Message a model2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Message a model3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model2": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Search Tool1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Message a model2",
+            "type": "ai_tool",
+            "index": 0
+          },
+          {
+            "node": "Message a model3",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Related Posts": {
+      "main": [
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Post Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post Data": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model3": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch3": {
+      "main": [
+        [
+          {
+            "node": "Prepare prompt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare prompt1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare prompt1": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "4otmc6jILN7VL0Z9",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "triggerCount": 1,
+  "versionId": "0d087b96-1bfc-477e-9a4b-7b51866d79fe",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "m9SlnlvWccSUBTns",
+  "isArchived": false
+}

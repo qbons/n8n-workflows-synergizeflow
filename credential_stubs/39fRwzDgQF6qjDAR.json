@@ -1,10 +1,9 @@
 {
-  "id": "zgTpx63oxNLMm8az",
-  "name": "SF - DataForSEO",
-  "type": "httpBasicAuth",
+  "id": "39fRwzDgQF6qjDAR",
+  "name": "SF WP Blog Dev",
+  "type": "telegramApi",
   "data": {
-    "user": "",
-    "password": ""
+    "accessToken": ""
   },
   "ownedBy": {
     "type": "team",

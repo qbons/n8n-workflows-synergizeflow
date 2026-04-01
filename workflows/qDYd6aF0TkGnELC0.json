@@ -1,0 +1,654 @@
+{
+  "id": "qDYd6aF0TkGnELC0",
+  "name": "SF - Blog FAQ v.1",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3d1ab9b0-7d1e-44f3-82c6-3b9e3f88d229",
+              "name": "license_key",
+              "value": "={{ $json.body.license_key }}",
+              "type": "string"
+            },
+            {
+              "id": "e0787359-9291-4921-ab77-7d19dd04f4a6",
+              "name": "domain_name",
+              "value": "={{ $json.body.domain_name }}",
+              "type": "string"
+            },
+            {
+              "id": "cc44044c-7290-40e2-a779-969fd6c24ca1",
+              "name": "blog",
+              "value": "={{ $json.body.content }}",
+              "type": "array"
+            },
+            {
+              "id": "d934a4a0-cb9b-4e4d-a12d-a49952ae5cba",
+              "name": "webhook",
+              "value": "={{ $json.body.webhook }}",
+              "type": "string"
+            },
+            {
+              "id": "c29472ce-ccff-4077-8e8c-0dbc456bf8c9",
+              "name": "faq_id",
+              "value": "={{ $json.body.faq_id }}",
+              "type": "number"
+            },
+            {
+              "id": "5bcdb0d1-7d00-4dbf-aa8a-1a8848aa89d7",
+              "name": "faq_count",
+              "value": "={{ $json.body.faq_count }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1424,
+        160
+      ],
+      "id": "e4c6bfc8-afc8-4ec0-a8ba-de09422ba814",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v1/blog/seo-faq",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1648,
+        160
+      ],
+      "id": "c0e16b9d-2f5c-4aee-8514-5e9c790aa5cc",
+      "name": "Webhook",
+      "webhookId": "e6cdc092-8bf7-4d04-8789-8162bddacbd0"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.domain_name }}wp-json/synergize/v1/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "code",
+              "value": "={{ $json.license_key }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1200,
+        160
+      ],
+      "id": "86b278f6-b8aa-490b-b636-3d2fecb94b77",
+      "name": "Check if license is valid"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "60458c94-986c-49cd-8b69-4b5616163eb3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f910b52-842c-4b6a-a862-e6914c883764",
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -976,
+        160
+      ],
+      "id": "a02103be-ee0d-4a2e-ad1f-14712f58f7d7",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "fail"
+            },
+            {
+              "name": "msg",
+              "value": "invalid_license"
+            },
+            {
+              "name": "faq_id",
+              "value": "={{ $('Prepare Data').item.json.faq_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -752,
+        256
+      ],
+      "id": "91e645b3-ed3a-41ec-b98d-d1b078cbdd3c",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $('Prepare Data').first().json.blog"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -752,
+        64
+      ],
+      "id": "8be1e710-d5c1-4cbd-9674-6e56283db368",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -528,
+        64
+      ],
+      "id": "c7529711-fb4c-4f90-8feb-f6ff02b5065c",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.domain_name }}wp-json/synergize/v1/get-single-post/",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "code",
+              "value": "={{ $('Prepare Data').item.json.license_key }}"
+            },
+            {
+              "name": "id",
+              "value": "={{ $json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -80,
+        0
+      ],
+      "id": "58c247e3-1fc3-467e-8b97-c0e10e95478c",
+      "name": "Get blog content detail"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_PREVIEW }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=1. faq_count: {{ $('Prepare Data').item.json.faq_count }}\n2. source_text: {{ $json.content }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "systemMessage": "=You are an expert Content Analyst and SEO Specialist. Your sole purpose is to process provided text content and generate a structured FAQ set along with its corresponding JSON-LD schema.\n\n**I. INPUTS**\nYou will receive two inputs from the user:\n1.  `source_text`: The content to analyze.\n2.  `faq_count`: An integer representing the exact number of Q&A pairs to generate.\n\n**II. PROCESSING GUIDELINES**\n1.  **Analyze:** Read the `source_text` thoroughly.\n2.  **Draft:** Create clear, concise, and helpful questions that a user would likely ask based *only* on the text provided.\n3.  **Answer:** Draft direct answers derived strictly from the source text. Do not hallucinate or add external information.\n4.  **Quantity:** You must generate exactly the number of items specified in `faq_count`. If the text is too short to support the count, create the maximum possible number of unique questions.\n5.  **Schema:** Construct a valid `FAQPage` JSON-LD schema object based on the generated questions and answers.\n\n**III. OUTPUT FORMAT (STRICT)**\n* Your response must be a **single valid JSON object**.\n* **Do not** include markdown formatting (e.g., ```json).\n* **Do not** include conversational fillers, introductions, or conclusions.\n* **Do not** include newlines (\\n) inside the JSON strings unless necessary for formatting the answer text.\n\n**IV. JSON STRUCTURE**\nThe output object must strictly follow this structure:\n\n{\n  \"faq_display\": [\n    {\n      \"question\": \"String\",\n      \"answer\": \"String\"\n    }\n  ],\n  \"faq_schema\": {\n    \"@context\": \"[https://schema.org](https://schema.org)\",\n    \"@type\": \"FAQPage\",\n    \"mainEntity\": [\n      {\n        \"@type\": \"Question\",\n        \"name\": \"String (Question)\",\n        \"acceptedAnswer\": {\n          \"@type\": \"Answer\",\n          \"text\": \"String (Answer)\"\n        }\n      }\n    ]\n  }\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        144,
+        0
+      ],
+      "id": "87ecb18a-86c4-4a28-835e-7ec9b724ca61",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "function getValidJsonObject(rawText) {\n\n    if (typeof rawText !== 'string' || rawText.trim() === '') {\n        console.error(\"Invalid input or empty text field.\");\n        return null;\n    }\n\n    let jsonString = rawText.trim();\n\n    // 2. Check for and remove the markdown JSON block fences.\n    // This regex is robust and handles variations in whitespace.\n    const markdownRegex = /^```json\\s*([\\s\\S]*?)\\s*```$/;\n    const match = jsonString.match(markdownRegex);\n\n    if (match) {\n        // If it's a match, the actual JSON string is in the first capture group.\n        jsonString = match[1];\n    }\n\n    // 3. Parse the cleaned string into a JSON object.\n    try {\n        return JSON.parse(jsonString);\n    } catch (error) {\n        console.error(\"Failed to parse JSON string:\", error);\n        console.error(\"Problematic string:\", jsonString);\n        return null;\n    }\n}\n\n// Combine the 'text' from all parts into a single string.\nconst combinedText = $input.first().json.content.parts.map(part => part.text).join('');\n\nreturn {data: getValidJsonObject(combinedText)};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        496,
+        0
+      ],
+      "id": "60250ef0-c007-4787-8676-de5e424b2bf3",
+      "name": "Code2",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.domain_name }}wp-json/synergize/v1/submit-blog-faq/",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "code",
+              "value": "={{ $('Prepare Data').item.json.license_key }}"
+            },
+            {
+              "name": "faq",
+              "value": "={{ $json.data.faq_display }}"
+            },
+            {
+              "name": "schema",
+              "value": "={{ $json.data.faq_schema }}"
+            },
+            {
+              "name": "blog_id",
+              "value": "={{ $('Edit Fields').item.json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        720,
+        -96
+      ],
+      "id": "5215ffa0-359d-4d5f-a6ad-a4b36eeed0dd",
+      "name": "Send content"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a61c4617-241a-4908-a8e9-355fe0a34cb8",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "090307d0-1f8b-463d-b923-806b94f480b4",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -304,
+        0
+      ],
+      "id": "378c6c88-29fd-4466-9a72-b57b23168661",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  status: $input.first().json.status,\n  id: $('Edit Fields').first().json.id,\n  title: $('Edit Fields').first().json.title,\n  faq: $('Code2').first().json.data.faq_display\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        944,
+        16
+      ],
+      "id": "1154903d-1cef-4b26-8d5b-ee1e49fdbc77",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  status: 'fail',\n  id: $('Edit Fields').first().json.id,\n  title: $('Edit Fields').first().json.title,\n  faq: []\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        96
+      ],
+      "id": "ae0c245c-86dd-4f3f-900e-cf8b8e485d33",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -304,
+        -192
+      ],
+      "id": "984bc29e-10f7-4f1a-a64e-77a072c8cd66",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "ok"
+            },
+            {
+              "name": "data",
+              "value": "={{ $json.data }}"
+            },
+            {
+              "name": "faq_id",
+              "value": "={{ $('Prepare Data').item.json.faq_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -80,
+        -192
+      ],
+      "id": "8f6d2175-6b1e-4dac-b961-b92438d36d64",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "website",
+              "value": "={{ $('Webhook').item.json.body.domain_name }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        -1440,
+        368
+      ],
+      "id": "240056e7-94d8-4249-b38b-7d7cbcaf783a",
+      "name": "Execution Data"
+    }
+  ],
+  "connections": {
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if license is valid": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get blog content detail": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Send content",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send content": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Get blog content detail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "4otmc6jILN7VL0Z9",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "triggerCount": 1,
+  "versionId": "37f2acff-0611-41de-a50c-abb024334c49",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "m9SlnlvWccSUBTns",
+  "isArchived": false
+}

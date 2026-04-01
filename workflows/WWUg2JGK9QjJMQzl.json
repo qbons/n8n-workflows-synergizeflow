@@ -1,0 +1,816 @@
+{
+  "id": "WWUg2JGK9QjJMQzl",
+  "name": "SF - Social Media Video Music",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        416
+      ],
+      "id": "1fe943bb-077d-4614-99de-eabaa9e42e66",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"website\": {{ $json.body.domain_name }},\n  \"license_key\": {{ $json.body.license_key }},\n  \"posts\": {{ $json.body.posts }},\n  \"model\": {{ $json.body.model }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -160,
+        0
+      ],
+      "id": "d7242397-c99b-47e3-a2cc-b175be0795b8",
+      "name": "Prepare data"
+    },
+    {
+      "parameters": {
+        "jsCode": "const posts = $('Prepare data').first().json.posts\n\nif (\n    Array.isArray(posts) &&\n    posts.every(item => typeof item === 'object' && item !== null && !Array.isArray(item))\n  ) {\n    return posts;\n  }\n\nreturn { \"json\": {} };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "d6af087b-5c97-4f3c-ad0f-70053d7cca35",
+      "name": "Format array posts"
+    },
+    {
+      "parameters": {
+        "batchSize": "={{ $input.all().length }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        624,
+        0
+      ],
+      "id": "b169e136-19f3-4370-a777-f4853481f335",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare data').item.json.website }}/wp-json/synergize/v1/get-single-post",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "code",
+              "value": "={{ $('Prepare data').item.json.license_key }}"
+            },
+            {
+              "name": "id",
+              "value": "={{ $json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        864,
+        16
+      ],
+      "id": "d4c06aa6-af03-4955-9d4a-69bba0868782",
+      "name": "HTTP Request",
+      "retryOnFail": false,
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "projectId": {
+          "__rl": true,
+          "value": "synergizeflow-480314",
+          "mode": "list",
+          "cachedResultName": "Synergizeflow"
+        },
+        "modelName": "={{ $vars.GEMINI_FLASH_TEXT }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleVertex",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        176
+      ],
+      "id": "bd32820a-cb28-43d0-839b-6b0ba2070107",
+      "name": "Google Vertex Chat Model",
+      "credentials": {
+        "googleApi": {
+          "id": "C4Bh0vq2T0s7HIDk",
+          "name": "SF - Vertex API Service Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = $input.first().json.output;\n\nconst cleaned = output.replace(/```json\\n?/, '')\n    .replace(/```$/, '')\n    .trim();\n\nconst data = JSON.parse(cleaned);\n\nreturn {data}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1472,
+        16
+      ],
+      "id": "591fda60-91e3-40d0-81f0-a6fb09822e76",
+      "name": "Format prompt"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.kie.ai/api/v1/generate",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"customMode\": true,\n  \"instrumental\": true,\n  \"model\": \"V5\",\n\"callBackUrl\": \"{{ $vars.SAAS_API }}/api/social-agent/music\",\n  \"prompt\": \"{{ $json.data.positive_prompt }}\",\n  \"negativeTags\": \"{{ $json.data.negative_prompt }}\",\n  \"style\": \"{{ $json.data.music_style }}\",\n  \"styleWeight\": 0.65,\n  \"weirdnessConstraint\": 0.5\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1680,
+        16
+      ],
+      "id": "6f8f5bdd-bdad-462f-8944-1780cb791f79",
+      "name": "HTTP Request1",
+      "retryOnFail": false,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        },
+        "googleApi": {
+          "id": "C4Bh0vq2T0s7HIDk",
+          "name": "SF - Vertex API Service Account"
+        },
+        "httpHeaderAuth": {
+          "id": "SFhjYsXsyVcRhxXr",
+          "name": "SF - KIE AI"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{$vars.GEMINI_FLASH_TEXT}}",
+          "mode": "id"
+        },
+        "imageUrls": "={{ $('HTTP Request').item.json.image }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        1888,
+        16
+      ],
+      "id": "49b3397c-7e5c-49fc-b8fc-6e9d35a97b1b",
+      "name": "Analyze image",
+      "retryOnFail": true,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "adbaa001-7b5b-46d4-b649-5819bbf14593",
+              "name": "img_desc",
+              "value": "={{ $json.content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2096,
+        16
+      ],
+      "id": "b1e43589-8439-45a8-b813-98e2ade20bd5",
+      "name": "Img Desc"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{$vars.GEMINI_PRO_PREVIEW}}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={\n\"title\": {{ $('HTTP Request').item.json.title.toJsonString() }},\n\"content\": {{ $('HTTP Request').item.json.content.toJsonString() }},\n\"img_desc\": {{ $json.img_desc.toJsonString() }},\n\"music_style\": {{ $('Format prompt').item.json.data.music_style.toJsonString() }}\n}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "systemMessage": "=You are an expert visual storyteller and AI video prompt engineer.\n\nYour primary goal is to transform a detailed article into a single, high-quality video generation prompt that visually represents the content and is stylistically aligned with the provided music style.\n\nYou will be given a JSON object as input containing:\n- title\n- content\n- img_desc\n- music_style\n\nYour task is to follow these instructions precisely:\n\n1. Analyze the Content:\n- Read and understand the title and content\n- Identify the core message and key concepts\n\n2. Extract Visual Narrative:\n- Distill the content into a clear visual flow:\n  - Beginning (main idea / hook)\n  - Middle (key developments or insights)\n  - Ending (final impact or conclusion)\n\n3. Generate a Single Video Prompt:\n- Output ONLY ONE prompt as a single string in English\n- The prompt must describe a continuous cinematic shot (no cuts)\n- Use a 9:16 vertical aspect ratio\n\n4. Music Style Synchronization:\n- The visuals MUST align with the provided music_style (e.g., Ambient, Cinematic, Lo-fi, Electronic, Orchestral, etc.)\n- Ensure:\n  - Visual pacing naturally fits the style\n  - Artistic tone and atmosphere reflect the music style\n\n5. Visual Style (STRICT):\n- The entire visual aesthetic MUST follow img_desc\n- This includes:\n  - Environment\n  - Lighting\n  - Color palette\n  - Character style\n  - Rendering style\n\n6. Narrative Structure:\n- The prompt must flow naturally in one continuous sequence:\n  - Establishing phase → visualize the main idea\n  - Development phase → show evolving actions and concepts\n  - Resolution phase → show outcome or emotional impact\n\n7. Output Rules:\n- Do NOT include script\n- Do NOT include explanations\n- Do NOT break into multiple prompts\n- Output must be a SINGLE JSON object\n\n8. Output Format (STRICT):\n{\n  \"prompt\": \"A single, detailed, cinematic, continuous-shot video prompt in English, 9:16 aspect ratio, fully aligned with the content, img_desc, and music_style.\"\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        2288,
+        16
+      ],
+      "id": "f4745258-1ab2-4fbc-a741-190731c7e1db",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.content }}",
+        "options": {
+          "systemMessage": "You are a professional musician, composer, and AI music prompt engineer.\n\nYour task is to analyze a given blog post and generate:\n\n1. A HIGH-QUALITY POSITIVE PROMPT (what the music SHOULD include)\n2. A HIGH-QUALITY NEGATIVE PROMPT (what the music SHOULD AVOID)\n3. A CLEAR MUSIC STYLE SPECIFICATION (main genre/style of the music)\n\nInstructions:\n\n1. Carefully read and understand the blog post content.\n\n2. Identify:\n\n   * Mood and emotional tone\n   * Target audience\n   * Theme, setting, and cultural context\n   * Intensity and pacing\n\n3. Based on your analysis:\n\nGenerate a MUSIC STYLE SPECIFICATION:\n\n* Define the primary genre or style (e.g., Jazz, Classical, Electronic, Pop, Rock, Hip-hop, Ambient, Cinematic, Nasheed, etc.)\n* Keep it short (1 line only)\n* Can include sub-genre if relevant (e.g., \"Ambient Cinematic\", \"Lo-fi Hip-hop\")\n\nGenerate a POSITIVE PROMPT that includes:\n\n* Suitable genre(s) aligned with the style specification\n* Appropriate instruments\n* Mood and atmosphere\n* Tempo and energy level\n* Style references (if relevant)\n* Production quality descriptors (e.g., cinematic, ambient, clean mix)\n\nGenerate a NEGATIVE PROMPT that excludes:\n\n* Max 200 characters length\n* Inappropriate genres\n* Wrong instruments\n* Conflicting moods/emotions\n* Distracting elements (e.g., vocals if not suitable)\n* Poor audio qualities (noise, distortion, clipping)\n* Any element that contradicts the blog tone\n\n4. Output Rules:\n\n* Each prompt must be concise (max 2–3 lines each)\n* Use comma-separated phrases\n* Optimized for AI music tools\n* Do NOT include explanations\n* Do NOT repeat phrases between positive and negative prompts\n\n5. Output Format (STRICT):\n\n{\n\"music_style\": \"...\",\n\"positive_prompt\": \"...\",\n\"negative_prompt\": \"...\"\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1120,
+        16
+      ],
+      "id": "02b60534-1e52-4d48-a5a5-bbb219b3fea7",
+      "name": "Music Agent",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.config.toJsonString() }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2784,
+        16
+      ],
+      "id": "757d1868-06a9-4693-9263-d3646366dee4",
+      "name": "Generate video",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "SFhjYsXsyVcRhxXr",
+          "name": "SF - KIE AI"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const model =  $('Prepare data').first().json.model;\nconst callback = $vars.SAAS_API + '/api/social-agent/process';\nconst obj = JSON.parse($input.first().json.content.parts[0].text);\nconst prompt = obj.prompt;\n\nif(model == 'veo3_fast'){\n  return {\n    \"url\": \"https://api.kie.ai/api/v1/veo/generate\",\n    \"config\": {\n      \"prompt\": prompt,\n      \"model\": model,\n      \"callBackUrl\": callback,\n      \"aspectRatio\": \"9:16\",\n      \"imageUrls\": [\n        $('HTTP Request').first().json.image\n      ]\n    } \n  }\n}else if(model == 'runway-duration-10-generate'){\n  return {\n    \"url\": \"https://api.kie.ai/api/v1/runway/generate\",\n    \"config\": {\n      \"prompt\": prompt,\n      \"model\": model,\n      \"callBackUrl\": callback,\n      \"aspectRatio\": \"9:16\",\n      \"quality\": \"720p\",\n      \"duration\": \"10\",\n      \"imageUrl\": $('HTTP Request').first().json.image\n    } \n  }\n   \n}else if(model == 'sora-2-text-to-video'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      //\"model\": model,\n      \"model\": \"sora-2-image-to-video\",\n      \"callBackUrl\": callback,\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_urls\": [$('HTTP Request').first().json.image],\n        \"aspect_ratio\": \"portrait\",\n        \"n_frames\": \"15\",\n        \"remove_watermark\": true\n      }\n    }\n  }\n}else if(model == 'kling-2.6/image-to-video'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": model,\n      \"callBackUrl\": callback,\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_urls\": [\n          $('HTTP Request').first().json.image\n        ],\n        \"sound\": false,\n        \"duration\": \"10\"\n      }\n    }\n  }\n}else if(model == 'bytedance/seedance-1.5-pro'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": model,\n      \"callBackUrl\": callback,\n      \"input\":{\n        \"prompt\": prompt,\n        \"input_urls\": [\n          $('HTTP Request').first().json.image\n        ],\n        \"aspect_ratio\": \"9:16\",\n        \"duration\": \"8\",\n        \"resolution\": \"480p\"\n      }\n    }\n  }\n}else if(model == 'grok-imagine/image-to-video'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": model,\n      \"callBackUrl\": callback,\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_urls\": [\n          $('HTTP Request').first().json.image\n        ],\n        \"duration\": \"10\",\n        \"resolution\": \"480p\",\n        \"mode\": \"normal\",\n      }\n    }\n  }\n}else if(model == 'hailuo/2-3-image-to-video-standard'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": model,\n      \"callBackUrl\": callback,\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_url\": $('HTTP Request').first().json.image,\n        \"duration\": \"10\",\n        \"resolution\": \"768P\"\n      }\n    }\n  }\n}else if(model == 'wan/2-2-a14b-image-to-video-turbo'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": model,\n      \"callBackUrl\": callback,\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_url\": $('HTTP Request').first().json.image,\n        \"enable_prompt_expansion\": false,\n        \"acceleration\": \"none\",\n        \"resolution\": \"480p\"\n      }\n    }\n  }\n}else if(model == 'midjourney'){\n  return {\n    url: \"https://api.kie.ai/api/v1/mj/generate\",\n    config: {\n      \"taskType\": \"mj_video\",\n      \"prompt\": prompt,\n      \"fileUrls\": [$('HTTP Request').first().json.image],\n      \"aspectRatio\": \"9:16\",\n      \"waterMark\": \"\",\n      \"callBackUrl\": callback,\n    }\n  }\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2624,
+        16
+      ],
+      "id": "e16826ae-0160-4c7f-8e6f-d781f7e5f922",
+      "name": "Format model"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SAAS_API }}/api/social-agent/music-prepare",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "task_id",
+              "value": "={{ $json.data.taskId }}"
+            },
+            {
+              "name": "license_key",
+              "value": "={{ $('Prepare data').item.json.license_key }}"
+            },
+            {
+              "name": "content_id",
+              "value": "={{ $('Format array posts').item.json.content_id }}"
+            },
+            {
+              "name": "music_task_id",
+              "value": "={{ $('HTTP Request1').item.json.data.taskId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2992,
+        16
+      ],
+      "id": "6e1257d4-453a-4b37-944a-68038b0462fd",
+      "name": "Callback prepared url"
+    },
+    {
+      "parameters": {
+        "amount": 30
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3168,
+        16
+      ],
+      "id": "12775757-371b-41d9-b585-84d775e403c5",
+      "name": "Wait",
+      "webhookId": "9d62d507-1d35-4c77-b603-c06866518118"
+    },
+    {
+      "parameters": {
+        "errorMessage": "An error occurred!"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1616,
+        352
+      ],
+      "id": "a494986e-d0fc-4526-a722-d8457638dbab",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SAAS_API }}/api/social-content/fail",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "post_id",
+              "value": "={{ $('HTTP Request').item.json.id }}"
+            },
+            {
+              "name": "license_key",
+              "value": "={{ $('Prepare data').item.json.code }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1344,
+        352
+      ],
+      "id": "191adb72-9a6f-43c4-a681-fee877161952",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.website }}/wp-json/synergize/v1/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "code",
+              "value": "={{ $json.license_key }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        16,
+        0
+      ],
+      "id": "f881257f-7cdf-4129-b3e8-eca1ebaa821d",
+      "name": "Check if license is valid"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "60458c94-986c-49cd-8b69-4b5616163eb3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f910b52-842c-4b6a-a862-e6914c883764",
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        192,
+        0
+      ],
+      "id": "02cc6569-c97f-4aed-92b0-6e35b7dcb2a3",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "website",
+              "value": "={{ $('Webhook').item.json.body.domain_name }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        -336,
+        0
+      ],
+      "id": "025da6b2-dbfc-43e9-9eb5-217d647d3818",
+      "name": "Execution Data",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v1/social-media/generate-music-video",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -544,
+        0
+      ],
+      "id": "f9921066-1985-46b9-9a73-b13ff6a0cdad",
+      "name": "Webhook",
+      "webhookId": "71c7fa76-3821-4993-915e-c3a09921860d"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        []
+      ]
+    },
+    "Prepare data": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format array posts": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Music Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Google Vertex Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Music Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format prompt": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze image": {
+      "main": [
+        [
+          {
+            "node": "Img Desc",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Img Desc": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Music Agent": {
+      "main": [
+        [
+          {
+            "node": "Format prompt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format model": {
+      "main": [
+        [
+          {
+            "node": "Generate video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Format model",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format model",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate video": {
+      "main": [
+        [
+          {
+            "node": "Callback prepared url",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Analyze image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Callback prepared url": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if license is valid": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Format array posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execution Data": {
+      "main": [
+        [
+          {
+            "node": "Prepare data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "4otmc6jILN7VL0Z9",
+    "callerPolicy": "workflowsFromSameOwner",
+    "saveDataSuccessExecution": "all"
+  },
+  "triggerCount": 1,
+  "versionId": "de75d3de-fd23-4a6b-9d0d-00b5018686da",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "zGFLpL21fhsLN1Cs",
+  "isArchived": false
+}

@@ -1,0 +1,291 @@
+{
+  "id": "1AtogQ4xIMgL84gD",
+  "name": "SF - AI Page Builder Image Downloader",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v1/page-builder/download-image",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -928,
+        48
+      ],
+      "id": "1d7e59b4-2fdb-4336-afa2-8187df5f80dc",
+      "name": "Webhook",
+      "webhookId": "4c43ac32-0446-445c-9c75-20d8f81b8341"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "body.images",
+        "options": {
+          "destinationFieldName": "image"
+        }
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -704,
+        48
+      ],
+      "id": "2e2062e4-ac56-47c8-bd42-06ca6600b97f",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -480,
+        48
+      ],
+      "id": "665efc92-2914-4445-b7f5-5310491e543a",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.image }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -32,
+        48
+      ],
+      "id": "f0ecc9f0-5425-40ac-9088-533ec552b741",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        192,
+        48
+      ],
+      "id": "e574db91-693a-4696-aeed-a6b144763482",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "43af3950-1aad-4336-9379-bc0a7433d0d9",
+              "name": "binary",
+              "value": "=data:{{ $('HTTP Request').item.json.headers['content-type'] }};base64,{{ $json.data }}",
+              "type": "string"
+            },
+            {
+              "id": "f99ec315-6635-4d6d-9003-82fb875b1ac5",
+              "name": "mime",
+              "value": "={{ $('HTTP Request').item.json.headers['content-type'] }}",
+              "type": "string"
+            },
+            {
+              "id": "02f1cf13-a457-4394-bb9f-92cf8c733818",
+              "name": "title",
+              "value": "={{ $('HTTP Request').item.json.headers['content-disposition'].substring($('HTTP Request').item.json.headers['content-disposition'].indexOf('\"') + 1, $('HTTP Request').item.json.headers['content-disposition'].lastIndexOf('\"')) }}",
+              "type": "string"
+            },
+            {
+              "id": "02226cf5-d25b-48e2-8eaa-142f13b638d3",
+              "name": "original_url",
+              "value": "={{ $('Edit Fields1').item.json.image }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        416,
+        128
+      ],
+      "id": "b1a3abfe-5fbf-4cf5-b63a-e2c1b0318961",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        -144
+      ],
+      "id": "3c548182-ba07-495d-af2e-ff1ff179ecc8",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -32,
+        -144
+      ],
+      "id": "2c5d2792-5b90-44e3-9231-0fc5d1b1d83a",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5cd39543-fd85-4c58-b736-a0ead8441a4a",
+              "name": "image",
+              "value": "={{ $json.image }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -256,
+        48
+      ],
+      "id": "580a9bff-2edd-411d-8959-e87e7faf8762",
+      "name": "Edit Fields1"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "4otmc6jILN7VL0Z9",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "triggerCount": 1,
+  "versionId": "0e98a2de-8eda-4438-901a-d5822548c272",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "G6aKnDBpsyCVjLdc",
+  "isArchived": false
+}

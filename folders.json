@@ -4,7 +4,7 @@
       "id": "W6kfCfNZPfSqIn2i",
       "name": "SynergizeFlow",
       "parentFolderId": null,
-      "homeProjectId": "ZvP1yE48ZEo7zgpC",
+      "homeProjectId": "hlqx30JRHLb2L6Zu",
       "createdAt": "2025-12-12T06:56:49.451Z",
       "updatedAt": "2025-12-12T06:56:49.451Z"
     },
@@ -12,9 +12,65 @@
       "id": "p9WxrFf2f0mnC9Ge",
       "name": "Random",
       "parentFolderId": null,
-      "homeProjectId": "ZvP1yE48ZEo7zgpC",
+      "homeProjectId": "hlqx30JRHLb2L6Zu",
       "createdAt": "2025-12-12T13:08:06.444Z",
       "updatedAt": "2025-12-12T13:08:06.444Z"
+    },
+    {
+      "id": "m9SlnlvWccSUBTns",
+      "name": "Blog Agent",
+      "parentFolderId": null,
+      "homeProjectId": "UNcEOCawQV9ZsxYR",
+      "createdAt": "2026-03-02T02:59:58.288Z",
+      "updatedAt": "2026-03-02T02:59:58.288Z"
+    },
+    {
+      "id": "DZr615Ms0rRYsoes",
+      "name": "Utility",
+      "parentFolderId": null,
+      "homeProjectId": "UNcEOCawQV9ZsxYR",
+      "createdAt": "2026-03-02T03:00:05.641Z",
+      "updatedAt": "2026-03-02T03:00:05.641Z"
+    },
+    {
+      "id": "ufNfABECZ3OXdtAU",
+      "name": "Chat Agent",
+      "parentFolderId": null,
+      "homeProjectId": "UNcEOCawQV9ZsxYR",
+      "createdAt": "2026-03-02T03:00:12.491Z",
+      "updatedAt": "2026-03-02T03:00:12.491Z"
+    },
+    {
+      "id": "zGFLpL21fhsLN1Cs",
+      "name": "Social Media Agent",
+      "parentFolderId": null,
+      "homeProjectId": "UNcEOCawQV9ZsxYR",
+      "createdAt": "2026-03-02T03:00:20.186Z",
+      "updatedAt": "2026-03-02T03:00:20.186Z"
+    },
+    {
+      "id": "G6aKnDBpsyCVjLdc",
+      "name": "Page Builder Agent",
+      "parentFolderId": null,
+      "homeProjectId": "UNcEOCawQV9ZsxYR",
+      "createdAt": "2026-03-04T07:41:25.629Z",
+      "updatedAt": "2026-03-04T07:41:25.629Z"
+    },
+    {
+      "id": "bZylUfi54l9T1o4U",
+      "name": "Product Campaign Agent",
+      "parentFolderId": null,
+      "homeProjectId": "UNcEOCawQV9ZsxYR",
+      "createdAt": "2026-03-04T07:51:28.281Z",
+      "updatedAt": "2026-03-04T07:51:28.281Z"
+    },
+    {
+      "id": "YWvqYzc9LBnr0MQk",
+      "name": "Telegram Agent",
+      "parentFolderId": null,
+      "homeProjectId": "UNcEOCawQV9ZsxYR",
+      "createdAt": "2026-03-04T09:18:09.841Z",
+      "updatedAt": "2026-03-04T09:18:09.841Z"
     }
   ]
 }

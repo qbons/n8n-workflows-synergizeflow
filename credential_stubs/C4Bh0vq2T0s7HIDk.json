@@ -1,0 +1,17 @@
+{
+  "id": "C4Bh0vq2T0s7HIDk",
+  "name": "SF - Vertex API Service Account",
+  "type": "googleApi",
+  "data": {
+    "email": "",
+    "privateKey": "",
+    "httpNode": true,
+    "scopes": ""
+  },
+  "ownedBy": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "isGlobal": false
+}

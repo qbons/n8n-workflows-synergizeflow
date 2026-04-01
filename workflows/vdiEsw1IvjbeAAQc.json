@@ -1,0 +1,271 @@
+{
+  "id": "vdiEsw1IvjbeAAQc",
+  "name": "SF - Publish Tiktok",
+  "nodes": [
+    {
+      "parameters": {
+        "bucketName": "={{ $vars.CLOUDFLARE_R2_BUCKET }}",
+        "fileKey": "={{ $json.file_key }}"
+      },
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [
+        400,
+        0
+      ],
+      "id": "c5bf6f1f-7697-4c71-88e4-b1077c04a704",
+      "name": "Download a file",
+      "credentials": {
+        "s3": {
+          "id": "AIXo2wxUCjaHKlfc",
+          "name": "SF - R2 Cloudflare Storage"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e2fc0363-ec02-4178-92b3-a2deb7e755da",
+              "name": "file_key",
+              "value": "={{ $json.body.file_key }}",
+              "type": "string"
+            },
+            {
+              "id": "541a3951-5d2f-4d6f-bb8a-abb35eb1c0ef",
+              "name": "access_token",
+              "value": "={{ $json.body.access_token }}",
+              "type": "string"
+            },
+            {
+              "id": "9c5546af-5c08-4083-bb7a-7817400dfc0c",
+              "name": "title",
+              "value": "={{ $json.body.title }}",
+              "type": "string"
+            },
+            {
+              "id": "3586d7cb-504c-4409-b5ad-79e30e38eacb",
+              "name": "content_id",
+              "value": "={{ $json.body.content_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        192,
+        0
+      ],
+      "id": "7a7dd520-5108-465a-af66-cce30138c658",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://open.tiktokapis.com/v2/post/publish/video/init/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Edit Fields').item.json.access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"post_info\": {\n    \"title\": {{ JSON.stringify($('Edit Fields').item.json.title) }},\n    \"privacy_level\": \"SELF_ONLY\",\n    \"disable_duet\": false,\n    \"disable_comment\": false,\n    \"disable_stitch\": false,\n    \"video_cover_timestamp_ms\": 1000\n  },\n  \"source_info\": {\n    \"source\": \"{{ $json.tiktokInitPayload.source_info.source }}\",\n    \"video_size\": {{ $json.tiktokInitPayload.source_info.video_size }},\n    \"chunk_size\": {{ $json.tiktokInitPayload.source_info.chunk_size }},\n    \"total_chunk_count\": {{ $json.tiktokInitPayload.source_info.total_chunk_count }}\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        848,
+        0
+      ],
+      "id": "7f075904-7743-4dd5-ad2f-4008d6f3a42b",
+      "name": "init upload"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ $('init upload').item.json.data.upload_url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Range",
+              "value": "={{ $('video props').item.json.singleUploadHeaders['Content-Range'] }}"
+            },
+            {
+              "name": "Content-Length",
+              "value": "={{ $('video props').item.json.singleUploadHeaders['Content-Length'] }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "={{ $('video props').item.json.singleUploadHeaders['Content-Type'] }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "={{ $('Download a file').item.binary.data }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1056,
+        0
+      ],
+      "id": "5f1f4183-1bef-4812-833a-e37892f540a2",
+      "name": "process upload"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Ambil binary data dari node sebelumnya (misalnya dari S3/R2)\nconst buffer = await this.helpers.getBinaryDataBuffer(0, 'data');\n\n// Konfigurasi\nconst videoSize = buffer.length; // Total ukuran file dalam bytes\n\n// Fungsi untuk menentukan chunk size optimal\nfunction getOptimalChunkSize(fileSize) {\n  const MB = 1024 * 1024;\n  \n  if (fileSize < 50 * MB) {\n    return fileSize; // Upload sekaligus untuk file kecil\n  } else if (fileSize < 500 * MB) {\n    return 10 * MB; // 10MB chunks untuk file sedang\n  } else {\n    return 20 * MB; // 20MB chunks untuk file besar\n  }\n}\n\n// Hitung chunk size dan total chunks\nconst chunkSize = getOptimalChunkSize(videoSize);\nconst totalChunkCount = Math.ceil(videoSize / chunkSize);\n\n// Buat array untuk semua chunks dengan header masing-masing\nconst chunks = [];\nfor (let i = 0; i < totalChunkCount; i++) {\n  const start = i * chunkSize;\n  const end = Math.min(start + chunkSize - 1, videoSize - 1);\n  const currentChunkSize = end - start + 1;\n  \n  chunks.push({\n    chunkIndex: i,\n    start: start,\n    end: end,\n    size: currentChunkSize,\n    contentRange: `bytes ${start}-${end}/${videoSize}`,\n    contentLength: currentChunkSize\n  });\n}\n\n// Return hasil\nreturn [\n  {\n    json: {\n      // Info file\n      videoSize: videoSize,\n      videoSizeMB: (videoSize / 1024 / 1024).toFixed(2),\n      contentType: items[0].binary.data.mimeType || 'video/mp4',\n      \n      // Info chunking\n      chunkSize: chunkSize,\n      chunkSizeMB: (chunkSize / 1024 / 1024).toFixed(2),\n      totalChunkCount: totalChunkCount,\n      \n      // Headers untuk single upload (jika 1 chunk)\n      singleUploadHeaders: {\n        'Content-Type': items[0].binary.data.mimeType || 'video/mp4',\n        'Content-Length': videoSize.toString(),\n        'Content-Range': `bytes 0-${videoSize - 1}/${videoSize}`\n      },\n      \n      // Detail semua chunks (untuk multi-chunk upload)\n      chunks: chunks,\n      \n      // Data untuk TikTok init payload\n      tiktokInitPayload: {\n        source_info: {\n          source: 'FILE_UPLOAD',\n          video_size: videoSize,\n          chunk_size: chunkSize,\n          total_chunk_count: totalChunkCount\n        }\n      }\n    },\n    binary: {\n      data: items[0].binary.data // Pass through binary data\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        0
+      ],
+      "id": "c2d5609a-9925-4789-b90c-3789b3f3e509",
+      "name": "video props"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SAAS_API }}/api/instagram/published",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content_id",
+              "value": "={{ $('Edit Fields').item.json.content_id }}"
+            },
+            {
+              "name": "social_type",
+              "value": "tiktok"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1264,
+        0
+      ],
+      "id": "f3d3feae-2a80-4188-b673-5d775d3023ce",
+      "name": "Callback publish"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v1/social-media/publish-tiktok",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "96988b43-1a1c-40a4-b17e-676850fbeae7",
+      "name": "Webhook",
+      "webhookId": "8a20514b-ccd4-4d7b-9803-075226996a28"
+    }
+  ],
+  "connections": {
+    "Download a file": {
+      "main": [
+        [
+          {
+            "node": "video props",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Download a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "init upload": {
+      "main": [
+        [
+          {
+            "node": "process upload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "process upload": {
+      "main": [
+        [
+          {
+            "node": "Callback publish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "video props": {
+      "main": [
+        [
+          {
+            "node": "init upload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "4otmc6jILN7VL0Z9",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "triggerCount": 1,
+  "versionId": "41ea6fbc-c5f1-4e06-956a-670c360c6c46",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "zGFLpL21fhsLN1Cs",
+  "isArchived": false
+}

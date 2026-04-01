@@ -1,0 +1,1108 @@
+{
+  "id": "dvQVb9dZ0g8Kib1b",
+  "name": "SF - Social Media Video",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.website }}/wp-json/synergize/v1/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "code",
+              "value": "={{ $json.code }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -384,
+        144
+      ],
+      "id": "e63fec9b-8294-4d35-bd26-1c78d378e583",
+      "name": "Check if license is valid"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7a5f7d9a-28cc-49e8-a1d2-e3e25ed8cd75",
+              "name": "website",
+              "value": "={{ $json.body.domain_name }}",
+              "type": "string"
+            },
+            {
+              "id": "8df36920-3df2-4c4e-bc18-4c85cf59b60e",
+              "name": "code",
+              "value": "={{ $json.body.license_key }}",
+              "type": "string"
+            },
+            {
+              "id": "38888392-860c-4b85-967b-323486ab102e",
+              "name": "post_id",
+              "value": "={{ $json.body.post_id }}",
+              "type": "array"
+            },
+            {
+              "id": "4b238cc8-df21-45e0-9be8-7a0398b08a76",
+              "name": "suffix",
+              "value": "={{ $json.body.suffix }}",
+              "type": "string"
+            },
+            {
+              "id": "23e73e41-a63d-4064-9c6b-f54a1bbbe3d3",
+              "name": "voice",
+              "value": "={{ $json.body.voice }}",
+              "type": "string"
+            },
+            {
+              "id": "2ce077fe-47f8-4e65-9185-210bb8f4b36d",
+              "name": "language",
+              "value": "={{ $json.body.language }}",
+              "type": "string"
+            },
+            {
+              "id": "f14a2552-d1a1-4c74-95ac-3cb5d0596ddb",
+              "name": "model",
+              "value": "={{ $json.body.model }}",
+              "type": "string"
+            },
+            {
+              "id": "041eafc1-c58d-487b-98d7-9c3ac3cc66bf",
+              "name": "prompt",
+              "value": "={{ $json.body.prompt }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -592,
+        144
+      ],
+      "id": "4dde24ac-6db3-49c7-8e9d-ba5da4ee00e0",
+      "name": "Prepare data"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v1/social-media/generate-video",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -976,
+        144
+      ],
+      "id": "beba95a4-6d32-4071-b0d0-fb65b39f3ae5",
+      "name": "Webhook",
+      "webhookId": "a60747c5-7d02-449c-aebf-9a0ffd5c95e9"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "60458c94-986c-49cd-8b69-4b5616163eb3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f910b52-842c-4b6a-a862-e6914c883764",
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -208,
+        144
+      ],
+      "id": "b450cc44-b36f-4b4a-b8b9-ef3273e95173",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "batchSize": "={{ $('format array posts').all().length }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        176,
+        0
+      ],
+      "id": "a3ebcbdb-9e78-44fe-9ea1-5273c281f26d",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "jsCode": "var posts = $('Prepare data').first().json.post_id.map(postId => {\n  return { json: { id: postId.id ?? postId, content_id: postId.content_id } };\n});\n\nreturn posts;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "93217dcf-0a23-4ffe-aedc-709abf66552a",
+      "name": "format array posts"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare data').item.json.website }}/wp-json/synergize/v1/get-single-post",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "code",
+              "value": "={{ $('Prepare data').item.json.code }}"
+            },
+            {
+              "name": "=id",
+              "value": "={{ $json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        400,
+        0
+      ],
+      "id": "6ccd232a-8e37-440c-a383-75c125426615",
+      "name": "Get post content"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2edddd94-6d56-4737-93ee-c66624919873",
+              "name": "id",
+              "value": "={{ $('format array posts').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "3b34b29c-c4a7-48bf-a81f-75d8f4d52c8b",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "cf5bcc4a-907e-4d4b-873d-2c11f5305f18",
+              "name": "content",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "20633dc1-fa4b-407d-907e-bbb00045df61",
+              "name": "img",
+              "value": "={{ $json.image }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        544,
+        0
+      ],
+      "id": "0f108b36-0f4d-43f1-9177-894f5cc0b30f",
+      "name": "Data Blog"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "adbaa001-7b5b-46d4-b649-5819bbf14593",
+              "name": "img_desc",
+              "value": "={{ $json.content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        0
+      ],
+      "id": "68ae3a7d-8bca-41e5-b228-15be5e1291e7",
+      "name": "Img Desc"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{$vars.GEMINI_PRO_PREVIEW}}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={\n\"title\": {{ $('Data Blog').item.json.title.toJsonString() }},\n\"content\": {{ $('Data Blog').item.json.content.toJsonString() }},\n\"language\": {{ $('Prepare data').item.json.language.toJsonString() }},\n\"img_desc\": {{ $json.img_desc.toJsonString() }}\n}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "systemMessage": "=You are an expert content strategist and scriptwriter AI. Your primary goal is to transform a detailed article on **any given topic** into a concise video script and a single, comprehensive video generation prompt that visually represents that script.\n\nYou will be given a JSON object as input containing the keys: `title`, `content`, `img_desc`, and `language`.\n\nYour task is to follow these instructions precisely:\n\n1.  **Analyze the Content:** Read and understand the input from the `title` and `content` fields to identify the core message and key concepts of the given subject.\n2.  **Synthesize Key Takeaways:** From the analysis, distill the information into **5 distinct and actionable key takeaways** relevant to the topic.\n3.  **Write the Video Script:**\n    *   The script must be written in the language specified by the `language` input, which will be a `BCP-47` language code.\n    *   The script must begin with a single, concise introductory hook derived from the `title`.\n    *   Immediately following the hook, the script must list the 5 key takeaways, starting each with words like \"First,\" \"Second,\" etc., in the specified language.\n    *   The total word count of the entire script must be approximately **70 words**.\n    *   The script must be a **single string of text** containing **only the spoken words**.\n4.  **Generate a Single, Narrative Video Prompt from the Script:**\n    *   You will generate **only one prompt as a single string of text, which must be in English.**\n    *   This prompt must describe a **continuous visual micro-narrative** that is a direct and creative visualization of the generated `script`.\n    *   You must use the inputs as follows:\n        *   **`script` (Primary Source):** The prompt's content, actions, and objects must be a direct visual translation of the nouns, verbs, and concepts mentioned in the script.\n        *   **`img_desc` (Stylistic Guide):** The prompt's visual aesthetic—including the environment, lighting, color palette, and character style—must be strictly defined by the `img_desc`.\n    *   The prompt must be framed for a **9:16 vertical aspect ratio** and describe an evolving, continuous shot.\n    *   The prompt's internal structure must flow logically through three phases based on the script's narrative:\n        *   **The Establishing Shot:** It must begin by visually interpreting the script's **introductory hook and first key takeaway(s)**.\n        *   **The Development:** It must then seamlessly transition to a dynamic action that visualizes the **central key takeaways** from the script.\n        *   **The Resolution:** It must conclude with a powerful final image that captures the **outcome or impact described in the last key takeaway(s)**.\n5.  **Format the Output:**\n    *   Your final output **must be a single, valid JSON object and nothing else.**\n    *   Do not include any introductory text, explanations, or markdown formatting like ```json before or after the object.\n    *   The JSON object must adhere strictly to the following structure:\n        ```json\n        {\n          \"script\": \"The 70-word script in the specified language as a single string, starting with the dynamic intro hook.\",\n          \"prompt\": \"A single, detailed prompt string in English that combines the establishing, development, and resolution phases into one continuous shot for a 9:16 aspect ratio, based directly on the script's content.\"\n        }\n        ```"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        0
+      ],
+      "id": "d3ba1a8a-5995-4697-8048-d6a5769b527a",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{$vars.GEMINI_FLASH_TEXT}}",
+          "mode": "id"
+        },
+        "imageUrls": "={{ $json.img }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        704,
+        0
+      ],
+      "id": "89f4a49e-32e6-4d52-8917-830d864f6679",
+      "name": "Analyze image",
+      "retryOnFail": true,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://texttospeech.googleapis.com/v1/text:synthesize",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"input\": {\n    \"prompt\": {{ $('Prepare data').item.json.prompt.toJsonString() }},\n    \"text\": {{ $json.script.toJsonString() }}\n  },\n  \"voice\": {\n    \"languageCode\": {{ $('Prepare data').item.json.language.toJsonString() }},\n    \"name\": {{ $('Prepare data').item.json.voice.toJsonString() }},\n    \"model_name\": \"{{$vars.GEMINI_FLASH_TEXT}}-tts\"\n  },\n  \"audioConfig\": {\n    \"audioEncoding\": \"MP3\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1504,
+        0
+      ],
+      "id": "09460d1b-e0a1-4351-a768-96883c8eacd8",
+      "name": "Text to speech",
+      "credentials": {
+        "googleApi": {
+          "id": "C4Bh0vq2T0s7HIDk",
+          "name": "SF - Vertex API Service Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{$vars.GEMINI_PRO_PREVIEW}}",
+          "mode": "id"
+        },
+        "text": "=**SYSTEM DIRECTIVE: RAW DATA OUTPUT MODE**\n\nYou are a specialized audio-to-subtitle parsing engine. Your only function is to convert an audio file into a raw `.ass` subtitle string suitable for programmatic parsing. Your output is consumed directly by an automated system, which will fail if any extraneous characters or formatting are present.\n\n**INPUT:**\nAn audio file will be provided.\n\n**OUTPUT PROTOCOL:**\n1.  Your entire response MUST be a single, raw `.ass` script string.\n2.  There must be absolutely no extraneous characters, whitespace, or newlines before the `[Script Info]` header or after the final `Dialogue` line.\n3.  **CRITICAL:** Do not include Markdown fences. The string ` ``` ` is forbidden in your output. Do not output any explanatory text. The response must be the `.ass` script and nothing else.\n\n**`.ass` SCRIPT REQUIREMENTS:**\n1.  **Header:** The string must begin with the exact `.ass` header block.\n2.  **Events:** After the header, generate a `Dialogue` event for every single word in the audio.\n3.  **Word-by-Word Timing:** Each `Dialogue` line must contain only one word, timed precisely to its start and end in the audio (`h:mm:ss.cs`). Punctuation must be appended to the word it follows.\n\n**EXAMPLE OF THE REQUIRED RAW OUTPUT:**\n[Script Info]\nTitle: Default Aegisub file\nScriptType: v4.00+\nWrapStyle: 0\nScaledBorderAndShadow: yes\nYCbCr Matrix: None\n\n[Aegisub Advanced SSA/ASS Style V4+]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\nStyle: Default,Arial,28,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1\n\n[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\nDialogue: 0,0:00:00.30,0:00:00.55,Default,,0,0,0,,Stop\nDialogue: 0,0:00:00.55,0:00:01.05,Default,,0,0,0,,searching\nDialogue: 0,0:00:01.05,0:00:01.30,Default,,0,0,0,,for\n\nExecute this directive. Failure to adhere to the raw output protocol will result in system error.",
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        1840,
+        0
+      ],
+      "id": "10156992-7b10-4107-9039-281a7e4bca5a",
+      "name": "Analyze audio",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "var obj = JSON.parse($input.first().json.content.parts[0].text)\n\nobj.script = obj.script + ' ' + $('Prepare data').first().json.suffix;\nreturn obj;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        0
+      ],
+      "id": "d000a77e-7793-4d52-b8a5-212e52268d6e",
+      "name": "Text speech"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ca5b28fe-fc75-40f5-8f40-65d58483503b",
+              "name": "subtitle",
+              "value": "={{ $json.content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2016,
+        0
+      ],
+      "id": "79cd505c-4ba0-45f5-ac52-6b6ae4893502",
+      "name": "Speech text"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "audioContent",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1680,
+        0
+      ],
+      "id": "fa8dafac-7b9e-4114-ae28-a02401212b55",
+      "name": "Convert base64 to File",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "subtitle",
+        "binaryPropertyName": "subtitle_file",
+        "options": {
+          "encoding": "utf8",
+          "fileName": "subtitle.ass"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        2192,
+        0
+      ],
+      "id": "6bfcb8c5-3661-467f-a5f6-58f6dc8ef444",
+      "name": "Convert to File",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "binaryPropertyName": "subtitle_file",
+        "destinationKey": "subtitle_base",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        2368,
+        0
+      ],
+      "id": "2fd93843-e474-4949-952f-a548fdbbc62d",
+      "name": "Extract from File",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "amount": 30
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3072,
+        0
+      ],
+      "id": "a1dc1798-ced3-4db4-ad0c-5f87cae8b559",
+      "name": "Wait",
+      "webhookId": "9d62d507-1d35-4c77-b603-c06866518118"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SAAS_API }}/api/social-agent/prepare",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "task_id",
+              "value": "={{ $json.data.taskId }}"
+            },
+            {
+              "name": "audio",
+              "value": "={{ $('Text to speech').item.json.audioContent }}"
+            },
+            {
+              "name": "subtitle",
+              "value": "={{ $('Extract from File').item.json.subtitle_base }}"
+            },
+            {
+              "name": "blog_id",
+              "value": "={{ $('Data Blog').item.json.id }}"
+            },
+            {
+              "name": "license_key",
+              "value": "={{ $('Prepare data').item.json.code }}"
+            },
+            {
+              "name": "voice",
+              "value": "={{ $('Prepare data').item.json.voice }}"
+            },
+            {
+              "name": "content_id",
+              "value": "={{ $('format array posts').item.json.content_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2880,
+        0
+      ],
+      "id": "6fdf0d41-0a6e-41d5-9a58-5175c9f19ef3",
+      "name": "Callback prepared url"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.config.toJsonString() }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2720,
+        0
+      ],
+      "id": "52f8f7d8-d6c9-4000-ae5f-3d115d20e435",
+      "name": "Generate video",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "SFhjYsXsyVcRhxXr",
+          "name": "SF - KIE AI"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SAAS_API }}/api/social-content/fail",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "post_id",
+              "value": "={{ $('Data Blog').item.json.id }}"
+            },
+            {
+              "name": "license_key",
+              "value": "={{ $('Prepare data').item.json.code }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        512,
+        304
+      ],
+      "id": "d99c6e60-2d0d-418b-8b2a-8df1d6d4fd08",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "errorMessage": "An error occurred!"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        784,
+        304
+      ],
+      "id": "9b7f8e53-23fa-42a7-915d-0973dc3d44bd",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "jsCode": "const model =  $('Prepare data').first().json.model;\nconst callback = $vars.SAAS_API + '/api/social-agent/process';\nconst prompt = $('Text speech').item.json.prompt;\n\nif(model == 'veo3_fast'){\n  return {\n    \"url\": \"https://api.kie.ai/api/v1/veo/generate\",\n    \"config\": {\n      \"prompt\": prompt,\n      \"model\": model,\n      \"callBackUrl\": callback,\n      \"aspectRatio\": \"9:16\",\n      \"imageUrls\": [\n        $('Data Blog').first().json.img\n      ]\n    } \n  }\n}else if(model == 'runway-duration-10-generate'){\n  return {\n    \"url\": \"https://api.kie.ai/api/v1/runway/generate\",\n    \"config\": {\n      \"prompt\": prompt,\n      \"model\": model,\n      \"callBackUrl\": callback,\n      \"aspectRatio\": \"9:16\",\n      \"quality\": \"720p\",\n      \"duration\": \"10\",\n      \"imageUrl\": $('Data Blog').first().json.img\n    } \n  }\n   \n}else if(model == 'sora-2-text-to-video'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      //\"model\": model,\n      \"model\": \"sora-2-image-to-video\",\n      \"callBackUrl\": callback,\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_urls\": [$('Data Blog').first().json.img],\n        \"aspect_ratio\": \"portrait\",\n        \"n_frames\": \"15\",\n        \"remove_watermark\": true\n      }\n    }\n  }\n}else if(model == 'kling-2.6/image-to-video'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": model,\n      \"callBackUrl\": callback,\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_urls\": [\n          $('Data Blog').first().json.img\n        ],\n        \"sound\": false,\n        \"duration\": \"10\"\n      }\n    }\n  }\n}else if(model == 'bytedance/seedance-1.5-pro'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": model,\n      \"callBackUrl\": callback,\n      \"input\":{\n        \"prompt\": prompt,\n        \"input_urls\": [\n          $('Data Blog').first().json.img\n        ],\n        \"aspect_ratio\": \"9:16\",\n        \"duration\": \"8\",\n        \"resolution\": \"480p\"\n      }\n    }\n  }\n}else if(model == 'grok-imagine/image-to-video'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": model,\n      \"callBackUrl\": callback,\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_urls\": [\n          $('Data Blog').first().json.img\n        ],\n        \"duration\": \"10\",\n        \"resolution\": \"480p\",\n        \"mode\": \"normal\",\n      }\n    }\n  }\n}else if(model == 'hailuo/2-3-image-to-video-standard'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": model,\n      \"callBackUrl\": callback,\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_url\": $('Data Blog').first().json.img,\n        \"duration\": \"10\",\n        \"resolution\": \"768P\"\n      }\n    }\n  }\n}else if(model == 'wan/2-2-a14b-image-to-video-turbo'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": model,\n      \"callBackUrl\": callback,\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_url\": $('Data Blog').first().json.img,\n        \"enable_prompt_expansion\": false,\n        \"acceleration\": \"none\",\n        \"resolution\": \"480p\"\n      }\n    }\n  }\n}else if(model == 'midjourney'){\n  return {\n    url: \"https://api.kie.ai/api/v1/mj/generate\",\n    config: {\n      \"taskType\": \"mj_video\",\n      \"prompt\": prompt,\n      \"fileUrls\": [$('Data Blog').first().json.img],\n      \"aspectRatio\": \"9:16\",\n      \"waterMark\": \"\",\n      \"callBackUrl\": callback,\n    }\n  }\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2560,
+        0
+      ],
+      "id": "84c88615-3f70-4ee7-bb43-9f50c85a1e6e",
+      "name": "Format model"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -272,
+        848
+      ],
+      "id": "d6a32e3a-c4ae-46bf-a5b2-cc8afc5456cb",
+      "name": "Schedule Trigger",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api-dev.synergizeflow.com/api/social-content/failed",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -64,
+        848
+      ],
+      "id": "3e7b4e63-79e0-4055-811b-d76df43c55fc",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "url": "https://api.kie.ai/api/v1/veo/record-info",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "taskId",
+              "value": "d8e5b7885f0c7e09b82f3475042920f3"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1888,
+        576
+      ],
+      "id": "f196c8b3-0416-417e-8408-a3ef32c8806d",
+      "name": "Kie AI video status check",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "SFhjYsXsyVcRhxXr",
+          "name": "SF - KIE AI"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        1680,
+        576
+      ],
+      "id": "26e8838c-816b-4e17-8fe3-ba17a59cf436",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "website",
+              "value": "={{ $('Webhook').item.json.body.domain_name }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        -768,
+        144
+      ],
+      "id": "8da827d0-414a-4f79-a463-9e67e5b122a1",
+      "name": "Execution Data",
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Check if license is valid": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare data": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "format array posts",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Get post content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "format array posts": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get post content": {
+      "main": [
+        [
+          {
+            "node": "Data Blog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data Blog": {
+      "main": [
+        [
+          {
+            "node": "Analyze image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Img Desc": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Text speech",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze image": {
+      "main": [
+        [
+          {
+            "node": "Img Desc",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text to speech": {
+      "main": [
+        [
+          {
+            "node": "Convert base64 to File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze audio": {
+      "main": [
+        [
+          {
+            "node": "Speech text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text speech": {
+      "main": [
+        [
+          {
+            "node": "Text to speech",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Speech text": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert base64 to File": {
+      "main": [
+        [
+          {
+            "node": "Analyze audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Format model",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Callback prepared url": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate video": {
+      "main": [
+        [
+          {
+            "node": "Callback prepared url",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format model": {
+      "main": [
+        [
+          {
+            "node": "Generate video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Kie AI video status check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execution Data": {
+      "main": [
+        [
+          {
+            "node": "Prepare data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "4otmc6jILN7VL0Z9",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "triggerCount": 2,
+  "versionId": "621397ec-dfb6-4d07-a7c5-474dcacb2beb",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "zGFLpL21fhsLN1Cs",
+  "isArchived": false
+}

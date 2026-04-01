@@ -1,0 +1,706 @@
+{
+  "id": "NSEKy5JjGKPWZUuY",
+  "name": "SF - Chat Agent Document Upload",
+  "nodes": [
+    {
+      "parameters": {
+        "mode": "insert",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "={{ $('Required data').item.json.code }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.3,
+      "position": [
+        1504,
+        112
+      ],
+      "id": "9d026b02-68b6-4444-8c79-35c30b5be551",
+      "name": "Qdrant Vector Store",
+      "credentials": {
+        "qdrantApi": {
+          "id": "fKAHlOe3mnPrJuNI",
+          "name": "SF - QdrantApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "=models/{{ $vars.GEMINI_EMBEDDING }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1424,
+        304
+      ],
+      "id": "6bc0eef9-d888-44b4-90c3-de0b7adc5c33",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "textSplittingMode": "custom",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        1632,
+        320
+      ],
+      "id": "a1951e08-5525-4797-8ed9-f303842ab2ad",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "chunkSize": 750,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        1632,
+        496
+      ],
+      "id": "7f18d2b5-78bd-486b-bfec-c2e9a5d38d34",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "operation": "collectionExists",
+        "collectionName": "={{ $('Required data').item.json.code }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-qdrant.qdrant",
+      "typeVersion": 1,
+      "position": [
+        -1040,
+        80
+      ],
+      "id": "2e18c2fb-7c95-422a-a6fe-5f22a2d35b92",
+      "name": "Check If Collection Exists",
+      "retryOnFail": true,
+      "credentials": {
+        "qdrantRestApi": {
+          "id": "x4lyWFNp7qjYd932",
+          "name": "SF - Qdrant account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a57760c3-3a24-43a9-bc83-e707219ca79e",
+              "leftValue": "={{ $json.result.exists }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -848,
+        80
+      ],
+      "id": "9d0b330c-34e4-4002-b2c6-a35dc5c892d6",
+      "name": "If collection exists"
+    },
+    {
+      "parameters": {
+        "operation": "deleteCollection",
+        "collectionName": {
+          "__rl": true,
+          "value": "={{ $('Required data').item.json.code }}",
+          "mode": "name"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-qdrant.qdrant",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        -64
+      ],
+      "id": "579873f6-ec78-4210-a169-aa497a7038cd",
+      "name": "Delete Collection",
+      "credentials": {
+        "qdrantRestApi": {
+          "id": "x4lyWFNp7qjYd932",
+          "name": "SF - Qdrant account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cc48725e-a61d-4dae-b859-0ad9aafc6057",
+              "name": "website",
+              "value": "={{ $json.body.domain_name }}",
+              "type": "string"
+            },
+            {
+              "id": "3fb748b3-ffed-49a4-8410-05c82ee2862c",
+              "name": "code",
+              "value": "={{ $json.body.license_key }}",
+              "type": "string"
+            },
+            {
+              "id": "8e003702-f40d-4102-9356-a7917924b6d5",
+              "name": "with_file",
+              "value": "={{ $json.body.with_file }}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1648,
+        80
+      ],
+      "id": "5c53abc7-17c1-4f6f-93b6-18a00b1538f4",
+      "name": "Required data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.website }}/wp-json/synergize/v1/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "code",
+              "value": "={{ $json.code }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1456,
+        80
+      ],
+      "id": "89103fa5-3a6a-4b54-a97a-0f026ffb69e0",
+      "name": "Check license"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c496ee6c-fcf8-4ca6-abba-248a31bd754b",
+              "leftValue": "={{ $json.is_valid }}",
+              "rightValue": "yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1264,
+        80
+      ],
+      "id": "6d2a2338-5e88-4815-8ee7-42151c0dafa5",
+      "name": "if valid"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Unauthorized access denied!"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -1040,
+        288
+      ],
+      "id": "837304df-e8bf-4622-969b-cc25ea9c7d1a",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "url": "={{ $vars.SAAS_API }}/api/chat-agent/onboarding",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "license_key",
+              "value": "={{ $('Required data').item.json.code }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -432,
+        80
+      ],
+      "id": "bf8cfb4a-a3b5-433d-a895-f05b7891836f",
+      "name": "Get onboarding data"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b74432d3-95ea-4327-bfee-763623807a4e",
+              "leftValue": "={{ $('Required data').item.json.with_file }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -48,
+        80
+      ],
+      "id": "b3c77a0a-c64f-42c0-9c96-0a4b5c9b44f4",
+      "name": "If use pdf"
+    },
+    {
+      "parameters": {
+        "url": "={{ $vars.SAAS_API }}/api/chat-agent/file/{{ $('Required data').item.json.code }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        208,
+        -96
+      ],
+      "id": "ab999bbf-988d-4e51-808f-48781fa3f371",
+      "name": "Get the file"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\n\nfunction jsonToMarkdown(data) {\n  const bullet = arr => arr.map(i => `- ${i}`).join('\\n');\n\n  return `\n**Website:** ${data.website_name}  \n*Niche:* ${data.website_niche}\n\n**Target Audience:**  \n${data.target_audience}\n\n**Purpose:**  \n${data.purpose}\n\n**Features:**  \n${bullet(data.features)}\n\n**Categories:**  \n${bullet(data.categories)}\n\n**Keywords:**  \n${bullet(data.keywords)}\n  `.trim();\n}\n\nreturn {\n  htmlMarkdown: jsonToMarkdown(item)\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -224,
+        80
+      ],
+      "id": "6e46ecde-d4f9-4104-b96c-2552f0ecf877",
+      "name": "Website data"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        416,
+        -96
+      ],
+      "id": "2d61f9cb-6817-44e1-a125-7daa2a442ecc",
+      "name": "Transform to base"
+    },
+    {
+      "parameters": {
+        "jsCode": "const textWebiste = $('Website data').first().json.htmlMarkdown;\nconst textDocument = $input.first().json.candidates[0].content.parts[0].text;\n\nreturn {\n  text: `${textWebiste}\\n\\n${textDocument}`\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        816,
+        -96
+      ],
+      "id": "31c3e687-62df-4134-8021-bf1f3042a0a8",
+      "name": "Combine Text"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "81ee4640-4949-4da5-8413-aebf30ff6cc9",
+              "name": "text",
+              "value": "={{ $('Website data').item.json.htmlMarkdown }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        816,
+        96
+      ],
+      "id": "a65a644d-f392-4519-a31b-6f84a34bb68d",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1280,
+        96
+      ],
+      "id": "9c80f731-f72b-419a-a0a8-f24a3e688319",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $vars.GEMINI_FLASH_TEXT }}:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpQueryAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"contents\": [{\n    \"parts\":[\n      {\"text\": \"Extract ALL the information and text from this PDF and output it without any additional text. Also extract text on images!\"},\n      {\n        \"inline_data\": {\n          \"mime_type\": \"application/pdf\",\n          \"data\": \"{{ $json.data }}\"\n        }\n      }\n    ]\n  }]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        608,
+        -96
+      ],
+      "id": "15f95416-5287-47f8-9bd7-c2f10756c4c9",
+      "name": "Extract PDF Content Using Gemini Vision",
+      "credentials": {
+        "httpQueryAuth": {
+          "id": "dRfZt3CTjRs3wTro",
+          "name": "SF - Gemini Query Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v1/chat-agent/document-upload",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1840,
+        80
+      ],
+      "id": "d5755556-8f33-47c4-9ae7-5b4e890bee2e",
+      "name": "Webhook",
+      "webhookId": "61120366-a870-4e3e-b7f2-b6455eff0bb9"
+    }
+  ],
+  "connections": {
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Collection Exists": {
+      "main": [
+        [
+          {
+            "node": "If collection exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If collection exists": {
+      "main": [
+        [
+          {
+            "node": "Delete Collection",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get onboarding data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Collection": {
+      "main": [
+        [
+          {
+            "node": "Get onboarding data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Required data": {
+      "main": [
+        [
+          {
+            "node": "Check license",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check license": {
+      "main": [
+        [
+          {
+            "node": "if valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if valid": {
+      "main": [
+        [
+          {
+            "node": "Check If Collection Exists",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get onboarding data": {
+      "main": [
+        [
+          {
+            "node": "Website data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If use pdf": {
+      "main": [
+        [
+          {
+            "node": "Get the file",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get the file": {
+      "main": [
+        [
+          {
+            "node": "Transform to base",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Website data": {
+      "main": [
+        [
+          {
+            "node": "If use pdf",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform to base": {
+      "main": [
+        [
+          {
+            "node": "Extract PDF Content Using Gemini Vision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Text": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract PDF Content Using Gemini Vision": {
+      "main": [
+        [
+          {
+            "node": "Combine Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Required data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "4otmc6jILN7VL0Z9",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "triggerCount": 1,
+  "versionId": "c864d0fc-09f1-43d8-93e7-3e9f0326a3ee",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "ufNfABECZ3OXdtAU",
+  "isArchived": false
+}

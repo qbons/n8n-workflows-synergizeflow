@@ -1,10 +1,10 @@
 {
-  "id": "zgTpx63oxNLMm8az",
-  "name": "SF - DataForSEO",
-  "type": "httpBasicAuth",
+  "id": "OLSn2aic7DIB7E1z",
+  "name": "SF - Slack Bot",
+  "type": "slackApi",
   "data": {
-    "user": "",
-    "password": ""
+    "accessToken": "",
+    "signatureSecret": ""
   },
   "ownedBy": {
     "type": "team",

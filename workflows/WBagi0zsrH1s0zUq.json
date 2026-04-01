@@ -1,0 +1,727 @@
+{
+  "id": "WBagi0zsrH1s0zUq",
+  "name": "SF - Publish Facebook",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "90caa86b-fe2b-4bd3-b012-4eb639b88fb9",
+              "name": "access_token",
+              "value": "={{ $json.body.access_token }}",
+              "type": "string"
+            },
+            {
+              "id": "ff36ef59-a45e-4bce-90b8-8448777987ea",
+              "name": "published",
+              "value": "={{ $json.body.published }}",
+              "type": "boolean"
+            },
+            {
+              "id": "56e05ee7-8a37-4895-b9ab-448bb5901243",
+              "name": "scheduled_publish_time",
+              "value": "={{ $json.body.scheduled_publish_time }}",
+              "type": "string"
+            },
+            {
+              "id": "d6f27846-135c-4e1d-b0d8-bf2acbd8faaa",
+              "name": "content_type",
+              "value": "={{ $json.body.content_type }}",
+              "type": "string"
+            },
+            {
+              "id": "974a167d-1814-4c2b-898f-42154ae5dc67",
+              "name": "fb_page_id",
+              "value": "={{ $json.body.fb_page_id }}",
+              "type": "string"
+            },
+            {
+              "id": "b7d638e4-42ce-4a4d-a199-1722a3b84ee0",
+              "name": "image_url",
+              "value": "={{ $json.body.image_url }}",
+              "type": "string"
+            },
+            {
+              "id": "d2db7cc3-6540-4af0-a8d6-ee52e6018f65",
+              "name": "video_url",
+              "value": "={{ $json.body.video_url }}",
+              "type": "string"
+            },
+            {
+              "id": "b78708a8-5581-425a-a323-0bda28889398",
+              "name": "language",
+              "value": "={{ $json.body.language }}",
+              "type": "string"
+            },
+            {
+              "id": "f1e5f01e-50ab-4f82-8cbb-6ce83eb11b46",
+              "name": "domain_name",
+              "value": "={{ $json.body.domain_name }}",
+              "type": "string"
+            },
+            {
+              "id": "b475d462-e57d-4fdd-85a0-8ee00b7e8da2",
+              "name": "code",
+              "value": "={{ $json.body.code }}",
+              "type": "string"
+            },
+            {
+              "id": "652226c6-eae6-429a-bea9-671e231f24b0",
+              "name": "article_id",
+              "value": "={{ $json.body.article_id }}",
+              "type": "string"
+            },
+            {
+              "id": "82808718-480a-4794-8b68-1c6ca3bfbe1e",
+              "name": "text",
+              "value": "={{ $json.body.text }}",
+              "type": "string"
+            },
+            {
+              "id": "584ea7fd-4f5c-4cb1-b7ef-aeebd624729f",
+              "name": "content_id",
+              "value": "={{ $json.body.content_id }}",
+              "type": "string"
+            },
+            {
+              "id": "78e33452-021c-45ca-bed0-da169c4f32fd",
+              "name": "video_title",
+              "value": "={{ $json.body.video_title }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1456,
+        224
+      ],
+      "id": "736e973b-c615-44f4-9bb0-6f38eec8f2ee",
+      "name": "Configuration"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "00db86c9-d331-45a6-af8e-5c8cf00994c6"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "28e6d99a-0f44-4529-8e75-2d11034b7a77",
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "article",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "article"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3e1609ee-eea7-433d-8d11-d8818a1df2ae",
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "fff43af6-462c-448c-a229-922761b25ddc",
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "video",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "video"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "e9b64288-0cd3-4baf-8326-f7adbf70e301",
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "internal_article",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "internal_article"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -1248,
+        192
+      ],
+      "id": "e174084d-5a80-439c-bfce-b7191c031409",
+      "name": "Content router"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.domain_name }}/wp-json/synergize/v1/get-single-post",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "=code",
+              "value": "={{ $json.code }}"
+            },
+            {
+              "name": "=id",
+              "value": "={{ $('Configuration').item.json.article_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -768,
+        192
+      ],
+      "id": "b998e077-a2ef-42da-bc0a-6581a470b0c9",
+      "name": "Get post content"
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = {\n  access_token: $('Configuration').first().json.access_token,\n};\n\nif (!$('Configuration').first().json.published) {\n  payload['published'] = false;\n  payload['scheduled_publish_time'] = $('Configuration').first().json.scheduled_publish_time;\n}\n\nif ($('Configuration').first().json.content_type === 'text') {\n  payload['message'] = $('Configuration').first().json.text;\n} else if (['article', 'internal_article'].includes($('Configuration').first().json.content_type)) {\n  payload['link'] = $('Get post content').first().json.link;\n  payload['message'] = $input.first().json.output;\n}\n\nreturn {\n  payload\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        -112
+      ],
+      "id": "416a81df-2251-46ac-9b78-c4f8bdbca3e5",
+      "name": "Feed Payload Formater"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.content }}",
+        "options": {
+          "systemMessage": "=You are an expert Facebook Page content writer.\n\nI will give you a blog post. Your task is to write a short, engaging Facebook caption that feels natural, conversational, and written by a real human. You MUST use {{ $('Configuration').item.json.language }} only. Do not mix languages.\n\nStrict formatting & tone rules:\n- Output plain text only (no markdown, no bold, no italics)\n- Keep the tone friendly, relaxed, and professional\n- Avoid corporate or sales-heavy language\n- Sentences should be short and easy to read\n- Emojis are allowed but limited to a maximum of 3 total\n- Emojis must feel natural and supportive, not decorative\n- Use simple bullet points with hyphens (-) if needed\n- Do not use special symbols, numbered lists, or emoji bullets\n- Avoid overusing technical terms\n- Do not exaggerate or use hype language\n\nContent rules:\n- Start with a scroll-stopping but natural opening line\n- Explain the core idea simply, like talking to a smart friend\n- Keep paragraphs short for mobile readers\n- Bullets should be clean and easy to scan\n- End with a soft Call to Action (invite readers to read, reflect, or share thoughts)\n- Do not mention links, URLs, or where to find the article\n- Hashtags are optional, maximum 3, placed at the end\n- Do not add explanations, notes, or meta commentary\n\nOutput ONLY the final Facebook caption."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -592,
+        64
+      ],
+      "id": "1108e262-9ac2-4c07-bcea-541e76e9e5e4",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "projectId": {
+          "__rl": true,
+          "value": "synergizeflow-480314",
+          "mode": "list",
+          "cachedResultName": "Synergizeflow"
+        },
+        "modelName": "={{ $vars.GEMINI_FLASH_TEXT }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleVertex",
+      "typeVersion": 1,
+      "position": [
+        -592,
+        208
+      ],
+      "id": "97c81362-a5af-4985-b292-2879ba151a6d",
+      "name": "Google Vertex Chat Model",
+      "credentials": {
+        "googleApi": {
+          "id": "C4Bh0vq2T0s7HIDk",
+          "name": "SF - Vertex API Service Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/{{ $vars.FACEBOOK_API_VERSION }}/{{ $('Configuration').item.json.fb_page_id }}/feed",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.payload }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -112,
+        -112
+      ],
+      "id": "911f3813-78d7-4097-a336-e0dab0412fa0",
+      "name": "Publish Content Feed"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SAAS_API }}/api/facebook/published",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.payload }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        624,
+        128
+      ],
+      "id": "5990f591-b178-473a-bb42-caa64b617b71",
+      "name": "Callback publish"
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = {\n  access_token: $('Configuration').first().json.access_token,\n  caption: $('Configuration').first().json.text,\n  url: $('Configuration').first().json.image_url\n};\n\nif (!$('Configuration').first().json.published) {\n  payload['published'] = false;\n  payload['scheduled_publish_time'] = $('Configuration').first().json.scheduled_publish_time;\n}\n\nreturn {\n  payload\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -336,
+        384
+      ],
+      "id": "fbffafa7-4ef7-4963-83a6-4e1bc3ab1b2a",
+      "name": "Image Payload Formater"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/{{ $vars.FACEBOOK_API_VERSION }}/{{ $('Configuration').item.json.fb_page_id }}/photos",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.payload }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -160,
+        384
+      ],
+      "id": "62e57249-71e1-4d70-a984-64d2c8e45f9a",
+      "name": "Publish Content Image"
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = {\n  access_token: $('Configuration').first().json.access_token,\n  title: $('Configuration').first().json.video_title,\n  description: $('Configuration').first().json.text,\n  file_url: $('Configuration').first().json.video_url\n};\n\nif (!$('Configuration').first().json.published) {\n  payload['published'] = false;\n  payload['scheduled_publish_time'] = $('Configuration').first().json.scheduled_publish_time;\n}\n\nreturn {\n  payload\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -336,
+        560
+      ],
+      "id": "b7656743-0c6c-4ca1-a277-709795945b65",
+      "name": "Video Payload Formater"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/{{ $vars.FACEBOOK_API_VERSION }}/{{ $('Configuration').item.json.fb_page_id }}/videos",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.payload }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -160,
+        560
+      ],
+      "id": "b0049746-73b6-487f-a8e9-5118388247a0",
+      "name": "Publish Content Video"
+    },
+    {
+      "parameters": {
+        "jsCode": "const payload = {\n  content_id: $('Configuration').first().json.content_id,\n  social_type: 'facebook'\n};\n\nif (['text', 'article', 'internal_article'].includes($('Configuration').first().json.content_type)) {\n  payload['post_id'] = $input.first().json.id;\n} else if (['image', 'video'].includes($('Configuration').first().json.content_type)) {\n  payload['post_id'] = $input.first().json.post_id;\n}\n\nreturn {\n  payload\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        128
+      ],
+      "id": "86564492-6633-4a4f-952b-a002c169508d",
+      "name": "Content Payload Formater"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f9fc7400-e79e-4ff0-9ab8-8a50c3ce6909",
+              "leftValue": "={{ $('Configuration').item.json.published }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        80,
+        448
+      ],
+      "id": "43693c3f-084c-4dba-9f49-51bc07c331a7",
+      "name": "Is Scheduled"
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        272,
+        464
+      ],
+      "id": "8b26eace-a4ed-4525-9814-54aad0d548f1",
+      "name": "Wait FB Processing File",
+      "webhookId": "b2a60f83-2ebd-4190-a736-e525e20865b9"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v1/social-media/publish-facebook",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1632,
+        224
+      ],
+      "id": "e4aec4ee-510b-4652-b0ee-1874aa2793d5",
+      "name": "Webhook",
+      "webhookId": "b4ef3c26-7a2d-490c-b693-cd4368ac2ec2"
+    }
+  ],
+  "connections": {
+    "Configuration": {
+      "main": [
+        [
+          {
+            "node": "Content router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content router": {
+      "main": [
+        [
+          {
+            "node": "Feed Payload Formater",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get post content",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Image Payload Formater",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Video Payload Formater",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get post content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get post content": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Feed Payload Formater": {
+      "main": [
+        [
+          {
+            "node": "Publish Content Feed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Feed Payload Formater",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Vertex Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish Content Feed": {
+      "main": [
+        [
+          {
+            "node": "Content Payload Formater",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Payload Formater": {
+      "main": [
+        [
+          {
+            "node": "Publish Content Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish Content Image": {
+      "main": [
+        [
+          {
+            "node": "Is Scheduled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Video Payload Formater": {
+      "main": [
+        [
+          {
+            "node": "Publish Content Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish Content Video": {
+      "main": [
+        [
+          {
+            "node": "Is Scheduled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content Payload Formater": {
+      "main": [
+        [
+          {
+            "node": "Callback publish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Scheduled": {
+      "main": [
+        [
+          {
+            "node": "Content Payload Formater",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait FB Processing File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait FB Processing File": {
+      "main": [
+        [
+          {
+            "node": "Content Payload Formater",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "4otmc6jILN7VL0Z9",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "triggerCount": 1,
+  "versionId": "ff5d23b5-2e8e-40f8-a09c-c4fbcc380284",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "zGFLpL21fhsLN1Cs",
+  "isArchived": false
+}

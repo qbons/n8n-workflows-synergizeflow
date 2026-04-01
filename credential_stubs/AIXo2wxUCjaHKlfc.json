@@ -1,0 +1,17 @@
+{
+  "id": "AIXo2wxUCjaHKlfc",
+  "name": "SF - R2 Cloudflare Storage",
+  "type": "s3",
+  "data": {
+    "endpoint": "",
+    "region": "",
+    "accessKeyId": "",
+    "secretAccessKey": ""
+  },
+  "ownedBy": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "isGlobal": false
+}

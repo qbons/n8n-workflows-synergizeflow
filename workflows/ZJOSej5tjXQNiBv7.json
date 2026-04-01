@@ -1,0 +1,37 @@
+{
+  "id": "ZJOSej5tjXQNiBv7",
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "38236170-1524-4a1a-b451-0444c03a6b67",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "fa954db0-96b3-4502-941d-8c5b466f43b3",
+      "name": "Webhook",
+      "webhookId": "38236170-1524-4a1a-b451-0444c03a6b67"
+    }
+  ],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "triggerCount": 0,
+  "versionId": "d3b7cbf0-97d6-4ff0-b928-41c98c856e8b",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "m9SlnlvWccSUBTns",
+  "isArchived": true
+}

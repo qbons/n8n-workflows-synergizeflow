@@ -1,0 +1,386 @@
+{
+  "id": "yjqFebm6lCENMOrK",
+  "name": "SF - Product Agent - Get Buyer Persona v.1",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.body.domain_name }}wp-json/synergize/v1/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "code",
+              "value": "={{ $json.body.license_key }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -464,
+        -96
+      ],
+      "id": "c35ca52e-bc1a-4171-b3c5-496d09b9ed22",
+      "name": "Check if license is valid"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v1/product-campaign/buyer-persona",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -688,
+        -96
+      ],
+      "id": "38c7380d-a9ba-4e2c-b926-b5f726f464a7",
+      "name": "Webhook",
+      "webhookId": "60436ba1-e5e1-4e4a-8545-3a5b4959f6b1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "60458c94-986c-49cd-8b69-4b5616163eb3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f910b52-842c-4b6a-a862-e6914c883764",
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -240,
+        -96
+      ],
+      "id": "6411a0ae-7b8d-4684-bd8e-b2b07cb8aa42",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7987527b-457c-49cf-b315-87d132a61bcc",
+              "name": "status",
+              "value": "fail",
+              "type": "string"
+            },
+            {
+              "id": "4483a92d-bc88-4955-b621-6d9ebbdc8ab8",
+              "name": "msg",
+              "value": "invalid_license",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -16,
+        0
+      ],
+      "id": "3b435b8e-2325-457b-98fb-203df808872e",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').item.json.body.domain_name }}wp-json/synergize/v1/helper-data/",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "code",
+              "value": "={{ $('Webhook').item.json.body.license_key }}"
+            },
+            {
+              "name": "type",
+              "value": "=get_product"
+            },
+            {
+              "name": "product_id",
+              "value": "={{ $('Webhook').item.json.body.product_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -16,
+        -192
+      ],
+      "id": "b6febe23-b932-40ca-8a51-05a2489147d2",
+      "name": "Get Product data"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        272,
+        0
+      ],
+      "id": "5f217f3b-ecaf-499d-ac54-9d90df3e88e9",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_PREVIEW }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Product: {{$json.data.data.toJsonString() }}"
+            },
+            {
+              "content": "=**ROLE**\nYou are an expert Market Segmentation Specialist and Consumer Psychologist. Your goal is to identify broad but distinct market segments for a specific product, focusing on behavioral and lifestyle patterns rather than hyper-specific individual details.\n\n**INPUT DATA**\n\n1. `Product`: A JSON object containing dynamic details about a product (e.g., title, description, specs, price, images, benefits).\n\n**TASK**\n\n1. **Deep Product Analysis:**\n* Analyze the product's features, price point, and value proposition.\n* Determine the \"Price Position\" to infer necessary income and education levels.\n\n\n2. **Generate Buyer Personas:**\n* Create a list of distinct buyer personas based on the analysis.\n* You must generate a **minimum of 5** unique personas.\n* **Focus Requirements:**\n* Do NOT use titles or prefixes like \"The 'Student':\". Start directly with the description.\n* Do not create specific characters (e.g., \"John from Ohio\"). Describe the **segment**.\n\n\n* Each persona description must cover:\n* **Age Range:** (e.g., 25-35)\n* **Gender:** (e.g., Predominantly female, Male-skewing, or Gender-neutral)\n* **Occupation/Job:** (e.g., Mid-level Corporate Management)\n* **Education Level:** (e.g., Undergraduate degree or higher)\n* **Lifestyle & Interests:** (e.g., Urban commuter, values sustainability, interested in tech)\n* **Consumer Habits:** (e.g., Researches extensively before buying, loyal to brands, impulsive buyer for gadgets)\n\n\n\n**CONSTRAINTS**\n\n* Output **only** a valid JSON array of strings.\n* Do NOT use objects (keys/values) inside the array; use only simple strings.\n* The array must contain **at least 5** items.\n* Each string must be a self-contained paragraph describing that specific market segment.\n\n**OUTPUT FORMAT**\n\n```json\n[\n  \"A segment of men aged 25-35 working in tech or finance with a Bachelor's degree or higher. They lead a fast-paced urban lifestyle and value efficiency over decoration. Their consumer habit is utilitarian; they research durability and purchase premium items that promise to save time, making this product ideal for their streamlined daily routine.\",\n  \"A group of women aged 40-55 working in skilled trades or engineering with technical certification. They spend weekends on home improvement projects and value self-sufficiency. As consumers, they are price-conscious but willing to pay for tools that offer long-term reliability and repairability, aligning perfectly with this product's robust build.\",\n  \"Individuals of any gender aged 30-45 working in healthcare or education with a university background. They prioritize organic living and family health, often checking labels for safety. They are frequent buyers of eco-friendly goods and are willing to pay a premium for non-toxic certifications, which this product offers.\",\n  \"...\",\n  \"...\",\n  \"...\",\n  \"...\",\n  \"...\",\n  \"...\",\n  \"...\"\n]\n\n```",
+              "role": "model"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        208,
+        -192
+      ],
+      "id": "cc19b941-14cd-428a-b673-6e1d98d83504",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "14fa0349-9844-49fa-bf3f-3493d2d9b4a5",
+              "name": "result",
+              "value": "={{ $json.content.parts[0].text }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        -192
+      ],
+      "id": "9db1149a-fd21-4ef6-9396-75a0dea55d9c",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        784,
+        -192
+      ],
+      "id": "3314430c-c6f6-4010-8a4d-0b1ee32f8e68",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "website",
+              "value": "={{ $('Webhook').item.json.body.domain_name }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        -464,
+        96
+      ],
+      "id": "7c38304a-28ff-4f8c-bbab-c325b72bb529",
+      "name": "Execution Data"
+    }
+  ],
+  "connections": {
+    "Check if license is valid": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Get Product data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Product data": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "4otmc6jILN7VL0Z9",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "triggerCount": 1,
+  "versionId": "043c5287-ddd4-4b41-9214-a2989910b2db",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "bZylUfi54l9T1o4U",
+  "isArchived": false
+}

@@ -1,0 +1,1318 @@
+{
+  "id": "4jBkqYap25WUAs9u",
+  "name": "SF - Product Page Builder Magento",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "6f6a153f-40d0-4b22-a252-c76b2e46f398",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -6560,
+        368
+      ],
+      "id": "615072c2-aab6-46ba-a519-41215c67fb93",
+      "name": "Webhook",
+      "webhookId": "6f6a153f-40d0-4b22-a252-c76b2e46f398"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7a5f7d9a-28cc-49e8-a1d2-e3e25ed8cd75",
+              "name": "website",
+              "value": "={{ $json.body.domain_name }}",
+              "type": "string"
+            },
+            {
+              "id": "8df36920-3df2-4c4e-bc18-4c85cf59b60e",
+              "name": "code",
+              "value": "={{ $json.body.license_key }}",
+              "type": "string"
+            },
+            {
+              "id": "23781822-bb76-47cc-82eb-1df84caa300a",
+              "name": "sku",
+              "value": "={{ $json.body.sku }}",
+              "type": "string"
+            },
+            {
+              "id": "9f814e51-b19a-459b-96cc-e236d3167b9b",
+              "name": "store_id",
+              "value": "={{ $json.body.store_id }}",
+              "type": "string"
+            },
+            {
+              "id": "d43c1fb0-4bbd-4725-8bce-e2d5964cb163",
+              "name": "acces_token",
+              "value": "={{ $json.body.token }}",
+              "type": "string"
+            },
+            {
+              "id": "e9f37114-e3e8-4e34-ac01-c5c7779c9918",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -6336,
+        368
+      ],
+      "id": "817d89c9-4342-47c1-8ea6-ad94fb43e224",
+      "name": "Prepare data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.website }}/rest/V1/synergize/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "code",
+              "value": "={{ $json.code }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -6112,
+        368
+      ],
+      "id": "86ffc48b-8b37-4709-ac50-dc2dd5cae306",
+      "name": "Check if license is valid"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "60458c94-986c-49cd-8b69-4b5616163eb3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f910b52-842c-4b6a-a862-e6914c883764",
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -5888,
+        368
+      ],
+      "id": "4280ebc1-8654-41ed-9458-b4895bfddf2a",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -5440,
+        464
+      ],
+      "id": "b4f5c14d-65a0-42d8-abfc-0180f049a5e9",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "42309d5f-a011-44ea-b2ec-66ced157a5d0",
+              "name": "status",
+              "value": "fail",
+              "type": "string"
+            },
+            {
+              "id": "14198afc-aa4e-433e-942a-ae418e817293",
+              "name": "msg",
+              "value": "invalid_license",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -5664,
+        464
+      ],
+      "id": "b161b3da-c3b8-4db4-9c5e-2e3c97491440",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Prepare data').item.json.website }}/rest/V1/synergize/oauth-bearer-status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5664,
+        272
+      ],
+      "id": "d70f29dc-ab73-46da-ae9c-be1b9e71f965",
+      "name": "check accesstoken config"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.oauth_bearer_enabled }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "id": "3f6f2bf7-a367-4e2e-9e36-b973c3555641"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "9ba386ac-a395-40d2-a7c7-3a15a2827f47",
+                    "leftValue": "={{ $json.oauth_bearer_enabled }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "false",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -5440,
+        272
+      ],
+      "id": "5ce0bd9a-1622-4e91-9736-d5f0550278d2",
+      "name": "Switch2"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -5216,
+        368
+      ],
+      "id": "0ed52e1e-f1cb-48f5-9715-2559545e81dd",
+      "name": "Respond to Webhook3"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Prepare data').item.json.website }}/rest/V1/synergize/product/{{ $('Prepare data').item.json.sku }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -5216,
+        176
+      ],
+      "id": "861b0241-48a7-4a54-a680-d0abd0e21b72",
+      "name": "Get sku data",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6611bbbd-5e6f-45ff-8b5a-567fa1f8b83f",
+              "name": "status",
+              "value": "fail",
+              "type": "string"
+            },
+            {
+              "id": "5bb7f1de-b7c3-4d8f-ac85-6054d0aaa54c",
+              "name": "msg",
+              "value": "={{ $json.message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -4992,
+        272
+      ],
+      "id": "6155260d-1161-41fe-9c9d-e228d6fcf5aa",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        -4768,
+        272
+      ],
+      "id": "aa9193f4-4670-47eb-b785-ebf82a457e6a",
+      "name": "Respond to Webhook2"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.image_urls[0] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -4768,
+        80
+      ],
+      "id": "f14a62bb-32de-41dd-833f-4cd660f4c622",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-pro",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-pro"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $('populate-productData-json-new').item.json.toJsonString() }}"
+            },
+            {
+              "content": "=**Role**\nExpert E-commerce Copywriter, SEO Specialist, and Magento Developer.\n\n**Task**\nGenerate a single, valid JSON object containing product metadata and a high-conversion, long-form HTML deep-dive. Use Gemini Search Tools to enrich the context, but the core product facts must remain immutable.\n\n**Input Data Analysis:**\n\n1. **`productData`:** This is your **Absolute Source of Truth**. You may explain scientific concepts found here (e.g., \"what is niacinamide\"), but you must NEVER alter specific product claims, dimensions, ingredients, or specs.\n2. **`languageCode`:** You will receive a language code in ISO 639-1 format (e.g., \"en\", \"es\", \"fr\", \"id\"). This dictates the exact language you must use for the entire output. If there is no language code, use product description language.\n3. **`magentoWidgetLiteral`:** This is the Magento widget code that must be appended to the end of the `content_html` value. It is a string literal that must be inserted verbatim.\n\n# HTML Content Requirements (for the \"content_html\" value)\nWrap everything in: `<div class=\"max-w-5xl mx-auto px-6 py-10 font-sans text-gray-900 antialiased bg-white\">`\n\n## 1. Visual Layout & Fixed Image Constraints\n- **Images:** Any image included MUST use these exact attributes, but you must replace `GEN_URL` with the actual image URL found in `productData`: \n  `<img src=\"GEN_URL\" style=\"width: 500px;\" class=\"h-auto object-cover rounded-2xl shadow-lg mb-10 mx-auto block\" alt=\"Lifestyle image\">`\n  (The fixed width must be controlled by `style=\"width: 500px;\"`, not a Tailwind class).\n- **Headings (h2):** `class=\"text-3xl font-extrabold text-indigo-900 mt-12 mb-6 border-b pb-2\"`.\n- **Paragraphs (p):** `class=\"text-lg leading-8 text-gray-700 mb-6\"`.\n- **Intro Section:** 100-150 words inside `<section class=\"mb-12 bg-indigo-50 p-8 rounded-2xl italic text-indigo-800 text-xl text-center\">`.\n\n## 2. Content\n- **Main Body:** 4-5 Chapters.\n- **Chapter Length:** 225-300 words per chapter.\n- **Focus:** Technical \"Why\" behind features (materials, ergonomics, durability).\n- **Citation Ban:** ABSOLUTELY NO CITATIONS. Speak as the primary authority.\n\n## 3. Mandatory Footer Widget\nAppend this exact literal string at the very end of the `content_html` (inside the final div): `{{ $('widget_literal').item.json.magento_widget_literal }}`\n\n\n# Identifier Logic\n- Create a unique, SEO-friendly slug (e.g., `performance-review-product-name-sku`).\n\n# Title & Meta Title\n- **Title:** Base the title on the `identifier` you generated, but format it as normal, readable text. Replace all hyphens with spaces and use Title Case (e.g., if the identifier is `performance-review-product-name-sku`, the title must be `Performance Review Product Name Sku`).\n- **Meta Title:** Create a highly clickable, SEO-optimized meta title based on the main Title. Keep it between 50-60 characters to ensure it displays perfectly on search engines.\n\n### **Execution Protocol**\n\n1. **Analyze** the input JSON.\n2. **Search** for SEO keywords and background.\n3. **Draft** the HTML content, strictly monitoring word counts and capitalization rules.\n4. **Insert Visuals** (Images from data and Diagrams from logic) naturally into the text.\n5. **Escape HTML:** You MUST properly escape all double quotes within the `content_html` string (e.g., `class=\\\"text-3xl...\\\"`) so the final JSON remains valid.\n6. **Validate** that no citations exist and facts match `productData`.\n7. **SILENTLY FORMAT** the output. **CRITICAL:** Do not output any \"Thought\" blocks, internal monologues, or conversational fillers.\n\n### **Final Output Format**\n\nYour response must be a **SINGLE RAW JSON OBJECT**.\n\n* **Do not** wrap the output in markdown code blocks (e.g., no ```json at the beginning and no ``` at the end).\n* **Do not** include any text before or after the JSON.\n* **Do not** include \"thought\" or \"reasoning\" keys in the JSON.\n\n```json\n{\n  \"identifier\": \"create-unique-url-slug\",\n  \"title\": \"Create Unique Url Slug\",\n  \"meta_title\": \"SEO Optimized Meta Title Here (50-60 chars)\",\n  \"content_html\": \"INSERT_ESCAPED_HTML_HERE\",\n  \"meta_keywords\": \"comma, separated, keywords\",\n  \"meta_description\": \"150-160 character high-CTR summary\"\n}\n```",
+              "role": "model"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1056,
+        80
+      ],
+      "id": "2335a2aa-7ea1-41a0-87e3-621d19e03f8a",
+      "name": "Message a model",
+      "retryOnFail": true,
+      "waitBetweenTries": 3000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.item.json;\n\n// 1. Clean up the HTML description (optional but recommended for AI prompts)\n// This removes <p> and <ul> tags to keep the prompt concise\nconst cleanDescription = item.description.replace(/<[^>]*>?/gm, '');\n\n// 2. Format the Arrays as bullet points or comma-separated strings\nconst categories = item.category_names ? item.category_names.join(', ') : 'N/A';\nconst images = item.image_urls ? item.image_urls.map(url => `- ${url}`).join('\\n') : 'No images available';\n\n// 3. Construct the Markdown String\nconst markdown = `\n### Product Details: ${item.name}\n---\n- **SKU:** ${item.sku}\n- **Categories:** ${categories}\n- **Description:** ${cleanDescription.trim()}\n\n**Product Images:**\n${images}\n`.trim();\n\n// 4. Return the markdown as a new property\nreturn {\n  ...item,\n  ai_prompt_markdown: markdown\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -4992,
+        80
+      ],
+      "id": "ac211aae-f556-4d55-8243-29145ef74247",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare data').item.json.website }}/rest/all/V1/cmsPage/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare data').item.json.acces_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"page\": {\n    \"identifier\": \"{{ $('clean string').item.json.identifier }}\",\n    \"title\": \"{{ $('clean string').item.json.title }}\",\n    \"content\": {{ $json.content_html }},\n    \"active\": true,\n    \"page_layout\": \"1column\",\n    \"meta_title\": {{ $json.meta_title }},\n    \"meta_description\": {{ $json.meta_desc }},\n    \"meta_keywords\": \"{{ $('clean string').item.json.meta_keywords }}\"\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -32,
+        16
+      ],
+      "id": "e33a65d0-b04b-488f-84d9-10232469459d",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b20ad857-3b5d-48f0-bfc9-fc8d7c9cc974",
+              "name": "content_html",
+              "value": "={{ JSON.stringify($json.content_html) }}",
+              "type": "string"
+            },
+            {
+              "id": "efef032b-7489-4773-8b74-6e6788685ec9",
+              "name": "meta_desc",
+              "value": "={{ JSON.stringify($json.meta_description) }}",
+              "type": "string"
+            },
+            {
+              "id": "17c933da-7dd4-43c0-b9d2-ba7ce4339222",
+              "name": "meta_title",
+              "value": "={{ JSON.stringify($json.meta_title) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -256,
+        16
+      ],
+      "id": "55a1a869-9ca2-4fa4-8f35-4c65e26cabd6",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', ``, 'string') }}",
+        "model": "={{ $vars.GEMINI_PRO_PREVIEW }}",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Items_per_Batch', ``, 'number') }}",
+              "batchInterval": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Batch_Interval__ms_', ``, 'number') }}"
+            }
+          },
+          "returnFullResponse": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_Full_Response', ``, 'boolean') }}"
+        }
+      },
+      "type": "n8n-nodes-gemini-search.geminiSearchToolTool",
+      "typeVersion": 1,
+      "position": [
+        -976,
+        304
+      ],
+      "id": "39f9e3bf-24ba-4bc7-8174-9b86ea54bc0b",
+      "name": "Gemini Search Tool",
+      "credentials": {
+        "geminiSearchApi": {
+          "id": "HzOj98juqUxHGjsa",
+          "name": "SF - Gemini Search Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Access the raw description string from your specific node\nconst rawData = $('Get sku data').first().json.description;\n\n// 1. Remove HTML tags (anything between < and >)\n// 2. Replace common HTML entities like &nbsp; and \\n\n// 3. Collapse multiple spaces into one and trim\nconst cleanDescription = rawData\n  .replace(/<[^>]*>/g, ' ') \n  .replace(/&nbsp;/g, ' ')\n  .replace(/\\\\n/g, ' ')\n  .replace(/\\s+/g, ' ')\n  .trim();\n\n// Return only the cleaned string\nreturn {\n  cleanDescription: cleanDescription\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -4320,
+        80
+      ],
+      "id": "ab701c5f-c41f-4f7f-8c63-374fc1af4d1b",
+      "name": "clean_desc"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nlet imageUrls = $('Get sku data').first().json.image_urls;\n\nreturn [\n  {\n    imgs:imageUrls,\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -4096,
+        80
+      ],
+      "id": "a7a918a5-b4e4-44d9-9938-10c1d7ec45c1",
+      "name": "getImgUrls"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "QNwNRxW0K3Hze0eK",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/QNwNRxW0K3Hze0eK",
+          "cachedResultName": "SynergizeFlow — SF - Product Agent - Get Image Description v.1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -3872,
+        80
+      ],
+      "id": "9e226fec-cbc3-48a7-82b6-5cc7c6546972",
+      "name": "Product Agent - Get Image Description"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.item.json;\n\n// Create the Magento widget string safely\n// We use a template literal to inject the SKU into the widget string\nconst magentoWidget = `{{widget type=\"Magento\\\\CatalogWidget\\\\Block\\\\Product\\\\ProductsList\" show_pager=\"0\" products_count=\"1\" template=\"Magento_CatalogWidget::product/widget/content/grid.phtml\" conditions_encoded=\"^[\\`1\\`:^[\\`type\\`:\\`Magento||CatalogWidget||Model||Rule||Condition||Combine\\`,\\`aggregator\\`:\\`all\\`,\\`value\\`:\\`1\\`,\\`new_child\\`:\\`\\`^],\\`1--1\\`:^[\\`type\\`:\\`Magento||CatalogWidget||Model||Rule||Condition||Product\\`,\\`attribute\\`:\\`sku\\`,\\`operator\\`:\\`==\\`,\\`value\\`:\\`${item.sku}\\`^]^]\"}}`;\n\nreturn {\n  ...item,\n  magento_widget_literal: magentoWidget\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -4544,
+        80
+      ],
+      "id": "d8cd2d2e-efdf-409b-b4ed-dd39e642184b",
+      "name": "widget_literal"
+    },
+    {
+      "parameters": {
+        "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', ``, 'string') }}",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Items_per_Batch', ``, 'number') }}",
+              "batchInterval": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Batch_Interval__ms_', ``, 'number') }}"
+            }
+          },
+          "returnFullResponse": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_Full_Response', ``, 'boolean') }}"
+        }
+      },
+      "type": "n8n-nodes-gemini-search.geminiSearchToolTool",
+      "typeVersion": 1,
+      "position": [
+        -2896,
+        304
+      ],
+      "id": "f03b0dfb-4535-4e1f-a26f-fe24096482e5",
+      "name": "Gemini Search Tool1",
+      "credentials": {
+        "geminiSearchApi": {
+          "id": "HzOj98juqUxHGjsa",
+          "name": "SF - Gemini Search Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_PREVIEW }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $('populate-productData-json').item.json.toJsonString() }}"
+            },
+            {
+              "content": "**Role**\nExpert AI Image Prompt Engineer and E-commerce Specialist.\n\n**Task**\nAnalyze the provided product data to generate a highly detailed prompt for an external image generator, and map the existing product images into a strict JSON structure. \n\n**Input Data Analysis:**\n- **`productData`:** Your primary source of truth. Pay special attention to `productData.images` for descriptions, URLs, and physical attributes.\n\n## 1. Image Prompting\n* Create a prompt for an external image generator that visualizes the content theme.\n* **Integration Requirement:** You **MUST** incorporate visual attributes found in `productData.images` (e.g., \"red packaging,\" \"sleek bottle,\" \"creamy texture\") directly into the prompt text. The prompt should explicitly describe the product based on this data to ensure the generated image resembles the actual product.\n\n### **Execution Protocol**\n1. **Analyze** the `productData.images` array for physical attributes, colors, textures, and existing descriptions.\n2. **Draft** a detailed, ultra-realistic prompt that blends the product's physical reality with a high-end e-commerce lifestyle setting.\n3. **Map** the source images into the `relevantImg` array exactly as provided in the input.\n4. **SILENTLY FORMAT** the output. **CRITICAL:** Do not output any \"Thought\" blocks, internal monologues, or conversational fillers.\n\n### **Final Output Format**\n\nYour response must be a **SINGLE RAW JSON OBJECT**.\n\n* **CRITICAL:** The very first character of your response MUST be the opening curly brace `{`. Do not include any leading spaces or newlines (`\\n`).\n* **Do not** wrap the output in markdown code blocks (e.g., no ```json at the beginning and no ``` at the end).\n* **Do not** include any text before or after the JSON.\n* **Do not** include \"thought\" or \"reasoning\" keys in the JSON.\n\n{\n  \"image\": {\n    \"prompt\": \"Detailed ultrarealistic prompt description... featuring [insert visual details from productData.images here]...\",\n    \"relevantImg\": [\n      {\n        \"desc\": \"Copy description from source 1\",\n        \"url\": \"Copy url from source 1\"\n      }\n    ]\n  }\n}",
+              "role": "model"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -2976,
+        80
+      ],
+      "id": "615226be-a61b-48b1-9079-85011bf60e96",
+      "name": "prompt generation",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Capture the input safely. \n// We join all 'parts' into a single string in case the AI split a leading '\\n' into parts[0]\nconst partsArray = $input.first().json.content.parts || [];\nconst rawData = partsArray.map(p => p.text).join('');\n\nif (!rawData) {\n    throw new Error(\"Could not find the AI output. Check if the field name is correct.\");\n}\n\n// 2. Clean the string\n// This removes markdown backticks and hidden whitespace that often breaks JSON.parse\nconst cleanedString = rawData\n    .replace(/```json/g, '')\n    .replace(/```/g, '')\n    .trim();\n\ntry {\n    // 3. Parse the string into a real object\n    const parsed = JSON.parse(cleanedString);\n    \n    // Return the object so n8n creates separate columns/fields\n    // Note: n8n usually expects an array of items, so we wrap it in [{ json: ... }]\n    return [{ json: parsed }];\n    \n} catch (error) {\n    // If it still fails, return the error and the cleaned string so you can see why\n    return [{\n        json: {\n            error: \"JSON Parse Failed\",\n            message: error.message,\n            debug_string: cleanedString\n        }\n    }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2624,
+        80
+      ],
+      "id": "e111a8d5-83ac-453b-a3b9-bfb193e8f963",
+      "name": "img prompt"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare data').item.json.website }}/rest/V1/synergize/upload-image",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare data').item.json.acces_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "base64Image",
+              "value": "=data:image/{{ $json.candidates[0].content.parts[0].inlineData.mimeType == 'image/jpeg' ? 'jpeg' : 'png' }};base64,{{ $json.candidates[0].content.parts[0].inlineData.data }}"
+            },
+            {
+              "name": "=name",
+              "value": "={{ $('Get sku data').item.json.name.replace(/\\s+/g, '-') }}.{{ $json.candidates[0].content.parts[0].inlineData.mimeType == 'image/jpeg' ? 'jpeg' : 'png' }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1952,
+        80
+      ],
+      "id": "6d288ddc-b16f-475d-a585-cfe2a1d26aa5",
+      "name": "upload image"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nlet imgs = $('Product Agent - Get Image Description').first().json.images;\n\nreturn {\n  productData: {\n    title: $('Get sku data').first().json.name,\n    link: $('Get sku data').first().json.product_url,\n    content: $('clean_desc').first().json.cleanDescription,\n    images: imgs\n  }\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3648,
+        80
+      ],
+      "id": "cce3a96a-b3e2-467d-82cf-e8ef9c66996a",
+      "name": "populate-productData-json"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(item => {\n  // 1. Get the images array from the input (default to an empty array if missing)\n  const sourceImages = $input.first().json.productData.images || [];\n\n  // 2. Map the source images to the new relevantImg structure\n  const relevantImg = sourceImages.map(img => ({\n    desc: img.desc || \"\",\n    url: img.url || \"\"\n  }));\n\n  // 3. Return the nested image.relevantImg object inside the n8n 'json' wrapper\n  return {\n    json: {\n      image: {\n        relevantImg: relevantImg\n      }\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3424,
+        80
+      ],
+      "id": "cd32b9eb-9e77-4785-b457-552f34e0545b",
+      "name": "relevantimg"
+    },
+    {
+      "parameters": {
+        "jsCode": "const prompt = $input.first().json.image.prompt;\n\n// Prepare the parts array with the text prompt first\nconst parts = [\n  { text: prompt }\n];\n\n// Loop through all incoming items and extract images\n// Note: If all images are in one item as different binary keys, adjust the loop.\n// This assumes multiple items (e.g., 3 separate image items).\n\nfor (const item of $('SF - Product  Agent - URL to Base64').first().json.image ) {\n\n  parts.push({\n      inlineData: {\n        mimeType: item.mime,\n        data: item.image // n8n already provides this as base64\n      }\n    });\n\n}\n\n// Return the structure ready for the API\nreturn {\n  json: {\n    payload: {\n      contents: [\n        {\n          parts: parts\n        }\n      ],\n      generationConfig: {\n          responseModalities: [\"image\"],\n          imageConfig:{\n               aspectRatio: \"16:9\",\n            \"imageSize\": \"1K\"\n          }\n      }\n    }\n  }\n};\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2400,
+        80
+      ],
+      "id": "f0acce29-da73-4cec-b83d-f6c568819dbe",
+      "name": "payloadgenerateimage"
+    },
+    {
+      "parameters": {
+        "jsCode": "\n\n\n  const relevantImg = [];\n\n  relevantImg.push({\n    imgs: $input.first().json.url\n  });\n\n  // 3. Return the nested image.relevantImg object inside the n8n 'json' wrapper\n  return {\n    json: {\n        imgs: relevantImg\n    }\n  };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1728,
+        80
+      ],
+      "id": "a4ad08eb-f090-421c-8dd8-c0ceb63f537d",
+      "name": "relevantImg2"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Grab the new images array from your incoming n8n data\n// (Default to an empty array if it doesn't exist so the code doesn't break)\nconst newImages = $input.first().json.images || [];\n\n// 2. Build your productData and merge the arrays\nconst productData = {\n  title: $input.first().json.name,\n  link: $('populate-productData-json').first().json.productData.link,\n  content: $('clean_desc').first().json.cleanDescription,\n  // Use the spread operator (...) to combine both arrays into one!\n  images: [...$('populate-productData-json').first().json.productData.images, ...newImages] \n};\n\n\n\n// 3. Return the final structure\nreturn {\n  json: {\n    productData: productData\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1280,
+        80
+      ],
+      "id": "ec496c79-3dfc-4a85-bf51-891f8b60703b",
+      "name": "populate-productData-json-new"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Capture the input safely. \n// We check 'text', then 'output', then 'message' in case the AI node changed the key name.\n\nconst rawData = $input.first().json.content.parts[0].text;\n\nif (!rawData) {\n    throw new Error(\"Could not find the AI output. Check if the field name is 'text'.\");\n}\n\n// 2. Clean the string\n// This removes markdown backticks and hidden whitespace that often breaks JSON.parse\nconst cleanedString = rawData\n    .replace(/```json/g, '')\n    .replace(/```/g, '')\n    .trim();\n\ntry {\n    // 3. Parse the string into a real object\n    const parsed = JSON.parse(cleanedString);\n    \n    // Return the object so n8n creates separate columns/fields\n    return parsed;\n} catch (error) {\n    // If it still fails, return the error and the cleaned string so you can see why\n    return {\n        error: \"JSON Parse Failed\",\n        message: error.message,\n        debug_string: cleanedString\n    };\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -704,
+        80
+      ],
+      "id": "b9db1898-48fa-46bb-904d-9a0e54fabe75",
+      "name": "clean string"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $vars.GEMINI_PRO_IMAGE }}:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.payload }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -2176,
+        80
+      ],
+      "id": "d634f020-5c5a-4504-ba07-17c3f18f9755",
+      "name": "generate image",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "SFhjYsXsyVcRhxXr",
+          "name": "SF - KIE AI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "MPo4L7rGGjv7QVKi",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/MPo4L7rGGjv7QVKi",
+          "cachedResultName": "SynergizeFlow — SF - Product  Agent - URL to Base64 v.1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -3200,
+        80
+      ],
+      "id": "a766f3b6-ceba-4c4f-bc30-0e91fafda21a",
+      "name": "SF - Product  Agent - URL to Base64"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7ff595f1-99fc-4259-8132-f43110ea6fae",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -496,
+        80
+      ],
+      "id": "0f14687d-b154-4365-908d-6d850a1acbcc",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "amount": 3
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -272,
+        208
+      ],
+      "id": "ae290d44-cee0-4a5c-924b-d511b495c99e",
+      "name": "Wait",
+      "webhookId": "a8c1f216-f5e7-4d2b-8198-0deaec68d527"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "QNwNRxW0K3Hze0eK",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/QNwNRxW0K3Hze0eK",
+          "cachedResultName": "SynergizeFlow — SF - Product Agent - Get Image Description v.1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -1504,
+        80
+      ],
+      "id": "c142be15-fc92-43b3-873b-b33d6e9734a5",
+      "name": "Call 'SF - Product Agent - Get Image Description v.1'"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Prepare data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare data": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if license is valid": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "check accesstoken config",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check accesstoken config": {
+      "main": [
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch2": {
+      "main": [
+        [
+          {
+            "node": "Get sku data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get sku data": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "widget_literal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "clean string",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Search Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Message a model",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "clean_desc": {
+      "main": [
+        [
+          {
+            "node": "getImgUrls",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "getImgUrls": {
+      "main": [
+        [
+          {
+            "node": "Product Agent - Get Image Description",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Product Agent - Get Image Description": {
+      "main": [
+        [
+          {
+            "node": "populate-productData-json",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "widget_literal": {
+      "main": [
+        [
+          {
+            "node": "clean_desc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Search Tool1": {
+      "ai_tool": [
+        [
+          {
+            "node": "prompt generation",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prompt generation": {
+      "main": [
+        [
+          {
+            "node": "img prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "img prompt": {
+      "main": [
+        [
+          {
+            "node": "payloadgenerateimage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "upload image": {
+      "main": [
+        [
+          {
+            "node": "relevantImg2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "populate-productData-json": {
+      "main": [
+        [
+          {
+            "node": "relevantimg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "relevantimg": {
+      "main": [
+        [
+          {
+            "node": "SF - Product  Agent - URL to Base64",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "payloadgenerateimage": {
+      "main": [
+        [
+          {
+            "node": "generate image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "relevantImg2": {
+      "main": [
+        [
+          {
+            "node": "Call 'SF - Product Agent - Get Image Description v.1'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "populate-productData-json-new": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "clean string": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "generate image": {
+      "main": [
+        [
+          {
+            "node": "upload image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SF - Product  Agent - URL to Base64": {
+      "main": [
+        [
+          {
+            "node": "prompt generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'SF - Product Agent - Get Image Description v.1'": {
+      "main": [
+        [
+          {
+            "node": "populate-productData-json-new",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "triggerCount": 0,
+  "versionId": "37930231-15ef-42a1-b0d6-309f92b273f4",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "G6aKnDBpsyCVjLdc",
+  "isArchived": false
+}

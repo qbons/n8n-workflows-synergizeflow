@@ -1,0 +1,250 @@
+{
+  "id": "pqyyWQY7rNHJcpVl",
+  "name": "SF - Keyword Suggestion v1",
+  "nodes": [
+    {
+      "parameters": {
+        "fieldToSplitOut": "toplevel.CompleteSuggestion",
+        "options": {}
+      },
+      "id": "04456cb2-ebf6-437e-b48a-c359688b3101",
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "position": [
+        624,
+        -16
+      ],
+      "typeVersion": 1,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "Keywords",
+              "renameField": true,
+              "outputFieldName": "suggestions"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5100303d-c0eb-4e98-ab1b-9c574c5f0eb6",
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "position": [
+        1072,
+        -16
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "url": "=https://google.com/complete/search?output=toolbar&gl={{ $json.location }}&q={{ $json.query }}",
+        "options": {}
+      },
+      "id": "674a6cfb-618f-443c-81f9-6a89cc636ce0",
+      "name": "Autogenerate Keywords",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        176,
+        -16
+      ],
+      "typeVersion": 4.1
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "5d947e85-beb4-4eef-b435-460e064c6918",
+      "name": "Format Keywords",
+      "type": "n8n-nodes-base.xml",
+      "position": [
+        400,
+        -16
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fb95058f-0c20-4249-8a45-7b935fde1874",
+              "name": "Keywords",
+              "type": "array",
+              "value": "={{ $json.suggestion.data }}"
+            }
+          ]
+        },
+        "options": {
+          "ignoreConversionErrors": true
+        }
+      },
+      "id": "5700f7bb-aa3b-4ecf-9dc8-9fc4e4f72691",
+      "name": "Clean Keywords",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        848,
+        -16
+      ],
+      "typeVersion": 3.3
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0bc17961-d8e6-4c52-9066-bd9aaa60e6ef",
+              "name": "query",
+              "value": "={{ $json.body.keyword }}",
+              "type": "string"
+            },
+            {
+              "id": "6e4dbc05-f447-40d9-916b-58d184f916f5",
+              "name": "location",
+              "value": "={{ $json.body.location }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -48,
+        -16
+      ],
+      "id": "a5948722-38bf-444c-a1a7-363696266c62",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v1/blog/expand-keyword",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -272,
+        -16
+      ],
+      "id": "38176c90-0d14-4d89-bcd4-61306742371a",
+      "name": "Webhook",
+      "webhookId": "92521421-391a-48ca-be39-384bf1e14c45"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1296,
+        -16
+      ],
+      "id": "bb397d2b-9535-4b6c-b9c6-5048eb8dab47",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Clean Keywords",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Autogenerate Keywords": {
+      "main": [
+        [
+          {
+            "node": "Format Keywords",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Keywords": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean Keywords": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Autogenerate Keywords",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "4otmc6jILN7VL0Z9",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "triggerCount": 1,
+  "versionId": "95899d9f-ba73-4d82-9cd3-02b85e10e596",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "m9SlnlvWccSUBTns",
+  "isArchived": false
+}
