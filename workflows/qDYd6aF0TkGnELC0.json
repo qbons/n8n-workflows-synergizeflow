@@ -273,6 +273,9 @@
       ],
       "id": "87ecb18a-86c4-4a28-835e-7ec9b724ca61",
       "name": "Message a model",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
       "credentials": {
         "googlePalmApi": {
           "id": "aLrGZCRV8oKLBNjE",
@@ -643,7 +646,7 @@
     "callerPolicy": "workflowsFromSameOwner"
   },
   "triggerCount": 1,
-  "versionId": "37f2acff-0611-41de-a50c-abb024334c49",
+  "versionId": "e1aa8243-e69a-4869-aec7-1067c0d1c746",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

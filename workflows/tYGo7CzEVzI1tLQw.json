@@ -502,6 +502,18 @@
           "name": "SF - Vertex API Service Account"
         }
       }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1168,
+        -352
+      ],
+      "id": "c9c1eddb-a2fd-448d-af37-0c795ac8c71f",
+      "name": "wait endpoint ready",
+      "webhookId": "59c68b81-5067-44a5-8f69-2e3ee8c1f46e"
     }
   ],
   "connections": {
@@ -654,7 +666,7 @@
       "main": [
         [
           {
-            "node": "Create container",
+            "node": "wait endpoint ready",
             "type": "main",
             "index": 0
           }
@@ -711,6 +723,17 @@
           }
         ]
       ]
+    },
+    "wait endpoint ready": {
+      "main": [
+        [
+          {
+            "node": "Create container",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -723,7 +746,7 @@
     "saveDataSuccessExecution": "all"
   },
   "triggerCount": 1,
-  "versionId": "a141b773-f0c3-428f-9575-bf1e6ec54a3f",
+  "versionId": "5836abff-1e71-481f-a927-5c4263f05b55",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

@@ -49,6 +49,30 @@
               "name": "content_id",
               "value": "={{ $json.body.content_id }}",
               "type": "string"
+            },
+            {
+              "id": "b68c7357-dfd3-460a-80d9-033cd86d960d",
+              "name": "privacy_level",
+              "value": "={{ $json.body.privacy_level ?? 'SELF_ONLY' }}",
+              "type": "string"
+            },
+            {
+              "id": "07ff4efb-0e28-4b08-8886-fb0ceaf251f4",
+              "name": "=disable_duet",
+              "value": "={{ $json.body.disable_duet ?? false }}",
+              "type": "boolean"
+            },
+            {
+              "id": "55213b7f-78aa-4cff-adf8-43405a3b6554",
+              "name": "disable_comment",
+              "value": "={{ $json.body.disable_comment ?? false }}",
+              "type": "boolean"
+            },
+            {
+              "id": "25e39932-824b-458e-82b8-1bccfd1a2309",
+              "name": "=disable_stitch",
+              "value": "={{ $json.body.disable_stich ?? false }}",
+              "type": "boolean"
             }
           ]
         },
@@ -78,7 +102,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"post_info\": {\n    \"title\": {{ JSON.stringify($('Edit Fields').item.json.title) }},\n    \"privacy_level\": \"SELF_ONLY\",\n    \"disable_duet\": false,\n    \"disable_comment\": false,\n    \"disable_stitch\": false,\n    \"video_cover_timestamp_ms\": 1000\n  },\n  \"source_info\": {\n    \"source\": \"{{ $json.tiktokInitPayload.source_info.source }}\",\n    \"video_size\": {{ $json.tiktokInitPayload.source_info.video_size }},\n    \"chunk_size\": {{ $json.tiktokInitPayload.source_info.chunk_size }},\n    \"total_chunk_count\": {{ $json.tiktokInitPayload.source_info.total_chunk_count }}\n  }\n}",
+        "jsonBody": "={\n  \"post_info\": {\n    \"title\": {{ JSON.stringify($('Edit Fields').item.json.title) }},\n    \"privacy_level\": {{ JSON.stringify($('Edit Fields').item.json.privacy_level) }},\n    \"disable_duet\": {{ $('Edit Fields').item.json.disable_duet }},\n    \"disable_comment\": {{ $('Edit Fields').item.json.disable_comment }},\n    \"disable_stitch\": {{ $('Edit Fields').item.json.disable_stitch }},\n    \"video_cover_timestamp_ms\": 1000\n  },\n  \"source_info\": {\n    \"source\": \"{{ $json.tiktokInitPayload.source_info.source }}\",\n    \"video_size\": {{ $json.tiktokInitPayload.source_info.video_size }},\n    \"chunk_size\": {{ $json.tiktokInitPayload.source_info.chunk_size }},\n    \"total_chunk_count\": {{ $json.tiktokInitPayload.source_info.total_chunk_count }}\n  }\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -260,7 +284,7 @@
     "callerPolicy": "workflowsFromSameOwner"
   },
   "triggerCount": 1,
-  "versionId": "41ea6fbc-c5f1-4e06-956a-670c360c6c46",
+  "versionId": "abc76112-e27e-47e7-8e2a-8e57f6649f09",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",
