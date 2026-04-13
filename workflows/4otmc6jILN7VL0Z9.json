@@ -11,7 +11,7 @@
           "mode": "list",
           "cachedResultName": "sf-error-monitoring"
         },
-        "text": "=*Environtment:* n8n Development\n*Workflow:* {{ $json.workflow }}\n*Execution:* {{ $json.execution_url }}\n*Node:* {{ $json.node }}\n*Time:* {{ $json.timestamp.toDateTime('ms') }}\n*Message:* {{ $json.error_message }}",
+        "text": "=*Environtment:* n8n Development\n*Workflow:* {{ $json.workflow }}\n*Execution:* {{ $json.execution_url }}\n*Node:* {{ $json.node }}\n*Time:* {{ $json.timestamp }}\n*Message:* {{ $json.error_message }}",
         "otherOptions": {
           "includeLinkToWorkflow": false,
           "mrkdwn": true
@@ -75,8 +75,8 @@
             {
               "id": "2122584f-c32e-4bef-aa0a-25c0b225171e",
               "name": "timestamp",
-              "value": "={{ $json.execution.error.timestamp }}",
-              "type": "number"
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
             }
           ]
         },
@@ -122,7 +122,7 @@
     "availableInMCP": false
   },
   "triggerCount": 0,
-  "versionId": "83faf29e-58a0-4031-b358-5961cfdcf0d1",
+  "versionId": "dccd8e2e-edaa-43bb-90ca-1887f7ffd723",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

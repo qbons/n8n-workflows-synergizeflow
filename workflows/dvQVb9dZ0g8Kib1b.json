@@ -295,7 +295,7 @@
       "parameters": {
         "modelId": {
           "__rl": true,
-          "value": "=models/{{$vars.GEMINI_PRO_PREVIEW}}",
+          "value": "=models/{{$vars.GEMINI_PRO_LATEST}}",
           "mode": "id"
         },
         "messages": {
@@ -389,7 +389,7 @@
         "operation": "analyze",
         "modelId": {
           "__rl": true,
-          "value": "=models/{{$vars.GEMINI_PRO_PREVIEW}}",
+          "value": "=models/{{$vars.GEMINI_PRO_LATEST}}",
           "mode": "id"
         },
         "text": "=**SYSTEM DIRECTIVE: RAW DATA OUTPUT MODE**\n\nYou are a specialized audio-to-subtitle parsing engine. Your only function is to convert an audio file into a raw `.ass` subtitle string suitable for programmatic parsing. Your output is consumed directly by an automated system, which will fail if any extraneous characters or formatting are present.\n\n**INPUT:**\nAn audio file will be provided.\n\n**OUTPUT PROTOCOL:**\n1.  Your entire response MUST be a single, raw `.ass` script string.\n2.  There must be absolutely no extraneous characters, whitespace, or newlines before the `[Script Info]` header or after the final `Dialogue` line.\n3.  **CRITICAL:** Do not include Markdown fences. The string ` ``` ` is forbidden in your output. Do not output any explanatory text. The response must be the `.ass` script and nothing else.\n\n**`.ass` SCRIPT REQUIREMENTS:**\n1.  **Header:** The string must begin with the exact `.ass` header block.\n2.  **Events:** After the header, generate a `Dialogue` event for every single word in the audio.\n3.  **Word-by-Word Timing:** Each `Dialogue` line must contain only one word, timed precisely to its start and end in the audio (`h:mm:ss.cs`). Punctuation must be appended to the word it follows.\n\n**EXAMPLE OF THE REQUIRED RAW OUTPUT:**\n[Script Info]\nTitle: Default Aegisub file\nScriptType: v4.00+\nWrapStyle: 0\nScaledBorderAndShadow: yes\nYCbCr Matrix: None\n\n[Aegisub Advanced SSA/ASS Style V4+]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\nStyle: Default,Arial,28,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1\n\n[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\nDialogue: 0,0:00:00.30,0:00:00.55,Default,,0,0,0,,Stop\nDialogue: 0,0:00:00.55,0:00:01.05,Default,,0,0,0,,searching\nDialogue: 0,0:00:01.05,0:00:01.30,Default,,0,0,0,,for\n\nExecute this directive. Failure to adhere to the raw output protocol will result in system error.",
@@ -1097,7 +1097,7 @@
     "callerPolicy": "workflowsFromSameOwner"
   },
   "triggerCount": 2,
-  "versionId": "621397ec-dfb6-4d07-a7c5-474dcacb2beb",
+  "versionId": "4dc504c0-839b-41f6-955c-9a80a5a668bd",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",
