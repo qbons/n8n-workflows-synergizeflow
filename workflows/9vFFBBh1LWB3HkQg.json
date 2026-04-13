@@ -423,9 +423,8 @@
         "operation": "analyze",
         "modelId": {
           "__rl": true,
-          "value": "models/nano-banana-pro-preview",
-          "mode": "list",
-          "cachedResultName": "models/nano-banana-pro-preview"
+          "value": "=models/{{$vars.GEMINI_NANO_BANANA}}",
+          "mode": "id"
         },
         "text": "={{ $('Prepare Data').item.json.prompt }}",
         "inputType": "binary",
@@ -723,7 +722,7 @@
     "availableInMCP": false
   },
   "triggerCount": 1,
-  "versionId": "a57e3ddb-2474-480d-9e8e-39ba3da60d4f",
+  "versionId": "4ad42d21-f1e9-4d5f-ab4e-5ff22d51461d",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",
