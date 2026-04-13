@@ -56,6 +56,12 @@
       "value": ""
     },
     {
+      "id": "iWiBzuKGVkLHbtNc",
+      "key": "GEMINI_PRO_LATEST",
+      "type": "string",
+      "value": ""
+    },
+    {
       "id": "HRVPYDGdcsKXRTIM",
       "key": "GEMINI_PRO_PREVIEW",
       "type": "string",

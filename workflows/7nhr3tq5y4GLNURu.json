@@ -509,7 +509,7 @@
       "type": "n8n-nodes-gemini-search.geminiSearchToolTool",
       "typeVersion": 1,
       "position": [
-        -1096,
+        -1104,
         320
       ],
       "id": "c062eff8-5e1d-4234-8acd-a1bfe1c28240",
@@ -673,7 +673,7 @@
       "parameters": {
         "modelId": {
           "__rl": true,
-          "value": "=models/{{ $vars.GEMINI_PRO_PREVIEW }}",
+          "value": "=models/{{ $vars.GEMINI_PRO_LATEST }}",
           "mode": "id"
         },
         "messages": {
@@ -1361,7 +1361,7 @@
     "saveDataSuccessExecution": "all"
   },
   "triggerCount": 1,
-  "versionId": "ef22c8f1-2fb9-4383-b998-d7fdbe6db257",
+  "versionId": "d52aff28-e778-4791-b29e-63dba0872164",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",
