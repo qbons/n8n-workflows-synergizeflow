@@ -353,7 +353,7 @@
       "parameters": {
         "modelId": {
           "__rl": true,
-          "value": "=models/{{ $vars.GEMINI_PRO_PREVIEW }}",
+          "value": "=models/{{ $vars.GEMINI_PRO_LATEST }}",
           "mode": "id"
         },
         "messages": {
@@ -387,7 +387,7 @@
       "parameters": {
         "toolDescription": "Use this tool for searching information.",
         "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', ``, 'string') }}",
-        "model": "={{$vars.GEMINI_FLASH_TEXT}}",
+        "model": "={{ $vars.GEMINI_PRO_LATEST }}",
         "enableUrlContext": "=",
         "options": {
           "batching": {
@@ -593,7 +593,7 @@
       "parameters": {
         "modelId": {
           "__rl": true,
-          "value": "=models/{{ $vars.GEMINI_PRO_PREVIEW }}",
+          "value": "=models/{{ $vars.GEMINI_PRO_LATEST }}",
           "mode": "id"
         },
         "messages": {
@@ -855,7 +855,7 @@
     "callerPolicy": "workflowsFromSameOwner"
   },
   "triggerCount": 1,
-  "versionId": "a8aac99c-cefa-4e39-a836-87c6828080f8",
+  "versionId": "d3f7bcf6-3b85-4e66-ac04-de0bdfc96122",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

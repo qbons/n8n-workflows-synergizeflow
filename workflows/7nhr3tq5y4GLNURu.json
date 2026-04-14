@@ -737,6 +737,7 @@
       "name": "HTTP Request1",
       "retryOnFail": true,
       "maxTries": 5,
+      "waitBetweenTries": 5000,
       "credentials": {
         "httpHeaderAuth": {
           "id": "tURjQrWDQUUGEoyg",
@@ -1358,10 +1359,12 @@
     "timeSavedMode": "fixed",
     "errorWorkflow": "4otmc6jILN7VL0Z9",
     "callerPolicy": "workflowsFromSameOwner",
-    "saveDataSuccessExecution": "all"
+    "saveDataSuccessExecution": "all",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true
   },
   "triggerCount": 1,
-  "versionId": "d52aff28-e778-4791-b29e-63dba0872164",
+  "versionId": "b85e5e39-c2a5-4e53-9eed-6293a4e550b8",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",
