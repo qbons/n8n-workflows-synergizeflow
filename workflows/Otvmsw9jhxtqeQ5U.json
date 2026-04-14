@@ -21,7 +21,7 @@
       "typeVersion": 4.2,
       "position": [
         -3760,
-        152
+        160
       ],
       "id": "fa9e1937-22d8-4e5e-b909-380594929063",
       "name": "Check if license is valid"
@@ -38,7 +38,7 @@
       "typeVersion": 2.1,
       "position": [
         -3984,
-        248
+        256
       ],
       "id": "3a08c6fb-4d15-4071-8cf3-da4fab4b78d4",
       "name": "Webhook",
@@ -104,7 +104,7 @@
       "typeVersion": 3.2,
       "position": [
         -3536,
-        152
+        160
       ],
       "id": "c9e9bcd8-bedc-448e-a699-46f3a12149bb",
       "name": "Switch"
@@ -136,7 +136,7 @@
       "typeVersion": 4.2,
       "position": [
         -3312,
-        56
+        64
       ],
       "id": "3b214e2a-042f-4134-9922-fd4375ff7939",
       "name": "Get Current Title"
@@ -149,7 +149,7 @@
       "typeVersion": 2,
       "position": [
         -3088,
-        56
+        64
       ],
       "id": "f49644d6-db52-47c0-bb4d-5456e30b47e7",
       "name": "Parsing Title"
@@ -181,7 +181,7 @@
       "typeVersion": 4.2,
       "position": [
         -2864,
-        56
+        64
       ],
       "id": "975d9339-ca57-4c7b-af40-323cf8281c54",
       "name": "Get Product Data"
@@ -252,7 +252,7 @@
       "typeVersion": 3.4,
       "position": [
         -2640,
-        56
+        64
       ],
       "id": "40b2cfca-eea7-4431-a721-56f813e52612",
       "name": "Prepare Data"
@@ -265,7 +265,7 @@
       "typeVersion": 2,
       "position": [
         -2416,
-        56
+        64
       ],
       "id": "6009d4f3-a9b4-4a5b-83bc-ed53142a015b",
       "name": "Code in JavaScript"
@@ -278,7 +278,7 @@
       "typeVersion": 2,
       "position": [
         -1744,
-        56
+        64
       ],
       "id": "47858ec3-d9f2-42f3-b15b-a8190b1d09de",
       "name": "Code in JavaScript1"
@@ -309,7 +309,7 @@
       "typeVersion": 1.3,
       "position": [
         -2192,
-        56
+        64
       ],
       "id": "2d0758e5-a6be-468e-a5db-670a55659899",
       "name": "Product Agent - Get Image Description"
@@ -337,7 +337,7 @@
       "typeVersion": 4.3,
       "position": [
         -1968,
-        56
+        64
       ],
       "id": "cda2ba03-fbbb-418b-892d-f8ed2deca54a",
       "name": "get Image Vault"
@@ -368,7 +368,7 @@
       "typeVersion": 1,
       "position": [
         -1072,
-        56
+        64
       ],
       "id": "ee95e4dd-3636-465a-96ce-67dc9762b477",
       "name": "Message a model",
@@ -397,8 +397,8 @@
       "type": "n8n-nodes-gemini-search.geminiSearchToolTool",
       "typeVersion": 1,
       "position": [
-        -1000,
-        280
+        -1008,
+        288
       ],
       "id": "41704837-6c5f-4d14-9bad-72c4ba06c5d0",
       "name": "Gemini Search Tool",
@@ -411,7 +411,7 @@
     },
     {
       "parameters": {
-        "jsCode": "function getValidJsonObject(rawText) {\n\n    if (typeof rawText !== 'string' || rawText.trim() === '') {\n        console.error(\"Invalid input or empty text field.\");\n        return null;\n    }\n\n    let jsonString = rawText.trim();\n\n    // 2. Check for and remove the markdown JSON block fences.\n    // This regex is robust and handles variations in whitespace.\n    const markdownRegex = /^```json\\s*([\\s\\S]*?)\\s*```$/;\n    const match = jsonString.match(markdownRegex);\n\n    if (match) {\n        // If it's a match, the actual JSON string is in the first capture group.\n        jsonString = match[1];\n    }\n\n    // 3. Parse the cleaned string into a JSON object.\n    try {\n        return JSON.parse(jsonString);\n    } catch (error) {\n        console.error(\"Failed to parse JSON string:\", error);\n        console.error(\"Problematic string:\", jsonString);\n        return null;\n    }\n}\nlet result = getValidJsonObject($input.first().json.content.parts[0].text); \nif (typeof result !== 'undefined' && typeof result.image !== 'undefined' && typeof result.image.relevantImg !== 'undefined' && result.image.relevantImg !== null) {\n  let relevantImage = [];\n  let tempImg = [];\n  for (const item of result.image.relevantImg) {\n    if (item.url.includes(\"https://temp.com/\")) {\n      tempImg.push(item);\n    }else{\n      relevantImage.push(item);\n    }\n  }\n  if(tempImg.length){\n    let parsed = $('get Image Vault').first().json.parsed;\n    let baseTempImg = [];\n    for (const itemParsed of parsed) {\n        let bufferObj = Buffer.from(itemParsed.title, \"utf8\");\n\n      // Encode the buffer as a base64 string\n      let base64String = bufferObj.toString(\"base64\");\n      let compare = 'https://temp.com/'+base64String+'.jpg';\n       for (const itemTemp of tempImg) {\n        if(itemTemp.url === compare ){\n          baseTempImg.push({\n            image: itemParsed.data,\n            mime: itemParsed.mime\n          })\n        }\n      } \n    }\n    if(baseTempImg.length){\n      result.image.tempImg = baseTempImg;  \n    }else{\n      result.image.tempImg = 'nope'; \n    }\n    \n  }else{\n    result.image.tempImg = 'nope';\n  }\n  if(relevantImage.length){\n    result.image.relevantImg = relevantImage;\n  }else{\n    result.image.relevantImg = [{url:'nope'}];  \n  }\n}else{\n  result.image.relevantImg = [{url:'nope'}];\n}\nreturn result;"
+        "jsCode": "function getValidJsonObject(rawText) {\n\n    if (typeof rawText !== 'string' || rawText.trim() === '') {\n        console.error(\"Invalid input or empty text field.\");\n        return null;\n    }\n\n    let jsonString = rawText.trim();\n\n    // 2. Check for and remove the markdown JSON block fences.\n    // This regex is robust and handles variations in whitespace.\n    const markdownRegex = /^```json\\s*([\\s\\S]*?)\\s*```$/;\n    const match = jsonString.match(markdownRegex);\n\n    if (match) {\n        // If it's a match, the actual JSON string is in the first capture group.\n        jsonString = match[1];\n    }\n\n    // 3. Parse the cleaned string into a JSON object.\n    try {\n        return JSON.parse(jsonString);\n    } catch (error) {\n        console.error(\"Failed to parse JSON string:\", error);\n        console.error(\"Problematic string:\", jsonString);\n        return null;\n    }\n}\nlet result = getValidJsonObject($input.first().json.content.parts[0].text); \nif (typeof result !== 'undefined' && typeof result.image !== 'undefined' && typeof result.image.relevantImg !== 'undefined' && result.image.relevantImg !== null) {\n  let relevantImage = [];\n  let tempImg = [];\n  for (const item of result.image.relevantImg) {\n    if (item.url.includes(\"https://temp.com/\")) {\n      tempImg.push(item);\n    }else{\n      relevantImage.push(item);\n    }\n  }\n  if(tempImg.length){\n    let parsed = $('get Image Vault').first().json.parsed;\n    let baseTempImg = [];\n    for (const itemParsed of parsed) {\n        let bufferObj = Buffer.from(itemParsed.title, \"utf8\");\n\n      // Encode the buffer as a base64 string\n      let base64String = bufferObj.toString(\"base64\");\n      let compare = 'https://temp.com/'+base64String+'.jpg';\n       for (const itemTemp of tempImg) {\n        if(itemTemp.url === compare ){\n          baseTempImg.push({\n            image: itemParsed.data,\n            mime: itemParsed.mime\n          })\n        }\n      } \n    }\n    if(baseTempImg.length){\n      result.image.tempImg = baseTempImg;  \n    }else{\n      result.image.tempImg = 'nope'; \n    }\n    \n  }else{\n    result.image.tempImg = 'nope';\n  }\n  if(relevantImage.length){\n    result.image.relevantImg = relevantImage;\n  }else{\n    result.image.relevantImg = [{url:'nope'}];  \n  }\n}else{\n  result.image.relevantImg = [{url:'nope'}];\n}\nif (result && typeof result.content === 'string') {\n  result.content = result.content.replace(\n    /<img[^>]+src=[\"']https:\\/\\/temp\\.com\\/[^\"']+[\"'][^>]*>/gi,\n    ''\n  );\n}\nreturn result;"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -431,7 +431,7 @@
       "typeVersion": 1.1,
       "position": [
         -496,
-        152
+        160
       ],
       "id": "623ddb6d-f5c9-497a-8d02-3383d20798f4",
       "name": "Wait",
@@ -582,7 +582,7 @@
       "typeVersion": 1.1,
       "position": [
         -3760,
-        344
+        352
       ],
       "id": "a651f088-08d5-48c2-8340-a826a1a4fce7",
       "name": "Execution Data"
@@ -678,7 +678,7 @@
       "typeVersion": 4.3,
       "position": [
         -3312,
-        248
+        256
       ],
       "id": "b38abbe2-ded3-4056-9fe8-dac9a5a8386a",
       "name": "Send Error License"
@@ -743,7 +743,7 @@
       "typeVersion": 3.3,
       "position": [
         -1520,
-        56
+        64
       ],
       "id": "9a3f4a78-e0af-4100-9bff-c4e587391c86",
       "name": "Switch1"
@@ -766,7 +766,7 @@
       "typeVersion": 3.4,
       "position": [
         -1296,
-        -40
+        -48
       ],
       "id": "1e7ac619-20ae-415b-87b7-f5c62bc5846d",
       "name": "Prepare Prompt"
@@ -789,7 +789,7 @@
       "typeVersion": 3.4,
       "position": [
         -1296,
-        152
+        160
       ],
       "id": "fcab65e5-0d35-4a74-88f7-e529c93d158b",
       "name": "Prepare Prompt1"
@@ -1081,7 +1081,7 @@
     "callerPolicy": "workflowsFromSameOwner"
   },
   "triggerCount": 1,
-  "versionId": "ba2ce17e-a0fe-4783-973c-8c41378e5e4c",
+  "versionId": "147517c6-d676-42ab-a1cb-173a9a9a4581",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",
