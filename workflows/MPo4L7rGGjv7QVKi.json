@@ -50,7 +50,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -496,
+        -272,
         176
       ],
       "id": "db9fd264-8e7a-489a-a242-d93eb498056b",
@@ -65,7 +65,7 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1,
       "position": [
-        -48,
+        176,
         176
       ],
       "id": "d5eeecd0-3b00-49a7-aaa4-40039ad66ac0",
@@ -83,7 +83,7 @@
       "type": "n8n-nodes-base.editImage",
       "typeVersion": 1,
       "position": [
-        -272,
+        -48,
         176
       ],
       "id": "0baca89c-8263-4f9a-89af-488d7218ac9f",
@@ -112,7 +112,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        176,
+        400,
         248
       ],
       "id": "750c01bd-dac6-4e6e-8d12-c6a8c7c43be9",
@@ -132,6 +132,71 @@
       ],
       "id": "9b42cfad-a350-47f4-ac29-81ec554d48a0",
       "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.url }}",
+                    "rightValue": "nope",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "c124fd3a-0f7b-4dc1-8f95-2596575b712b"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "no_image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "343b5e07-f50f-4a76-9cd0-d94e0e555192",
+                    "leftValue": "={{ $json.url }}",
+                    "rightValue": "nope",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "has_image"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -496,
+        176
+      ],
+      "id": "50dad7f0-53ec-43d6-9825-1f8c23677ff5",
+      "name": "Switch"
     }
   ],
   "connections": {
@@ -168,7 +233,7 @@
         ],
         [
           {
-            "node": "HTTP Request",
+            "node": "Switch",
             "type": "main",
             "index": 0
           }
@@ -218,6 +283,24 @@
           }
         ]
       ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -229,7 +312,7 @@
     "callerPolicy": "workflowsFromSameOwner"
   },
   "triggerCount": 0,
-  "versionId": "dc82d28c-b343-458a-9d8b-66af8b91e610",
+  "versionId": "7a9f0df0-fe1e-455e-b7ee-0adb1c07fe0f",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",
