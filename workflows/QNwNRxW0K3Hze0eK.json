@@ -71,7 +71,7 @@
         "operation": "analyze",
         "modelId": {
           "__rl": true,
-          "value": "=models/{{ $vars.GEMINI_FLASH_TEXT }}",
+          "value": "=models/{{ $vars.GEMINI_NANO_BANANA }}",
           "mode": "id"
         },
         "text": "Analyze the input image with great detail and precision. Directly response without introduction text.\n",
@@ -232,7 +232,7 @@
     "callerPolicy": "workflowsFromSameOwner"
   },
   "triggerCount": 0,
-  "versionId": "37a53112-a6f3-4088-9211-ba581cdf2b87",
+  "versionId": "2518f1c2-055d-43e4-86a2-f4b37e0e3882",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",
