@@ -250,7 +250,7 @@
       "parameters": {
         "modelId": {
           "__rl": true,
-          "value": "=models/{{ $vars.GEMINI_PRO_PREVIEW }}",
+          "value": "=models/{{ $vars.GEMINI_PRO_LATEST}}",
           "mode": "id"
         },
         "messages": {
@@ -646,7 +646,7 @@
     "callerPolicy": "workflowsFromSameOwner"
   },
   "triggerCount": 1,
-  "versionId": "e1aa8243-e69a-4869-aec7-1067c0d1c746",
+  "versionId": "c19ec31e-d735-4a30-98b6-8bcff04fe624",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",
