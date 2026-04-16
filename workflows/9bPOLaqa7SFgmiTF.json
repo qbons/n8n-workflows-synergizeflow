@@ -622,6 +622,26 @@
           "name": "SF - Gemini API Account"
         }
       }
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "website",
+              "value": "={{ $('Webhook').item.json.body.domain_name }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        -1952,
+        672
+      ],
+      "id": "627ffd88-33b9-4eb5-a2cc-6f5f067a1292",
+      "name": "Execution Data"
     }
   ],
   "connections": {
@@ -630,6 +650,11 @@
         [
           {
             "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execution Data",
             "type": "main",
             "index": 0
           }
@@ -855,7 +880,7 @@
     "callerPolicy": "workflowsFromSameOwner"
   },
   "triggerCount": 1,
-  "versionId": "d3f7bcf6-3b85-4e66-ac04-de0bdfc96122",
+  "versionId": "631e5eb3-f8af-4ded-9443-b9595e0b36e7",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

@@ -734,7 +734,7 @@
       "typeVersion": 1.1,
       "position": [
         -768,
-        144
+        384
       ],
       "id": "8da827d0-414a-4f79-a463-9e67e5b122a1",
       "name": "Execution Data",
@@ -767,6 +767,11 @@
     "Webhook": {
       "main": [
         [
+          {
+            "node": "Prepare data",
+            "type": "main",
+            "index": 0
+          },
           {
             "node": "Execution Data",
             "type": "main",
@@ -1077,13 +1082,7 @@
     },
     "Execution Data": {
       "main": [
-        [
-          {
-            "node": "Prepare data",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     }
   },
@@ -1097,7 +1096,7 @@
     "callerPolicy": "workflowsFromSameOwner"
   },
   "triggerCount": 2,
-  "versionId": "4dc504c0-839b-41f6-955c-9a80a5a668bd",
+  "versionId": "36f08d12-eb12-4d11-bff3-ec23b0e9935a",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

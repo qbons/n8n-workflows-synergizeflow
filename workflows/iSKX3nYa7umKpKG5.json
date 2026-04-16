@@ -24,8 +24,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -1040,
-        112
+        -1328,
+        800
       ],
       "id": "2782c12b-3bcb-4966-8a70-e8d9321f5423",
       "name": "Webhook",
@@ -146,15 +146,15 @@
       "type": "n8n-nodes-qdrant.qdrant",
       "typeVersion": 1,
       "position": [
-        -208,
-        112
+        -224,
+        48
       ],
       "id": "f2a34bec-938f-4327-9127-80785ab60f9e",
       "name": "Check If Collection Exists",
       "credentials": {
         "qdrantRestApi": {
-          "id": "Ky9zq5gndxQO48S6",
-          "name": "Qdrant account"
+          "id": "x4lyWFNp7qjYd932",
+          "name": "SF - Qdrant account"
         }
       }
     },
@@ -212,8 +212,8 @@
       "name": "Delete Old Collection",
       "credentials": {
         "qdrantRestApi": {
-          "id": "Ky9zq5gndxQO48S6",
-          "name": "Qdrant account"
+          "id": "x4lyWFNp7qjYd932",
+          "name": "SF - Qdrant account"
         }
       }
     },
@@ -305,6 +305,380 @@
       ],
       "id": "eb0bc646-de00-43e4-91fe-dccdda39caa4",
       "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1552,
+        560
+      ],
+      "id": "60f34857-7c83-4c98-8e6f-7f479496e6a2",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"website\": {{ $json.body.domain_name }},\n  \"code\": {{ $json.body.license_key }},\n  \"collection\": \"cta-{{ $json.body.license_key }}\",\n  \"ctas\": {{ $json.body.ctas }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1136,
+        800
+      ],
+      "id": "e5a85480-a66a-4416-a79a-9449b7e8a5fd",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.website }}/wp-json/synergize/v1/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "code",
+              "value": "={{ $json.code }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -960,
+        800
+      ],
+      "id": "b0591596-6e5c-49c8-bd89-f204544b2dc9",
+      "name": "Check license1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c496ee6c-fcf8-4ca6-abba-248a31bd754b",
+              "leftValue": "={{ $json.is_valid }}",
+              "rightValue": "yes",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -784,
+        800
+      ],
+      "id": "f3539aa1-ae9e-4e02-bfca-8719c9e87d0e",
+      "name": "if valid1"
+    },
+    {
+      "parameters": {
+        "errorMessage": "Unauthorized access denied!"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -560,
+        1008
+      ],
+      "id": "21daa634-257d-459a-a1a4-274fb39b9494",
+      "name": "Stop and Error1"
+    },
+    {
+      "parameters": {
+        "operation": "collectionExists",
+        "collectionName": "={{ $('Edit Fields').item.json.collection }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-qdrant.qdrant",
+      "typeVersion": 1,
+      "position": [
+        -576,
+        736
+      ],
+      "id": "a2d2ba06-ed03-4fc2-b2d7-20738ba1f274",
+      "name": "Check If Collection Exists1",
+      "credentials": {
+        "qdrantRestApi": {
+          "id": "x4lyWFNp7qjYd932",
+          "name": "SF - Qdrant account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a57760c3-3a24-43a9-bc83-e707219ca79e",
+              "leftValue": "={{ $json.result.exists }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -352,
+        800
+      ],
+      "id": "ea92da65-236f-40f8-8843-aea0956818d9",
+      "name": "If collection exists1"
+    },
+    {
+      "parameters": {
+        "operation": "deleteCollection",
+        "collectionName": {
+          "__rl": true,
+          "value": "={{ $('Edit Fields').item.json.collection }}",
+          "mode": "name"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-qdrant.qdrant",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        656
+      ],
+      "id": "0542d884-f755-4fba-a658-3f22777c3b83",
+      "name": "Delete Old Collection1",
+      "credentials": {
+        "qdrantRestApi": {
+          "id": "x4lyWFNp7qjYd932",
+          "name": "SF - Qdrant account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        496,
+        768
+      ],
+      "id": "d592a00b-71d1-4a05-9f0c-ddafe2fbb4e2",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"id\": {{ $runIndex + 1 }},\n  \"text\": {{ JSON.stringify($json.output) }},\n  \"payload\": {\n    \"pageContent\": {{JSON.stringify(\n  \"Goal: \" + $('Loop Over Items').item.json.goal_prompt + \". \" +\n  \"Destination: \" + $('Loop Over Items').item.json.destination + \". \" +\n  \"Collected data: \" + $('Loop Over Items').item.json.collect_fields.map(item => item.label + \" \"+\"[\" + (item.required ? \"required\" : \"optional\") + \"]\"))}},\n    \"metadata\": {\n      \"goal_prompt\": {{JSON.stringify($('Loop Over Items').item.json.goal_prompt)}},\n      \"semanticIntent\": {{ JSON.stringify($json.output) }},\n      \"destination\": {{JSON.stringify($('Loop Over Items').item.json.destination)}},\n      \"Collected data\": {{JSON.stringify($('Loop Over Items').item.json.collect_fields)}}\n    }\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1088,
+        768
+      ],
+      "id": "c88a7776-7c7e-4b52-a711-eba01bd817a6",
+      "name": "Format data embdding"
+    },
+    {
+      "parameters": {
+        "jsCode": "const ctas = $('Edit Fields').first().json.ctas\n\nreturn ctas"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        768
+      ],
+      "id": "7cdc148e-2cd2-4ab1-b850-3b75afb550ee",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $vars.GEMINI_EMBEDDING }}:embedContent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googlePalmApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"models/{{ $vars.GEMINI_EMBEDDING }}\",\n  \"content\": {\n    \"parts\": [\n      {\n        \"text\": {{ JSON.stringify($('Format data embdding').item.json.text) }}\n      }\n    ]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1296,
+        768
+      ],
+      "id": "e6d8c021-315d-497c-b409-1cc76bc776b2",
+      "name": "Embedding data",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 0.5
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1472,
+        768
+      ],
+      "id": "1c52b621-8c07-4dd8-b325-59877df11310",
+      "name": "Wait",
+      "webhookId": "9c9258aa-5cff-4485-a66b-36405b9bbade"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n      \"id\": {{ $('Format data embdding').item.json.id }},\n      \"vector\": {{JSON.stringify($('Embedding data').item.json.embedding.values)}},\n      \"payload\": {{ JSON.stringify($('Format data embdding').item.json.payload) }}\n    }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1648,
+        768
+      ],
+      "id": "6c264f89-b345-4e46-8521-c4c8606cba1b",
+      "name": "Format point vector"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=http://213.239.213.236:6333/collections/{{ $('Edit Fields').item.json.collection }}/points",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "qdrantRestApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"points\": {{ JSON.stringify($json.data) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2064,
+        768
+      ],
+      "id": "78a0102a-72d8-4472-84d9-06e57e430dc2",
+      "name": "HTTP Request1",
+      "credentials": {
+        "qdrantRestApi": {
+          "id": "x4lyWFNp7qjYd932",
+          "name": "SF - Qdrant account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1840,
+        768
+      ],
+      "id": "7fce5876-7eb1-4251-9144-b34ccb004280",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "operation": "createCollection",
+        "collectionName": "={{ $('Edit Fields').item.json.collection }}",
+        "vectors": "{\n  \"size\": 3072,\n  \"distance\": \"Cosine\"\n}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-qdrant.qdrant",
+      "typeVersion": 1,
+      "position": [
+        16,
+        800
+      ],
+      "id": "acbb5492-13b4-484e-82fb-dd72079a37e3",
+      "name": "Create Collection1",
+      "credentials": {
+        "qdrantRestApi": {
+          "id": "x4lyWFNp7qjYd932",
+          "name": "SF - Qdrant account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.goal_prompt }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are an expert in semantic search optimization for Qdrant vector databases.\n\nYour task is to rewrite the given trigger sentence into one highly optimized natural-language search phrase that best represents how real users would ask it.\n\nGoal:\n- Maximize semantic matching accuracy in Qdrant.\n- Preserve original intent exactly.\n- Convert system-style sentence into user-style query.\n- Make it natural, clear, and searchable.\n- Use the language most likely used by the target user.\n\nOutput rules:\n- Return plain string only.\n- No JSON.\n- No explanation.\n- One best semantic phrase only.",
+          "returnIntermediateSteps": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        720,
+        768
+      ],
+      "id": "58e0fa65-0923-4f13-ab96-d3d1e707d930",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "=models/{{ $vars.GEMINI_PRO_PREVIEW }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        704,
+        976
+      ],
+      "id": "4cc9bfac-0e21-40dc-92ab-28fe5eab6327",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
     }
   ],
   "connections": {
@@ -323,7 +697,7 @@
       "main": [
         [
           {
-            "node": "Required data",
+            "node": "Edit Fields",
             "type": "main",
             "index": 0
           }
@@ -453,6 +827,213 @@
           }
         ]
       ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Check license1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if valid1": {
+      "main": [
+        [
+          {
+            "node": "Check If Collection Exists1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Collection Exists1": {
+      "main": [
+        [
+          {
+            "node": "If collection exists1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If collection exists1": {
+      "main": [
+        [
+          {
+            "node": "Delete Old Collection1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Collection1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check license1": {
+      "main": [
+        [
+          {
+            "node": "if valid1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Old Collection1": {
+      "main": [
+        [
+          {
+            "node": "Create Collection1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format data embdding": {
+      "main": [
+        [
+          {
+            "node": "Embedding data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embedding data": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Format point vector",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format point vector": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Collection1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Format data embdding",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -461,10 +1042,11 @@
     "availableInMCP": false,
     "timeSavedMode": "fixed",
     "errorWorkflow": "4otmc6jILN7VL0Z9",
-    "callerPolicy": "workflowsFromSameOwner"
+    "callerPolicy": "workflowsFromSameOwner",
+    "saveDataSuccessExecution": "all"
   },
   "triggerCount": 1,
-  "versionId": "fb11c497-45ad-43cb-aad7-083ef7a78906",
+  "versionId": "18d71af4-b149-4e6a-b432-2a63932d821a",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

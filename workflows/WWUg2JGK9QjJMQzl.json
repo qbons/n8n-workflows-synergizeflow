@@ -503,7 +503,7 @@
       "typeVersion": 1.1,
       "position": [
         -336,
-        0
+        160
       ],
       "id": "025da6b2-dbfc-43e9-9eb5-217d647d3818",
       "name": "Execution Data",
@@ -774,18 +774,17 @@
     },
     "Execution Data": {
       "main": [
-        [
-          {
-            "node": "Prepare data",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "Webhook": {
       "main": [
         [
+          {
+            "node": "Prepare data",
+            "type": "main",
+            "index": 0
+          },
           {
             "node": "Execution Data",
             "type": "main",
@@ -805,7 +804,7 @@
     "saveDataSuccessExecution": "all"
   },
   "triggerCount": 1,
-  "versionId": "de75d3de-fd23-4a6b-9d0d-00b5018686da",
+  "versionId": "f76fff9d-303f-4087-8a7b-781fc02d6032",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

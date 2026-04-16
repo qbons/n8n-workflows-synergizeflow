@@ -235,6 +235,26 @@
       ],
       "id": "29907b08-dc1e-4198-99d4-de34d900de54",
       "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "website",
+              "value": "={{ $('Webhook').item.json.body.domain_name }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        -1104,
+        352
+      ],
+      "id": "ec892963-fbbe-4692-9c29-f22b5bd14002",
+      "name": "Execution Data"
     }
   ],
   "connections": {
@@ -243,6 +263,11 @@
         [
           {
             "node": "Prepare data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execution Data",
             "type": "main",
             "index": 0
           }
@@ -321,7 +346,7 @@
     "callerPolicy": "workflowsFromSameOwner"
   },
   "triggerCount": 1,
-  "versionId": "90c52bc6-f1ce-476f-9cb1-df65cf953256",
+  "versionId": "174c3a7a-0beb-40f1-bd6d-5367811053fa",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",
