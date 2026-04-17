@@ -327,7 +327,7 @@
       "parameters": {
         "modelId": {
           "__rl": true,
-          "value": "=models/{{ $vars.GEMINI_FLASH_TEXT }}",
+          "value": "=models/{{ $vars.GEMINI_FLASH_PREVIEW }}",
           "mode": "id"
         },
         "messages": {
@@ -566,7 +566,7 @@
     "callerPolicy": "workflowsFromSameOwner"
   },
   "triggerCount": 1,
-  "versionId": "21560801-eb25-414f-a0f0-ac95c8b7acc1",
+  "versionId": "6d1bb8cc-e37b-4fbf-bdc0-eefd13c7f63a",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",
