@@ -194,8 +194,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -336,
-        192
+        -608,
+        480
       ],
       "id": "47edad3e-f58d-4e67-bc17-aedc534faf44",
       "name": "HTTP Request"
@@ -265,8 +265,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -336,
-        0
+        -320,
+        16
       ],
       "id": "03afad2c-2717-4c0d-b4c5-b663e288cba5",
       "name": "Get website data"
@@ -277,10 +277,10 @@
         "operation": "analyze",
         "modelId": {
           "__rl": true,
-          "value": "=models/{{$vars.GEMINI_NANO_BANANA}}",
+          "value": "=models/{{ $vars.GEMINI_FLASH_PREVIEW }}",
           "mode": "id"
         },
-        "text": "=This is image of {{ $('Prepare Data').item.json.title }}. Analyze the input images with great detail and precision. Describe the image directly as response without introduction text in plain text format.\n",
+        "text": "=This is image of {{ $('Prepare Data').item.json.title }}. Analyze the input images with great detail and precision. Describe the image directly as response without introduction text in plain text format.",
         "inputType": "binary",
         "binaryPropertyName": "image",
         "options": {}
@@ -293,12 +293,16 @@
       ],
       "id": "350bd5bd-18ea-41dc-a7db-686e890f6f1b",
       "name": "Analyze an image",
+      "retryOnFail": false,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
       "credentials": {
         "googlePalmApi": {
           "id": "aLrGZCRV8oKLBNjE",
           "name": "SF - Gemini API Account"
         }
-      }
+      },
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -420,6 +424,18 @@
       ],
       "id": "6e35c726-02ab-4e43-8f48-3132215b8bf5",
       "name": "Execution Data"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        528,
+        208
+      ],
+      "id": "b11b04a7-3719-4416-b7cf-b45fd2dc702f",
+      "name": "Wait",
+      "webhookId": "0c20d51e-db47-4d8b-84b3-2fdac633467e"
     }
   ],
   "connections": {
@@ -520,6 +536,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -555,6 +578,17 @@
           }
         ]
       ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Get website data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -566,7 +600,7 @@
     "callerPolicy": "workflowsFromSameOwner"
   },
   "triggerCount": 1,
-  "versionId": "6d1bb8cc-e37b-4fbf-bdc0-eefd13c7f63a",
+  "versionId": "c749d424-040d-46bc-9326-1bfbf7760652",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",
