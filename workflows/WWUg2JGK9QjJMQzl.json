@@ -16,7 +16,7 @@
     {
       "parameters": {
         "mode": "raw",
-        "jsonOutput": "={\n  \"website\": {{ $json.body.domain_name }},\n  \"license_key\": {{ $json.body.license_key }},\n  \"posts\": {{ $json.body.posts }},\n  \"model\": {{ $json.body.model }}\n}",
+        "jsonOutput": "={\n  \"website\": {{ JSON.stringify($json.body.domain_name) }},\n  \"license_key\": {{ JSON.stringify($json.body.license_key) }},\n  \"posts\": {{ $json.body.posts }},\n  \"model\": {{ JSON.stringify($json.body.model) }}\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.set",
@@ -801,10 +801,11 @@
     "timeSavedMode": "fixed",
     "errorWorkflow": "4otmc6jILN7VL0Z9",
     "callerPolicy": "workflowsFromSameOwner",
-    "saveDataSuccessExecution": "all"
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true
   },
   "triggerCount": 1,
-  "versionId": "f76fff9d-303f-4087-8a7b-781fc02d6032",
+  "versionId": "e855fbe5-0089-4f47-9888-eb68a2ed8c83",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

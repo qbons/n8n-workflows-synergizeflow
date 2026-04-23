@@ -20,77 +20,6 @@
     },
     {
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "454a0159-a56c-4055-a07f-9f36edf56cb6",
-              "name": "file",
-              "value": "={{ $json.body.file }}",
-              "type": "string"
-            },
-            {
-              "id": "6ef18411-cb10-4169-96b8-47d7e7d5a821",
-              "name": "caption",
-              "value": "={{ $json.body.caption }}",
-              "type": "string"
-            },
-            {
-              "id": "4a7c5c80-53b5-494b-903d-a3e5e9ddaf53",
-              "name": "instagram_id",
-              "value": "={{ $json.body.instagram_id }}",
-              "type": "string"
-            },
-            {
-              "id": "5c26c150-cf7d-493c-a398-6420d04dc5b6",
-              "name": "instagram_token",
-              "value": "={{ $json.body.instagram_token }}",
-              "type": "string"
-            },
-            {
-              "id": "e0d80256-4903-4bed-aea3-369b7efe0b25",
-              "name": "content_id",
-              "value": "={{ $json.body.content_id }}",
-              "type": "number"
-            },
-            {
-              "id": "9981eb4c-5540-4c7d-b58b-78ca2dde02fd",
-              "name": "user_id",
-              "value": "={{ $json.body.user_id }}",
-              "type": "string"
-            },
-            {
-              "id": "ec5cd0f9-7fcb-4772-bbd6-2ee647b2ce5b",
-              "name": "content_type",
-              "value": "={{ $json.body.content_type ?? \"video\" }}",
-              "type": "string"
-            },
-            {
-              "id": "1ff6f945-9bd6-4b04-8bcd-06353886ec71",
-              "name": "blog_post",
-              "value": "={{ $json.body.blog_post }}",
-              "type": "string"
-            },
-            {
-              "id": "74de91b3-fcbc-4977-b6bb-64fcd428ca51",
-              "name": "lang_code",
-              "value": "={{ $json.body.lang_code }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        -688,
-        -96
-      ],
-      "id": "25a583ad-515e-4f15-bb62-bb13103f6636",
-      "name": "Prepare data"
-    },
-    {
-      "parameters": {
         "method": "POST",
         "url": "=https://graph.instagram.com/{{ $vars.INSTAGRAM_API_VERSION }}/{{ $('Prepare data').item.json.instagram_id }}/media",
         "sendBody": true,
@@ -514,6 +443,125 @@
       "id": "c9c1eddb-a2fd-448d-af37-0c795ac8c71f",
       "name": "wait endpoint ready",
       "webhookId": "59c68b81-5067-44a5-8f69-2e3ee8c1f46e"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "454a0159-a56c-4055-a07f-9f36edf56cb6",
+              "name": "file",
+              "value": "={{ $json.body.file }}",
+              "type": "string"
+            },
+            {
+              "id": "6ef18411-cb10-4169-96b8-47d7e7d5a821",
+              "name": "caption",
+              "value": "={{ $json.body.caption }}",
+              "type": "string"
+            },
+            {
+              "id": "4a7c5c80-53b5-494b-903d-a3e5e9ddaf53",
+              "name": "instagram_id",
+              "value": "={{ $json.body.instagram_id }}",
+              "type": "string"
+            },
+            {
+              "id": "5c26c150-cf7d-493c-a398-6420d04dc5b6",
+              "name": "instagram_token",
+              "value": "={{ $json.body.instagram_token }}",
+              "type": "string"
+            },
+            {
+              "id": "e0d80256-4903-4bed-aea3-369b7efe0b25",
+              "name": "content_id",
+              "value": "={{ $json.body.content_id }}",
+              "type": "number"
+            },
+            {
+              "id": "9981eb4c-5540-4c7d-b58b-78ca2dde02fd",
+              "name": "user_id",
+              "value": "={{ $json.body.user_id }}",
+              "type": "string"
+            },
+            {
+              "id": "ec5cd0f9-7fcb-4772-bbd6-2ee647b2ce5b",
+              "name": "content_type",
+              "value": "={{ $json.body.content_type ?? \"video\" }}",
+              "type": "string"
+            },
+            {
+              "id": "1ff6f945-9bd6-4b04-8bcd-06353886ec71",
+              "name": "blog_post",
+              "value": "={{ $json.body.blog_post }}",
+              "type": "string"
+            },
+            {
+              "id": "74de91b3-fcbc-4977-b6bb-64fcd428ca51",
+              "name": "lang_code",
+              "value": "={{ $json.body.lang_code }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -688,
+        -96
+      ],
+      "id": "25a583ad-515e-4f15-bb62-bb13103f6636",
+      "name": "Prepare data"
+    },
+    {
+      "parameters": {
+        "url": "https://assets.synergizeflow.com/temp/file-18.png?date=1776826954915",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1376,
+        -352
+      ],
+      "id": "36726911-3543-4613-80af-28d243008721",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "528e0962-607b-4ac1-ab17-e7ee123fa4c2",
+              "leftValue": "={{ $binary.data.mimeType }}",
+              "rightValue": "image/png",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1584,
+        -352
+      ],
+      "id": "db9393e4-a5b8-4126-927e-cfc55e966feb",
+      "name": "If"
     }
   ],
   "connections": {
@@ -684,17 +732,6 @@
         ]
       ]
     },
-    "Prepare data": {
-      "main": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Google Vertex Chat Model": {
       "ai_languageModel": [
         [
@@ -728,7 +765,47 @@
       "main": [
         [
           {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare data": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
             "node": "Create container",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "wait endpoint ready",
             "type": "main",
             "index": 0
           }
@@ -746,7 +823,7 @@
     "saveDataSuccessExecution": "all"
   },
   "triggerCount": 1,
-  "versionId": "5836abff-1e71-481f-a927-5c4263f05b55",
+  "versionId": "cbd96f9a-cb4e-489d-b249-df854301dde4",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",
