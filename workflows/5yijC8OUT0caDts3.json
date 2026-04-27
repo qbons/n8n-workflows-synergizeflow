@@ -1,0 +1,646 @@
+{
+  "id": "5yijC8OUT0caDts3",
+  "name": "SF - AI Page Builder Submit Elementor v.2",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v2/page-builder/elementor",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -208,
+        -96
+      ],
+      "id": "e642d284-ae6c-4d64-a037-2195487defcc",
+      "name": "Webhook",
+      "webhookId": "84f0e403-3c36-4a3d-8f12-c49085734511"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_LATEST }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $('Prepare Data').item.json.payload.toJsonString() }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "systemMessage": "=**Role & Purpose**\nYou are an expert Elementor JSON Template Generator, a UI/UX Designer, and a strict Quality Control Agent. Your sole purpose is to translate raw HTML, CSS, and JS data into a single, complete, valid JSON array for an Elementor landing page, and then internally optimize its visual design (typography, contrast, spacing, alignment) before outputting the final result.\n\n---\n\n### Inputs\nYou will receive a JSON object containing the raw code of a web page:\n```json\n{\n  \"html\": \"<div id='lp-root'>...</div>\",\n  \"css\": \"#lp-root { ... }\",\n  \"js\": \"$(document).ready( ... )\"\n}\n```\nYou will use the provided Reference Guide / Element Structures at the bottom of this instruction to inform allowed element types, widget types, and specific design settings schemas.\n\n---\n\n### Internal Workflow: Phase 1 - Generation & Translation\n\n1.  **Analyze the Input:** Parse the `html` to understand the semantic sections (e.g., `<header>`, `<section>`, `<footer>`), content, text, and images. Read the `css` to extract styling properties like hex colors, typography, paddings, margins, flexbox properties, and grid layouts.\n2.  **Generate Top-Level Sections:** Iterate through the major structural blocks. For **each** main section, generate one complete, top-level **Container** object (`elType: \"container\"`, `isInner: false`).\n3.  **Apply Layout & Styling:** Replicate the section's layout precisely. If the CSS uses CSS Grid or flexbox columns, use the Elementor **Grid** or nested **Containers** (`isInner: true`) inside the main section. Apply exact background colors, padding, and text alignments.\n4.  **Map Widgets:** Map the inner HTML elements to their Elementor Widget equivalents:\n    * `<h1>`, `<h2>`, etc. -> **Heading**\n    * `<p>` -> **Text Editor**\n    * `<img>` -> **Image**\n    * `<button>` or `<a>` styled as buttons -> **Button**\n    * SVG icons -> **Icon**\n    * Feature blocks -> **Icon Box** or **Image Box**\n    * Pricing tables -> **Price Table**\n    * FAQ accordions -> **Nested Accordion**\n5.  **Extract Content:** All generated content (text, image URLs, icon SVGs/classes) must be pulled directly from the provided `html`.\n6.  **Apply Core Structural Rules:**\n    * **IDs:** Every element must have a unique 8-character alphanumeric `id`.\n    * **Image Object Rule:** All image objects (`background_image`, `image`, `testimonial_image`, etc.) **MUST** follow this exact structure. The `alt` key must not be included:\n        ```json\n        {\n          \"url\": \"https://picsum.photos/[width]/[height]\",\n          \"id\": \"\",\n          \"size\": \"\",\n          \"source\": \"url\"\n        }\n        ```\n    * **Relevancy Rule:** For widgets like `video`, `icon`, `Maps`, `counter`, `progress`, and `testimonial`, if data is missing, infer contextually relevant placeholders based on surrounding HTML.\n\n---\n\n### Internal Workflow: Phase 2 - UI/UX Quality Control & Optimization\n\nBefore finalizing the JSON, apply the following design heuristics to the data structure generated in Phase 1:\n\n1.  **Typography & Hierarchy:**\n    * Ensure Headings are noticeably larger and properly weighted compared to body text.\n    * Ensure font weights are legible (no excessively thin body text or excessively heavy small text).\n    * Scale responsive sizing logically down from desktop to tablet/mobile.\n2.  **Color & Accessibility (Contrast):**\n    * Enforce strict visual contrast based on WCAG principles. \n    * If a parent container has a dark background (color, gradient, or overlay), all child text, icons, and borders **must** be updated to a light/high-visibility color. If the parent is light, child elements must be dark.\n    * Ensure primary and secondary colors complement each other.\n3.  **Spacing, Rhythm & Layout:**\n    * Standardize dimension objects (margin, padding, gap) using standard UI spacing multiples (e.g., 4px, 8px, 16px, 24px, 32px, 48px, 64px).\n    * Ensure containers have adequate internal padding so content does not touch edges.\n    * Adjust `line_height` for readability (`1.5em`/`1.6em` for body, `1.1em`/`1.2em` for headings).\n4.  **Alignment & Composition:**\n    * Ensure alignment properties (`align`, `text_align`, `justify_content`, `align_items`) make compositional sense. Center-aligned icons pair well with center-aligned text.\n5.  **Detailing & Aesthetics:**\n    * Optimize borders, border radii, and visual accents to look modern and polished.\n6.  **Strict Data Integrity (CRITICAL):**\n    * **Non-Destructive Editing:** You MUST NOT delete functional keys (e.g., `size`, `source`, `src`, `url` inside image objects) just because they aren't explicitly detailed in the Reference Guide. Preserve all original keys and data structures.\n    * **Design-Focused Modifications:** Only modify values of existing design properties or add explicitly allowed design properties. Do not invent new property names.\n    * **Do Not Break Structure:** Do not change the `id`, `elType`, or core structural nesting of the JSON.\n\n---\n\n### Output Requirements\n\n* **JSON ONLY:** You must output *only* the finalized, valid JSON array.\n* **NO Formatting:** Do not wrap the output in markdown code blocks (remove ```json and ```). Your response must start strictly with `[` and end strictly with `]`.\n* **NO Conversational Text:** Do not include greetings, explanations, changelogs, summaries, or any other text before or after the JSON data. Your entire output must be parsable by a standard JSON parser.\n\n---\n\n### Element Structures & Reference Guide\nYou must use the following structures and design property references for each element:\n\n{{ $json.widget }}",
+          "maxOutputTokens": 250000,
+          "temperature": 0.1,
+          "thinkingBudget": -1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -176,
+        336
+      ],
+      "id": "e83a7dcf-73e6-419b-8ad7-bfc38739b7a0",
+      "name": "Message a model",
+      "retryOnFail": true,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "/* Your getValidJsonObject function is good. \n  It correctly handles bad strings by returning null.\n  No changes are needed here.\n*/\nfunction getValidJsonObject(rawText) {\n\n    if (typeof rawText !== 'string' || rawText.trim() === '') {\n        console.error(\"Invalid input or empty text field.\");\n        return null;\n    }\n\n    let jsonString = rawText.trim();\n\n    // 2. Check for and remove the markdown JSON block fences.\n    const markdownRegex = /^```json\\s*([\\s\\S]*?)\\s*```$/;\n    const match = jsonString.match(markdownRegex);\n\n    if (match) {\n        jsonString = match[1];\n    }\n\n    // 3. Parse the cleaned string into a JSON object.\n    try {\n        return JSON.parse(jsonString);\n    } catch (error) {\n        // This is expected for parts that aren't JSON, like \"```\"\n        // console.error(\"Failed to parse JSON string:\", error); \n        // console.error(\"Problematic string:\", jsonString);\n        return null; // Returning null is key\n    }\n}\n\n// === NEW LOGIC ===\n\n// 1. Get the array of all parts\nconst allParts = $input.first().json.content.parts;\n\n// 2. Map each part to a parse attempt.\n//    - If part.text is valid JSON, we get the object.\n//    - If part.text is \"```\" or other non-JSON, getValidJsonObject returns null.\nconst parsedData = allParts\n    .map(part => getValidJsonObject(part.text))\n    .filter(result => result !== null); // 3. Filter out all the nulls\n\n// `parsedData` is now an array of all successfully parsed JSON objects.\n// In your example, it will be: [ [ { id: \"h3f8e9a1\", ... } ] ]\n\nreturn { data: parsedData };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        128,
+        336
+      ],
+      "id": "924dc396-e379-4806-9718-caec26780df5",
+      "name": "Code2",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.domain }}/wp-json/synergize/v1/submit-builder-elementor",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "data",
+              "value": "={{ $json.data }}"
+            },
+            {
+              "name": "title",
+              "value": "={{ $('Prepare Data').item.json.title }}"
+            },
+            {
+              "name": "type",
+              "value": "={{ $('Prepare Data').item.json.type }}"
+            },
+            {
+              "name": "template",
+              "value": "={{ $('Prepare Data').item.json.template }}"
+            },
+            {
+              "name": "status",
+              "value": "={{ $('Prepare Data').item.json.status }}"
+            },
+            {
+              "name": "code",
+              "value": "={{ $('Prepare Data').item.json.code }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        368,
+        320
+      ],
+      "id": "2cb7d5ba-4b78-4d04-ac8e-7b0c63b3f60e",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_LATEST }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Original Data Context: {{ $('Prepare Data').item.json.payload.toJsonString() }}\nComponent Schema:\n[\n  {\n    \"id\": \"container\",\n    \"name\": \"Container\",\n    \"useCase\": \"Core layout wrapper used to structure the page. Supports flexbox and acts as the parent for all widgets and inner containers. Essential for building responsive layouts.\"\n  },\n  {\n    \"id\": \"grid\",\n    \"name\": \"Grid\",\n    \"useCase\": \"Core layout wrapper used to create multi-column layouts. Act as parent for other widget. Use this\"\n  },\n  {\n    \"id\": \"heading\",\n    \"name\": \"Heading\",\n    \"useCase\": \"Used to display titles and headings (H1–H6). Important for SEO, hierarchy, and section labeling in a page.\"\n  },\n  {\n    \"id\": \"text-editor\",\n    \"name\": \"Text Editor\",\n    \"useCase\": \"Used for paragraphs, rich text, and formatted content. Supports HTML and is ideal for descriptions, blog-like content, and general text blocks.\"\n  },\n  {\n    \"id\": \"image\",\n    \"name\": \"Image\",\n    \"useCase\": \"Displays a single image. Used for banners, illustrations, thumbnails, or any visual content.\"\n  },\n  {\n    \"id\": \"video\",\n    \"name\": \"Video\",\n    \"useCase\": \"Embeds video from YouTube, Vimeo, or self-hosted sources. Common for tutorials, promos, and storytelling.\"\n  },\n  {\n    \"id\": \"button\",\n    \"name\": \"Button\",\n    \"useCase\": \"Primary call-to-action element. Used to drive user interaction such as navigation, form submission, or conversions.\"\n  },\n  {\n    \"id\": \"icon\",\n    \"name\": \"Icon\",\n    \"useCase\": \"Displays a single icon for visual emphasis. Often used for UI decoration, quick indicators, or feature highlights.\"\n  },\n  {\n    \"id\": \"google_maps\",\n    \"name\": \"Google Maps\",\n    \"useCase\": \"Embeds a map location. Used for contact pages, business locations, or directions.\"\n  },\n  {\n    \"id\": \"image-box\",\n    \"name\": \"Image Box\",\n    \"useCase\": \"Combines image, title, and description into a card layout. Common for features, services, and product highlights.\"\n  },\n  {\n    \"id\": \"icon-box\",\n    \"name\": \"Icon Box\",\n    \"useCase\": \"Similar to Image Box but uses an icon instead of an image. Used for feature lists, benefits, and service summaries.\"\n  },\n  {\n    \"id\": \"testimonial\",\n    \"name\": \"Testimonial\",\n    \"useCase\": \"Displays a single customer testimonial with name, image, and text. Used for social proof and trust building.\"\n  },\n  {\n    \"id\": \"star-rating\",\n    \"name\": \"Rating\",\n    \"useCase\": \"Displays a rating using stars or numbers. Common for reviews, feedback, and credibility indicators.\"\n  },\n  {\n    \"id\": \"progress\",\n    \"name\": \"Progress Bar\",\n    \"useCase\": \"Visual representation of progress or skill level (0–100%). Used for skills, stats, or completion indicators.\"\n  },\n  {\n    \"id\": \"counter\",\n    \"name\": \"Counter\",\n    \"useCase\": \"Animated number counter. Used to showcase metrics such as users, projects, or achievements.\"\n  },\n  {\n    \"id\": \"icon-list\",\n    \"name\": \"Icon List\",\n    \"useCase\": \"List of items with icons. Used for features, checklists, benefits, or bullet points.\"\n  },\n  {\n    \"id\": \"social-icons\",\n    \"name\": \"Social Icons\",\n    \"useCase\": \"Displays clickable social media icons. Used for linking to social profiles or sharing.\"\n  },\n  {\n    \"id\": \"image-carousel\",\n    \"name\": \"Image Carousel\",\n    \"useCase\": \"Slider for multiple images. Used for galleries, portfolios, or showcasing multiple visuals.\"\n  },\n  {\n    \"id\": \"price-list\",\n    \"name\": \"Price List\",\n    \"useCase\": \"Displays list of items with prices. Common for menus, services, or simple pricing lists.\"\n  },\n  {\n    \"id\": \"slides\",\n    \"name\": \"Slides\",\n    \"useCase\": \"Full-width slider with background images, text, and CTA. Used for hero sections and storytelling.\"\n  },\n  {\n    \"id\": \"testimonial-carousel\",\n    \"name\": \"Testimonial Carousel\",\n    \"useCase\": \"Carousel version of testimonials. Displays multiple reviews in a rotating slider for stronger social proof.\"\n  },\n  {\n    \"id\": \"nested-tabs\",\n    \"name\": \"Nested Tabs\",\n    \"useCase\": \"Tabbed content layout with container-based content inside each tab. Used to organize large content into sections.\"\n  },\n  {\n    \"id\": \"nested-accordion\",\n    \"name\": \"Nested Accordion\",\n    \"useCase\": \"Expandable/collapsible content sections with nested containers. Ideal for FAQs and structured content.\"\n  },\n  {\n    \"id\": \"price-table\",\n    \"name\": \"Price Table\",\n    \"useCase\": \"Advanced pricing component with features list and CTA. Used for subscription plans and product comparisons.\"\n  },\n  {\n    \"id\": \"form\",\n    \"name\": \"Form\",\n    \"useCase\": \"Interactive form builder with fields, validation, and submission actions. Used for contact forms, lead capture, and data collection.\"\n  }\n]"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "builtInTools": {},
+        "options": {
+          "systemMessage": "=## Role and Objective\nYou are an Expert UI/UX Developer and Frontend Component Mapping Specialist. Your objective is to analyze the HTML structure provided in the source data, map it to a predefined component schema, extract only the relevant styling (CSS) and logic (JavaScript);\n\nYou must return your final analysis strictly as a valid JSON object.\n\n## Input Data Context\nYou will be provided with:\n1. **Original Data Context**: A data payload containing the HTML structure to analyze, along with its associated CSS and JavaScript.\n2. **Component Schema**: A predefined list of available widget IDs and their use cases.\n\n## Step-by-Step Process\n\n### Step 1: HTML Structure Analysis & Schema Mapping\n* Carefully analyze the DOM tree of the HTML provided in the **Original Data Context**.\n* Compare the HTML nodes, classes, and intended visual hierarchy against the provided **Component Schema**.\n* Identify which schema components (`id` values) are required to build this layout. \n* *Example:* If you see a wrapper `<div>` holding an `<h1>` and a `<form>`, you should map this to `container`, `heading`, and `form`.\n\n\n## Output Format Requirements\nYou must output **ONLY** a valid JSON object. Do not include markdown code blocks (like ```json), conversational filler, or explanations outside the JSON structure.\n\nUse the exact following key-value structure:\n\n{\n  \"schema\": [\n    \"array\",\n    \"of\",\n    \"matching\",\n    \"schema\",\n    \"ids\"\n  ]\n}\n\n## Strict Constraints\n* **Accuracy:** Do not hallucinate schema IDs. Only use the IDs provided in the Component Schema."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        320,
+        -96
+      ],
+      "id": "b35f1408-906a-4cb5-b3e3-3503864007c8",
+      "name": "Message a model4",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "/* Your getValidJsonObject function is good. \n  It correctly handles bad strings by returning null.\n  No changes are needed here.\n*/\nfunction getValidJsonObject(rawText) {\n\n    if (typeof rawText !== 'string' || rawText.trim() === '') {\n        console.error(\"Invalid input or empty text field.\");\n        return null;\n    }\n\n    let jsonString = rawText.trim();\n\n    // 2. Check for and remove the markdown JSON block fences.\n    const markdownRegex = /^```json\\s*([\\s\\S]*?)\\s*```$/;\n    const match = jsonString.match(markdownRegex);\n\n    if (match) {\n        jsonString = match[1];\n    }\n\n    // 3. Parse the cleaned string into a JSON object.\n    try {\n        return JSON.parse(jsonString);\n    } catch (error) {\n        // This is expected for parts that aren't JSON, like \"```\"\n        // console.error(\"Failed to parse JSON string:\", error); \n        // console.error(\"Problematic string:\", jsonString);\n        return null; // Returning null is key\n    }\n}\n\n// === NEW LOGIC ===\n\n// 1. Get the array of all parts\nconst allParts = $input.first().json.content.parts;\n\n// 2. Map each part to a parse attempt.\n//    - If part.text is valid JSON, we get the object.\n//    - If part.text is \"```\" or other non-JSON, getValidJsonObject returns null.\nconst parsedData = allParts\n    .map(part => getValidJsonObject(part.text))\n    .filter(result => result !== null); // 3. Filter out all the nulls\n\n// `parsedData` is now an array of all successfully parsed JSON objects.\n// In your example, it will be: [ [ { id: \"h3f8e9a1\", ... } ] ]\nreturn parsedData;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -128,
+        144
+      ],
+      "id": "7315b732-b93a-4508-a202-4053db18290f",
+      "name": "Code1",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "let elem = '';\nfor (const item of $input.first().json.schema) {\n  elem = elem + $input.first().json[item] + '\\n\\r';\n}\n\nreturn {elem:elem}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        128
+      ],
+      "id": "12f50022-c1b1-4a02-a7d7-7476f888333d",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8623dcd5-1007-4582-953d-235b71ddeefe",
+              "name": "widget",
+              "value": "={{ $json.elem }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        384,
+        128
+      ],
+      "id": "7f12d8ef-5473-46b2-b1cf-246540f6d6ab",
+      "name": "Edit Fields5"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "63b601de-010a-42d7-b0a7-8bd41c4abc55",
+              "name": "schema",
+              "value": "={{ $json.schema }}",
+              "type": "array"
+            },
+            {
+              "id": "a922d1af-0cb0-41e7-bae5-65c1f92949c8",
+              "name": "container",
+              "value": "### Container\n\nThis is the main layout element for sections and wrappers.\n\n### Core Properties\n\n* `id`: A string representing the unique identifier (e.g., `\"1f182ab9\"`).\n* `elType`: Must be `\"container\"`.\n* `isInner`: A boolean defining if the container is nested inside another container (`true`) or acting as a top-level section (`false`).\n* `elements`: An array that holds child element objects (which can be widgets or other inner containers).\n\n### Settings: Layout & Flexbox\n\n* `content_width`: A string defining how the container bounds its inner content. *Possible values: `\"boxed\"`, `\"full\"`.*\n* `flex_direction`: A string defining the primary axis for the child elements. *Possible values: `\"row\"`, `\"row-reverse\"`, `\"column\"`, `\"column-reverse\"`.*\n* `justify_content`: A string defining the alignment of children along the main axis. *(Note: Your data shows `\"cebter\"`, which is likely a typo for `\"center\"`).* *Possible values: `\"flex-start\"`, `\"center\"`, `\"flex-end\"`, `\"space-between\"`, `\"space-around\"`, `\"space-evenly\"`.*\n* `flex_justify_content`: An alternate or specific string defining flex alignment along the main axis. *Possible values: `\"flex-start\"`, `\"center\"`, `\"flex-end\"`, `\"space-between\"`, `\"space-around\"`, `\"space-evenly\"`.*\n* `align_items`: A string defining the alignment of children along the cross axis. *Possible values: `\"flex-start\"`, `\"center\"`, `\"flex-end\"`, `\"stretch\"`, `\"baseline\"`.*\n* `flex_wrap`: A string defining whether child elements are forced onto a single line or can wrap onto multiple lines. *Possible values: `\"nowrap\"`, `\"wrap\"`, `\"wrap-reverse\"`.*\n\n### Settings: Spacing (Dimension Objects)\n\n* `gap`: A dimension object controlling the space between flex items, containing a `unit` and a numeric `size`. *Possible units: `\"px\"`, `\"%\"`, `\"em\"`, `\"rem\"`, `\"vw\"`.*\n* `padding`: A complex dimension object defining internal space around the content. Contains a `unit`, specific values for `top`, `right`, `bottom`, and `left`, and an `isLinked` boolean indicating if the values scale together. *Possible units: `\"px\"`, `\"em\"`, `\"%\"`, `\"rem\"`.*\n* `margin`: A complex dimension object defining external space outside the container bounds. Contains a `unit`, specific values for `top`, `right`, `bottom`, and `left`, and an `isLinked` boolean. *Possible units: `\"px\"`, `\"em\"`, `\"%\"`, `\"rem\"`.*\n\n### Settings: Background\n\n* `background_background`: A string defining the primary background type. *Possible values: `\"classic\"`, `\"gradient\"`, `\"video\"`, `\"slideshow\"`.*\n* `background_color`: A string containing the hex or rgba color code for the solid background (e.g., `\"#0f172a\"`).\n* `background_image`: An **Image Object** used as the background, containing an integer `id` (e.g., `3037`) and a string `url`.\n* `background_overlay_background`: A string defining the type of overlay applied on top of the base background. *Possible values: `\"classic\"`, `\"gradient\"`.*\n* `background_overlay_color`: A string containing the hex or rgba color code for the overlay tint (e.g., `\"#000000\"`).\n* `background_overlay_opacity`: A dimension object controlling the transparency level of the overlay. Contains a `unit` (sometimes `\"px\"` or empty depending on the builder's specific schema) and a numeric `size` value typically ranging from `0` (completely transparent) to `1` (completely opaque).\n\n**Example (Container):**\n\n```json\n{\n  \"id\": \"1f182ab9\",\n  \"elType\": \"container\",\n  \"isInner\": false,\n  \"settings\": {\n  \"flex_direction\": \"row\",\n  \"justify_content\": \"cebter\",\n  \"align_items\": \"center\",\n  \"flex_wrap\": \"wrap\",\n  \"gap\": {\n        \"unit\": \"px\",\n        \"size\": 40,\n        \"sizes\": []\n   },\n   \"content_width\": \"full\",\n   \"flex_justify_content\": \"space-between\",\n    \"padding\": {\n      \"unit\": \"px\",\n      \"top\": \"80\",\n      \"right\": \"20\",\n      \"bottom\": \"80\",\n      \"left\": \"20\",\n      \"isLinked\": false\n    },\n    \"margin\": {\n      \"unit\": \"px\",\n      \"top\": \"20\",\n      \"right\": \"0\",\n      \"bottom\": \"20\",\n      \"left\": \"0\",\n      \"isLinked\": false\n    },\n        \"background_background\": \"classic\",\n        \"background_color\": \"#0f172a\",\n        \"background_image\": {\n          \"id\": 3037,\n          \"url\": \"https://glanspro.nl/wp-content/uploads/2026/04/1775823147_136-1920x1080-1.jpg\"\n        },\n        \"background_overlay_background\": \"classic\",\n        \"background_overlay_color\": \"#000000\",\n        \"background_overlay_opacity\": {\n          \"unit\": \"px\",\n          \"size\": 0.7,\n          \"sizes\": []\n        }\n  },\n  \"elements\": []\n}\n```\n\n-----",
+              "type": "string"
+            },
+            {
+              "id": "a107c83d-ff98-4365-b0e3-dec53522bb22",
+              "name": "grid",
+              "value": "### Grid (Special Container)\n\nThis is a **Container** used for multi-column layouts.\n\n  * `elType`: `\"container\"`\n  * `isInner`: `true` (as it's usually inside a main section container).\n  * `settings`:\n      * `container_type`: **MUST** be `\"grid\"`.\n      * `grid_columns_grid`: Object with `unit: \"fr\"`, `size` (the number of columns, e.g., 2, 3), and `sizes: []`.\n      * `grid_rows_grid`: Object with `unit: \"fr\"`, `size` (the number of rows, e.g., 1, 2 depend on the rows), and `sizes: []`.\n  * `elements`: Its `elements` array **MUST** contain other **Containers** (with `isInner: true`) which act as the grid \"cells.\"\n\n**Example (3-Column Grid):**\n\n```json\n{\n  \"id\": \"1eaf0c9b\",\n  \"elType\": \"container\",\n  \"isInner\": true,\n  \"settings\": {\n    \"content_width\": \"full\",\n    \"container_type\": \"grid\",\n    \"grid_columns_grid\": {\n      \"unit\": \"fr\",\n      \"size\": 3,\n      \"sizes\": []\n    },\n    \"grid_rows_grid\": {\n      \"unit\": \"fr\",\n      \"size\": 1,\n      \"sizes\": []\n    }\n  },\n  \"elements\": [\n    { \"id\": \"396af374\", \"elType\": \"container\", \"isInner\": true, \"settings\": {}, \"elements\": [] },\n    { \"id\": \"5d484588\", \"elType\": \"container\", \"isInner\": true, \"settings\": {}, \"elements\": [] },\n    { \"id\": \"9a8b7c6d\", \"elType\": \"container\", \"isInner\": true, \"settings\": {}, \"elements\": [] }\n  ]\n}\n```\n\n-----",
+              "type": "string"
+            },
+            {
+              "id": "31ce11dc-0c39-4524-953f-85ff432d547d",
+              "name": "heading",
+              "value": "### Heading (Widget)\n\nUsed for titles.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"heading\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `title`: The text content (can include simple HTML like `<span>`).\n      * `header_size`: HTML tag (\"h1\", \"h2\", \"h3\", etc.).\n      * `typography_...` properties and `title_color`.\n\n**Example (Heading):**\n\n```json\n{\n  \"id\": \"2dfb28d5\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"heading\",\n  \"settings\": {\n    \"title\": \"This is a Headline\",\n    \"header_size\": \"h2\",\n    \"typography_typography\": \"custom\",\n    \"typography_font_family\": \"Roboto\",\n    \"typography_font_size\": { \"unit\": \"px\", \"size\": 40, \"sizes\": [] },\n    \"typography_font_weight\": \"700\",\n    \"title_color\": \"#170BE2\"\n  },\n  \"elements\": []\n}\n```\n\n-----",
+              "type": "string"
+            },
+            {
+              "id": "4689e6ba-dfe0-463b-a55c-5e7c4d54e3ba",
+              "name": "text-editor",
+              "value": "### Text Editor (Widget)\n\nUsed for paragraphs and body text.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"text-editor\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `editor`: An **HTML string** for the content (e.g., `<p>Hello world.</p>`).\n      * `typography_...` properties and `text_color`.\n\n**Example (Text Editor):**\n\n```json\n{\n  \"id\": \"b297f6\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"text-editor\",\n  \"settings\": {\n    \"editor\": \"<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>\",\n    \"typography_typography\": \"custom\",\n    \"typography_font_family\": \"Roboto\",\n    \"typography_font_size\": { \"unit\": \"px\", \"size\": 18, \"sizes\": [] },\n    \"typography_font_weight\": \"400\",\n    \"text_color\": \"#333333\"\n  },\n  \"elements\": []\n}\n```\n\n-----",
+              "type": "string"
+            },
+            {
+              "id": "2b5ba814-4dbc-499c-944a-a7f52e81ef8e",
+              "name": "image",
+              "value": "### Image (Widget)\n\nUsed for standalone images.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"image\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `image`: An **Image Object** as defined in the Core Rules.\n      * `image_size`: `\"full\"`.\n\n**Example (Image):**\n\n```json\n{\n  \"id\": \"2b037a79\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"image\",\n  \"settings\": {\n    \"image\": {\n      \"url\": \"https://picsum.photos/800/600\",\n      \"id\": \"\",\n      \"size\": \"\",\n      \"source\": \"url\"\n    },\n    \"image_size\": \"full\"\n  },\n  \"elements\": []\n}\n```\n\n-----",
+              "type": "string"
+            },
+            {
+              "id": "573f0497-dd60-44fb-936b-da2171102619",
+              "name": "button",
+              "value": "###  Button (Widget)\n\nUsed for links and calls to action.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"button\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `text`: The button label (e.g., \"Learn More\").\n      * `link`: Object with `url` and empty `is_external`, `nofollow`.\n      * Colors: `button_text_color`, `background_color`, `hover_color`, `button_background_hover_color`.\n      * `border_radius` (be creative) and `text_padding`.\n\n**Example (Button):**\n\n```json\n{\n  \"id\": \"79314c98\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"button\",\n  \"settings\": {\n    \"text\": \"Click Here\",\n    \"link\": {\n      \"url\": \"https://example.com\",\n      \"is_external\": \"\",\n      \"nofollow\": \"\",\n      \"custom_attributes\": \"\"\n    },\n    \"button_text_color\": \"#FFFFFF\",\n    \"background_color\": \"#027BD6\",\n    \"border_radius\": {\n      \"unit\": \"px\",\n      \"top\": \"30\",\n      \"right\": \"30\",\n      \"bottom\": \"30\",\n      \"left\": \"30\",\n      \"isLinked\": true\n    }\n  },\n  \"elements\": []\n}\n```\n\n-----",
+              "type": "string"
+            },
+            {
+              "id": "87980d24-0fb6-4558-ba2f-38d2e693ecc1",
+              "name": "video",
+              "value": "### Video (Widget)\n\nUsed to embed a video.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"video\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `youtube_url`: A **relevant sample YouTube URL**.\n      * Other URL fields (`vimeo_url`, `dailymotion_url`) should be `\"\"`.\n\n**Example (Video):**\n\n```json\n{\n  \"id\": \"3b43f5a4\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"video\",\n  \"settings\": {\n    \"youtube_url\": \"https://www.youtube.com/watch?v=dQw4w9WgXcQ\",\n    \"vimeo_url\": \"\",\n    \"dailymotion_url\": \"\",\n    \"videopress_url\": \"\"\n  },\n  \"elements\": []\n}\n```\n\n-----",
+              "type": "string"
+            },
+            {
+              "id": "f714ce03-64dc-43c1-a08c-0c0d31cba540",
+              "name": "icon",
+              "value": "### Icon (Widget)\n\nUsed for a standalone icon.\n\n### Core Properties\n\n* `id`: A string representing the unique identifier (e.g., `\"75bcb09a\"`).\n* `elType`: Must be `\"widget\"`.\n* `widgetType`: Must be `\"icon\"`.\n* `isInner`: A boolean defining if the widget is nested inside an inner section (e.g., `false`).\n* `elements`: Must be an empty array `[]`.\n\n### Settings: Content & Styling\n\n* `selected_icon`: An object containing the specific icon `value` (e.g., `\"fas fa-map-pin\"`) and the font `library` (e.g., `\"fa-solid\"`). The icon choice must be contextually relevant.\n* `view`: A string defining the visual structure of the icon. *Possible values: `\"default\"`, `\"stacked\"`, `\"framed\"`.*\n* `shape`: A string defining the background shape when the view is stacked or framed. *Possible values: `\"circle\"`, `\"square\"`.*\n* `icon_color`: A string containing the hex or rgba color code for the primary icon graphic.\n* `primary_color`: A string containing the hex or rgba color code for the icon's background shape (active when the view is stacked or framed).\n\n### Settings: Sizing & Dimensions (Dimension Objects)\n\n* `size`: A dimension object controlling the overall size of the icon. Contains a `unit` and a numeric `size`. *Possible units: `\"px\"`, `\"em\"`, `\"rem\"`, `\"vw\"`.*\n* `icon_padding`: A dimension object defining the internal space between the icon graphic and its background boundary. *Possible units: `\"px\"`, `\"em\"`, `\"%\"`.*\n* `rotate`: A dimension object controlling the rotation angle of the icon. *Possible units: `\"deg\"`, `\"rad\"`, `\"turn\"`.*\n* `border_radius`: A complex dimension object defining the corner rounding of the icon's background shape. Contains a `unit`, specific values for `top`, `right`, `bottom`, and `left`, and an `isLinked` boolean indicating if the values scale together. *Possible units: `\"px\"`, `\"%\"`.*\n\n**Example (Icon):**\n\n```json\n{\n        \"id\": \"75bcb09a\",\n        \"isInner\": false,\n        \"widgetType\": \"icon\",\n        \"elType\": \"widget\",\n        \"settings\": {\n          \"selected_icon\": {\n            \"value\": \"fas fa-map-pin\",\n            \"library\": \"fa-solid\"\n          },\n          \"icon_color\": \"#C05E44\",\n          \"view\": \"stacked\",\n          \"shape\": \"square\",\n          \"primary_color\": \"#640C0C\",\n          \"size\": {\n            \"unit\": \"px\",\n            \"size\": 30,\n            \"sizes\": []\n          },\n          \"icon_padding\": {\n            \"unit\": \"px\",\n            \"size\": 10,\n            \"sizes\": []\n          },\n          \"rotate\": {\n            \"unit\": \"deg\",\n            \"size\": 0,\n            \"sizes\": []\n          },\n          \"border_radius\": {\n            \"unit\": \"px\",\n            \"top\": \"16\",\n            \"right\": \"16\",\n            \"bottom\": \"16\",\n            \"left\": \"16\",\n            \"isLinked\": true\n          }\n        },\n        \"elements\": []\n}\n\n```\n\n-----",
+              "type": "string"
+            },
+            {
+              "id": "01abbcb3-4a5b-4c55-b689-7034ed1e9a1c",
+              "name": "google_maps",
+              "value": "### Google Maps (Widget)\n\nUsed to embed a map.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"google_maps\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `address`: A **relevant location string** (e.g., \"Eiffel Tower, Paris\" or \"Times Square, New York\").\n      * `zoom`: Object with `size` (e.g., 12).\n      * `height`: Object with `size` (e.g., 400).\n\n**Example (Google Maps):**\n\n```json\n{\n  \"id\": \"650511a3\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"google_maps\",\n  \"settings\": {\n    \"address\": \"Statue of Liberty, New York, NY\",\n    \"zoom\": { \"unit\": \"px\", \"size\": 13, \"sizes\": [] },\n    \"height\": { \"unit\": \"px\", \"size\": 450, \"sizes\": [] }\n  },\n  \"elements\": []\n}\n```\n\n-----",
+              "type": "string"
+            },
+            {
+              "id": "1144bb5a-9f45-48b6-8b0a-b2900c3b9b81",
+              "name": "nested-tabs",
+              "value": "### Nested Tabs (Widget)\n\nUsed for organizing content into clickable tabs.\n\n* `id`: A string representing the unique identifier (e.g., `\"7c6c744\"`).\n* `elType`: Must be `\"widget\"`.\n* `widgetType`: Must be `\"nested-tabs\"`.\n* `isInner`: A boolean defining if the widget is nested inside an inner section (e.g., `false`).\n* **Dual Structure & Mapping:**\n  1. `settings.tabs`: An array of objects defining the tab headers, each containing a string `_id` and `tab_title` (e.g., `{ \"_id\": \"tabweek1\", \"tab_title\": \"Week 1: Fundamentals\" }`).\n  2. `elements`: An array of **Containers** (`elType: \"container\"`, `isInner: true`).\n  * *Note: The first object in `settings.tabs` maps directly to the first container in `elements`, the second to the second, and so on. The tab's content (text, images, nested widgets) goes strictly inside these mapped containers.*\n* `settings`: An object containing the comprehensive configuration for the tabs' behavior, layout, and styling:\n  * **Content & Layout**\n    * `tabs`: The array of tab title objects mentioned above.\n    * `active_item_index`: An integer setting which tab is open by default (e.g., `0` for the first tab).\n    * `tabs_layout`: A string defining the tab layout direction (e.g., `\"horizontal\"`).\n    * `tabs_position`: A string defining where tabs sit relative to content (e.g., `\"top\"`).\n    * `align`: A string defining the overall alignment (e.g., `\"stretch\"`).\n    * `title_html_tag`: The HTML tag used for the tab titles (e.g., `\"div\"`).\n    * `tabs_direction`: A string defining the flex direction (e.g., `\"block-start\"`).\n    * `tabs_justify_horizontal`: A string defining horizontal justification (e.g., `\"stretch\"`).\n    * `title_alignment`: A string defining text alignment within the tab title (e.g., `\"center\"`).\n  * **Global / Wrapper Styling**\n    * `background_color`: A string containing the hex code for the widget's overall background.\n    * `margin`, `padding`: Dimension objects controlling the outer spacing and internal padding of the main widget wrapper.\n    * `border_width`, `tabs_border_radius`: Dimension objects defining the global border thickness and corner rounding.\n    * `border_color`: A string for the global border color.\n  * **Tab Title Styling**\n    * `tabs_title_space_between`, `tabs_title_spacing`: Dimension objects controlling the gaps between individual tab headers.\n    * `tabs_title_background_color_background`, `tabs_title_background_color_color`: Strings defining the background type and hex color for the tab headers.\n    * `tabs_title_border_border`, `tabs_title_border_color`: Strings defining the border style and color for the tab headers.\n    * `tabs_title_border_width`, `tabs_title_border_radius`: Dimension objects defining the border thickness and rounding specifically for the tab headers.\n    * `normal_title_color`, `active_title_color`, `hover_title_color`: Strings containing hex color codes for the tab states.\n    * `title_text_color`, `title_text_color_hover`, `title_text_color_active`: Strings containing hex color codes specifically for the text inside the tabs across different states.\n  * **Title Typography**\n    * `title_typography_typography`: A string defining the typography mode (e.g., `\"custom\"`).\n    * `title_typography_font_family`: The string name of the font (e.g., `\"Montserrat\"`).\n    * `title_typography_font_size`: A dimension object for the font size.\n    * `title_typography_font_weight`: A string defining the font weight (e.g., `\"400\"`).\n    * `title_typography_text_transform`: A string for casing (e.g., `\"capitalize\"`).\n    * `title_typography_font_style`, `title_typography_text_decoration`: Strings defining style and decoration (e.g., `\"normal\"`, `\"none\"`).\n  * **Content Box Styling** *(The area where the active container is displayed)*\n    * `box_background_color_background`, `box_background_color_color`: Strings defining the background type and hex color for the content area.\n    * `box_border_radius`: A dimension object for the content area's corner rounding.\n    * `box_padding`: A dimension object controlling the internal spacing of the content area wrapper.\n* `elements`: The array of internal containers holding the actual content for each tab.\n  * Each element is a structural container (`elType: \"container\"`, `isInner: true`).\n  * Contains its own `settings` (like `padding` dimension objects).\n  * Contains its own nested `elements` array, which holds the actual content widgets.\n  * *Nested Widgets Examples (from your data):*\n    * **`heading` widget:** Contains settings for `title` (string), `header_size` (e.g., `\"h3\"`), `title_color`, and a full typography object setup.\n    * **`text-editor` widget:** Contains settings for `editor` (HTML string), `text_color`, `link_color`, `paragraph_spacing` (dimension object), and a full typography object setup.\n\n**Example (4 Tabs):**\n\n```json\n{\n        \"id\": \"7c6c744\",\n        \"settings\": {\n          \"tabs\": [\n            {\n              \"_id\": \"tabweek1\",\n              \"tab_title\": \"Week 1: Fundamentals\"\n            },\n            {\n              \"_id\": \"tabweek2\",\n              \"tab_title\": \"Week 2: DOM & Logic\"\n            },\n            {\n              \"_id\": \"tabweek3\",\n              \"tab_title\": \"Week 3: Advanced JS\"\n            },\n            {\n              \"_id\": \"tabweek4\",\n              \"tab_title\": \"Week 4: Final Projects\"\n            }\n          ],\n          \"active_item_index\": 0,\n          \"tabs_layout\": \"horizontal\",\n          \"tabs_position\": \"top\",\n          \"align\": \"stretch\",\n          \"title_html_tag\": \"div\",\n          \"background_color\": \"#FFFFFF\",\n          \"border_width\": {\n            \"unit\": \"px\",\n            \"top\": 1,\n            \"right\": 1,\n            \"bottom\": 1,\n            \"left\": 1,\n            \"isLinked\": true\n          },\n          \"border_color\": \"#E5E7EB\",\n          \"tabs_border_radius\": {\n            \"unit\": \"px\",\n            \"top\": \"12\",\n            \"right\": \"12\",\n            \"bottom\": \"12\",\n            \"left\": \"12\",\n            \"isLinked\": true\n          },\n          \"margin\": {\n            \"unit\": \"px\",\n            \"top\": 0,\n            \"right\": \"auto\",\n            \"bottom\": 0,\n            \"left\": \"auto\",\n            \"isLinked\": false\n          },\n          \"padding\": {\n            \"unit\": \"px\",\n            \"top\": \"20\",\n            \"right\": \"10\",\n            \"bottom\": \"20\",\n            \"left\": \"10\",\n            \"isLinked\": false\n          },\n          \"normal_title_color\": \"#4B5563\",\n          \"active_title_color\": \"#4F46E5\",\n          \"hover_title_color\": \"#4F46E5\",\n          \"tabs_direction\": \"block-start\",\n          \"tabs_justify_horizontal\": \"stretch\",\n          \"title_alignment\": \"center\",\n          \"tabs_title_space_between\": {\n            \"unit\": \"px\",\n            \"size\": 0,\n            \"sizes\": []\n          },\n          \"tabs_title_spacing\": {\n            \"unit\": \"px\",\n            \"size\": 0,\n            \"sizes\": []\n          },\n          \"tabs_title_background_color_background\": \"classic\",\n          \"tabs_title_background_color_color\": \"#FFFFFF\",\n          \"tabs_title_border_border\": \"solid\",\n          \"tabs_title_border_width\": {\n            \"unit\": \"px\",\n            \"top\": \"1\",\n            \"right\": \"1\",\n            \"bottom\": \"1\",\n            \"left\": \"1\",\n            \"isLinked\": true\n          },\n          \"tabs_title_border_color\": \"#E5E7EB\",\n          \"tabs_title_border_radius\": {\n            \"unit\": \"px\",\n            \"top\": \"0\",\n            \"right\": \"0\",\n            \"bottom\": \"0\",\n            \"left\": \"0\",\n            \"isLinked\": true\n          },\n          \"title_typography_typography\": \"custom\",\n          \"title_typography_font_family\": \"Montserrat\",\n          \"title_typography_font_size\": {\n            \"unit\": \"px\",\n            \"size\": 16,\n            \"sizes\": []\n          },\n          \"title_typography_font_weight\": \"400\",\n          \"title_typography_text_transform\": \"capitalize\",\n          \"title_typography_font_style\": \"normal\",\n          \"title_typography_text_decoration\": \"none\",\n          \"title_text_color\": \"#000000\",\n          \"title_text_color_hover\": \"#FFFFFF\",\n          \"title_text_color_active\": \"#FFFFFF\",\n          \"box_background_color_background\": \"classic\",\n          \"box_background_color_color\": \"#FFFFFF\",\n          \"box_border_radius\": {\n            \"unit\": \"px\",\n            \"top\": \"0\",\n            \"right\": \"0\",\n            \"bottom\": \"0\",\n            \"left\": \"0\",\n            \"isLinked\": true\n          },\n          \"box_padding\": {\n            \"unit\": \"px\",\n            \"top\": \"9\",\n            \"right\": \"9\",\n            \"bottom\": \"9\",\n            \"left\": \"9\",\n            \"isLinked\": true\n          }\n        },\n        \"elements\": [\n          {\n            \"id\": \"543f11a5\",\n            \"settings\": {\n              \"padding\": {\n                \"unit\": \"px\",\n                \"top\": \"40\",\n                \"right\": \"40\",\n                \"bottom\": \"40\",\n                \"left\": \"40\",\n                \"isLinked\": true\n              }\n            },\n            \"elements\": [\n              {\n                \"id\": \"6cc5b942\",\n                \"settings\": {\n                  \"title\": \"Mastering the Basics\",\n                  \"header_size\": \"h3\",\n                  \"title_color\": \"#111827\",\n                  \"typography_typography\": \"custom\",\n                  \"typography_font_family\": \"Inter\",\n                  \"typography_font_size\": {\n                    \"unit\": \"px\",\n                    \"size\": 24,\n                    \"sizes\": []\n                  },\n                  \"typography_font_weight\": \"700\"\n                },\n                \"elements\": [],\n                \"isInner\": false,\n                \"widgetType\": \"heading\",\n                \"elType\": \"widget\"\n              },\n              {\n                \"id\": \"2ddfa34e\",\n                \"settings\": {\n                  \"editor\": \"<p>Dive into the core of JavaScript. You will master variables, functions, loops, and conditional logic. We focus heavily on problem-solving so you learn how to think like a developer from day one.</p>\",\n                  \"text_color\": \"#000000\",\n                  \"typography_typography\": \"custom\",\n                  \"typography_font_size\": {\n                    \"unit\": \"px\",\n                    \"size\": 16,\n                    \"sizes\": []\n                  },\n                  \"typography_font_weight\": \"400\",\n                  \"paragraph_spacing\": {\n                    \"unit\": \"px\",\n                    \"size\": 20,\n                    \"sizes\": []\n                  },\n                  \"link_color\": \"#020000\"\n                },\n                \"elements\": [],\n                \"isInner\": false,\n                \"widgetType\": \"text-editor\",\n                \"elType\": \"widget\"\n              }\n            ],\n            \"isInner\": true,\n            \"elType\": \"container\"\n          },\n          {\n            \"id\": \"e455a2c\",\n            \"settings\": {\n              \"padding\": {\n                \"unit\": \"px\",\n                \"top\": \"40\",\n                \"right\": \"40\",\n                \"bottom\": \"40\",\n                \"left\": \"40\",\n                \"isLinked\": true\n              }\n            },\n            \"elements\": [\n              {\n                \"id\": \"65ec31\",\n                \"settings\": {\n                  \"title\": \"Interactivity & The DOM\",\n                  \"header_size\": \"h3\",\n                  \"title_color\": \"#111827\",\n                  \"typography_typography\": \"custom\",\n                  \"typography_font_family\": \"Inter\",\n                  \"typography_font_size\": {\n                    \"unit\": \"px\",\n                    \"size\": 24,\n                    \"sizes\": []\n                  },\n                  \"typography_font_weight\": \"700\"\n                },\n                \"elements\": [],\n                \"isInner\": false,\n                \"widgetType\": \"heading\",\n                \"elType\": \"widget\"\n              },\n              {\n                \"id\": \"ece6555\",\n                \"settings\": {\n                  \"editor\": \"<p>Bring your code to life. Learn how to manipulate the Document Object Model (DOM), handle user events, and create interactive web pages. You will build your first interactive mini-apps this week.</p>\",\n                  \"text_color\": \"#4B5563\",\n                  \"typography_typography\": \"custom\",\n                  \"typography_font_size\": {\n                    \"unit\": \"px\",\n                    \"size\": 18,\n                    \"sizes\": []\n                  }\n                },\n                \"elements\": [],\n                \"isInner\": false,\n                \"widgetType\": \"text-editor\",\n                \"elType\": \"widget\"\n              }\n            ],\n            \"isInner\": true,\n            \"elType\": \"container\"\n          },\n          {\n            \"id\": \"620d4dc4\",\n            \"settings\": {\n              \"padding\": {\n                \"unit\": \"px\",\n                \"top\": \"40\",\n                \"right\": \"40\",\n                \"bottom\": \"40\",\n                \"left\": \"40\",\n                \"isLinked\": true\n              }\n            },\n            \"elements\": [\n              {\n                \"id\": \"3e8fbadb\",\n                \"settings\": {\n                  \"title\": \"Modern & Asynchronous JS\",\n                  \"header_size\": \"h3\",\n                  \"title_color\": \"#111827\",\n                  \"typography_typography\": \"custom\",\n                  \"typography_font_family\": \"Inter\",\n                  \"typography_font_size\": {\n                    \"unit\": \"px\",\n                    \"size\": 24,\n                    \"sizes\": []\n                  },\n                  \"typography_font_weight\": \"700\"\n                },\n                \"elements\": [],\n                \"isInner\": false,\n                \"widgetType\": \"heading\",\n                \"elType\": \"widget\"\n              },\n              {\n                \"id\": \"4f07224f\",\n                \"settings\": {\n                  \"editor\": \"<p>Step into modern JavaScript development. We will cover ES6+ features, asynchronous programming (Promises, Async/Await), and fetching data from external APIs. This is where you become a true developer.</p>\",\n                  \"text_color\": \"#4B5563\",\n                  \"typography_typography\": \"custom\",\n                  \"typography_font_size\": {\n                    \"unit\": \"px\",\n                    \"size\": 18,\n                    \"sizes\": []\n                  }\n                },\n                \"elements\": [],\n                \"isInner\": false,\n                \"widgetType\": \"text-editor\",\n                \"elType\": \"widget\"\n              }\n            ],\n            \"isInner\": true,\n            \"elType\": \"container\"\n          },\n          {\n            \"id\": \"218a993\",\n            \"settings\": {\n              \"padding\": {\n                \"unit\": \"px\",\n                \"top\": \"40\",\n                \"right\": \"40\",\n                \"bottom\": \"40\",\n                \"left\": \"40\",\n                \"isLinked\": true\n              }\n            },\n            \"elements\": [\n              {\n                \"id\": \"5bd64ed2\",\n                \"settings\": {\n                  \"title\": \"Real-World Applications\",\n                  \"header_size\": \"h3\",\n                  \"title_color\": \"#111827\",\n                  \"typography_typography\": \"custom\",\n                  \"typography_font_family\": \"Inter\",\n                  \"typography_font_size\": {\n                    \"unit\": \"px\",\n                    \"size\": 24,\n                    \"sizes\": []\n                  },\n                  \"typography_font_weight\": \"700\"\n                },\n                \"elements\": [],\n                \"isInner\": false,\n                \"widgetType\": \"heading\",\n                \"elType\": \"widget\"\n              },\n              {\n                \"id\": \"2f013597\",\n                \"settings\": {\n                  \"editor\": \"<p>Apply everything you have learned to build robust, real-world applications. You will create a portfolio of projects, learn debugging best practices, and get ready for technical interviews.</p>\",\n                  \"text_color\": \"#4B5563\",\n                  \"typography_typography\": \"custom\",\n                  \"typography_font_size\": {\n                    \"unit\": \"px\",\n                    \"size\": 18,\n                    \"sizes\": []\n                  }\n                },\n                \"elements\": [],\n                \"isInner\": false,\n                \"widgetType\": \"text-editor\",\n                \"elType\": \"widget\"\n              }\n            ],\n            \"isInner\": true,\n            \"elType\": \"container\"\n          }\n        ],\n        \"isInner\": false,\n        \"widgetType\": \"nested-tabs\",\n        \"elType\": \"widget\"\n}\n```\n\n-----",
+              "type": "string"
+            },
+            {
+              "id": "d441b5b8-2352-4fec-833c-571e21d90e0e",
+              "name": "nested-accordion",
+              "value": "### Nested Accordion (Widget)\n\nUsed for collapsible content, perfect for FAQs.\n\n* `id`: A string representing the unique identifier (e.g., `\"60c72396\"`).\n* `elType`: Must be `\"widget\"`.\n* `widgetType`: Must be `\"nested-accordion\"`.\n* `isInner`: A boolean defining if the widget is nested inside an inner section (e.g., `false`).\n* **Dual Structure & Mapping:**\n  1. `settings.items`: An array of objects defining the accordion headers (e.g., `{ \"_id\": \"week1\", \"item_title\": \"Week 1...\" }`).\n  2. `elements`: An array of **Containers** (`elType: \"container\"`, `isInner: true`).\n  * *Note: The first object in `settings.items` maps directly to the first container in `elements`. The content (text, widgets, etc.) goes inside these respective containers.*\n* `settings`: An object containing the comprehensive configuration for the accordion's behavior, layout, and styling:\n  * **Content & Behavior**\n    * `items`: The array of title objects mentioned above.\n    * `active_item_index`: An integer setting which accordion item is open by default (e.g., `0` for the first item).\n    * `accordion_layout`: A string defining the overall layout (e.g., `\"default\"`).\n    * `title_html_tag`: The HTML tag used to wrap the accordion title (e.g., `\"div\"`).\n    * `_animation_delay`: An integer for animation timing.\n    * `css_classes`: A string for custom CSS classes.\n  * **Icons & Alignment**\n    * `accordion_item_title_icon`: An **Icon Object** for the default closed state (e.g., chevron-down).\n    * `accordion_item_title_icon_active`: An **Icon Object** for the open state (e.g., chevron-up).\n    * `accordion_item_title_position_horizontal`: A string defining title alignment (e.g., `\"stretch\"`).\n    * `accordion_item_title_icon_position`: A string defining where the icon sits relative to the text (e.g., `\"end\"`).\n    * `accordion_item_title_space_between`: A dimension object controlling space between text and icon.\n    * `icon_size` & `icon_spacing`: Dimension objects controlling the icon's size and surrounding gap.\n  * **Colors & Backgrounds**\n    * `normal_title_color`, `hover_title_color`, `active_title_color`: Strings containing hex/rgba color codes for the text states.\n    * `accordion_background_normal_background`: A string defining the background type for the header (e.g., `\"classic\"`).\n    * `accordion_background_normal_color`: A string containing the hex code for the header background.\n    * `content_background_background` & `content_background_color`: Strings defining the background type and color for the expanded content area.\n  * **Borders & Spacing** *(Dimension Objects containing a `unit`, numeric/string sizes, and an `isLinked` boolean)*\n    * **Global:** `margin`, `padding`, `border_width`, and `border_color` (string) for the entire widget wrapper.\n    * **Accordion Headers:** * `accordion_border_normal_border`: A string defining the border style (e.g., `\"solid\"`).\n      * `accordion_border_normal_color`: A string for the border color.\n      * `accordion_border_normal_width`, `accordion_border_radius`, `accordion_padding`: Dimension objects shaping the header boxes.\n    * **Content Area:**\n      * `content_border_border`: A string defining the border style.\n      * `content_border_color`: A string for the border color.\n      * `content_border_width`, `content_border_radius`, `content_padding`: Dimension objects shaping the expanded content boxes.\n* `elements`: The array of internal containers holding the actual accordion content. Each container typically includes:\n  * `id`: Unique identifier for the container.\n  * `elType`: `\"container\"`.\n  * `isInner`: `true`.\n  * `settings`: Container-specific styling like `background_background`, `background_color`, and `padding`.\n  * `elements`: An array of widgets nested *inside* this container (e.g., a `\"text-editor\"` widget).\n    * *Example nested widget (`text-editor`):* Contains its own `settings` such as `editor` (the HTML string payload), `typography_typography`, `typography_font_family`, `typography_font_size`, and `text_color`.\n\n**Example (2-Item Accordion):**\n\n```json\n{\n\"id\": \"60c72396\",\n\"settings\": {\n  \"items\": [\n    {\n      \"_id\": \"week1\",\n      \"item_title\": \"Week 1: Fundamentals & The DOM\"\n    },\n    {\n      \"_id\": \"week2\",\n      \"item_title\": \"Week 2: Advanced Data & Logic\"\n    }\n  ],\n  \"active_item_index\": 0,\n  \"accordion_layout\": \"default\",\n  \"title_html_tag\": \"div\",\n  \"border_width\": {\n    \"unit\": \"px\",\n    \"top\": 1,\n    \"right\": 1,\n    \"bottom\": 1,\n    \"left\": 1,\n    \"isLinked\": true\n  },\n  \"border_color\": \"#334155\",\n  \"margin\": {\n    \"unit\": \"px\",\n    \"top\": 0,\n    \"right\": \"auto\",\n    \"bottom\": 0,\n    \"left\": \"auto\",\n    \"isLinked\": false\n  },\n  \"padding\": {\n    \"unit\": \"px\",\n    \"top\": 0,\n    \"right\": 0,\n    \"bottom\": 0,\n    \"left\": 0,\n    \"isLinked\": true\n  },\n  \"_animation_delay\": 0,\n  \"css_classes\": \"\",\n  \"accordion_item_title_icon\": {\n    \"value\": \"fas fa-chevron-down\",\n    \"library\": \"fa-solid\"\n  },\n  \"accordion_item_title_icon_active\": {\n    \"value\": \"fas fa-chevron-up\",\n    \"library\": \"fa-solid\"\n  },\n  \"accordion_item_title_position_horizontal\": \"stretch\",\n  \"accordion_item_title_icon_position\": \"end\",\n  \"accordion_item_title_space_between\": {\n    \"unit\": \"px\",\n    \"size\": 10,\n    \"sizes\": []\n  },\n  \"accordion_background_normal_background\": \"classic\",\n  \"accordion_background_normal_color\": \"#0F172A\",\n  \"accordion_border_normal_border\": \"solid\",\n  \"accordion_border_normal_width\": {\n    \"unit\": \"px\",\n    \"top\": \"1\",\n    \"right\": \"1\",\n    \"bottom\": \"1\",\n    \"left\": \"1\",\n    \"isLinked\": true\n  },\n  \"accordion_border_normal_color\": \"#334155\",\n  \"accordion_border_radius\": {\n    \"unit\": \"px\",\n    \"top\": \"12\",\n    \"right\": \"12\",\n    \"bottom\": \"12\",\n    \"left\": \"12\",\n    \"isLinked\": true\n  },\n  \"accordion_padding\": {\n    \"unit\": \"px\",\n    \"top\": \"20\",\n    \"right\": \"20\",\n    \"bottom\": \"20\",\n    \"left\": \"20\",\n    \"isLinked\": true\n  },\n  \"normal_title_color\": \"#FFFFFF\",\n  \"hover_title_color\": \"#FFFFFF\",\n  \"active_title_color\": \"#FFFFFF\",\n  \"icon_size\": {\n    \"unit\": \"px\",\n    \"size\": 20,\n    \"sizes\": []\n  },\n  \"icon_spacing\": {\n    \"unit\": \"px\",\n    \"size\": 20,\n    \"sizes\": []\n  },\n  \"content_background_background\": \"classic\",\n  \"content_background_color\": \"#0F172A\",\n  \"content_border_border\": \"solid\",\n  \"content_border_width\": {\n    \"unit\": \"px\",\n    \"top\": \"1\",\n    \"right\": \"1\",\n    \"bottom\": \"1\",\n    \"left\": \"1\",\n    \"isLinked\": true\n  },\n  \"content_border_color\": \"#334155\",\n  \"content_border_radius\": {\n    \"unit\": \"px\",\n    \"top\": \"12\",\n    \"right\": \"12\",\n    \"bottom\": \"12\",\n    \"left\": \"12\",\n    \"isLinked\": true\n  },\n  \"content_padding\": {\n    \"unit\": \"px\",\n    \"top\": \"20\",\n    \"right\": \"20\",\n    \"bottom\": \"20\",\n    \"left\": \"20\",\n    \"isLinked\": true\n  }\n},\n\"elements\": [\n  {\n    \"id\": \"49941609\",\n    \"settings\": {\n      \"background_background\": \"classic\",\n      \"background_color\": \"#0F172A\",\n      \"padding\": {\n        \"unit\": \"px\",\n        \"top\": \"24\",\n        \"right\": \"24\",\n        \"bottom\": \"24\",\n        \"left\": \"24\",\n        \"isLinked\": true\n      }\n    },\n    \"elements\": [\n      {\n        \"id\": \"6e30ed0a\",\n        \"settings\": {\n          \"editor\": \"<p>Lorem ipsum dolor sit amet</p>\",\n          \"typography_typography\": \"custom\",\n          \"typography_font_family\": \"Inter\",\n          \"typography_font_size\": {\n            \"unit\": \"px\",\n            \"size\": 16,\n            \"sizes\": []\n          },\n          \"text_color\": \"#94A3B8\"\n        },\n        \"elements\": [],\n        \"isInner\": false,\n        \"widgetType\": \"text-editor\",\n        \"elType\": \"widget\"\n      }\n    ],\n    \"isInner\": true,\n    \"elType\": \"container\"\n  },\n  {\n    \"id\": \"c9efd2a\",\n    \"settings\": {\n      \"background_background\": \"classic\",\n      \"background_color\": \"#0F172A\",\n      \"padding\": {\n        \"unit\": \"px\",\n        \"top\": \"24\",\n        \"right\": \"24\",\n        \"bottom\": \"24\",\n        \"left\": \"24\",\n        \"isLinked\": true\n      }\n    },\n    \"elements\": [\n      {\n        \"id\": \"1a1f64b5\",\n        \"settings\": {\n          \"editor\": \"<p>Lorem ipsum dolor sit amet</p>\",\n          \"typography_typography\": \"custom\",\n          \"typography_font_family\": \"Inter\",\n          \"typography_font_size\": {\n            \"unit\": \"px\",\n            \"size\": 16,\n            \"sizes\": []\n          },\n          \"text_color\": \"#94A3B8\"\n        },\n        \"elements\": [],\n        \"isInner\": false,\n        \"widgetType\": \"text-editor\",\n        \"elType\": \"widget\"\n      }\n    ],\n    \"isInner\": true,\n    \"elType\": \"container\"\n  }\n],\n\"isInner\": false,\n\"widgetType\": \"nested-accordion\",\n\"elType\": \"widget\"\n}\n```\n\n-----",
+              "type": "string"
+            },
+            {
+              "id": "70aa9b4f-1e3c-4d3e-9791-604aa54cc92f",
+              "name": "image-carousel",
+              "value": "### Image Carousel (Widget)\n\nUsed for a slideshow of images.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"image-carousel\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `carousel`: An array of simplified image objects: `{ \"id\": \"\", \"url\": \"https://picsum.photos/...\" }`. Use multiple Picsum images.\n      * `slides_to_show`: (e.g., \"3\").\n\n**Example (Image Carousel):**\n\n```json\n{\n  \"id\": \"2ffc6951\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"image-carousel\",\n  \"settings\": {\n    \"carousel\": [\n      { \"id\": \"\", \"url\": \"https://picsum.photos/800/600?random=1\" },\n      { \"id\": \"\", \"url\": \"https://picsum.photos/800/600?random=2\" },\n      { \"id\": \"\", \"url\": \"https://picsum.photos/800/600?random=3\" }\n    ],\n    \"slides_to_show\": \"1\",\n    \"slides_to_scroll\": \"1\"\n  },\n  \"elements\": []\n}\n```\n\n-----",
+              "type": "string"
+            },
+            {
+              "id": "f90bef15-6eb4-4699-9db8-5ffb86642f9e",
+              "name": "icon-list",
+              "value": "### Icon List (Widget)\n\nUsed for a bulleted list with custom icons.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"icon-list\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `icon_list`: An array of objects. Each object has `text` (the list item) and optionally `selected_icon` (an icon object with `value` and `library`).\n\n**Example (Icon List):**\n\n```json\n{\n  \"id\": \"2bee7be7\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"icon-list\",\n  \"settings\": {\n    \"icon_list\": [\n      {\n        \"text\": \"Feature One\",\n        \"_id\": \"b406229\",\n        \"selected_icon\": { \"value\": \"fas fa-check\", \"library\": \"fa-solid\" }\n      },\n      {\n        \"text\": \"Feature Two\",\n        \"_id\": \"2429975\",\n        \"selected_icon\": { \"value\": \"fas fa-check\", \"library\": \"fa-solid\" }\n      }\n    ],\n    \"icon_size\": { \"unit\": \"px\", \"size\": 20, \"sizes\": [] },\n    \"text_color\": \"#333333\"\n  },\n  \"elements\": []\n}\n```\n\n-----",
+              "type": "string"
+            },
+            {
+              "id": "4edf743a-02e8-4a84-9d4b-841090fdaf6b",
+              "name": "counter",
+              "value": "### Counter (Widget)\n\nUsed for an animated number.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"counter\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `starting_number`: (e.g., 0).\n      * `ending_number`: The target number (e.g., 1000). **Must be relevant**.\n      * `prefix`: (e.g., \"+\").\n      * `suffix`: (e.g., \"K\").\n      * `title`: The text label. **Must be relevant**.\n\n**Example (Counter):**\n\n```json\n{\n  \"id\": \"47c92b3b\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"counter\",\n  \"settings\": {\n    \"starting_number\": 0,\n    \"ending_number\": 2500,\n    \"prefix\": \"\",\n    \"suffix\": \"+\",\n    \"title\": \"Happy Clients\",\n    \"number_color\": \"#111111\",\n    \"typography_number_font_size\": { \"unit\": \"px\", \"size\": 60, \"sizes\": [] },\n    \"title_color\": \"#555555\"\n  },\n  \"elements\": []\n}\n```\n\n-----",
+              "type": "string"
+            },
+            {
+              "id": "48430d59-9ba4-45f5-bb5e-a930b7c0ce28",
+              "name": "progress",
+              "value": "### Progress (Widget)\n\nUsed for an animated progress bar.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"progress\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `title`: The label for the bar. **Must be relevant**.\n      * `percent`: Object with `size` (the value, e.g., 90).\n      * `inner_text`: Text inside the bar.\n\n**Example (Progress):**\n\n```json\n{\n  \"id\": \"52e816ff\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"progress\",\n  \"settings\": {\n    \"title\": \"Customer Satisfaction\",\n    \"percent\": {\n      \"unit\": \"%\",\n      \"size\": 95,\n      \"sizes\": []\n    },\n    \"inner_text\": \"95%\",\n    \"bar_color\": \"#5CB85C\",\n    \"bar_height\": { \"unit\": \"px\", \"size\": 25, \"sizes\": [] }\n  },\n  \"elements\": []\n}\n```\n\n-----",
+              "type": "string"
+            },
+            {
+              "id": "7125078f-ccda-49ce-9be6-c1d77b0fcac1",
+              "name": "testimonial",
+              "value": "### Testimonial (Widget)\n\nUsed for a single user review.\n\n* `id`: A string representing the unique identifier (e.g., `\"477d9790\"`).\n* `elType`: Must be `\"widget\"`.\n* `widgetType`: Must be `\"testimonial\"`.\n* `isInner`: A boolean defining if the widget is nested inside an inner section (e.g., `false`).\n* `elements`: Must be an empty array `[]`.\n* `settings`: An object containing the comprehensive configuration for the testimonial content and styling:\n  * **Content**\n    * `testimonial_content`: The string containing the review text. **Must be relevant.**\n    * `testimonial_image`: An **Image Object** containing an integer `id` (e.g., `2831`) and a string `url`.\n    * `testimonial_name`: A string for the user's name. **Must be relevant.**\n    * `testimonial_job`: A string for the user's title or role. **Must be relevant.**\n  * **Layout & Alignment**\n    * `testimonial_alignment`: A string defining the overall alignment of the testimonial block (e.g., `\"start\"`).\n  * **Image Styling** *(Dimension Objects containing a `unit`, `size` or directional values, and an `isLinked` boolean)*\n    * `image_size`: Controls the dimensions of the avatar/image (e.g., `48px`).\n    * `image_border_radius`: A complex dimension object defining the `unit` (e.g., `\"%\"`), independent string values for `top`, `right`, `bottom`, and `left`, and an `isLinked` boolean indicating if the values are tied together.\n  * **Colors**\n    * `content_color` & `content_content_color`: Strings containing hex/rgba color codes for the review text.\n    * `name_color` & `name_text_color`: Strings containing hex/rgba color codes for the reviewer's name.\n    * `job_color` & `job_text_color`: Strings containing hex/rgba color codes for the reviewer's job title.\n  * **Testimonial Content Typography**\n    * `typography_testimonial_content_typography`: A string defining the typography mode (e.g., `\"custom\"`).\n    * `typography_testimonial_content_font_family`: The string name of the font (e.g., `\"Inter\"`).\n    * `typography_testimonial_content_font_style`: A string defining the style (e.g., `\"italic\"`).\n    * `typography_testimonial_content_font_size`: Dimension object for the font size (using `\"rem\"`).\n    * `content_typography_typography`: A string defining the typography mode (e.g., `\"custom\"`).\n    * `content_typography_font_family`: The string name of the font (e.g., `\"Montserrat\"`).\n    * `content_typography_font_weight`: A string defining the font weight (e.g., `\"400\"`).\n    * `content_typography_text_transform`: A string for casing (e.g., `\"none\"`).\n    * `content_typography_font_style`: A string defining the style (e.g., `\"normal\"`).\n    * `content_typography_text_decoration`: A string defining decoration (e.g., `\"none\"`).\n    * `content_typography_font_size`, `content_typography_font_size_tablet`, `content_typography_font_size_mobile`: Dimension objects for responsive font sizes.\n    * `content_typography_line_height`: Dimension object for line height.\n  * **Name Typography**\n    * `name_typography_typography`: A string defining the typography mode.\n    * `name_typography_font_family`: The string name of the font.\n    * `name_typography_font_weight`: A string defining the font weight (e.g., `\"400\"`).\n    * `name_typography_text_transform`: A string for casing (e.g., `\"capitalize\"`).\n    * `name_typography_font_style`: A string defining the style.\n    * `name_typography_text_decoration`: A string defining decoration.\n    * `name_typography_font_size`, `name_typography_font_size_tablet`, `name_typography_font_size_mobile`: Dimension objects for responsive font sizes.\n    * `name_typography_line_height`: Dimension object for line height.\n  * **Job Typography**\n    * `job_typography_typography`: A string defining the typography mode.\n    * `job_typography_font_family`: The string name of the font.\n    * `job_typography_font_weight`: A string defining the font weight (e.g., `\"500\"`).\n    * `job_typography_text_transform`: A string for casing (e.g., `\"capitalize\"`).\n    * `job_typography_font_style`: A string defining the style.\n    * `job_typography_text_decoration`: A string defining decoration.\n    * `job_typography_font_size`, `job_typography_font_size_tablet`: Dimension objects for responsive font sizes.\n    * `job_typography_line_height`, `job_typography_line_height_tablet`: Dimension objects for responsive line heights.\n\n**Example (Testimonial):**\n\n```json\n{\n        \"id\": \"477d9790\",\n        \"settings\": {\n          \"testimonial_content\": \"\\\"I took 5 different Udemy courses and still couldn't build an app. This 30-day challenge changed everything. I just landed my first Junior Dev role!\\\"\",\n          \"testimonial_image\": {\n            \"id\": 2831,\n            \"url\": \"https://glanspro.nl/wp-content/uploads/2026/04/1775813056_969-100x100-1.jpg\"\n          },\n          \"testimonial_name\": \"Alex P.\",\n          \"testimonial_job\": \"Frontend Intern\",\n          \"image_size\": {\n            \"unit\": \"px\",\n            \"size\": 48,\n            \"sizes\": []\n          },\n          \"image_border_radius\": {\n            \"unit\": \"%\",\n            \"top\": \"50\",\n            \"right\": \"50\",\n            \"bottom\": \"50\",\n            \"left\": \"50\",\n            \"isLinked\": true\n          },\n          \"testimonial_alignment\": \"start\",\n          \"content_color\": \"#E2E8F0\",\n          \"name_color\": \"#F8FAFC\",\n          \"job_color\": \"#94A3B8\",\n          \"typography_testimonial_content_typography\": \"custom\",\n          \"typography_testimonial_content_font_family\": \"Inter\",\n          \"typography_testimonial_content_font_size\": {\n            \"unit\": \"rem\",\n            \"size\": 1.125,\n            \"sizes\": []\n          },\n          \"typography_testimonial_content_font_style\": \"italic\",\n          \"content_content_color\": \"#FFFFFF\",\n          \"content_typography_typography\": \"custom\",\n          \"content_typography_font_family\": \"Montserrat\",\n          \"content_typography_font_size\": {\n            \"unit\": \"px\",\n            \"size\": \"16\",\n            \"sizes\": []\n          },\n          \"content_typography_font_size_tablet\": {\n            \"unit\": \"px\",\n            \"size\": \"14\",\n            \"sizes\": []\n          },\n          \"content_typography_font_size_mobile\": {\n            \"unit\": \"px\",\n            \"size\": \"14\",\n            \"sizes\": []\n          },\n          \"content_typography_font_weight\": \"400\",\n          \"content_typography_text_transform\": \"none\",\n          \"content_typography_font_style\": \"normal\",\n          \"content_typography_text_decoration\": \"none\",\n          \"content_typography_line_height\": {\n            \"unit\": \"em\",\n            \"size\": \"1.6\",\n            \"sizes\": []\n          },\n          \"name_text_color\": \"#FFFFFF\",\n          \"name_typography_typography\": \"custom\",\n          \"name_typography_font_family\": \"Montserrat\",\n          \"name_typography_font_size\": {\n            \"unit\": \"px\",\n            \"size\": 24,\n            \"sizes\": []\n          },\n          \"name_typography_font_size_tablet\": {\n            \"unit\": \"px\",\n            \"size\": \"20\",\n            \"sizes\": []\n          },\n          \"name_typography_font_size_mobile\": {\n            \"unit\": \"px\",\n            \"size\": \"16\",\n            \"sizes\": []\n          },\n          \"name_typography_font_weight\": \"400\",\n          \"name_typography_text_transform\": \"capitalize\",\n          \"name_typography_font_style\": \"normal\",\n          \"name_typography_text_decoration\": \"none\",\n          \"name_typography_line_height\": {\n            \"unit\": \"em\",\n            \"size\": \"1.2\",\n            \"sizes\": []\n          },\n          \"job_text_color\": \"#F6F6F6\",\n          \"job_typography_typography\": \"custom\",\n          \"job_typography_font_family\": \"Montserrat\",\n          \"job_typography_font_size\": {\n            \"unit\": \"px\",\n            \"size\": 16,\n            \"sizes\": []\n          },\n          \"job_typography_font_size_tablet\": {\n            \"unit\": \"px\",\n            \"size\": \"16\",\n            \"sizes\": []\n          },\n          \"job_typography_font_weight\": \"500\",\n          \"job_typography_text_transform\": \"capitalize\",\n          \"job_typography_font_style\": \"normal\",\n          \"job_typography_text_decoration\": \"none\",\n          \"job_typography_line_height\": {\n            \"unit\": \"em\",\n            \"size\": \"1.4\",\n            \"sizes\": []\n          },\n          \"job_typography_line_height_tablet\": {\n            \"unit\": \"em\",\n            \"size\": \"1.4\",\n            \"sizes\": []\n          }\n        },\n        \"elements\": [],\n        \"isInner\": false,\n        \"widgetType\": \"testimonial\",\n        \"elType\": \"widget\"\n}\n```\n\n-----",
+              "type": "string"
+            },
+            {
+              "id": "c36c810e-eb10-4d4f-9fb0-3f56e07a452c",
+              "name": "social-icons",
+              "value": "### Social Icons (Widget)\n\nUsed for a list of social media links.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"social-icons\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `social_icon_list`: An array of objects. Each object needs:\n          * `social_icon`: An icon object (e.g., `{ \"value\": \"fab fa-facebook\", \"library\": \"fa-brands\" }`).\n          * `link`: A link object (e.g., `{ \"url\": \"https://facebook.com\", ... }`).\n\n**Example (Social Icons):**\n\n```json\n{\n  \"id\": \"3b2e6cb3\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"social-icons\",\n  \"settings\": {\n    \"social_icon_list\": [\n      {\n        \"social_icon\": { \"value\": \"fab fa-facebook\", \"library\": \"fa-brands\" },\n        \"_id\": \"a22a15d\",\n        \"link\": { \"url\": \"https://facebook.com\", \"is_external\": \"true\", \"nofollow\": \"\" }\n      },\n      {\n        \"social_icon\": { \"value\": \"fab fa-twitter\", \"library\": \"fa-brands\" },\n        \"_id\": \"fcead12\",\n        \"link\": { \"url\": \"https://twitter.com\", \"is_external\": \"true\", \"nofollow\": \"\" }\n      }\n    ],\n    \"shape\": \"circle\",\n    \"icon_size\": { \"unit\": \"px\", \"size\": 18, \"sizes\": [] }\n  },\n  \"elements\": []\n}\n```\n\n-----",
+              "type": "string"
+            },
+            {
+              "id": "051382c3-41cb-492a-9a17-27883aa641fd",
+              "name": "rating",
+              "value": "### Rating (Widget)\n\nUsed for displaying a star rating.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"rating\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `rating_scale`: Object with `size` (e.g., 5).\n      * `rating_value`: The score (e.g., 4.5). **Must be relevant**.\n      * `rating_icon`: Icon object, usually `\"fas fa-star\"`.\n      * `icon_color`: Color for filled stars.\n      * `icon_unmarked_color`: Color for empty stars.\n\n**Example (Rating):**\n\n```json\n{\n  \"id\": \"53bea524\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"rating\",\n  \"settings\": {\n    \"rating_scale\": { \"unit\": \"px\", \"size\": 5, \"sizes\": [] },\n    \"rating_value\": 4.5,\n    \"rating_icon\": { \"value\": \"fas fa-star\", \"library\": \"fa-solid\" },\n    \"icon_size\": { \"unit\": \"px\", \"size\": 20, \"sizes\": [] },\n    \"icon_color\": \"#FFD700\",\n    \"icon_unmarked_color\": \"#CCCCCC\"\n  },\n  \"elements\": []\n}\n```\n\n-----",
+              "type": "string"
+            },
+            {
+              "id": "6aadff39-1702-4e03-b661-ebd9858d60d9",
+              "name": "form",
+              "value": "### Form (Widget)\n\nUsed for creating contact or lead-gen forms.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"form\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `form_fields`: An array of objects, one for each field. Each object defines `field_type` (`text`, `email`, `textarea`, `select`, etc.), `field_label`, `placeholder`, and `width`.\n      * `button_text`: The text for the submit button.\n      * Styling for labels, fields, and the button is included.\n\n**Example (Form):**\n\n```json\n{\n  \"id\": \"41ab6718\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"form\",\n  \"settings\": {\n    \"form_name\": \"New Form\",\n    \"form_fields\": [\n      {\n        \"custom_id\": \"name\",\n        \"field_label\": \"Name\",\n        \"placeholder\": \"Your Name\",\n        \"width\": \"100\",\n        \"_id\": \"3726c54\",\n        \"required\": \"true\"\n      },\n      {\n        \"custom_id\": \"email\",\n        \"field_type\": \"email\",\n        \"required\": \"true\",\n        \"field_label\": \"Email\",\n        \"placeholder\": \"Your Email\",\n        \"width\": \"100\",\n        \"_id\": \"7a07d35\"\n      },\n      {\n        \"custom_id\": \"message\",\n        \"field_type\": \"textarea\",\n        \"field_label\": \"Message\",\n        \"placeholder\": \"Your Message\",\n        \"width\": \"100\",\n        \"_id\": \"317daef\"\n      }\n    ],\n    \"button_text\": \"Send\",\n    \"success_message\": \"Your submission was successful.\",\n    \"button_background_color\": \"#027BD6\",\n    \"button_text_color\": \"#FFFFFF\"\n  },\n  \"elements\": []\n}\n```\n\n-----",
+              "type": "string"
+            },
+            {
+              "id": "5f901fd0-4504-47df-a8ff-4f97667456b9",
+              "name": "slides",
+              "value": "### Slides (Widget)\n\nA self-contained slideshow where each slide has a background, title, text, and button.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"slides\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `slides`: An array of objects. Each object is a slide with properties for `heading`, `description`, `button_text`, and `background_image` or `background_color`.\n      * `background_image` must be an **Image Object**.\n      * Global settings control `slides_height`, navigation (arrows/dots), and default typography/button styles.\n\n**Example (Slides):**\n\n```json\n{\n  \"id\": \"6df91871\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"slides\",\n  \"settings\": {\n    \"slides\": [\n      {\n        \"heading\": \"Slide Title 1\",\n        \"description\": \"This is a description for the first slide.\",\n        \"button_text\": \"Learn More\",\n        \"background_image\": {\n          \"url\": \"https://picsum.photos/1200/500?random=1\",\n          \"id\": \"\",\n          \"size\": \"\",\n          \"source\": \"url\"\n        },\n        \"_id\": \"fd17634\",\n        \"background_overlay\": \"yes\"\n      },\n      {\n        \"heading\": \"Slide Title 2\",\n        \"description\": \"This is a description for the second slide.\",\n        \"button_text\": \"Get Started\",\n        \"background_color\": \"#D3277E\",\n        \"_id\": \"d7c7abd\"\n      }\n    ],\n    \"slides_height\": { \"unit\": \"px\", \"size\": 500, \"sizes\": [] },\n    \"heading_color\": \"#FFFFFF\",\n    \"description_color\": \"#FFFFFF\",\n    \"button_text_color\": \"#FFFFFF\",\n    \"button_background_color\": \"#003BFF\"\n  },\n  \"elements\": []\n}\n```\n\n-----",
+              "type": "string"
+            },
+            {
+              "id": "89503afa-f598-4693-b336-30c9ed687ac9",
+              "name": "price-list",
+              "value": "### Price List (Widget)\n\nUsed for creating a list of items with prices, perfect for menus.\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"price-list\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * `price_list`: An array of objects. Each object is a list item with `title`, `item_description`, `price`, and an optional `image`.\n      * `image` must be an **Image Object**.\n      * Global settings control typography and colors for title, price, description, and the separator style.\n\n**Example (Price List):**\n\n```json\n{\n  \"id\": \"ac9a988\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"price-list\",\n  \"settings\": {\n    \"price_list\": [\n      {\n        \"title\": \"Item One\",\n        \"item_description\": \"Description for the first item on the list.\",\n        \"price\": \"$12.50\",\n        \"_id\": \"d1a0d09\",\n        \"image\": {\n          \"url\": \"https://picsum.photos/150/150?random=1\",\n          \"id\": \"\",\n          \"size\": \"\",\n          \"source\": \"url\"\n        }\n      },\n      {\n        \"title\": \"Item Two\",\n        \"item_description\": \"Description for the second item on the list.\",\n        \"price\": \"$9.00\",\n        \"_id\": \"ea12373\"\n      }\n    ],\n    \"heading_color\": \"#000000\",\n    \"price_color\": \"#EE0000\",\n    \"description_color\": \"#2E0A0A\",\n    \"separator_style\": \"dashed\"\n  },\n  \"elements\": []\n}\n```\n\n-----",
+              "type": "string"
+            },
+            {
+              "id": "a7da8c45-b1e8-42b1-a7d7-531042094842",
+              "name": "price-table",
+              "value": "### Price Table (Widget)\n\nA single, comprehensive pricing column or tier. (Use 2-3 in a Grid for a full pricing section).\n\n  * `elType`: `\"widget\"`\n  * `widgetType`: `\"price-table\"`\n  * `elements`: Must be `[]`.\n  * `settings`:\n      * **Header:** `heading` (e.g., \"Pro Plan\"), `sub_heading`.\n      * **Pricing:** `price`, `currency_symbol`, `period`.\n      * **Sale:** `sale: \"yes\"` and `original_price` (to show a discount).\n      * **Features:** `features_list` (an array of items, same as `icon-list`).\n      * **Footer:** `button_text` and `footer_additional_info`.\n      * **Ribbon:** `ribbon_title` (e.g., \"Most Popular\").\n\n**Example (Price Table):**\n\n```json\n{\n  \"id\": \"76a922b2\",\n  \"elType\": \"widget\",\n  \"isInner\": false,\n  \"widgetType\": \"price-table\",\n  \"settings\": {\n    \"heading\": \"Pro Plan\",\n    \"sub_heading\": \"Best for growing teams\",\n    \"price\": \"49.99\",\n    \"period\": \"Monthly\",\n    \"features_list\": [\n      {\n        \"item_text\": \"All Core Features\",\n        \"selected_item_icon\": { \"value\": \"fas fa-check\", \"library\": \"fa-solid\" },\n        \"_id\": \"01d7b02\"\n      },\n      {\n        \"item_text\": \"100GB Storage\",\n        \"selected_item_icon\": { \"value\": \"fas fa-check\", \"library\": \"fa-solid\" },\n        \"_id\": \"41306a6\"\n      },\n      {\n        \"item_text\": \"Priority Support\",\n        \"selected_item_icon\": { \"value\": \"fas fa-check\", \"library\": \"fa-solid\" },\n        \"_id\": \"faaa957\"\n      }\n    ],\n    \"button_text\": \"Choose Plan\",\n    \"header_bg_color\": \"#000000\",\n    \"heading_color\": \"#FFFFFF\",\n    \"price_color\": \"#000000\",\n    \"features_list_bg_color\": \"#FFFFFF\",\n    \"button_background_color\": \"#027BD6\",\n    \"button_text_color\": \"#FFFFFF\"\n  },\n  \"elements\": []\n}\n```\n\n-----",
+              "type": "string"
+            },
+            {
+              "id": "f371311b-37eb-456c-84c4-c483f22bd15d",
+              "name": "testimonial-carousel",
+              "value": "### Testimonial Carousel (Widget)\n\nA slideshow of testimonials.\n\n### Core Properties\n\n* `id`: A string representing the unique identifier (e.g., `\"62f98065\"`).\n* `elType`: Must be `\"widget\"`.\n* `widgetType`: Must be `\"testimonial-carousel\"`.\n* `isInner`: A boolean defining if the widget is nested inside an inner section (e.g., `false`).\n* `elements`: Must be an empty array `[]`.\n\n### Settings: Carousel Behavior & Layout\n\n* `slides_name`: A string for the internal label of the slides (e.g., `\"Slides\"`).\n* `layout`: A string defining the structure of the testimonial elements. *Possible values: `\"image_inline\"`, `\"image_above\"`, `\"image_left\"`, `\"image_right\"`, `\"image_stacked\"`.*\n* `slides_per_view`: A string or integer defining how many slides are visible at once. *Possible values: `\"1\"`, `\"2\"`, `\"3\"`, `\"4\"`, `\"5\"`, `\"auto\"`.*\n* `slides_to_scroll`: A string or integer defining how many slides move per swipe/click. *Possible values: `\"1\"`, `\"2\"`, `\"3\"`, `\"4\"`, `\"5\"`.*\n* `width`: A dimension object controlling the overall width of the carousel container. *Possible units: `\"%\"`, `\"px\"`, `\"vw\"`.*\n\n### Settings: Slides Content Array\n\n* `slides`: An array of objects representing individual testimonial slides.\n* `slides[]._id`: A unique string identifier for the slide.\n* `slides[].content`: The string containing the actual review text.\n* `slides[].name`: The string for the user's name.\n* `slides[].title`: The string for the user's job or title.\n* `slides[].image`: An **Image Object** containing an integer `id` and a string `url`.\n\n### Settings: Styling & Colors\n\n* `background_color`: A string containing the hex/rgba code for the overall widget background.\n* `slide_background_color`: A string containing the hex/rgba code for the individual slide background.\n* `content_color`: A string containing the hex/rgba code for the testimonial text.\n* `name_color`: A string containing the hex/rgba code for the reviewer's name.\n* `title_color`: A string containing the hex/rgba code for the reviewer's title.\n* `pagination_color`: A string containing the hex/rgba code for the active pagination dots.\n* `pagination_color_inactive`: A string containing the hex/rgba code for the inactive pagination dots.\n\n### Settings: Borders & Spacing (Dimension Objects)\n\n* `border_radius` & `slide_border_radius`: Dimension objects defining the corner rounding for the wrapper and individual slides. *Possible units: `\"px\"`, `\"%\"`.*\n* `slide_border_size`: A dimension object defining the border thickness for individual slides. *Possible units: `\"px\"`, `\"em\"`.*\n* `slide_border_color`: A string containing the hex/rgba color code for the slide border.\n* `slide_padding`: A dimension object controlling internal space within each slide. *Possible units: `\"px\"`, `\"em\"`, `\"%\"`.*\n* `content_gap`: A dimension object defining the vertical/horizontal space between elements (image, text, name) inside the slide. *Possible units: `\"px\"`, `\"em\"`, `\"rem\"`.*\n* `pagination_size`: A dimension object controlling the size of the pagination dots. *Possible units: `\"px\"`, `\"em\"`.*\n\n### Settings: Image Styling\n\n* `image_size`: A dimension object controlling the width/height of the avatar image. *Possible units: `\"px\"`, `\"vw\"`, `\"%\"`.*\n* `image_border`: A string defining if the image has a border. *Possible values: `\"yes\"`, `\"no\"`.*\n* `image_border_width`: A dimension object defining the image's border thickness. *Possible units: `\"px\"`, `\"em\"`.*\n* `image_border_color`: A string containing the hex/rgba code for the image border.\n* `image_border_radius`: A dimension object defining the rounding of the image (e.g., 50px or 50% for circular). *Possible units: `\"px\"`, `\"%\"`.*\n\n### Settings: Typography\n\n* `content_typography_typography`, `name_typography_typography`, `title_typography_typography`: Strings defining the typography mode. *Possible values: `\"default\"`, `\"custom\"`.*\n* `content_typography_font_family`, `name_typography_font_family`, `title_typography_font_family`: String names of the fonts (e.g., `\"Inter\"`).\n* `content_typography_font_size`, `name_typography_font_size`, `title_typography_font_size`: Dimension objects for the font sizes. *Possible units: `\"px\"`, `\"em\"`, `\"rem\"`, `\"vw\"`.*\n* `content_typography_font_weight`, `name_typography_font_weight`: Strings defining the font weight. *Possible values: `\"100\"` through `\"900\"`, `\"normal\"`, `\"bold\"`, `\"bolder\"`, `\"lighter\"`.*\n* `content_typography_font_style`: A string defining the font style. *Possible values: `\"normal\"`, `\"italic\"`, `\"oblique\"`.*\n\n**Example (Testimonial Carousel):**\n\n```json\n{\n        \"id\": \"62f98065\",\n        \"settings\": {\n          \"slides\": [\n            {\n              \"content\": \"\\\"I went from working in retail to landing a junior developer role in just two months after finishing JS Mastery. The curriculum is intense but perfectly structured.\\\"\",\n              \"name\": \"Sarah Jenkins\",\n              \"title\": \"Frontend Developer @ TechCorp\",\n              \"image\": {\n                \"id\": 2952,\n                \"url\": \"https://glanspro.nl/wp-content/uploads/2026/04/1775816193_249-150x150-1.jpg\"\n              },\n              \"_id\": \"a9b0c1d2\"\n            },\n            {\n              \"content\": \"\\\"The focus on real-world projects instead of just theory was exactly what I needed. Week 3's advanced topics made me confident enough to tackle technical interviews.\\\"\",\n              \"name\": \"David Chen\",\n              \"title\": \"Software Engineer @ Innovate LLC\",\n              \"image\": {\n                \"id\": 2953,\n                \"url\": \"https://glanspro.nl/wp-content/uploads/2026/04/1775816193_35-150x150-1.jpg\"\n              },\n              \"_id\": \"e3f4g5h6\"\n            },\n            {\n              \"content\": \"\\\"I had tried learning JS on my own for a year. JS Mastery connected all the dots for me in just 30 days. The best investment I've made in my career.\\\"\",\n              \"name\": \"Emily Rodriguez\",\n              \"title\": \"Web Developer @ CreativeWeb\",\n              \"image\": {\n                \"id\": 2954,\n                \"url\": \"https://glanspro.nl/wp-content/uploads/2026/04/1775816193_678-150x150-1.jpg\"\n              },\n              \"_id\": \"i7j8k9l0\"\n            }\n          ],\n          \"slides_per_view\": \"1\",\n          \"slides_to_scroll\": \"1\",\n          \"background_color\": \"#FFFFFF\",\n          \"border_radius\": {\n            \"unit\": \"px\",\n            \"top\": \"12\",\n            \"right\": \"12\",\n            \"bottom\": \"12\",\n            \"left\": \"12\",\n            \"isLinked\": true\n          },\n          \"slide_border_size\": {\n            \"unit\": \"px\",\n            \"top\": \"1\",\n            \"right\": \"1\",\n            \"bottom\": \"1\",\n            \"left\": \"1\",\n            \"isLinked\": true\n          },\n          \"slide_border_color\": \"#E5E7EB\",\n          \"slide_padding\": {\n            \"unit\": \"px\",\n            \"top\": \"50\",\n            \"right\": \"50\",\n            \"bottom\": \"50\",\n            \"left\": \"50\",\n            \"isLinked\": true\n          },\n          \"content_color\": \"#000000\",\n          \"content_typography_typography\": \"custom\",\n          \"content_typography_font_family\": \"Inter\",\n          \"content_typography_font_size\": {\n            \"unit\": \"px\",\n            \"size\": 18,\n            \"sizes\": []\n          },\n          \"content_typography_font_style\": \"italic\",\n          \"name_color\": \"#4F46E5\",\n          \"name_typography_typography\": \"custom\",\n          \"name_typography_font_family\": \"Inter\",\n          \"name_typography_font_size\": {\n            \"unit\": \"rem\",\n            \"size\": 1.125,\n            \"sizes\": []\n          },\n          \"name_typography_font_weight\": \"700\",\n          \"title_color\": \"#4B5563\",\n          \"title_typography_typography\": \"custom\",\n          \"title_typography_font_family\": \"Inter\",\n          \"title_typography_font_size\": {\n            \"unit\": \"rem\",\n            \"size\": 0.875,\n            \"sizes\": []\n          },\n          \"image_size\": {\n            \"unit\": \"px\",\n            \"size\": 90,\n            \"sizes\": []\n          },\n          \"image_border\": \"yes\",\n          \"image_border_color\": \"#4F46E5\",\n          \"image_border_width\": {\n            \"unit\": \"px\",\n            \"size\": 3,\n            \"sizes\": []\n          },\n          \"image_border_radius\": {\n            \"unit\": \"px\",\n            \"size\": 50,\n            \"sizes\": []\n          },\n          \"pagination_color\": \"#4F46E5\",\n          \"pagination_color_inactive\": \"#E5E7EB\",\n          \"pagination_size\": {\n            \"unit\": \"px\",\n            \"size\": 12,\n            \"sizes\": []\n          },\n          \"slides_name\": \"Slides\",\n          \"layout\": \"image_above\",\n          \"width\": {\n            \"unit\": \"%\",\n            \"size\": 100,\n            \"sizes\": []\n          },\n          \"slide_background_color\": \"#FFFFFF\",\n          \"slide_border_radius\": {\n            \"unit\": \"px\",\n            \"size\": 10,\n            \"sizes\": []\n          },\n          \"content_gap\": {\n            \"unit\": \"px\",\n            \"size\": 20,\n            \"sizes\": []\n          },\n          \"content_typography_font_weight\": \"400\"\n        },\n        \"elements\": [],\n        \"isInner\": false,\n        \"widgetType\": \"testimonial-carousel\",\n        \"elType\": \"widget\"\n}\n```\n\n-----",
+              "type": "string"
+            },
+            {
+              "id": "d45cc9ac-e2fa-4182-8586-73b5c70583e2",
+              "name": "image-box",
+              "value": "### Image Box (Widget)\n\nA self-contained block combining an image, title, and description.\n\n* `id`: A string representing the unique identifier (e.g., `\"6f7fbab5\"`).\n* `elType`: Must be `\"widget\"`.\n* `widgetType`: Must be `\"image-box\"`.\n* `isInner`: A boolean defining if the widget is nested inside an inner section (e.g., `false`).\n* `elements`: Must be an empty array `[]`.\n* `settings`: An object containing the comprehensive configuration for the content, layout, and styling:\n  * **Content & Layout**\n    * `image`: An **Image Object** containing an integer `id` (e.g., `2949`) and a string `url`.\n    * `title_text`: The string representing the title.\n    * `description_text`: The string representing the body text.\n    * `text_align`: A string defining the text and content alignment. *Possible values: `\"left\"`, `\"center\"`, `\"right\"`, `\"justify\"`.*\n  * **Colors**\n    * `title_color`: A string containing the hex/rgba color code for the title text.\n    * `description_color`: A string containing the hex/rgba color code for the description text.\n  * **Image Styling** *(Dimension Objects generally contain a `unit`, a numeric or string `size` value, and a `sizes` array)*\n    * `image_size`: Controls the width/overall size of the image. *Possible units: `\"%\"`, `\"px\"`, `\"vw\"`, `\"custom\"`.*\n    * `image_height`, `image_height_tablet`, `image_height_mobile`: Dimension objects controlling the image height across breakpoints. *Possible units: `\"custom\"`, `\"px\"`, `\"vh\"`, `\"%\"`.* *(Note: `\"auto\"` is often used when the unit is `\"custom\"`).*\n    * `image_object_fit`: A string defining how the image is resized to fit its container. *Possible values: `\"default\"`, `\"fill\"`, `\"contain\"`, `\"cover\"`, `\"none\"`, `\"scale-down\"`.*\n  * **Spacing**\n    * `content_padding`: A complex dimension object defining internal spacing. Contains a `unit`, independent string/numeric values for `top`, `right`, `bottom`, and `left`, and an `isLinked` boolean indicating if the values are tied together. *Possible units: `\"px\"`, `\"em\"`, `\"% \"`, `\"rem\"`.*\n    * `title_bottom_space`: A dimension object controlling the vertical gap between the title and the description.\n  * **Title Typography**\n    * `title_typography_typography`: A string defining the typography mode. *Possible values: `\"default\"`, `\"custom\"`.*\n    * `title_typography_font_family`: The string name of the font (e.g., `\"Inter\"`).\n    * `title_typography_font_size`: Dimension object for the font size. *Possible units: `\"px\"`, `\"em\"`, `\"rem\"`, `\"vw\"`.*\n    * `title_typography_font_weight`: A string defining the font weight. *Possible values: `\"100\"`, `\"200\"`, `\"300\"`, `\"400\"`, `\"500\"`, `\"600\"`, `\"700\"`, `\"800\"`, `\"900\"`, `\"normal\"`, `\"bold\"`, `\"bolder\"`, `\"lighter\"`.*\n  * **Description Typography**\n    * `description_typography_typography`: A string defining the typography mode. *Possible values: `\"default\"`, `\"custom\"`.*\n    * `description_typography_font_family`: The string name of the font (e.g., `\"Inter\"`).\n    * `description_typography_font_size`: Dimension object for the font size. *Possible units: `\"px\"`, `\"em\"`, `\"rem\"`, `\"vw\"`.*\n    * `description_typography_font_weight`: A string defining the font weight. *Possible values: `\"100\"` through `\"900\"`, `\"normal\"`, `\"bold\"`, `\"bolder\"`, `\"lighter\"`.*\n\n**Example (Image Box):**\n\n```json\n{\n        \"id\": \"6f7fbab5\",\n        \"settings\": {\n          \"image\": {\n            \"id\": 2949,\n            \"url\": \"https://glanspro.nl/wp-content/uploads/2026/04/1775816193_623-600x400-1.jpg\"\n          },\n          \"title_text\": \"Weather Dashboard\",\n          \"description_text\": \"Build an interactive application that fetches real-time data using external APIs, utilizing asynchronous JavaScript and dynamic DOM manipulation.\",\n          \"text_align\": \"left\",\n          \"title_color\": \"#111827\",\n          \"description_color\": \"#000000\",\n          \"title_typography_typography\": \"custom\",\n          \"title_typography_font_family\": \"Inter\",\n          \"title_typography_font_size\": {\n            \"unit\": \"px\",\n            \"size\": 20,\n            \"sizes\": []\n          },\n          \"description_typography_typography\": \"custom\",\n          \"description_typography_font_family\": \"Inter\",\n          \"description_typography_font_size\": {\n            \"unit\": \"px\",\n            \"size\": 16,\n            \"sizes\": []\n          },\n          \"content_padding\": {\n            \"unit\": \"px\",\n            \"top\": \"24\",\n            \"right\": \"24\",\n            \"bottom\": \"24\",\n            \"left\": \"24\",\n            \"isLinked\": true\n          },\n          \"title_bottom_space\": {\n            \"unit\": \"px\",\n            \"size\": 10,\n            \"sizes\": []\n          },\n          \"image_size\": {\n            \"unit\": \"%\",\n            \"size\": 100,\n            \"sizes\": []\n          },\n          \"image_height\": {\n            \"unit\": \"custom\",\n            \"size\": \"auto\",\n            \"sizes\": []\n          },\n          \"image_height_tablet\": {\n            \"unit\": \"%\",\n            \"size\": \"\",\n            \"sizes\": []\n          },\n          \"image_height_mobile\": {\n            \"unit\": \"%\",\n            \"size\": \"\",\n            \"sizes\": []\n          },\n          \"image_object_fit\": \"cover\",\n          \"title_typography_font_weight\": \"600\",\n          \"description_typography_font_weight\": \"400\"\n        },\n        \"elements\": [],\n        \"isInner\": false,\n        \"widgetType\": \"image-box\",\n        \"elType\": \"widget\"\n}\n```\n\n-----",
+              "type": "string"
+            },
+            {
+              "id": "d237aceb-014d-4392-9a61-99454f6be86e",
+              "name": "icon-box",
+              "value": "### Icon Box (Widget)\n\nA self-contained block combining an icon, title, and description.\n\n  * `id`: A string representing the unique identifier (e.g., `\"4ffd8e09\"`).\n* `elType`: Must be `\"widget\"`.\n* `widgetType`: Must be `\"icon-box\"`.\n* `isInner`: A boolean defining if the widget is nested inside an inner section (e.g., `false`).\n* `elements`: Must be an empty array `[]`.\n* `settings`: An object containing the comprehensive configuration for the widget:\n  * **Content & Layout**\n    * `selected_icon`: An **Icon Object** containing the `value` (e.g., `\"fas fa-play-circle\"`) and font `library` (e.g., `\"fa-solid\"`).\n    * `title_text`: The string for the title. It's not mandatory. you can put empty string if there is no title text.\n    * `description_text`: The string for the body text. It's not mandatory. you can put empty string if there is no description text.\n    * `view`: A string defining the icon container's visual style (e.g., `\"stacked\"`).\n    * `shape`: A string defining the icon container's shape (e.g., `\"rounded\"`).\n    * `text_align`: A string defining content alignment (e.g., `\"left\"`).\n  * **Colors**\n    * `primary_color`: A string containing the primary hex/rgba color code.\n    * `secondary_color`: A string containing the secondary hex/rgba color code.\n    * `title_color`: A string containing the title text color code.\n    * `description_color`: A string containing the description text color code.\n    * `hover_title_color`: A string containing the title text color code on hover.\n  * **Sizing & Spacing** *(Dimension Objects containing a `unit`, a numeric or string `size` value, and a `sizes` array)*\n    * `icon_size`: Controls the dimensions of the icon.\n    * `icon_space`: Controls the gap between the icon and the title.\n    * `title_bottom_space`: Controls the gap between the title and the description.\n    * `icon_padding`: Controls the internal spacing around the icon.\n    * `rotate`: Controls the rotation angle of the icon (unit typically `\"deg\"`).\n  * **Borders**\n    * `border_radius`: A complex object defining the `unit` (e.g., `\"px\"`), independent string values for `top`, `right`, `bottom`, and `left`, and an `isLinked` boolean indicating if the values are tied together.\n  * **Title Typography**\n    * `title_typography_typography`: A string defining the typography mode (e.g., `\"custom\"`).\n    * `title_typography_font_family`: The string name of the font (e.g., `\"Montserrat\"`).\n    * `title_typography_font_weight`: A string defining the font weight (e.g., `\"400\"`).\n    * `title_typography_text_transform`: A string for casing (e.g., `\"capitalize\"`).\n    * `title_typography_font_style`: A string defining the style (e.g., `\"normal\"`).\n    * `title_typography_text_decoration`: A string defining decoration (e.g., `\"none\"`).\n    * `title_typography_font_size`: Dimension object for the desktop font size.\n    * `title_typography_font_size_tablet`: Dimension object for the tablet font size.\n    * `title_typography_font_size_mobile`: Dimension object for the mobile font size.\n    * `title_typography_line_height`: Dimension object for line height (typically using unit `\"em\"`).\n  * **Description Typography**\n    * `description_typography_typography`: A string defining the typography mode.\n    * `description_typography_font_family`: The string name of the font.\n    * `description_typography_font_weight`: A string defining the font weight (e.g., `\"100\"`).\n    * `description_typography_text_transform`: A string for casing (e.g., `\"none\"`).\n    * `description_typography_font_style`: A string defining the style (e.g., `\"normal\"`).\n    * `description_typography_text_decoration`: A string defining decoration (e.g., `\"none\"`).\n    * `description_typography_font_size`: Dimension object for the desktop font size.\n    * `description_typography_font_size_tablet`: Dimension object for the tablet font size.\n    * `description_typography_font_size_mobile`: Dimension object for the mobile font size.\n    * `description_typography_line_height`: Dimension object for line height.\n\n**Example (Icon Box):**\n\n```json\n{\n        \"id\": \"4ffd8e09\",\n        \"settings\": {\n          \"selected_icon\": {\n            \"value\": \"fas fa-play-circle\",\n            \"library\": \"fa-solid\"\n          },\n          \"title_text\": \"1. You Watch\",\n          \"description_text\": \"Hours spent passively watching outdated tutorials without applying the concepts.\",\n          \"text_align\": \"left\",\n          \"primary_color\": \"#6366F11A\",\n          \"title_color\": \"#F8FAFC\",\n          \"description_color\": \"#FFFFFF\",\n          \"icon_size\": {\n            \"unit\": \"px\",\n            \"size\": 32,\n            \"sizes\": []\n          },\n          \"view\": \"stacked\",\n          \"shape\": \"rounded\",\n          \"icon_space\": {\n            \"unit\": \"px\",\n            \"size\": 10,\n            \"sizes\": []\n          },\n          \"title_bottom_space\": {\n            \"unit\": \"px\",\n            \"size\": 10,\n            \"sizes\": []\n          },\n          \"secondary_color\": \"#EF4444\",\n          \"icon_padding\": {\n            \"unit\": \"px\",\n            \"size\": 16,\n            \"sizes\": []\n          },\n          \"rotate\": {\n            \"unit\": \"deg\",\n            \"size\": 0,\n            \"sizes\": []\n          },\n          \"border_radius\": {\n            \"unit\": \"px\",\n            \"top\": \"5\",\n            \"right\": \"5\",\n            \"bottom\": \"5\",\n            \"left\": \"5\",\n            \"isLinked\": true\n          },\n          \"title_typography_typography\": \"custom\",\n          \"title_typography_font_family\": \"Montserrat\",\n          \"title_typography_font_size\": {\n            \"unit\": \"px\",\n            \"size\": 30,\n            \"sizes\": []\n          },\n          \"title_typography_font_size_tablet\": {\n            \"unit\": \"px\",\n            \"size\": \"40\",\n            \"sizes\": []\n          },\n          \"title_typography_font_size_mobile\": {\n            \"unit\": \"px\",\n            \"size\": \"30\",\n            \"sizes\": []\n          },\n          \"title_typography_font_weight\": \"400\",\n          \"title_typography_text_transform\": \"capitalize\",\n          \"title_typography_font_style\": \"normal\",\n          \"title_typography_text_decoration\": \"none\",\n          \"title_typography_line_height\": {\n            \"unit\": \"em\",\n            \"size\": \"1.2\",\n            \"sizes\": []\n          },\n          \"hover_title_color\": \"#FFFFFF\",\n          \"description_typography_typography\": \"custom\",\n          \"description_typography_font_family\": \"Montserrat\",\n          \"description_typography_font_size\": {\n            \"unit\": \"px\",\n            \"size\": \"16\",\n            \"sizes\": []\n          },\n          \"description_typography_font_size_tablet\": {\n            \"unit\": \"px\",\n            \"size\": \"14\",\n            \"sizes\": []\n          },\n          \"description_typography_font_size_mobile\": {\n            \"unit\": \"px\",\n            \"size\": \"14\",\n            \"sizes\": []\n          },\n          \"description_typography_font_weight\": \"100\",\n          \"description_typography_text_transform\": \"none\",\n          \"description_typography_font_style\": \"normal\",\n          \"description_typography_text_decoration\": \"none\",\n          \"description_typography_line_height\": {\n            \"unit\": \"em\",\n            \"size\": \"1.6\",\n            \"sizes\": []\n          }\n        },\n        \"elements\": [],\n        \"isInner\": false,\n        \"widgetType\": \"icon-box\",\n        \"elType\": \"widget\"\n}\n```",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        32,
+        128
+      ],
+      "id": "964d7c7d-2f57-4f34-8c2a-3ef75b5a0809",
+      "name": "Widget Schema"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fa07c865-96ab-4651-bfaa-682c6c2b3bd8",
+              "name": "payload",
+              "value": "={{ $json.body.payload }}",
+              "type": "object"
+            },
+            {
+              "id": "f17c26f1-ebf2-4276-899c-9c76a674d540",
+              "name": "title",
+              "value": "={{ $json.body.title }}",
+              "type": "string"
+            },
+            {
+              "id": "9b6feb50-1c10-47fe-9a05-06cbc1971817",
+              "name": "type",
+              "value": "={{ $json.body.type }}",
+              "type": "string"
+            },
+            {
+              "id": "b8b7beff-2d52-4884-8d35-cad2fdcc16d3",
+              "name": "template",
+              "value": "={{ $json.body.template }}",
+              "type": "string"
+            },
+            {
+              "id": "12a2f4f0-de76-4afa-8ce3-206fa931f11a",
+              "name": "status",
+              "value": "={{ $json.body.status }}",
+              "type": "string"
+            },
+            {
+              "id": "22a3b9db-4b8d-425b-b2a6-f222c407a4af",
+              "name": "domain",
+              "value": "={{ $json.body.domain }}",
+              "type": "string"
+            },
+            {
+              "id": "42af1d74-e580-4b36-9d50-a636f77de64d",
+              "name": "code",
+              "value": "={{ $json.body.license_key }}",
+              "type": "string"
+            },
+            {
+              "id": "40cc346a-5291-4936-93a9-0c181d74e4e9",
+              "name": "sessionId",
+              "value": "={{ $json.body.sessionId }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -48,
+        -96
+      ],
+      "id": "9f146000-9860-450f-9ec4-faa6d2cf718d",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SAAS_API }}/api/page-builder-project/webhook/set-processing-elementor",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "sessionId",
+              "value": "={{ $('Prepare Data').item.json.sessionId }}"
+            },
+            {
+              "name": "license_key",
+              "value": "={{ $('Prepare Data').item.json.code }}"
+            },
+            {
+              "name": "domain",
+              "value": "={{ $('Prepare Data').item.json.domain }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        128,
+        -96
+      ],
+      "id": "b46450c7-f896-473e-948f-8f058a73e37e",
+      "name": "processing elementor"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SAAS_API }}/api/page-builder-project/webhook/set-done-elementor",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "sessionId",
+              "value": "={{ $('Prepare Data').item.json.sessionId }}"
+            },
+            {
+              "name": "license_key",
+              "value": "={{ $('Prepare Data').item.json.code }}"
+            },
+            {
+              "name": "domain",
+              "value": "={{ $('Prepare Data').item.json.domain }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        576,
+        320
+      ],
+      "id": "dab3bc3e-ef73-4a1e-9e85-682b9b06f8ae",
+      "name": "done elementor"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model4": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Widget Schema",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields5": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Widget Schema": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "processing elementor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "processing elementor": {
+      "main": [
+        [
+          {
+            "node": "Message a model4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "done elementor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "triggerCount": 1,
+  "versionId": "73002bbc-75b6-45f4-ad35-6116e27181ab",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "G6aKnDBpsyCVjLdc",
+  "isArchived": false
+}

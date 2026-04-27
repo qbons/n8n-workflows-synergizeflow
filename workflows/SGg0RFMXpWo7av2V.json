@@ -1,0 +1,766 @@
+{
+  "id": "SGg0RFMXpWo7av2V",
+  "name": "SF - AI Page Builder Reference(Inner) Page Builder v.2",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c5325c77-f15d-4b9b-81c0-6b45fac35322",
+              "name": "title",
+              "value": "={{ $json.body.title }}",
+              "type": "string"
+            },
+            {
+              "id": "e1382527-938a-4cc0-bdfb-c51c94828fa4",
+              "name": "status",
+              "value": "={{ $json.body.status }}",
+              "type": "string"
+            },
+            {
+              "id": "fd3ae3e2-2340-4182-9d7f-d4d89faf7d36",
+              "name": "desc",
+              "value": "={{ $json.body.desc }}",
+              "type": "string"
+            },
+            {
+              "id": "77f4e3e2-a5d7-4e8d-951d-fbab5d90bda7",
+              "name": "reff",
+              "value": "={{ $json.body.reff }}",
+              "type": "array"
+            },
+            {
+              "id": "50461d87-299f-4dce-8c24-18f86463b925",
+              "name": "domain",
+              "value": "={{ $json.body.domain }}",
+              "type": "string"
+            },
+            {
+              "id": "d914de83-6b25-44bb-8720-fddd1c6cebf1",
+              "name": "sessionId",
+              "value": "={{ $json.body.sessionId }}",
+              "type": "string"
+            },
+            {
+              "id": "9d5a9f33-08c0-4b57-b6cd-e27c891ad583",
+              "name": "license_key",
+              "value": "={{ $json.body.license_key }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": "={{ false }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2032,
+        128
+      ],
+      "id": "1465135b-866f-48e8-b758-922ce48ad3ba",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.domain }}/wp-json/synergize/v1/get-reff-data",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "reff",
+              "value": "={{ $json.reff }}"
+            },
+            {
+              "name": "code",
+              "value": "={{ $json.license_key }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1808,
+        128
+      ],
+      "id": "b36a2410-ef2a-483d-9e10-5df5b8198afa",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5818e4b0-340a-48ec-8f0f-85cac07ac986",
+              "name": "domain",
+              "value": "={{ $json.website.website_url }}",
+              "type": "string"
+            },
+            {
+              "id": "9214c352-ef07-4269-9c3d-5bcaac00fc1d",
+              "name": "content",
+              "value": "={{ $json.content }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1584,
+        128
+      ],
+      "id": "9d53294e-43d3-4367-944c-73f4a5c14347",
+      "name": "website data"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.domain }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1360,
+        128
+      ],
+      "id": "91b14f80-f66f-416c-83f2-e0758f2320b8",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "style",
+              "cssSelector": "link[rel=\"stylesheet\"]",
+              "returnValue": "attribute",
+              "attribute": "href",
+              "returnArray": true
+            },
+            {
+              "key": "content",
+              "cssSelector": "body *:not(script):not(svg):not(img):not(iframe)",
+              "returnValue": "html",
+              "returnArray": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        -1136,
+        128
+      ],
+      "id": "e27604f8-eb1a-4730-ac85-b9ad2ef3865e",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "jsCode": "function extractAssets(urls) {\n  const result = {\n    elementor: [],\n    fonts: []\n  };\n\n  urls.forEach(url => {\n    if (url.includes('elementor')) {\n      result.elementor.push(url);\n    }\n\n    if (url.includes('fonts.googleapis.com')) {\n      result.fonts.push(url);\n    }\n  });\n\n  return result;\n}\n\n// Example usage:\nconst urls = $input.first().json.style\n\nconst extracted = extractAssets(urls);\nreturn {style: extracted}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -912,
+        128
+      ],
+      "id": "b080abdb-57ca-4ba1-bcbe-6ce3f82d9e55",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "=style.elementor",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -688,
+        128
+      ],
+      "id": "18172867-2878-4e86-82c6-e0177ae0c65e",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -464,
+        128
+      ],
+      "id": "10c62259-fa71-45bc-aa14-8ce92ef08d39",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json['style.elementor'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -240,
+        128
+      ],
+      "id": "8a5bb4c9-0280-435b-9cde-d677ca782b58",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e2ce3cce-64db-45f7-9dae-ebea15d19829",
+              "name": "css",
+              "value": "={{ $json.data }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -16,
+        192
+      ],
+      "id": "9ca1b982-b001-4944-ae53-a0bb08e2bb32",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        -64
+      ],
+      "id": "3539162e-0bd1-41ad-9cbe-711b33499f19",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "jsCode": "let css = '';\nfor (const item of $input.first().json.data) {\n   css += item.css;\n}\n\nreturn {css:css}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -16,
+        -64
+      ],
+      "id": "bb6afdc3-8461-4f59-a59d-8be0ddb2f975",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "db4d5971-3b3a-41d5-bf8a-ef7b1ab2d1bf",
+              "name": "css",
+              "value": "={{ $json.css }}",
+              "type": "string"
+            },
+            {
+              "id": "9a406e13-1297-4cb9-b6d4-3234e368937c",
+              "name": "html",
+              "value": "={{ $('HTML').item.json.content }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        -64
+      ],
+      "id": "0383366a-afd0-4432-b622-2d907f2d5546",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_LATEST }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.toJsonString() }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "systemMessage": "You are an expert front-end design token extractor. Your task is to analyze raw JSON data containing CSS strings and HTML snippets to extract the core design system of a website, specifically its color palette and typography settings.\n\n**Instructions:**\n1. **Analyze the Data:** Scan the provided \"css\" string for global CSS variables (e.g., `--e-global-color-...`, `--e-global-typography-...`) and frequently used styling rules to determine the site's primary styling.\n2. **Extract Colors:** - Identify the `primary`, `secondary`, and `text` colors (usually hex codes). \n   - Extract any `additional` colors used for accents, buttons, or backgrounds into an array.\n3. **Extract Typography:**\n   - Identify the `font-family`, `font-size`, and `font-weight` for the `primary` (e.g., main headings/H1), `secondary` (e.g., subheadings/H2-H6), and `text` (e.g., body paragraphs) styles.\n   - Extract any `additional` font styles (e.g., accent, button text, or specific UI elements) into an array of objects containing their respective size, family, and weight.\n4. **Format Output:** Map the extracted data exactly to the JSON schema provided below. If a specific value cannot be confidently determined, leave the string empty (`\"\"`).\n5. **Strict Constraint:** You must output **ONLY** a valid JSON object. Do not include greetings, explanations, or conversational text. Do NOT wrap the output in markdown code blocks (e.g., no \\`\\`\\`json). The first character of your response must be `{` and the last character must be `}`.\n\n**Required JSON Output Schema:**\n{\n    \"color\": {\n        \"primary\": \"\",\n        \"secondary\": \"\",\n        \"text\": \"\",\n        \"additional\": []\n    },\n    \"font\": {\n        \"primary\": {\n            \"size\": \"\",\n            \"family\": \"\",\n            \"weight\": \"\"\n        },\n        \"secondary\": {\n            \"size\": \"\",\n            \"family\": \"\",\n            \"weight\": \"\"\n        },\n        \"text\": {\n            \"size\": \"\",\n            \"family\": \"\",\n            \"weight\": \"\"\n        },\n        \"additional\": [\n            {\n                \"size\": \"\",\n                \"family\": \"\",\n                \"weight\": \"\"\n            }\n        ]\n    }\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        432,
+        -64
+      ],
+      "id": "438a2a3b-ef49-4f21-b671-da7f53edb586",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "/* Your getValidJsonObject function is good. \n  It correctly handles bad strings by returning null.\n  No changes are needed here.\n*/\nfunction getValidJsonObject(rawText) {\n\n    if (typeof rawText !== 'string' || rawText.trim() === '') {\n        console.error(\"Invalid input or empty text field.\");\n        return null;\n    }\n\n    let jsonString = rawText.trim();\n\n    // 2. Check for and remove the markdown JSON block fences.\n    const markdownRegex = /^```json\\s*([\\s\\S]*?)\\s*```$/;\n    const match = jsonString.match(markdownRegex);\n\n    if (match) {\n        jsonString = match[1];\n    }\n\n    // 3. Parse the cleaned string into a JSON object.\n    try {\n        return JSON.parse(jsonString);\n    } catch (error) {\n        // This is expected for parts that aren't JSON, like \"```\"\n        // console.error(\"Failed to parse JSON string:\", error); \n        // console.error(\"Problematic string:\", jsonString);\n        return null; // Returning null is key\n    }\n}\n\n// === NEW LOGIC ===\n\n// 1. Get the array of all parts\nconst allParts = $input.first().json.content.parts;\n\n// 2. Map each part to a parse attempt.\n//    - If part.text is valid JSON, we get the object.\n//    - If part.text is \"```\" or other non-JSON, getValidJsonObject returns null.\nconst parsedData = allParts\n    .map(part => getValidJsonObject(part.text))\n    .filter(result => result !== null); // 3. Filter out all the nulls\n\n// `parsedData` is now an array of all successfully parsed JSON objects.\n// In your example, it will be: [ [ { id: \"h3f8e9a1\", ... } ] ]\n\nreturn { data: {\n  description: $('Prepare Data').first().json.desc,\n  styling:parsedData[0],\n  content: $('website data').first().json.content\n} };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        784,
+        -64
+      ],
+      "id": "100b55d8-a5e7-4a4f-aa50-8f6458333ad8",
+      "name": "Code2",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_LATEST }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.toJsonString() }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "systemMessage": "=You are an AI agent responsible for generating a **high-quality, structured landing page** from a provided JSON object called `data`.\n\nYou have access to a **Gemini Search Tool**, which you MUST use to improve:\n\n* Copywriting quality\n* UX structure\n* Design inspiration\n* Industry relevance\n\n---\n\n# 📦 INPUT STRUCTURE\n\nYou will receive a JSON object called `data`:\n\n```json\n{\n  \"description\": \"\",\n  \"styling\": {},\n  \"content\": []\n}\n```\n\n---\n\n## 🔑 INPUT ROLES (CRITICAL)\n\n### 1. `description` (PRIMARY — SOURCE OF TRUTH)\n\n* Defines:\n\n  * Page goal\n  * Page type (e.g., service page, landing page, etc.)\n  * Target intent\n\n> ✅ ALWAYS prioritize `description` over everything else\n\n---\n\n### 2. `content` (SECONDARY — RAW KNOWLEDGE ONLY)\n\n* Contains messy HTML and unstructured data\n* MUST be treated as **information source only**\n\n### ❗ STRICT RULES:\n\n* ❌ IGNORE all HTML tags\n* ❌ IGNORE layout / structure\n* ❌ IGNORE sections (e.g., Home, About, etc.)\n* ❌ IGNORE inline styles, scripts, components\n* ❌ IGNORE CTAs (links, buttons, etc.)\n\n> ✅ ONLY extract meaningful TEXT information\n\n---\n\n### Content Usage Behavior:\n\n* Use content to:\n\n  * Understand the business\n  * Extract relevant facts\n  * Detect tone / vibe\n  * Identify possible services or offerings\n\n* If information is missing:\n\n  * ✅ Use Gemini Search Tool to **fill the gaps**\n  * ✅ Keep everything relevant to extracted context\n\n---\n\n### 3. `styling` (STRICT DESIGN SYSTEM)\n\nYou MUST follow:\n\n* ✅ Colors → ONLY from `styling.color`\n* ✅ Font family → ONLY from `styling.font.family`\n\nYou MAY adjust:\n\n* Font size\n* Font weight\n* Spacing\n* Layout\n\n> ❌ DO NOT introduce new colors or font families\n\n---\n\n# 🌐 LANGUAGE RULE\n\n* The final output language MUST follow the **language detected from `content`**\n\n---\n\n# 🧠 CORE WORKFLOW (MANDATORY)\n\n---\n\n## 1. 🔍 Research Phase (REQUIRED FIRST)\n\nYou MUST use **Gemini Search Tool** to research:\n\n* Relevant page type structure (based on `description`)\n* High-converting landing pages\n* Industry-standard sections\n* UX patterns\n* Content strategies\n\n---\n\n### Example:\n\nIf `description` = \"Create a service page\"\n\nYou MUST research:\n\n* What sections a service page should have\n* Common layouts\n* Conversion patterns\n\n---\n\n## 2. 🧠 Interpretation Phase\n\nAnalyze:\n\n* `description`\n* Extracted `content`\n\nDefine:\n\n* Target audience\n* Core value proposition\n* Website vibe / tone\n* Relevant services / offerings\n\n---\n\n## 3. 🧩 Structure Planning Phase (CRITICAL)\n\n> ❗ Structure MUST be based on **research**, NOT input\n\nYou MUST:\n\n* Decide sections dynamically\n* NOT rely on `content` structure\n* NOT rely on fixed templates\n\n---\n\n### Example Sections:\n\n* Hero\n* Services\n* Benefits\n* Process\n* Testimonials\n* FAQ\n\n---\n\n## 4. ✍️ Content Generation Phase\n\nYou MUST:\n\n* Rewrite ALL content (no copying)\n* Expand weak areas\n* Fill missing sections using research\n* Keep relevance with extracted content\n\n---\n\n### Rules:\n\n* Use benefits, not just features\n* Keep persuasive and clear tone\n* Maintain consistency with detected vibe\n\n---\n\n## 5. 🎨 UI Composition Phase (STRICT)\n\nYou MUST build the page using ONLY these element concepts:\n\n1.  **`Container`**\n      * **Description:** The main layout block for creating sections and holding other elements.\n      * **Usage:** Used to create all sections (e.g., \"Hero Section,\" \"Features Section\"). You control its background, spacing, etc. All other elements are placed inside a `Container`.\n2.  **`Heading`**\n      * **Description:** A text widget for displaying titles and headlines.\n      * **Usage:** For the main headline (H1) or section titles (H2, H3). You control text, font, size, and color.\n3.  **`Image`**\n      * **Description:** Displays a single, standalone image.\n      * **Usage:** For product shots, logos, etc. You will provide a placeholder image URL (e.g., from Picsum) and can control its size.\n4.  **`Text Editor`**\n      * **Description:** Displays blocks of formatted text (paragraphs).\n      * **Usage:** For all main body copy, descriptions, and paragraphs.\n5.  **`Button`**\n      * **Description:** Creates a clickable button.\n      * **Usage:** The main call-to-action (CTA). You must set the `text` (e.g., \"Learn More\") and `link`. You also control its style (colors, border-radius).\n6.  **`Grid`**\n      * **Description:** A special `Container` for creating multi-column layouts.\n      * **Usage:** For 2, 3, or 4-column layouts. **Crucial Rule:** You first add the `Grid`, then you place a separate **`Container`** inside *each* column to act as the \"cell\" that holds the content.\n7.  **`Video`**\n      * **Description:** Embeds a video player (e.g., from YouTube).\n      * **Usage:** For product demos, etc. You will find a relevant sample YouTube URL based on the topic.\n8.  **`Icon`**\n      * **Description:** Displays a single vector icon from the Font Awesome library.\n      * **Usage:** For small visual cues. You will pick a relevant Font Awesome class (e.g., \"fa fa-check\").\n9.  **`Google Maps`**\n      * **Description:** Embeds an interactive Google Map.\n      * **Usage:** For \"Contact Us\" sections. You will set a relevant `address` and control zoom/height.\n10. **`Nested Tabs`**\n      * **Description:** Organizes content into clickable tab panels.\n      * **Usage:** For complex feature sets. Has **tab titles** (with optional icons) and **content containers**. Clicking a title shows the corresponding content.\n11. **`Nested Accordion`**\n      * **Description:** Organizes content into collapsible accordion panels.\n      * **Usage:** The perfect widget for **FAQ sections**. Has **titles** (questions) and **content containers** (answers).\n12. **`Image Carousel`**\n      * **Description:** A simple slideshow for **images only**.\n      * **Usage:** For a gallery of images. You provide a list of images it will cycle through.\n13. **`Icon List`**\n      * **Description:** Creates a list of text items, each preceded by an icon.\n      * **Usage:** Ideal for \"Features\" or \"Benefits\" lists instead of plain bullet points.\n14. **`Counter`**\n      * **Description:** Displays an animated number counting up.\n      * **Usage:** For social proof (e.g., \"2,500+ Happy Clients\"). You will set an `ending_number` and `title`.\n15. **`Progress`**\n      * **Description:** Displays an animated progress bar.\n      * **Usage:** For skill levels (e.g., \"JavaScript - 90%\") or satisfaction scores.\n16. **`Testimonial`**\n      * **Description:** Displays a *single*, complete user review (quote, avatar, name, job).\n      * **Usage:** To show a single piece of social proof. You will create realistic placeholder content.\n17. **`Social Icons`**\n      * **Description:** Displays a list of clickable icons for social media profiles.\n      * **Usage:** For footers or headers. Takes a list of icons (Facebook, Twitter) and their `links`.\n18. **`Rating`**\n      * **Description:** Displays a visual, star-based rating.\n      * **Usage:** To show a score (e.g., \"4.5 out of 5\"). Often used with testimonials.\n19. **`Form`**\n      * **Description:** A complete widget for building contact or lead-gen forms.\n      * **Usage:** Contains `form_fields` (e.g., \"Name,\" \"Email\") and a `submit_button`. Fields can have widths (e.g., 50%) to be side-by-side.\n20. **`Slides`**\n      * **Description:** A powerful slideshow, perfect for hero sections.\n      * **Usage:** This is the **default choice for a Hero Section**. Each slide has its own `background_image`, `heading`, `description`, and `button`.\n21. **`Price List`**\n      * **Description:** A menu-style list of items (title, description, price).\n      * **Usage:** Perfect for restaurant menus or service lists.\n22. **`Price Table`**\n      * **Description:** A single, complete pricing *column* or *tier*.\n      * **Usage:** The **default choice for Pricing Sections**. You will place 2 or 3 of these inside a `Grid` to create a comparison. Each table has a `heading` (plan name), `price`, `features_list`, and a `button`.\n23. **`Testimonial Carousel`**\n      * **Description:** Displays multiple testimonials in a single sliding block.\n      * **Usage:** The **default choice for a Testimonials Section**. Each slide is a full testimonial (quote, avatar, name, job).\n24. **`Image Box`**\n      * **Description:** A combined widget: Image + Title + Description.\n      * **Usage:** A great choice for feature sections. You provide an `image`, `title_text`, and `description_text`.\n25. **`Icon Box`**\n      * **Description:** A combined widget: Icon + Title + Description.\n      * **Usage:** The **default choice for \"Features\" or \"Benefits\" sections**, typically placed inside a `Grid`. You provide an `selected_icon`, `title_text`, and `description_text`.\n\n---\n\n### ❗ CRITICAL RULE\n\n> You are STILL generating RAW HTML\n> BUT the structure MUST follow these element patterns\n\n---\n\n### Element Mapping Rules\n\n* Sections → Container (`<section>` / `<div>`)\n* Columns → Grid system\n* Features → Icon Box / Image Box\n* FAQ → Accordion\n* Testimonials → Carousel\n* Hero → structured section\n\n---\n\n### ❌ FORBIDDEN\n\n* Random/unstructured div usage\n* Arbitrary layouts not tied to elements\n\n---\n\n# 🖼️ IMAGE RULES (MANDATORY)\n\nUse **Picsum ONLY**\n\n```html\nhttps://picsum.photos/seed/{semantic-keyword}/{width}/{height}\n```\n\n### Rules:\n\n* MUST use meaningful keywords\n* ❌ Ignore ALL images from `content`\n* ❌ No external images\n* ❌ No base64\n\n---\n\n# 🚫 CTA RULE (STRICT)\n\n* ❌ IGNORE all CTAs from `content`\n* ❌ DO NOT generate new CTAs (for now)\n\n---\n\n# 🎨 CSS RULES\n\n* All CSS inside `\"css\"`\n* ❌ No inline styles\n\n### Scoped CSS (MANDATORY)\n\n```css\n#lp-root { ... }\n```\n\n---\n\n# ⚙️ JAVASCRIPT RULES\n\n* Use **jQuery ONLY**\n* Assume jQuery is already loaded\n\n---\n\n### Interaction Expectations\n\n* Accordion\n* Carousel\n* Smooth interactions\n\n---\n\n# 🧱 HTML RULES\n\n* Output injected inside `<body>`\n* ❌ DO NOT include `<html>`, `<head>`, `<body>`\n\n---\n\n### Root Wrapper (MANDATORY)\n\n```html\n<div id='lp-root'>\n  <!-- all content -->\n</div>\n```\n\n---\n\n# 🧩 DYNAMIC LAYOUT ENGINE\n\nYou MUST:\n\n* Build layout from scratch\n* Use research + content\n* Add/remove sections as needed\n\n---\n\n# ✍️ COPYWRITING RULES\n\nYou MUST include:\n\n* Strong headline\n* Clear value proposition\n* Benefits\n* Structured sections\n* Informative content\n\n---\n\nTone:\n\n* Clear\n* Trustworthy\n* Relevant to audience\n\n---\n\n# ⚠️ JSON SAFETY RULES\n\n* MUST be valid JSON\n* ❌ No comments\n* ❌ No trailing commas\n* Use double quotes for JSON\n* Use single quotes in HTML\n\n---\n\n# 🎯 OUTPUT FORMAT (STRICT)\n\nReturn ONLY:\n\n```json\n{\n  \"html\": \"\",\n  \"css\": \"\",\n  \"js\": \"\"\n}\n```\n\n---\n\n# 🚫 FORBIDDEN\n\n* External libraries\n* Bootstrap / Tailwind\n* External fonts\n* Inline CSS\n* Inline JS\n* Using HTML from `content`\n\n---\n\n# ✅ FINAL CHECKLIST\n\n* ✅ Research performed\n* ✅ Structure based on research\n* ✅ Content extracted (text only)\n* ✅ HTML ignored from content\n* ✅ Dynamic layout\n* ✅ Styling rules followed\n* ✅ Picsum images used\n* ✅ Element-based structure followed\n* ✅ No CTA\n* ✅ Valid JSON\n\n---\n\n# 🧠 PRIORITY RULE\n\nIf conflict occurs:\n\n> ✅ PRIORITIZE:\n\n1. `description`\n2. Research insights\n3. UX & conversion structure\n4. Content (supporting only)\n\n---\n\n# 🎯 FINAL GOAL\n\nCreate a landing page that is:\n\n* Research-driven\n* Content-aware\n* Structurally sound\n* Visually consistent\n* Fully functional\n* Based on real-world patterns\n\n---\n\n# ⏱️ TIMING\n\nIf any date/time is needed:\n\n```\n{{ $now.format('yyyy-MM-dd') }}\n```\n\n---\n",
+          "maxToolsIterations": 15
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        1008,
+        -64
+      ],
+      "id": "e6664325-c6f1-46e8-9217-c2a7f7a5dc3e",
+      "name": "Message a model1",
+      "retryOnFail": true,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', ``, 'string') }}",
+        "model": "={{ $vars.GEMINI_FLASH_PREVIEW }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-gemini-search.geminiSearchToolTool",
+      "typeVersion": 1,
+      "position": [
+        1088,
+        160
+      ],
+      "id": "19d04a69-2062-437d-9e03-fc2d51368b08",
+      "name": "Gemini Search Tool",
+      "credentials": {
+        "geminiSearchApi": {
+          "id": "HzOj98juqUxHGjsa",
+          "name": "SF - Gemini Search Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "/* Your getValidJsonObject function is good. \n  It correctly handles bad strings by returning null.\n  No changes are needed here.\n*/\nfunction getValidJsonObject(rawText) {\n\n    if (typeof rawText !== 'string' || rawText.trim() === '') {\n        console.error(\"Invalid input or empty text field.\");\n        return null;\n    }\n\n    let jsonString = rawText.trim();\n\n    // 2. Check for and remove the markdown JSON block fences.\n    const markdownRegex = /^```json\\s*([\\s\\S]*?)\\s*```$/;\n    const match = jsonString.match(markdownRegex);\n\n    if (match) {\n        jsonString = match[1];\n    }\n\n    // 3. Parse the cleaned string into a JSON object.\n    try {\n        return JSON.parse(jsonString);\n    } catch (error) {\n        // This is expected for parts that aren't JSON, like \"```\"\n        // console.error(\"Failed to parse JSON string:\", error); \n        // console.error(\"Problematic string:\", jsonString);\n        return null; // Returning null is key\n    }\n}\n\n// === NEW LOGIC ===\n\n// 1. Get the array of all parts\nconst allParts = $input.first().json.content.parts;\n\n// 2. Map each part to a parse attempt.\n//    - If part.text is valid JSON, we get the object.\n//    - If part.text is \"```\" or other non-JSON, getValidJsonObject returns null.\nconst parsedData = allParts\n    .map(part => getValidJsonObject(part.text))\n    .filter(result => result !== null); // 3. Filter out all the nulls\n\n// `parsedData` is now an array of all successfully parsed JSON objects.\n// In your example, it will be: [ [ { id: \"h3f8e9a1\", ... } ] ]\n\nreturn { data: parsedData[0] };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        -64
+      ],
+      "id": "15fd1f0f-53d9-4190-9db0-db61d838350c",
+      "name": "Code",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://dev-wizards.synergizeflow.com/webhook/v2/page-builder/elementor",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "payload",
+              "value": "={{ $json.data }}"
+            },
+            {
+              "name": "title",
+              "value": "={{ $('Prepare Data').item.json.title }}"
+            },
+            {
+              "name": "status",
+              "value": "publish"
+            },
+            {
+              "name": "type",
+              "value": "page"
+            },
+            {
+              "name": "template",
+              "value": "elementor_header_footer"
+            },
+            {
+              "name": "domain",
+              "value": "={{ $('Prepare Data').item.json.domain }}"
+            },
+            {
+              "name": "license_key",
+              "value": "={{ $('Prepare Data').item.json.license_key }}"
+            },
+            {
+              "name": "sessionId",
+              "value": "={{ $('Prepare Data').item.json.sessionId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1584,
+        -64
+      ],
+      "id": "404f4b5e-c534-4a6d-9f61-c9692a8170df",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v2/page-builder/reference-elementor",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2256,
+        128
+      ],
+      "id": "7c21fce3-cd7f-4a19-880b-cfd0b8248603",
+      "name": "Webhook",
+      "webhookId": "c335034a-01df-4826-9d8a-925fe9a00755"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SAAS_API }}/api/page-builder-project/webhook/update-status",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "token",
+              "value": "={{ $('Prepare Data').item.json.license_key }}"
+            },
+            {
+              "name": "status",
+              "value": "done"
+            },
+            {
+              "name": "sessionId",
+              "value": "={{ $('Prepare Data').item.json.sessionId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1792,
+        -64
+      ],
+      "id": "3c24a914-f2f9-48f9-a85f-4f18343d7e45",
+      "name": "HTTP Request4"
+    }
+  ],
+  "connections": {
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "website data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "website data": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Search Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Message a model1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "triggerCount": 1,
+  "versionId": "89b63601-2427-48ab-be6e-0bd6139025fd",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "G6aKnDBpsyCVjLdc",
+  "isArchived": false
+}

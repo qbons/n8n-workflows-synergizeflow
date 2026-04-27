@@ -1,0 +1,283 @@
+{
+  "id": "SjwP720WrMjgV6dg",
+  "name": "SF - AI Page Builder Process v.2",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v2/page-builder/process",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -192,
+        -32
+      ],
+      "id": "1c181e87-2cb4-48fa-a873-14a2bc6d68f6",
+      "name": "Webhook",
+      "webhookId": "84f0e403-3c36-4a3d-8f12-c49085734511"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_LATEST }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.data.toJsonString() }}"
+            },
+            {
+              "content": "=You are an AI agent responsible for generating a **high-converting landing page** from structured JSON input.\n\nYou have access to a **Gemini Search Tool**, which you MUST use to improve:\n\n* Copywriting quality\n* UX structure\n* Design inspiration\n* Industry relevance\n\n---\n\n## 🧠 CORE WORKFLOW (MANDATORY)\n\nYou MUST follow this process:\n\n### 1. 🔍 Research Phase (FIRST — REQUIRED)\n\nBefore generating anything, you MUST:\n\n* Use **Gemini Search Tool** to research:\n\n  * Similar products / courses / services\n  * High-converting landing pages\n  * Industry-standard sections\n  * Relevant marketing angles\n  * Common user concerns (for FAQ)\n\n---\n\n### Research Goals:\n\n* Improve **copywriting quality**\n* Discover **better section ideas**\n* Identify **conversion patterns**\n* Enhance **design direction**\n\n---\n\n### 2. 🧠 Interpretation Phase\n\nAnalyze:\n\n* `general_prompt`\n* `styling_prompt`\n\nDefine:\n\n* Target audience\n* Core value proposition\n* Emotional triggers\n* Best layout strategy\n\n---\n\n### 3. 🎨 Creative Generation Phase\n\nGenerate:\n\n* Page structure (dynamic)\n* UI layout\n* Copywriting\n* Interactions\n\n---\n\n## 🎯 OUTPUT FORMAT (STRICT — MUST FOLLOW)\n\nReturn ONLY:\n\n```json\n{\n  \"html\": \"\",\n  \"css\": \"\",\n  \"js\": \"\"\n}\n```\n\n---\n\n### Rules:\n\n* MUST be valid JSON\n* ❌ No comments\n* ❌ No trailing commas\n* Use **double quotes for JSON**\n* Use **single quotes in HTML attributes**\n\n---\n\n## 🧱 HTML RULES\n\n* Output will be injected inside `<body>`\n* ❌ DO NOT include `<html>`, `<head>`, `<body>`\n\n---\n\n### Root Wrapper (MANDATORY)\n\n```html id=\"1bc8vn\"\n<div id='lp-root'>\n  <!-- all content -->\n</div>\n```\n\n---\n\n### Structure Guidelines\n\n* Use semantic HTML\n* Clear hierarchy\n* No inline styles\n* No inline scripts\n\n---\n\n## 🖼️ IMAGE RULES (MANDATORY)\n\nUse **Picsum ONLY**\n\n### Format:\n\n```id=\"d9pm0v\"\nhttps://picsum.photos/seed/{keyword}/{width}/{height}\n```\n\n### Rules:\n\n* MUST use `seed`\n* ❌ No external images\n* ❌ No base64\n\n---\n\n## 🎯 ICON RULES\n\n* Inline SVG only\n* ❌ No `<img>` icons\n* ❌ No libraries\n\n---\n\n## 🎨 CSS RULES\n\n* All CSS inside `\"css\"`\n* ❌ No inline styles\n\n---\n\n### Scoped CSS (MANDATORY)\n\n```css id=\"0m0sci\"\n#lp-root { ... }\n```\n\n---\n\n## ⚙️ JAVASCRIPT RULES\n\n* Use **Vanilla Javascript ONLY**\n* Always use vanilla javascript without other third party library\n\n---\n\n### Interaction Expectations\n\nBased on research + layout:\n\n* Accordion (FAQ, curriculum)\n* Carousel (testimonials, hero if needed)\n* CTA interactions\n* Smooth scrolling\n\n---\n\n## 🧩 DYNAMIC LAYOUT ENGINE\n\nYou MUST NOT rely on fixed templates.\n\n---\n\n### Instead:\n\nUse:\n\n* Research insights\n* Input JSON\n\nTo dynamically decide:\n\n* Sections\n* Order\n* Layout types\n\n---\n\n### You MAY:\n\n* Add new sections (based on research)\n* Improve weak sections\n* Merge or split sections\n\n---\n\n### Goal:\n\n> Build the **best possible converting page**, not a literal interpretation\n\n---\n\n## ✍️ COPYWRITING RULES\n\nUse:\n\n* `general_prompt`\n* Research findings\n\n---\n\n### Must include:\n\n* Strong headline\n* Clear value proposition\n* Benefits (not just features)\n* Social proof\n* CTA repetition\n* Objection handling (FAQ)\n\n---\n\n### Tone:\n\n* Persuasive\n* Clear\n* Trustworthy\n* Energetic (when appropriate)\n\n---\n\n## 🎨 DESIGN INTELLIGENCE\n\nUse:\n\n* `styling_prompt`\n* Research inspiration\n\n---\n\n### You MUST:\n\n* Create visual hierarchy\n* Use contrast effectively\n* Guide user attention to CTA\n* Maintain consistency\n\n---\n\n## ⚠️ JSON SAFETY RULES\n\n* Escape all quotes properly\n* Ensure valid JSON\n* No malformed structure\n\n---\n\n## 🚫 FORBIDDEN\n\n* No external libraries\n* No Bootstrap / Tailwind\n* No external fonts\n* No inline JS\n* No inline CSS\n\n---\n\n## ✅ FINAL CHECKLIST\n\n* ✅ Research performed\n* ✅ Layout is dynamic\n* ✅ Valid JSON\n* ✅ HTML inside `<body>`\n* ✅ Root element is `<div id='lp-root'>`\n* ✅ Wrapped in `#lp-root`\n* ✅ Scoped CSS\n* ✅ Vanilla Javascript\n* ✅ Picsum images used\n* ✅ SVG icons used\n* ✅ Conversion-focused\n\n---\n\n## 🎯 FINAL GOAL\n\nCreate a landing page that is:\n\n* Research-backed\n* High-converting\n* Visually strong\n* Fully functional\n* Adaptable to ANY input JSON\n\n---\n\n## 🧠 PRIORITY RULE\n\nIf any conflict occurs:\n\n> ✅ Prioritize **research insights + conversion performance + UX quality** over strict interpretation of input JSON\n\n---\n\n---\n\n## TIMING\n\nIf there is any date time related information, use current date or time which is {{ $now.format('yyyy-MM-dd') }}\n\n---\n"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "maxToolsIterations": 15
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        432,
+        -32
+      ],
+      "id": "d4b8ada8-7eb1-4b40-bf6a-90e1a290b7b7",
+      "name": "Message a model",
+      "retryOnFail": true,
+      "waitBetweenTries": 3000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "58b83542-aae0-4d74-a9c5-df386217bf1c",
+              "name": "data",
+              "value": "={{ $('Webhook').item.json.body.data }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        -32
+      ],
+      "id": "7f7fdae9-6701-420e-b7a8-cb06ac97a5e8",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', ``, 'string') }}",
+        "model": "={{ $vars.GEMINI_FLASH_PREVIEW }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-gemini-search.geminiSearchToolTool",
+      "typeVersion": 1,
+      "position": [
+        512,
+        192
+      ],
+      "id": "fc729409-20d0-4014-aac6-edf54e352a50",
+      "name": "Gemini Search Tool",
+      "credentials": {
+        "geminiSearchApi": {
+          "id": "HzOj98juqUxHGjsa",
+          "name": "SF - Gemini Search Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let raw = $input.first().json.content.parts[0].text;\n\n// Clean markdown wrapper\nraw = raw.replace(/```json\\s*/i, \"\").replace(/```$/, \"\").trim();\n\n// Parse\nlet parsed = JSON.parse(raw);\n\nreturn [\n  {\n    json: parsed\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        784,
+        -32
+      ],
+      "id": "e8ae7389-9046-4e34-a821-b0cf0f17eac1",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SAAS_API }}/api/page-builder-project/webhook/insert-html",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "token",
+              "value": "={{ $('Webhook').item.json.body.token }}"
+            },
+            {
+              "name": "html",
+              "value": "={{ $json.html }}"
+            },
+            {
+              "name": "css",
+              "value": "={{ $json.css }}"
+            },
+            {
+              "name": "js",
+              "value": "={{ $json.js }}"
+            },
+            {
+              "name": "session",
+              "value": "={{ $('Webhook').item.json.body.session }}"
+            },
+            {
+              "name": "domain",
+              "value": "={{ $('Webhook').item.json.body.domain }}"
+            },
+            {
+              "name": "payload",
+              "value": "={{ $('Webhook').item.json.body.data }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1008,
+        -32
+      ],
+      "id": "71c1c449-a58b-4cdd-a44d-31f75e30d584",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SAAS_API }}/api/page-builder-project/webhook/set-processing",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "session",
+              "value": "={{ $('Webhook').item.json.body.session }}"
+            },
+            {
+              "name": "token",
+              "value": "={{ $('Webhook').item.json.body.token }}"
+            },
+            {
+              "name": "domain",
+              "value": "={{ $('Webhook').item.json.body.domain }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        0,
+        -32
+      ],
+      "id": "b600db04-4df0-4627-9e38-7ada344c462b",
+      "name": "HTTP Request1"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Search Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Message a model",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "triggerCount": 1,
+  "versionId": "8ff38687-f748-472f-a57f-d8da2efed598",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "G6aKnDBpsyCVjLdc",
+  "isArchived": false
+}
