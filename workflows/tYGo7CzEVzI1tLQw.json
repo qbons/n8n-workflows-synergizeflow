@@ -434,34 +434,6 @@
       "onError": "continueErrorOutput"
     },
     {
-      "parameters": {
-        "projectId": {
-          "__rl": true,
-          "value": "synergizeflow-480314",
-          "mode": "list",
-          "cachedResultName": "Synergizeflow"
-        },
-        "modelName": "={{ $vars.GEMINI_FLASH_TEXT }}",
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleVertex",
-      "typeVersion": 1,
-      "position": [
-        -464,
-        48
-      ],
-      "id": "b0db939e-78b0-4963-9a9a-7b5e7f7bc9bf",
-      "name": "Google Vertex Chat Model",
-      "retryOnFail": true,
-      "waitBetweenTries": 5000,
-      "credentials": {
-        "googleApi": {
-          "id": "C4Bh0vq2T0s7HIDk",
-          "name": "SF - Vertex API Service Account"
-        }
-      }
-    },
-    {
       "parameters": {},
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
@@ -751,6 +723,26 @@
       ],
       "id": "9aff9b9a-2e33-4d16-ae5f-b8989d325b75",
       "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "modelName": "=models/{{ $vars.GEMINI_FLASH_PREVIEW }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -608,
+        128
+      ],
+      "id": "10a0b0f0-b74f-4336-9763-48d153ab98b1",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
     }
   ],
   "connections": {
@@ -928,17 +920,6 @@
         ]
       ]
     },
-    "Google Vertex Chat Model": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "AI Agent": {
       "main": [
         [
@@ -1102,6 +1083,17 @@
           }
         ]
       ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -1115,7 +1107,7 @@
     "saveManualExecutions": false
   },
   "triggerCount": 1,
-  "versionId": "e85a44ee-4954-4043-bdd0-5aa63fc649ae",
+  "versionId": "2171ad21-1231-4c92-88c1-ff971e792860",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",
