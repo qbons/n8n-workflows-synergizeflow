@@ -54,7 +54,10 @@
         176
       ],
       "id": "db9fd264-8e7a-489a-a242-d93eb498056b",
-      "name": "HTTP Request"
+      "name": "HTTP Request",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
@@ -113,7 +116,7 @@
       "typeVersion": 3.4,
       "position": [
         400,
-        248
+        256
       ],
       "id": "750c01bd-dac6-4e6e-8d12-c6a8c7c43be9",
       "name": "Edit Fields"
@@ -312,7 +315,7 @@
     "callerPolicy": "workflowsFromSameOwner"
   },
   "triggerCount": 0,
-  "versionId": "7a9f0df0-fe1e-455e-b7ee-0adb1c07fe0f",
+  "versionId": "e58e05bf-b6bf-424c-b218-eabc5a90dc1a",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

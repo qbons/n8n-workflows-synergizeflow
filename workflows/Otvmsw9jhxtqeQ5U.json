@@ -277,7 +277,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1744,
+        -1600,
         64
       ],
       "id": "47858ec3-d9f2-42f3-b15b-a8190b1d09de",
@@ -367,7 +367,7 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1,
       "position": [
-        -1072,
+        -928,
         64
       ],
       "id": "ee95e4dd-3636-465a-96ce-67dc9762b477",
@@ -397,7 +397,7 @@
       "type": "n8n-nodes-gemini-search.geminiSearchToolTool",
       "typeVersion": 1,
       "position": [
-        -1008,
+        -864,
         288
       ],
       "id": "41704837-6c5f-4d14-9bad-72c4ba06c5d0",
@@ -416,7 +416,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -720,
+        -576,
         -16
       ],
       "id": "b476aa62-e079-4e26-ab46-b48b1ecce819",
@@ -430,7 +430,7 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        -496,
+        -352,
         160
       ],
       "id": "623ddb6d-f5c9-497a-8d02-3383d20798f4",
@@ -462,7 +462,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
       "position": [
-        -496,
+        -352,
         -64
       ],
       "id": "fd39d9df-1100-4305-981a-fd519d9f156a",
@@ -475,7 +475,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -272,
+        -128,
         -64
       ],
       "id": "e5f8c907-fa7d-4274-9723-5ac8111834f5",
@@ -495,7 +495,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -48,
+        96,
         -64
       ],
       "id": "db64dc84-3d40-46e1-84d9-306fced3d4c9",
@@ -559,7 +559,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        176,
+        320,
         -64
       ],
       "id": "1afd7698-97b0-4ceb-8000-1c12ac4a2c82",
@@ -613,7 +613,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        400,
+        544,
         -160
       ],
       "id": "27c93c00-2a9a-40be-bba1-2dd939559698",
@@ -645,7 +645,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        400,
+        544,
         32
       ],
       "id": "8def747e-a1d3-4ac4-889a-9ad802e8f262",
@@ -742,7 +742,7 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.3,
       "position": [
-        -1520,
+        -1376,
         64
       ],
       "id": "9a3f4a78-e0af-4100-9bff-c4e587391c86",
@@ -765,7 +765,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -1296,
+        -1152,
         -48
       ],
       "id": "1e7ac619-20ae-415b-87b7-f5c62bc5846d",
@@ -788,11 +788,41 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -1296,
+        -1152,
         160
       ],
       "id": "fcab65e5-0d35-4a74-88f7-e529c93d158b",
       "name": "Prepare Prompt1"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "4F54m4qCgFpglV9c",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/4F54m4qCgFpglV9c",
+          "cachedResultName": "SynergizeFlow — SF - Image Vaults Converter"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -1776,
+        64
+      ],
+      "id": "95865eb1-7819-4642-aeb4-8731a3b1644b",
+      "name": "SF - Image Vaults Converter"
     }
   ],
   "connections": {
@@ -922,7 +952,7 @@
       "main": [
         [
           {
-            "node": "Code in JavaScript1",
+            "node": "SF - Image Vaults Converter",
             "type": "main",
             "index": 0
           }
@@ -1070,6 +1100,17 @@
           }
         ]
       ]
+    },
+    "SF - Image Vaults Converter": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -1082,7 +1123,7 @@
     "saveDataSuccessExecution": "all"
   },
   "triggerCount": 1,
-  "versionId": "62a357a2-c9a9-4a93-9929-fb5a1a6f9418",
+  "versionId": "abc0e686-df40-426e-8782-4fe5d2155619",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",
