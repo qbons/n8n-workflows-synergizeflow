@@ -1,0 +1,15 @@
+{
+  "id": "RXOPfunwTtytLW6L",
+  "name": "Header Auth Google",
+  "type": "httpHeaderAuth",
+  "data": {
+    "name": "",
+    "value": ""
+  },
+  "ownedBy": {
+    "type": "team",
+    "teamId": "DGt5sadI4PCrWLIx",
+    "teamName": "Starling"
+  },
+  "isGlobal": false
+}

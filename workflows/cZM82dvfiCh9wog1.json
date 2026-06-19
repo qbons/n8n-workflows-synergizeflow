@@ -47,12 +47,6 @@
               "type": "string"
             },
             {
-              "id": "bb3e1bee-f4dc-473f-a63e-bc590b6b5d54",
-              "name": "token_bearer",
-              "value": "={{ $json.headers.authorization }}",
-              "type": "string"
-            },
-            {
               "id": "3a408949-347d-4176-8a4f-48cbde84e0f1",
               "name": "content_id",
               "value": "={{ $json.body.content_id }}",
@@ -407,12 +401,7 @@
         "url": "={{ $vars.SAAS_API }}/api/social-agent/finish",
         "sendHeaders": true,
         "headerParameters": {
-          "parameters": [
-            {
-              "name": "Authorization",
-              "value": "={{ $('Edit Fields').item.json.token_bearer }}"
-            }
-          ]
+          "parameters": []
         },
         "sendBody": true,
         "bodyParameters": {
@@ -685,10 +674,11 @@
     "availableInMCP": false,
     "timeSavedMode": "fixed",
     "errorWorkflow": "4otmc6jILN7VL0Z9",
-    "callerPolicy": "workflowsFromSameOwner"
+    "callerPolicy": "workflowsFromSameOwner",
+    "saveDataSuccessExecution": "all"
   },
   "triggerCount": 1,
-  "versionId": "f797d213-4615-45ff-a5a1-68bf4fb8bab0",
+  "versionId": "ad6eb5cd-0628-4636-b7f0-b156ec874b22",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

@@ -153,6 +153,12 @@
               "name": "pro_instruction",
               "value": "=1.  **`Container`**\n      * **Description:** The main layout block for creating sections and holding other elements.\n      * **Usage:** Used to create all sections (e.g., \"Hero Section,\" \"Features Section\"). You control its background, spacing, etc. All other elements are placed inside a `Container`.\n2.  **`Heading`**\n      * **Description:** A text widget for displaying titles and headlines.\n      * **Usage:** For the main headline (H1) or section titles (H2, H3). You control text, font, size, and color.\n3.  **`Image`**\n      * **Description:** Displays a single, standalone image.\n      * **Usage:** For product shots, logos, etc. You will provide a placeholder image URL (e.g., from Picsum) and can control its size.\n4.  **`Text Editor`**\n      * **Description:** Displays blocks of formatted text (paragraphs).\n      * **Usage:** For all main body copy, descriptions, and paragraphs.\n5.  **`Button`**\n      * **Description:** Creates a clickable button.\n      * **Usage:** The main call-to-action (CTA). You must set the `text` (e.g., \"Learn More\") and `link`. You also control its style (colors, border-radius).\n6.  **`Grid`**\n      * **Description:** A special `Container` for creating multi-column layouts.\n      * **Usage:** For 2, 3, or 4-column layouts. **Crucial Rule:** You first add the `Grid`, then you place a separate **`Container`** inside *each* column to act as the \"cell\" that holds the content.\n7.  **`Video`**\n      * **Description:** Embeds a video player (e.g., from YouTube).\n      * **Usage:** For product demos, etc. You will find a relevant sample YouTube URL based on the topic.\n8.  **`Icon`**\n      * **Description:** Displays a single vector icon from the Font Awesome library.\n      * **Usage:** For small visual cues. You will pick a relevant Font Awesome class (e.g., \"fa fa-check\").\n9.  **`Google Maps`**\n      * **Description:** Embeds an interactive Google Map.\n      * **Usage:** For \"Contact Us\" sections. You will set a relevant `address` and control zoom/height.\n10. **`Nested Tabs`**\n      * **Description:** Organizes content into clickable tab panels.\n      * **Usage:** For complex feature sets. Has **tab titles** (with optional icons) and **content containers**. Clicking a title shows the corresponding content.\n11. **`Nested Accordion`**\n      * **Description:** Organizes content into collapsible accordion panels.\n      * **Usage:** The perfect widget for **FAQ sections**. Has **titles** (questions) and **content containers** (answers).\n12. **`Image Carousel`**\n      * **Description:** A simple slideshow for **images only**.\n      * **Usage:** For a gallery of images. You provide a list of images it will cycle through.\n13. **`Icon List`**\n      * **Description:** Creates a list of text items, each preceded by an icon.\n      * **Usage:** Ideal for \"Features\" or \"Benefits\" lists instead of plain bullet points.\n14. **`Counter`**\n      * **Description:** Displays an animated number counting up.\n      * **Usage:** For social proof (e.g., \"2,500+ Happy Clients\"). You will set an `ending_number` and `title`.\n15. **`Progress`**\n      * **Description:** Displays an animated progress bar.\n      * **Usage:** For skill levels (e.g., \"JavaScript - 90%\") or satisfaction scores.\n16. **`Testimonial`**\n      * **Description:** Displays a *single*, complete user review (quote, avatar, name, job).\n      * **Usage:** To show a single piece of social proof. You will create realistic placeholder content.\n17. **`Social Icons`**\n      * **Description:** Displays a list of clickable icons for social media profiles.\n      * **Usage:** For footers or headers. Takes a list of icons (Facebook, Twitter) and their `links`.\n18. **`Rating`**\n      * **Description:** Displays a visual, star-based rating.\n      * **Usage:** To show a score (e.g., \"4.5 out of 5\"). Often used with testimonials.\n19. **`Form`**\n      * **Description:** A complete widget for building contact or lead-gen forms.\n      * **Usage:** Contains `form_fields` (e.g., \"Name,\" \"Email\") and a `submit_button`. Fields can have widths (e.g., 50%) to be side-by-side.\n20. **`Slides`**\n      * **Description:** A powerful slideshow, perfect for hero sections.\n      * **Usage:** This is the **default choice for a Hero Section**. Each slide has its own `background_image`, `heading`, `description`, and `button`.\n21. **`Price List`**\n      * **Description:** A menu-style list of items (title, description, price).\n      * **Usage:** Perfect for restaurant menus or service lists.\n22. **`Price Table`**\n      * **Description:** A single, complete pricing *column* or *tier*.\n      * **Usage:** The **default choice for Pricing Sections**. You will place 2 or 3 of these inside a `Grid` to create a comparison. Each table has a `heading` (plan name), `price`, `features_list`, and a `button`.\n23. **`Testimonial Carousel`**\n      * **Description:** Displays multiple testimonials in a single sliding block.\n      * **Usage:** The **default choice for a Testimonials Section**. Each slide is a full testimonial (quote, avatar, name, job).\n24. **`Image Box`**\n      * **Description:** A combined widget: Image + Title + Description.\n      * **Usage:** A great choice for feature sections. You provide an `image`, `title_text`, and `description_text`.\n25. **`Icon Box`**\n      * **Description:** A combined widget: Icon + Title + Description.\n      * **Usage:** The **default choice for \"Features\" or \"Benefits\" sections**, typically placed inside a `Grid`. You provide an `selected_icon`, `title_text`, and `description_text`.",
               "type": "string"
+            },
+            {
+              "id": "2633fcdd-fc13-4064-a887-1a63118c5655",
+              "name": "service_id",
+              "value": "={{ $json.body.service_id }}",
+              "type": "string"
             }
           ]
         },
@@ -440,6 +446,23 @@
         "toolDescription": "This is `GenerateLandingPage`. Call this tool if you have enough information from user and send the JSON data here.",
         "method": "POST",
         "url": "={{ $vars.N8N_URL }}/webhook/v2/page-builder/process",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "=CF-Access-Client-Id",
+              "value": "={{ $vars.CF_ID }}"
+            },
+            {
+              "name": "=CF-Access-Client-Secret",
+              "value": "={{ $vars.CF_SECRET }}"
+            }
+          ]
+        },
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
@@ -713,7 +736,7 @@
     "callerPolicy": "workflowsFromSameOwner"
   },
   "triggerCount": 1,
-  "versionId": "9e2f8a8d-c837-47fe-a722-6b28bde071cd",
+  "versionId": "0ac923c6-9c9a-43d8-b930-cbde281c8867",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

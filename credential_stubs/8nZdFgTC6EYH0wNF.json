@@ -1,0 +1,15 @@
+{
+  "id": "8nZdFgTC6EYH0wNF",
+  "name": "n8n account",
+  "type": "n8nApi",
+  "data": {
+    "apiKey": "",
+    "baseUrl": ""
+  },
+  "ownedBy": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "isGlobal": false
+}

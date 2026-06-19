@@ -645,7 +645,6 @@
       "parameters": {
         "promptType": "define",
         "text": "={{ $json.goal_prompt }}",
-        "hasOutputParser": true,
         "options": {
           "systemMessage": "You are an expert in semantic search optimization for Qdrant vector databases.\n\nYour task is to rewrite the given trigger sentence into one highly optimized natural-language search phrase that best represents how real users would ask it.\n\nGoal:\n- Maximize semantic matching accuracy in Qdrant.\n- Preserve original intent exactly.\n- Convert system-style sentence into user-style query.\n- Make it natural, clear, and searchable.\n- Use the language most likely used by the target user.\n\nOutput rules:\n- Return plain string only.\n- No JSON.\n- No explanation.\n- One best semantic phrase only.",
           "returnIntermediateSteps": false
@@ -1046,7 +1045,7 @@
     "saveDataSuccessExecution": "all"
   },
   "triggerCount": 1,
-  "versionId": "18d71af4-b149-4e6a-b432-2a63932d821a",
+  "versionId": "64b9f764-8fec-4f26-a5fa-9e5995af25be",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

@@ -240,6 +240,7 @@
       ],
       "id": "f4745258-1ab2-4fbc-a741-190731c7e1db",
       "name": "Message a model",
+      "retryOnFail": true,
       "credentials": {
         "googlePalmApi": {
           "id": "aLrGZCRV8oKLBNjE",
@@ -669,11 +670,6 @@
         ],
         [
           {
-            "node": "Format model",
-            "type": "main",
-            "index": 0
-          },
-          {
             "node": "HTTP Request2",
             "type": "main",
             "index": 0
@@ -805,7 +801,7 @@
     "saveManualExecutions": true
   },
   "triggerCount": 1,
-  "versionId": "e855fbe5-0089-4f47-9888-eb68a2ed8c83",
+  "versionId": "826888cf-bc36-490e-b622-94a193fe102b",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

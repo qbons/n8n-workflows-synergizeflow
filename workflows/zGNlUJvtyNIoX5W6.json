@@ -1,0 +1,577 @@
+{
+  "id": "zGNlUJvtyNIoX5W6",
+  "name": "Job Scrape Data URL",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "generic-agent/scrape-url",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2464,
+        16
+      ],
+      "id": "c88d1ed1-5391-4069-aac2-195f014538b9",
+      "name": "Webhook",
+      "webhookId": "39b03875-62de-4bef-a799-5cc8a2ad7d74"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "281d1f80-d55d-4c94-a3d8-a25004606618",
+              "name": "url",
+              "value": "={{ $json.body.url }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2240,
+        16
+      ],
+      "id": "7781e1b7-696f-48eb-9b09-0492e0a064b3",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "function isValidUrl(url) {\n    if (typeof url !== 'string') return false;\n\n    const pattern = /^(https?:\\/\\/)[^\\s/$.?#].[^\\s]*$/i;\n    return pattern.test(url);\n}\n\nconst inputUrl = $input.first().json.url;\n\nreturn [\n    {\n        json: {\n            url: inputUrl,\n            isValid: isValidUrl(inputUrl) ? 'yes' : 'no'\n        }\n    }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2016,
+        16
+      ],
+      "id": "eb9ee971-4429-4cb9-9ccb-9f29f19a259a",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.isValid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "8a48d598-334a-4c33-b60d-e8122369e444"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "valid"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "cf8fc633-57da-41ec-a391-87e16caf90aa",
+                    "leftValue": "={{ $json.isValid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "invalid"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -1792,
+        16
+      ],
+      "id": "796c938a-f702-49b2-b9f5-010381a486f9",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "585d08de-4f93-4694-9572-4c5f667ad0b7",
+              "name": "status",
+              "value": "error",
+              "type": "string"
+            },
+            {
+              "id": "c1607625-9f55-4ed0-bb37-999147f6af2d",
+              "name": "msg",
+              "value": "Invalid URL",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1568,
+        112
+      ],
+      "id": "1cf870c8-4bca-4de3-bfd6-e2871bda735b",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -1344,
+        112
+      ],
+      "id": "86dba4ae-26fb-4875-a3f9-c42d2cd4295a",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1568,
+        -80
+      ],
+      "id": "abdd1eb6-ccf4-4395-bd88-cc805f04d0e1",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "content",
+              "cssSelector": "body"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        -1344,
+        -80
+      ],
+      "id": "bbef0cbc-0d8f-41bd-9585-0344e5072d15",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -96,
+        -176
+      ],
+      "id": "8af082ea-4ee8-4df0-a4af-3eb57dc86147",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "585d08de-4f93-4694-9572-4c5f667ad0b7",
+              "name": "status",
+              "value": "success",
+              "type": "string"
+            },
+            {
+              "id": "c1607625-9f55-4ed0-bb37-999147f6af2d",
+              "name": "data",
+              "value": "={{ $json.data.jobData }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -320,
+        -176
+      ],
+      "id": "fbe01448-0ed9-44b8-8b20-750d26b8b252",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-3.1-pro-preview",
+          "mode": "list",
+          "cachedResultName": "models/gemini-3.1-pro-preview"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $('HTML').item.json.content }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "systemMessage": "## 🎯 Objective\n\nThe agent must process **any input data (structured or unstructured, in any format)** and:\n\n1. Determine whether the data represents a **valid job vacancy**\n2. If valid, extract **ALL relevant job-related information in maximum detail**\n3. Return the result in **strict JSON format only**\n\n---\n\n## 📥 Input Characteristics\n\nThe input data may:\n\n* Have **any structure or no structure at all**\n* Contain **HTML, plain text, JSON, mixed formats**\n* Include **noise** (menus, links, ads, repeated sections, UI elements)\n* Be written in **any language**\n* Present information in **non-standard or inconsistent formats**\n\n> ⚠️ The agent MUST NOT rely on fixed patterns or specific layouts.\n\n---\n\n## 🧠 Task 1: Job Validity Detection\n\n### ✅ Classify as **VALID JOB** if:\n\nThe content **clearly represents a job vacancy**, based on **semantic understanding**, not format.\n\nStrong indicators include (but are not limited to):\n\n* Job title / role being offered\n* Hiring company or organization\n* Responsibilities / job description\n* Requirements / qualifications\n* Application-related context (apply, recruitment, hiring)\n* Employment details (location, type, salary, etc.)\n\n> The agent must evaluate the **overall meaning**, not isolated keywords.\n\n---\n\n### ❌ Classify as **INVALID JOB** if:\n\n* Content is dominated by:\n\n  * Navigation/UI elements\n  * Login/register prompts\n  * Ads or promotions\n  * Articles, blogs, or career advice\n  * Company profile without hiring intent\n* Or lacks sufficient evidence of an actual job vacancy\n\n---\n\n## 🧹 Task 2: Advanced Noise Filtering\n\nThe agent MUST aggressively remove irrelevant content, including:\n\n* Navigation menus (e.g., \"Masuk\", \"Cari lowongan\")\n* Footer sections and legal disclaimers\n* URLs, tracking links, and redirects\n* UI labels, buttons, and system text\n* Repeated or duplicated content blocks\n* Non-job-related sections\n\n> Only retain **content directly related to the job vacancy**\n\n---\n\n## 📊 Task 3: Deep & Complete Data Extraction\n\n### 🔥 Core Principle:\n\n> Extract **ALL relevant job-related information**, not just common fields.\n\n---\n\n### 🧠 Extraction Rules:\n\n* Do NOT rely on predefined structure\n* Use **semantic interpretation** to identify data\n* Capture **explicit AND implicitly expressed information**\n* Normalize similar meanings into clear labels\n* Preserve original meaning and wording\n* DO NOT hallucinate or infer missing data\n* INCLUDE as many relevant fields as possible\n\n---\n\n### 📌 Examples of Extractable Data (Non-Exhaustive)\n\nThe agent should extract **ANY relevant job-related information**, including but not limited to:\n\n#### 🏷 Basic Information\n\n* Position / Job Title\n* Company Name\n* Location\n* Employment Type (Full-time, Part-time, Contract, etc.)\n* Category / Industry\n* Posted Date\n\n#### 💰 Compensation\n\n* Salary\n* Benefits\n* Allowances\n\n#### 📋 Job Details\n\n* Job Description / Responsibilities\n* Key Duties\n* Daily Tasks\n\n#### 🎓 Requirements\n\n* Education\n* Experience (years, domain)\n* Skills (technical & soft skills)\n* Certifications\n\n#### 🧩 Additional Information\n\n* Tools / Technologies (e.g., SEO, HTML, CSS, Google Ads)\n* Work Environment (remote, onsite, hybrid)\n* Language requirements\n* Eligibility criteria\n\n#### 🏢 Company Info (ONLY if relevant to job context)\n\n* Company description (shortened if necessary)\n\n#### 📝 Application Info\n\n* Application process\n* Questions from employer\n* Special instructions\n\n---\n\n### ⚠️ Completeness Requirement\n\n* The agent MUST:\n\n  * Extract **as many relevant fields as possible**\n  * Avoid missing important details\n  * Ensure **high coverage of all job-related content**\n  * Perform an internal **“triple-check” pass** before output\n\n---\n\n## 📦 Output Format (STRICT)\n\n### ✅ If VALID:\n\n```json\n{\n  \"isValidJob\": \"yes\",\n  \"jobData\": [\n    {\n      \"label\": \"Position\",\n      \"value\": \"WordPress Developer\"\n    }\n  ]\n}\n```\n\n### ❌ If INVALID:\n\n```json\n{\n  \"isValidJob\": \"no\",\n  \"jobData\": []\n}\n```\n\n---\n\n## ⚠️ Output Rules (CRITICAL)\n\n* Output **ONLY valid JSON**\n* Do NOT include:\n\n  * Explanations\n  * Notes\n  * Markdown\n  * Extra characters\n* Ensure:\n\n  * Proper JSON syntax\n  * Double quotes for keys and values\n  * No trailing commas\n\n---\n\n## 🚫 Strict Prohibitions\n\n* Do NOT assume fixed structure\n* Do NOT limit extraction to predefined fields\n* Do NOT ignore relevant details\n* Do NOT fabricate or guess missing information\n* Do NOT include irrelevant/noise data\n* Do NOT output anything outside the JSON\n\n---\n\n## ✅ Final Behavior Summary\n\nThe agent must be:\n\n* **Structure-agnostic**\n* **Semantically intelligent**\n* **Highly thorough (maximum extraction)**\n* **Strictly formatted in JSON**\n\n---\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -1120,
+        -80
+      ],
+      "id": "e1359477-a266-4595-829b-d0fe00ced916",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "/* Your getValidJsonObject function is good. \n  It correctly handles bad strings by returning null.\n  No changes are needed here.\n*/\nfunction getValidJsonObject(rawText) {\n\n    if (typeof rawText !== 'string' || rawText.trim() === '') {\n        console.error(\"Invalid input or empty text field.\");\n        return null;\n    }\n\n    let jsonString = rawText.trim();\n\n    // 2. Check for and remove the markdown JSON block fences.\n    const markdownRegex = /^```json\\s*([\\s\\S]*?)\\s*```$/;\n    const match = jsonString.match(markdownRegex);\n\n    if (match) {\n        jsonString = match[1];\n    }\n\n    // 3. Parse the cleaned string into a JSON object.\n    try {\n        return JSON.parse(jsonString);\n    } catch (error) {\n        // This is expected for parts that aren't JSON, like \"```\"\n        // console.error(\"Failed to parse JSON string:\", error); \n        // console.error(\"Problematic string:\", jsonString);\n        return null; // Returning null is key\n    }\n}\n\n// === NEW LOGIC ===\n\n// 1. Get the array of all parts\nconst allParts = $input.first().json.content.parts;\n\n// 2. Map each part to a parse attempt.\n//    - If part.text is valid JSON, we get the object.\n//    - If part.text is \"```\" or other non-JSON, getValidJsonObject returns null.\nconst parsedData = allParts\n    .map(part => getValidJsonObject(part.text))\n    .filter(result => result !== null); // 3. Filter out all the nulls\n\n// `parsedData` is now an array of all successfully parsed JSON objects.\n// In your example, it will be: [ [ { id: \"h3f8e9a1\", ... } ] ]\n\nreturn { data: parsedData[0] };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -768,
+        -80
+      ],
+      "id": "062e4f7c-e830-4496-8689-bbd67129d990",
+      "name": "Code2",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data.isValidJob }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "a4964c0d-eb38-45ac-ac18-22c40d9a90b2"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "valid"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "a03514f3-d866-4b2b-8ad3-face860dcd90",
+                    "leftValue": "={{ $json.data.isValidJob }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "invalid"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -544,
+        -80
+      ],
+      "id": "1ad34822-a60a-4511-a5e7-1032029a4132",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "585d08de-4f93-4694-9572-4c5f667ad0b7",
+              "name": "status",
+              "value": "error",
+              "type": "string"
+            },
+            {
+              "id": "c1607625-9f55-4ed0-bb37-999147f6af2d",
+              "name": "msg",
+              "value": "Invalid Job",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -320,
+        16
+      ],
+      "id": "d09710d8-e2b4-4534-969c-ea41e2ad7009",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -96,
+        16
+      ],
+      "id": "b6534ab2-89fe-4673-b3e4-09a0a0914220",
+      "name": "Respond to Webhook2"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "triggerCount": 0,
+  "versionId": "5f41bd31-f005-4b7a-a9d2-04de4fdab29c",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "8iF3VS4uHwCV47XQ",
+  "isArchived": false
+}

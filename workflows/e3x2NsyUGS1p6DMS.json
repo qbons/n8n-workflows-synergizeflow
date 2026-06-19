@@ -277,7 +277,7 @@
         "operation": "analyze",
         "modelId": {
           "__rl": true,
-          "value": "=models/{{ $vars.GEMINI_FLASH_PREVIEW }}",
+          "value": "=models/{{ $vars.GEMINI_NANO_BANANA }}",
           "mode": "id"
         },
         "text": "=This is image of {{ $('Prepare Data').item.json.title }}. Analyze the input images with great detail and precision. Describe the image directly as response without introduction text in plain text format.",
@@ -600,7 +600,7 @@
     "callerPolicy": "workflowsFromSameOwner"
   },
   "triggerCount": 1,
-  "versionId": "c749d424-040d-46bc-9326-1bfbf7760652",
+  "versionId": "f6422801-4055-4c81-baa2-4010bc6b2e94",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

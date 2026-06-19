@@ -1,0 +1,203 @@
+{
+  "id": "LJxHoSAPIqeaMhiB",
+  "name": "SF - Chat Agent CTA Email",
+  "nodes": [
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"name\": {{ $json.body.name }},\n  \"contact\": {{ $json.body.contact }},\n  \"message\": {{ $json.body.message }},\n  \"ctaQuery\": {{ $json.body.ctaQuery }},\n  \"code\": {{ $json.body.code }},\n  \"website\": {{ $json.body.website }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "995def8a-749b-4f94-8163-213fa2bf9e26",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $vars.GEMINI_EMBEDDING }}:embedContent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googlePalmApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"models/{{ $vars.GEMINI_EMBEDDING }}\",\n  \"content\": {\n    \"parts\": [\n      {\n        \"text\": {{ JSON.stringify($json.ctaQuery) }}\n      }\n    ]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        432,
+        0
+      ],
+      "id": "b9fe6480-de62-42fa-b651-b373c83c8c57",
+      "name": "Embedding data",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://213.239.213.236:6333/collections/cta-{{ $('Edit Fields').item.json.code }}/points/search",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "qdrantRestApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  vector: $json.embedding.values,\n  limit: 1,\n  with_payload: true,\n  score_threshold: 0.5\n}) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        656,
+        0
+      ],
+      "id": "07d09525-5f6b-487e-b66e-8b319eecbae3",
+      "name": "HTTP Request1",
+      "credentials": {
+        "qdrantRestApi": {
+          "id": "x4lyWFNp7qjYd932",
+          "name": "SF - Qdrant account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.N8N_URL }}/webhook/v1/util/send-email",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "CF-Access-Client-Id",
+              "value": "={{ $vars.CF_ID }}"
+            },
+            {
+              "name": "CF-Access-Client-Secret",
+              "value": "={{ $vars.CF_SECRET }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1056,
+        0
+      ],
+      "id": "5765ef2e-68b2-4d02-b8cd-2a3d9291a0ad",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  key: $vars.STATIC_TOKEN,\n  senderName: \"SynergizeFlow\",\n  fromEmail: \"noreply@synergizeflow.com\",\n  replyTo: \"noreply@synergizeflow.com\",\n  toEmail: $input.first().json.result[0].payload.metadata.destination,\n  subject: $('Edit Fields').first().json.website + \" User Inquiry\",\n  htmlBody: `<strong>Goal:</strong> ${$input.first().json.result[0].payload.metadata.goal_prompt}<br>\n<strong>Name:</strong> ${$('Edit Fields').first().json.name}<br>\n<strong>Contact:</strong> ${$('Edit Fields').first().json.contact}<br>\n<strong>Message:</strong> ${$('Edit Fields').first().json.ctaQuery}<br>`\n}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        864,
+        0
+      ],
+      "id": "365bbb23-2995-4523-a4ed-daae98ce9080",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v1/chat-agent/cta-email",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        16,
+        0
+      ],
+      "id": "2acdeb05-3f8a-498c-99a0-efd14f3f0583",
+      "name": "Webhook",
+      "webhookId": "df7ee3ce-14c9-49b7-9e2f-71024f89f608"
+    }
+  ],
+  "connections": {
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Embedding data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embedding data": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "triggerCount": 1,
+  "versionId": "ce755108-0c2a-4d14-a788-fdb8489bbd01",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "ufNfABECZ3OXdtAU",
+  "isArchived": false
+}

@@ -14,6 +14,18 @@
   },
   "variableStubs": [
     {
+      "id": "Kyu8uHLuF9N1X3Mx",
+      "key": "CF_ID",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "RS4yzvHf96lRcJFy",
+      "key": "CF_SECRET",
+      "type": "string",
+      "value": ""
+    },
+    {
       "id": "Cczv1bxHHItzLqTb",
       "key": "CLOUDFLARE_R2_BUCKET",
       "type": "string",

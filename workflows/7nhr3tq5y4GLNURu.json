@@ -547,7 +547,9 @@
         96
       ],
       "id": "180f3959-129b-4fa6-9383-9012cf2cc50e",
-      "name": "HTTP Request"
+      "name": "HTTP Request",
+      "retryOnFail": true,
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -696,6 +698,8 @@
       ],
       "id": "750f1264-0882-4bb6-be63-fcebc43166ce",
       "name": "Message a model1",
+      "retryOnFail": true,
+      "maxTries": 5,
       "credentials": {
         "googlePalmApi": {
           "id": "aLrGZCRV8oKLBNjE",
@@ -1033,6 +1037,38 @@
       ],
       "id": "11ceba67-28ab-440a-865b-a7c4aa7e6adb",
       "name": "Prepare prompt1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SAAS_API }}/api/webhook/blog-agent",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "service_id",
+              "value": "={{ $('Webhook').item.json.body.service_id }}"
+            },
+            {
+              "name": "msg",
+              "value": "error_img_vault"
+            },
+            {
+              "name": "status",
+              "value": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -352,
+        304
+      ],
+      "id": "0c9f9868-de42-44c7-b0fd-e58286461003",
+      "name": "HTTP Request6"
     }
   ],
   "connections": {
@@ -1224,6 +1260,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "HTTP Request6",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -1364,7 +1407,7 @@
     "saveManualExecutions": true
   },
   "triggerCount": 1,
-  "versionId": "b85e5e39-c2a5-4e53-9eed-6293a4e550b8",
+  "versionId": "d978b82d-c23d-489c-bf80-a591274da998",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

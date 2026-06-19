@@ -47,6 +47,12 @@
               "name": "license_key",
               "value": "={{ $json.body.license_key }}",
               "type": "string"
+            },
+            {
+              "id": "9f866fc0-b1af-4440-a20c-788274bcea85",
+              "name": "service_id",
+              "value": "={{ $json.body.service_id }}",
+              "type": "string"
             }
           ]
         },
@@ -419,7 +425,24 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://dev-wizards.synergizeflow.com/webhook/v2/page-builder/elementor",
+        "url": "={{ $vars.N8N_URL }}/webhook/v2/page-builder/elementor",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "CF-Access-Client-Id",
+              "value": "={{ $vars.CF_ID }}"
+            },
+            {
+              "name": "CF-Access-Client-Secret",
+              "value": "={{ $vars.CF_SECRET }}"
+            }
+          ]
+        },
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
@@ -755,7 +778,7 @@
     "callerPolicy": "workflowsFromSameOwner"
   },
   "triggerCount": 1,
-  "versionId": "89b63601-2427-48ab-be6e-0bd6139025fd",
+  "versionId": "a887198b-968b-4f5f-997b-87931adc39f1",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

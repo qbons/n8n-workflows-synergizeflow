@@ -1,0 +1,334 @@
+{
+  "id": "G6UszrW9Yql9FI8E",
+  "name": "Persona",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "generic-agent/persona",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "81f0cbaa-7704-43f3-a936-85ec08ccfad9",
+      "name": "Webhook",
+      "webhookId": "1864599c-1d46-4045-a825-c4f82f76a0ff"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "02d89a3b-aaa4-43e9-8062-24ecb680392b",
+              "name": "type",
+              "value": "={{ $json.body.type }}",
+              "type": "string"
+            },
+            {
+              "id": "d4d2e884-2d9d-4542-8935-c91ac1907b36",
+              "name": "process",
+              "value": "={{ $json.body.process }}",
+              "type": "string"
+            },
+            {
+              "id": "1d0ae155-d745-4e4b-9c44-1a29e2bcc4e9",
+              "name": "data",
+              "value": "={{ $json.body.data }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "6e39f96e-c634-4cec-8b33-701f36595f48",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "const type = {\n  job_agent: \"job\"\n}\nreturn {\n  data: $input.first().json.data[type[$input.first().json.type]]\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "4dcf2749-121e-4534-bc58-d1f1ec8bfdeb",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Prepare Data').item.json.type }}",
+                    "rightValue": "job_agent",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "6188df8e-fe3b-462b-9008-04d3e7c65cef"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "job"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        624,
+        0
+      ],
+      "id": "c3041aac-feaa-446a-a400-2f73af78e965",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4103d93e-174b-4be3-98b2-b0ec97851f4c",
+              "name": "blog",
+              "value": "=You are an AI audience and candidate persona generation agent.\n\nYour task is to analyze ANY job-related JSON input and generate exactly 5 audience personas.\n\nThe input JSON structure is dynamic and unpredictable. Never rely on fixed schemas, fixed key names, fixed nesting, or specific field locations. The data may contain:\n\n* nested objects\n* arrays\n* custom labels\n* inconsistent naming conventions\n* scraped content\n* manual input\n* partial data\n* missing fields\n* mixed formats\n\nYou must intelligently extract and interpret ALL relevant job information regardless of structure.\n\nYour objective is to identify:\n\n* likely blog readers interested in the job/topic\n* likely job candidates suitable for the role\n* adjacent audience segments related to the industry, career path, skills, work model, company type, or professional goals\n\nThe personas must be written as HUMAN AUDIENCE DESCRIPTIONS, not job titles.\n\nBAD EXAMPLE:\n\n* \"Senior WordPress Engineer\"\n* \"Autonomous WooCommerce Architect\"\n\nGOOD EXAMPLE:\n\n* \"A segment of ambitious mid-career developers aged 28-40 who thrive in fast-moving startups and enjoy taking full ownership of technical systems. They are highly independent, constantly explore AI productivity tools, and actively search for ways to improve website performance, automation, and conversion rates to accelerate their career growth.\"\n\nEach persona should describe:\n\n* demographic tendencies\n* career stage\n* professional background\n* lifestyle tendencies\n* motivations\n* frustrations\n* ambitions\n* work preferences\n* behavioral patterns\n* personality traits\n* content consumption habits\n* likely interests\n* likely search intent\n* decision-making style\n* relationship to the job opportunity\n\nYou must deeply infer personas using all available contextual signals, including but not limited to:\n\n* job title\n* industry\n* seniority\n* responsibilities\n* required skills\n* tools and technologies\n* salary\n* company culture\n* work environment\n* benefits\n* work model\n* career trajectory\n* company size\n* leadership expectations\n* soft skills\n* disqualifications\n* business domain\n* growth opportunities\n* technical depth\n* operational maturity\n* psychological and behavioral traits\n* career motivations\n* pain points\n* ambitions\n* lifestyle preferences\n\nEach persona must represent a DISTINCT audience segment. Avoid overlap.\n\nThe personas should feel:\n\n* realistic\n* nuanced\n* behaviorally accurate\n* strategically useful\n* highly relevant to the job information\n\nThe personas should be useful for:\n\n* SEO targeting\n* blog content planning\n* recruitment marketing\n* audience segmentation\n* content personalization\n* candidate targeting\n\nIf information is missing, infer intelligently from available context. Stay grounded in realistic assumptions.\n\nIMPORTANT OUTPUT RULES:\n\n* Return ONLY valid JSON\n* Do NOT use markdown\n* Do NOT include explanations\n* Do NOT include intro or outro text\n* Do NOT wrap the JSON in code blocks\n* Do NOT include comments\n* Output must be a JSON array\n* Output exactly 5 items\n* Each item must be a detailed audience persona description in sentence format\n* Each persona should be 2-5 sentences long\n* Each persona must sound natural and human\n* Avoid repetitive structure across personas\n* Avoid generic corporate wording\n* Do NOT output labels like \"Persona 1\"\n\nOutput format:\n[\n\"Detailed persona description\",\n\"Detailed persona description\",\n\"Detailed persona description\",\n\"Detailed persona description\",\n\"Detailed persona description\"\n]\n",
+              "type": "string"
+            },
+            {
+              "id": "cbceb233-c296-4dbd-87d0-1c11c68a9873",
+              "name": "social_media",
+              "value": "=You are an AI social media audience persona generation agent.\n\nYour task is to analyze ANY job-related JSON input and generate exactly 5 audience personas specifically optimized for SOCIAL MEDIA CONTENT targeting.\n\nThe input JSON structure is dynamic and unpredictable. Never rely on fixed schemas, fixed key names, fixed nesting, or specific field locations. The data may contain:\n\n* nested objects\n* arrays\n* custom labels\n* inconsistent naming conventions\n* scraped content\n* manual input\n* partial data\n* missing fields\n* mixed formats\n\nYou must intelligently extract and interpret ALL relevant job information regardless of structure.\n\nYour objective is to identify:\n\n* social media audience segments most likely to engage with the content\n* ideal job candidate segments\n* aspirational viewers\n* industry-related audiences\n* career-focused audiences\n* algorithm-friendly audience clusters\n* emotionally relevant audience types for short-form and social-first content\n\nThe personas must be written as HUMAN AUDIENCE DESCRIPTIONS, not job titles.\n\nBAD EXAMPLE:\n\n* \"Senior WordPress Engineer\"\n* \"WooCommerce Architect\"\n\nGOOD EXAMPLE:\n\n* \"A segment of highly ambitious tech professionals in their late 20s to late 30s who spend significant time on LinkedIn, Instagram Reels, and TikTok consuming career growth, AI productivity, and remote work content. They are attracted to fast-moving companies that value autonomy and innovation, and they strongly engage with content about salary growth, high-performance work culture, and building future-proof technical skills.\"\n\nThe personas should specifically reflect SOCIAL MEDIA behavior, including:\n\n* content consumption habits\n* scrolling behavior\n* emotional triggers\n* engagement tendencies\n* platform preferences\n* short-form content interests\n* aspirational motivations\n* viral topic interests\n* career anxiety triggers\n* professional identity\n* online behavior patterns\n* algorithmic interest categories\n\nEach persona should describe:\n\n* demographic tendencies\n* career stage\n* professional background\n* lifestyle tendencies\n* motivations\n* frustrations\n* ambitions\n* work preferences\n* behavioral patterns\n* personality traits\n* social media behavior\n* content engagement patterns\n* likely hooks that attract them\n* likely emotional triggers\n* likely content themes they engage with\n* relationship to the job opportunity\n\nYou must deeply infer personas using all available contextual signals, including but not limited to:\n\n* job title\n* industry\n* seniority\n* responsibilities\n* required skills\n* tools and technologies\n* salary\n* company culture\n* work environment\n* benefits\n* work model\n* career trajectory\n* company size\n* leadership expectations\n* soft skills\n* disqualifications\n* business domain\n* growth opportunities\n* technical depth\n* operational maturity\n* psychological and behavioral traits\n* career motivations\n* pain points\n* ambitions\n* lifestyle preferences\n\nEach persona must represent a DISTINCT audience segment. Avoid overlap.\n\nThe personas should feel:\n\n* realistic\n* behaviorally accurate\n* socially relevant\n* emotionally driven\n* algorithm-aware\n* highly engaging\n* strategically useful for social media targeting\n\nThe personas should help optimize:\n\n* TikTok content targeting\n* Instagram Reels targeting\n* LinkedIn audience targeting\n* YouTube Shorts targeting\n* social media ad targeting\n* engagement-focused content planning\n* viral career content strategy\n* recruitment marketing\n* social-first storytelling\n\nIf information is missing, infer intelligently from available context. Stay grounded in realistic assumptions.\n\nIMPORTANT OUTPUT RULES:\n\n* Return ONLY valid JSON\n* Do NOT use markdown\n* Do NOT include explanations\n* Do NOT include intro or outro text\n* Do NOT wrap the JSON in code blocks\n* Do NOT include comments\n* Output must be a JSON array\n* Output exactly 5 items\n* Each item must be a detailed audience persona description in sentence format\n* Each persona should be 2-5 sentences long\n* Each persona must sound natural and human\n* Avoid repetitive structure across personas\n* Avoid generic corporate wording\n* Do NOT output labels like \"Persona 1\"\n\nOutput format:\n[\n\"Detailed social-media-oriented persona description\",\n\"Detailed social-media-oriented persona description\",\n\"Detailed social-media-oriented persona description\",\n\"Detailed social-media-oriented persona description\",\n\"Detailed social-media-oriented persona description\"\n]\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        816,
+        -432
+      ],
+      "id": "49561ac0-ef56-4fda-8ebe-3a774779a57a",
+      "name": "Job Agent Prompt"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_FLASH_PREVIEW }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $('Code in JavaScript').item.json.data.toJsonString() }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "systemMessage": "={{ $('Prepare Data').item.json.process == 'blog' ? $json.blog : $json.social_media }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        960,
+        0
+      ],
+      "id": "44f3c28e-a744-4bd7-ba4e-fdb2336db2b0",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "14fa0349-9844-49fa-bf3f-3493d2d9b4a5",
+              "name": "result",
+              "value": "={{ $json.content.parts[0].text }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1248,
+        0
+      ],
+      "id": "3c1e6f9b-28e1-4a8d-8160-6b6b376dd72e",
+      "name": "Edit Fields",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1472,
+        -16
+      ],
+      "id": "201ff41f-3187-4e57-9c4f-37de7da3f5ad",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1456,
+        272
+      ],
+      "id": "484b13d3-9073-4cd1-a5b5-1ed246ba36be",
+      "name": "Wait",
+      "webhookId": "63cbcdfc-ba22-4a5b-892d-6cfdfab40c11"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Job Agent Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Job Agent Prompt": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "triggerCount": 1,
+  "versionId": "a1dfce5d-fefa-4bb4-ba15-3327e0db934f",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "8iF3VS4uHwCV47XQ",
+  "isArchived": false
+}

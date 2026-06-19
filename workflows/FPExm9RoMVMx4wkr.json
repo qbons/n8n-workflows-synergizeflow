@@ -200,7 +200,8 @@
           "id": "aLrGZCRV8oKLBNjE",
           "name": "SF - Gemini API Account"
         }
-      }
+      },
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -291,7 +292,8 @@
           "id": "aLrGZCRV8oKLBNjE",
           "name": "SF - Gemini API Account"
         }
-      }
+      },
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -613,8 +615,8 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        -4176,
-        736
+        -3968,
+        720
       ],
       "id": "e6781821-c583-407c-a46b-42f5e4e3ca44",
       "name": "send number saved or phone number not found in saas",
@@ -914,7 +916,7 @@
             {
               "id": "19a4c1f3-ff3a-45bd-bbdf-75e0bb1b4046",
               "name": "msg",
-              "value": "Phone number already linked to an account",
+              "value": "={{ $json.message }}",
               "type": "string"
             }
           ]
@@ -924,8 +926,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -4400,
-        832
+        -4192,
+        816
       ],
       "id": "c764b2c3-36ee-4533-834f-7c3de5c28d6c",
       "name": "Edit Fields2"
@@ -985,6 +987,63 @@
       ],
       "id": "853ff437-a49a-4b79-98ac-bbd616a0425e",
       "name": "Execution Data"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "Something happen when processing, please try again!",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -2704,
+        272
+      ],
+      "id": "362d52fa-aa07-4886-a032-f509e2bf1a94",
+      "name": "Send a text message3",
+      "webhookId": "63b72c48-9d0b-4725-88d7-88e4687d55a7",
+      "credentials": {
+        "telegramApi": {
+          "id": "39fRwzDgQF6qjDAR",
+          "name": "SF WP Blog Dev"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "Something happen when processing, please try again!",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1456,
+        240
+      ],
+      "id": "e1dfc067-837f-4f48-a0cb-7f0535fca5ab",
+      "name": "Send a text message4",
+      "webhookId": "630a1856-3d3b-49cd-af86-0d83cc1197b5",
+      "credentials": {
+        "telegramApi": {
+          "id": "39fRwzDgQF6qjDAR",
+          "name": "SF WP Blog Dev"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json.error.message;\n\n// Remove the leading '404 - ' and surrounding quotes\nconst jsonString = raw.replace(/^\\d+ - \"(.+)\"$/, '$1').replace(/\\\\\"/g, '\"');\n\n// Parse and get the message\nconst parsed = JSON.parse(jsonString);\n\nreturn [{ json: { message: parsed.message } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -4384,
+        832
+      ],
+      "id": "32c0be8e-d7e8-4666-8d23-f04d2ac688d8",
+      "name": "Code in JavaScript"
     }
   ],
   "connections": {
@@ -1058,6 +1117,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Send a text message3",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -1084,6 +1150,13 @@
         [
           {
             "node": "remove markdown if exist1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message4",
             "type": "main",
             "index": 0
           }
@@ -1148,7 +1221,7 @@
         ],
         [
           {
-            "node": "Edit Fields2",
+            "node": "Code in JavaScript",
             "type": "main",
             "index": 0
           }
@@ -1327,6 +1400,17 @@
           }
         ]
       ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -1340,7 +1424,7 @@
     "callerPolicy": "workflowsFromSameOwner"
   },
   "triggerCount": 1,
-  "versionId": "bee3e460-2885-41b3-a40c-3cd5059b2fa8",
+  "versionId": "afd81452-b235-401c-821a-e86f9d34142a",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

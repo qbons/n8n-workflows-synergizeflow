@@ -20,7 +20,8 @@
           "id": "AIXo2wxUCjaHKlfc",
           "name": "SF - R2 Cloudflare Storage"
         }
-      }
+      },
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -71,7 +72,7 @@
             {
               "id": "25e39932-824b-458e-82b8-1bccfd1a2309",
               "name": "=disable_stitch",
-              "value": "={{ $json.body.disable_stich ?? false }}",
+              "value": "={{ $json.body.disable_stitch ?? false }}",
               "type": "boolean"
             }
           ]
@@ -96,13 +97,13 @@
           "parameters": [
             {
               "name": "Authorization",
-              "value": "=Bearer {{ $('Edit Fields').item.json.access_token }}"
+              "value": "=Bearer {{ $('Edit Fields').first().json.access_token }}"
             }
           ]
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"post_info\": {\n    \"title\": {{ JSON.stringify($('Edit Fields').item.json.title) }},\n    \"privacy_level\": {{ JSON.stringify($('Edit Fields').item.json.privacy_level) }},\n    \"disable_duet\": {{ $('Edit Fields').item.json.disable_duet }},\n    \"disable_comment\": {{ $('Edit Fields').item.json.disable_comment }},\n    \"disable_stitch\": {{ $('Edit Fields').item.json.disable_stitch }},\n    \"video_cover_timestamp_ms\": 1000\n  },\n  \"source_info\": {\n    \"source\": \"{{ $json.tiktokInitPayload.source_info.source }}\",\n    \"video_size\": {{ $json.tiktokInitPayload.source_info.video_size }},\n    \"chunk_size\": {{ $json.tiktokInitPayload.source_info.chunk_size }},\n    \"total_chunk_count\": {{ $json.tiktokInitPayload.source_info.total_chunk_count }}\n  }\n}",
+        "jsonBody": "={\n  \"post_info\": {\n    \"title\": {{ JSON.stringify($('Edit Fields').first().json.title) }},\n    \"privacy_level\": {{ JSON.stringify($('Edit Fields').first().json.privacy_level) }},\n    \"disable_duet\": {{ $('Edit Fields').first().json.disable_duet }},\n    \"disable_comment\": {{ $('Edit Fields').first().json.disable_comment }},\n    \"disable_stitch\": {{ $('Edit Fields').first().json.disable_stitch }},\n    \"video_cover_timestamp_ms\": 1000\n  },\n  \"source_info\": {\n    \"source\": \"{{ $json.tiktokInitPayload.source_info.source }}\",\n    \"video_size\": {{ $json.tiktokInitPayload.source_info.video_size }},\n    \"chunk_size\": {{ $json.tiktokInitPayload.source_info.chunk_size }},\n    \"total_chunk_count\": {{ $json.tiktokInitPayload.source_info.total_chunk_count }}\n  }\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -147,11 +148,12 @@
         0
       ],
       "id": "5f1f4183-1bef-4812-833a-e37892f540a2",
-      "name": "process upload"
+      "name": "process upload",
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
-        "jsCode": "// Ambil binary data dari node sebelumnya (misalnya dari S3/R2)\nconst buffer = await this.helpers.getBinaryDataBuffer(0, 'data');\n\n// Konfigurasi\nconst videoSize = buffer.length; // Total ukuran file dalam bytes\n\n// Fungsi untuk menentukan chunk size optimal\nfunction getOptimalChunkSize(fileSize) {\n  const MB = 1024 * 1024;\n  \n  if (fileSize < 50 * MB) {\n    return fileSize; // Upload sekaligus untuk file kecil\n  } else if (fileSize < 500 * MB) {\n    return 10 * MB; // 10MB chunks untuk file sedang\n  } else {\n    return 20 * MB; // 20MB chunks untuk file besar\n  }\n}\n\n// Hitung chunk size dan total chunks\nconst chunkSize = getOptimalChunkSize(videoSize);\nconst totalChunkCount = Math.ceil(videoSize / chunkSize);\n\n// Buat array untuk semua chunks dengan header masing-masing\nconst chunks = [];\nfor (let i = 0; i < totalChunkCount; i++) {\n  const start = i * chunkSize;\n  const end = Math.min(start + chunkSize - 1, videoSize - 1);\n  const currentChunkSize = end - start + 1;\n  \n  chunks.push({\n    chunkIndex: i,\n    start: start,\n    end: end,\n    size: currentChunkSize,\n    contentRange: `bytes ${start}-${end}/${videoSize}`,\n    contentLength: currentChunkSize\n  });\n}\n\n// Return hasil\nreturn [\n  {\n    json: {\n      // Info file\n      videoSize: videoSize,\n      videoSizeMB: (videoSize / 1024 / 1024).toFixed(2),\n      contentType: items[0].binary.data.mimeType || 'video/mp4',\n      \n      // Info chunking\n      chunkSize: chunkSize,\n      chunkSizeMB: (chunkSize / 1024 / 1024).toFixed(2),\n      totalChunkCount: totalChunkCount,\n      \n      // Headers untuk single upload (jika 1 chunk)\n      singleUploadHeaders: {\n        'Content-Type': items[0].binary.data.mimeType || 'video/mp4',\n        'Content-Length': videoSize.toString(),\n        'Content-Range': `bytes 0-${videoSize - 1}/${videoSize}`\n      },\n      \n      // Detail semua chunks (untuk multi-chunk upload)\n      chunks: chunks,\n      \n      // Data untuk TikTok init payload\n      tiktokInitPayload: {\n        source_info: {\n          source: 'FILE_UPLOAD',\n          video_size: videoSize,\n          chunk_size: chunkSize,\n          total_chunk_count: totalChunkCount\n        }\n      }\n    },\n    binary: {\n      data: items[0].binary.data // Pass through binary data\n    }\n  }\n];"
+        "jsCode": "// Ambil binary data dari node sebelumnya (misalnya dari S3/R2)\nconst buffer = await this.helpers.getBinaryDataBuffer(0, 'data');\n\n// Konfigurasi\nconst videoSize = buffer.length; // Total ukuran file dalam bytes\n\n// Fungsi untuk menentukan chunk size optimal\nfunction getOptimalChunkSize(fileSize) {\n  const MB = 1024 * 1024;\n  \n  if (fileSize < 50 * MB) {\n    return fileSize; // Upload sekaligus untuk file kecil\n  } else if (fileSize < 500 * MB) {\n    return 10 * MB; // 10MB chunks untuk file sedang\n  } else {\n    return 20 * MB; // 20MB chunks untuk file besar\n  }\n}\n\n// Hitung chunk size dan total chunks\nconst chunkSize = getOptimalChunkSize(videoSize);\nconst totalChunkCount = Math.ceil(videoSize / chunkSize);\n\n// Buat array untuk semua chunks dengan header masing-masing\nconst chunks = [];\nfor (let i = 0; i < totalChunkCount; i++) {\n  const start = i * chunkSize;\n  const end = Math.min(start + chunkSize - 1, videoSize - 1);\n  const currentChunkSize = end - start + 1;\n  \n  chunks.push({\n    chunkIndex: i,\n    start: start,\n    end: end,\n    size: currentChunkSize,\n    contentRange: `bytes ${start}-${end}/${videoSize}`,\n    contentLength: currentChunkSize\n  });\n}\n\n// Return hasil\nreturn [\n  {\n    json: {\n      videoSize: videoSize,\n      videoSizeMB: (videoSize / 1024 / 1024).toFixed(2),\n      contentType: items[0].binary.data.mimeType || 'video/mp4',\n      chunkSize: chunkSize,\n      chunkSizeMB: (chunkSize / 1024 / 1024).toFixed(2),\n      totalChunkCount: totalChunkCount,\n      singleUploadHeaders: {\n        'Content-Type': items[0].binary.data.mimeType || 'video/mp4',\n        'Content-Length': videoSize.toString(),\n        'Content-Range': `bytes 0-${videoSize - 1}/${videoSize}`\n      },\n      chunks: chunks,\n      tiktokInitPayload: {\n        source_info: {\n          source: 'FILE_UPLOAD',\n          video_size: videoSize,\n          chunk_size: chunkSize,\n          total_chunk_count: totalChunkCount\n        }\n      }\n    },\n    binary: {\n      data: items[0].binary.data\n    }\n  }\n];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -165,13 +167,13 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $vars.SAAS_API }}/api/instagram/published",
+        "url": "={{ $vars.SAAS_API }}/api/tiktok/published",
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
             {
               "name": "content_id",
-              "value": "={{ $('Edit Fields').item.json.content_id }}"
+              "value": "={{ $('Edit Fields').first().json.content_id }}"
             },
             {
               "name": "social_type",
@@ -188,7 +190,8 @@
         0
       ],
       "id": "f3d3feae-2a80-4188-b673-5d775d3023ce",
-      "name": "Callback publish"
+      "name": "Callback publish",
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -205,6 +208,43 @@
       "id": "96988b43-1a1c-40a4-b17e-676850fbeae7",
       "name": "Webhook",
       "webhookId": "8a20514b-ccd4-4d7b-9803-075226996a28"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SAAS_API }}/api/social-content/fail",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "content_id",
+              "value": "={{ $('Edit Fields').item.json.content_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        400,
+        320
+      ],
+      "id": "b45536fc-0daa-4ed7-b22c-08fdb35daad7",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "errorMessage": "An error occurred!"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        640,
+        320
+      ],
+      "id": "8a4a95b2-7dee-4b75-bfe2-c07bd128c8b5",
+      "name": "Stop and Error"
     }
   ],
   "connections": {
@@ -213,6 +253,13 @@
         [
           {
             "node": "video props",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
             "type": "main",
             "index": 0
           }
@@ -238,7 +285,8 @@
             "type": "main",
             "index": 0
           }
-        ]
+        ],
+        []
       ]
     },
     "process upload": {
@@ -246,6 +294,13 @@
         [
           {
             "node": "Callback publish",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
             "type": "main",
             "index": 0
           }
@@ -273,6 +328,29 @@
           }
         ]
       ]
+    },
+    "Callback publish": {
+      "main": [
+        [],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -281,10 +359,11 @@
     "availableInMCP": false,
     "timeSavedMode": "fixed",
     "errorWorkflow": "4otmc6jILN7VL0Z9",
-    "callerPolicy": "workflowsFromSameOwner"
+    "callerPolicy": "workflowsFromSameOwner",
+    "saveDataSuccessExecution": "all"
   },
   "triggerCount": 1,
-  "versionId": "abc76112-e27e-47e7-8e2a-8e57f6649f09",
+  "versionId": "8e78aeb6-d61e-461a-8a2b-feef627a7b1e",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

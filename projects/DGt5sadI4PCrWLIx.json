@@ -1,0 +1,16 @@
+{
+  "id": "DGt5sadI4PCrWLIx",
+  "name": "Starling",
+  "icon": {
+    "type": "icon",
+    "value": "layers"
+  },
+  "description": "",
+  "type": "team",
+  "owner": {
+    "type": "team",
+    "teamId": "DGt5sadI4PCrWLIx",
+    "teamName": "Starling"
+  },
+  "variableStubs": []
+}

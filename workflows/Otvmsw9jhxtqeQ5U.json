@@ -470,7 +470,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const prompt = $('Code in JavaScript2').first().json.image.prompt;\n\n// Prepare the parts array with the text prompt first\nconst parts = [\n  { text: prompt }\n];\n\n// Loop through all incoming items and extract images\n// Note: If all images are in one item as different binary keys, adjust the loop.\n// This assumes multiple items (e.g., 3 separate image items).\n\nfor (const item of $input.first().json.image ) {\n\n  parts.push({\n      inlineData: {\n        mimeType: item.mime,\n        data: item.image // n8n already provides this as base64\n      }\n    });\n\n}\nconst tempImg = $('Code in JavaScript2').first().json.image.tempImg;\nif( tempImg !== 'nope'){\n  for (const item of tempImg ) {\n\n  parts.push({\n      inlineData: {\n        mimeType: item.mime,\n        data: item.image // n8n already provides this as base64\n      }\n    });\n\n}\n}\n\n// Return the structure ready for the API\nreturn {\n  json: {\n    payload: {\n      contents: [\n        {\n          parts: parts\n        }\n      ],\n      generationConfig: {\n          responseModalities: [\"image\"],\n          topP: 0.2,\n          imageConfig:{\n               aspectRatio: \"16:9\",\n            \"imageSize\": \"1K\"\n          }\n      }\n    }\n  }\n};\n\n"
+        "jsCode": "const prompt = $('Code in JavaScript2').first().json.image.prompt;\n\n// Prepare the parts array with the text prompt first\nconst parts = [\n  { text: prompt }\n];\n\n// Loop through all incoming items and extract images\n// Note: If all images are in one item as different binary keys, adjust the loop.\n// This assumes multiple items (e.g., 3 separate image items).\n\nfor (const item of $input.first().json.image ) {\n  if (typeof item.mime !== 'undefined' && item.mime !== null) {\n    parts.push({\n        inlineData: {\n          mimeType: item.mime,\n          data: item.image // n8n already provides this as base64\n        }\n      });\n  }\n}\nconst tempImg = $('Code in JavaScript2').first().json.image.tempImg;\nif( tempImg !== 'nope'){\n  for (const item of tempImg ) {\n\n  parts.push({\n      inlineData: {\n        mimeType: item.mime,\n        data: item.image // n8n already provides this as base64\n      }\n    });\n\n}\n}\n\n// Return the structure ready for the API\nreturn {\n  json: {\n    payload: {\n      contents: [\n        {\n          parts: parts\n        }\n      ],\n      generationConfig: {\n          responseModalities: [\"image\"],\n          topP: 0.2,\n          imageConfig:{\n               aspectRatio: \"16:9\",\n            \"imageSize\": \"1K\"\n          }\n      }\n    }\n  }\n};\n\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -1078,10 +1078,11 @@
     "availableInMCP": false,
     "timeSavedMode": "fixed",
     "errorWorkflow": "4otmc6jILN7VL0Z9",
-    "callerPolicy": "workflowsFromSameOwner"
+    "callerPolicy": "workflowsFromSameOwner",
+    "saveDataSuccessExecution": "all"
   },
   "triggerCount": 1,
-  "versionId": "147517c6-d676-42ab-a1cb-173a9a9a4581",
+  "versionId": "62a357a2-c9a9-4a93-9929-fb5a1a6f9418",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

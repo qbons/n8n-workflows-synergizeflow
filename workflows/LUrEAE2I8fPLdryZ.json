@@ -1,0 +1,1441 @@
+{
+  "id": "LUrEAE2I8fPLdryZ",
+  "name": "Generic Social Media Publish",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        160,
+        608
+      ],
+      "id": "f66f322f-6be3-43ef-9808-e5b814f4cb6d",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "url": "https://assets.synergizeflow.com/job_listing/image_0_a6963bfe08e9699c0827d32f22d5dc1d2f4852aa0249e671afeb679c0bf36f04.jpg",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        3616,
+        -272
+      ],
+      "id": "c5de7eae-89de-44cf-9d4c-c38a7a0d03f6",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.instagram.com/{{ $vars.INSTAGRAM_API_VERSION }}/{{ $('Loop Over Items4').item.json.id }}/media",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "media_type",
+              "value": "CAROUSEL"
+            },
+            {
+              "name": "children",
+              "value": "={{ $json.data.map(item => item.id) }}"
+            },
+            {
+              "name": "caption",
+              "value": "={{ $('When Executed by Another Workflow').item.json.caption }}"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $('Loop Over Items4').item.json.access_token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2960,
+        1088
+      ],
+      "id": "e7e967f5-37bb-4713-b3a9-27e0e01bbc01",
+      "name": "Create carousel container"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  body: {\n    id: $input.first().json.id\n  }\n}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3152,
+        1088
+      ],
+      "id": "e23ff5da-f280-4387-bd60-4f778e70426b",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "amount": 90
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3344,
+        1088
+      ],
+      "id": "959a3ec7-b5aa-40a3-8130-122d45b311fe",
+      "name": "Wait",
+      "webhookId": "af6714b2-4f7d-4446-bbda-f194fe8d2e24"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.instagram.com/{{ $vars.INSTAGRAM_API_VERSION }}/{{ $('Loop Over Items4').item.json.id }}/media_publish",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "creation_id",
+              "value": "={{ $json.body.id }}"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $('Loop Over Items4').item.json.access_token }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3536,
+        1088
+      ],
+      "id": "072f1d22-a455-4910-8bda-6cb15f4aa96b",
+      "name": "Post to IG",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "images",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        768,
+        272
+      ],
+      "id": "176fe90a-7ea5-4d9f-a2e8-43ab7bbd1711",
+      "name": "Split Out3"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        976,
+        272
+      ],
+      "id": "ff41b64e-59a7-4132-a546-ecfa86a3e6ca",
+      "name": "Loop Over Items3"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  item.binary = {\n    image: {\n      data: item.json.data,\n      mimeType: item.json.mime || 'image/jpeg',\n      fileName: `image_${$runIndex}.jpg`\n    }\n  };\n\n  return item;\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1184,
+        272
+      ],
+      "id": "5c4df851-b441-4a61-a460-5810dcba70a7",
+      "name": "Code in JavaScript5"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "account",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1232,
+        704
+      ],
+      "id": "2df85132-8e3a-443d-9943-760650345d7d",
+      "name": "Split Out4"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1568,
+        272
+      ],
+      "id": "af2bd2ab-8b59-4e1b-a814-fc6cd87aacf7",
+      "name": "Wait2",
+      "webhookId": "ea371124-6e0e-4756-82ad-c6e2a220d39d"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  account: $('When Executed by Another Workflow').first().json.account,\n  image_urls: items.map((item) => item.json.image_url)\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        512
+      ],
+      "id": "37e8c467-e0d5-4088-a093-433e7335e215",
+      "name": "Code in JavaScript6"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1456,
+        704
+      ],
+      "id": "79159f5e-5135-4feb-af12-8170ce27cea2",
+      "name": "Loop Over Items4"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Loop Over Items4').item.json.type }}",
+                    "rightValue": "instagram",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "f472ee59-b8ef-4e0d-9a6c-f9cd903917bf"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "instagram"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "4c2cc742-c3dd-49d6-b8a0-5bd2651d8c08",
+                    "leftValue": "={{ $('Loop Over Items4').item.json.type }}",
+                    "rightValue": "facebook",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "facebook"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        2592,
+        1536
+      ],
+      "id": "b2680de0-3b3b-4bab-b3ac-a751f960d466",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  image_url: `https://assets.synergizeflow.com/job_listing_agent_${$('When Executed by Another Workflow').first().json.license}/image_${$runIndex}.jpg`\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1744,
+        272
+      ],
+      "id": "3c034f92-de89-4bd4-97a0-5578598e331c",
+      "name": "Code in JavaScript7"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "image_urls",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        2144,
+        1392
+      ],
+      "id": "840c9421-ceeb-47ec-b6ad-db50687dd9a0",
+      "name": "Split Out5"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  image_urls: $('Code in JavaScript6').first().json.image_urls\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1936,
+        1392
+      ],
+      "id": "ac2fb12c-8109-4ce9-adff-191455f25bc7",
+      "name": "Code in JavaScript8"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": "={{ $prevNode.name === 'Split Out5' }}"
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2352,
+        1392
+      ],
+      "id": "e14dbea4-3603-4b6a-aff9-3448f43fe025",
+      "name": "Loop Over Items5"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.instagram.com/{{ $vars.INSTAGRAM_API_VERSION }}/{{ $('Loop Over Items4').item.json.id }}/media",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "image_url",
+              "value": "={{ $json.image_urls }}"
+            },
+            {
+              "name": "is_carousel_item",
+              "value": "true"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $('Loop Over Items4').item.json.access_token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2784,
+        1504
+      ],
+      "id": "7817c941-5ce2-4c9a-b08b-78feb732aa5d",
+      "name": "Create Child Container1"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2960,
+        1504
+      ],
+      "id": "31f6a8e8-efec-4758-8b11-310f5f173e19",
+      "name": "Wait3",
+      "webhookId": "70a7dd14-690f-4ab8-a730-77bc579d3184"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Loop Over Items4').item.json.type }}",
+                    "rightValue": "instagram",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "f472ee59-b8ef-4e0d-9a6c-f9cd903917bf"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "instagram"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "4c2cc742-c3dd-49d6-b8a0-5bd2651d8c08",
+                    "leftValue": "={{ $('Loop Over Items4').item.json.type }}",
+                    "rightValue": "facebook",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "facebook"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        2592,
+        1200
+      ],
+      "id": "e37b8e82-0cee-4316-a023-869b3f03ccc8",
+      "name": "Switch2"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2784,
+        1088
+      ],
+      "id": "1d28c353-0488-4569-a1f9-5dd363fd1350",
+      "name": "Aggregate1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/{{ $vars.FACEBOOK_API_VERSION }}/{{ $('Loop Over Items4').item.json.id }}/photos",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"url\": \"{{ $json.image_urls }}\",\n  \"published\": false,\n  \"access_token\": \"{{ $('Loop Over Items4').item.json.access_token }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2784,
+        1696
+      ],
+      "id": "012b8529-dadc-49f4-a305-cb52a186f01e",
+      "name": "Upload content image1"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2960,
+        1696
+      ],
+      "id": "9d5d8be4-d3e5-4239-bf26-23c3cee694bd",
+      "name": "Wait4",
+      "webhookId": "7cb6322e-2d83-4631-ba68-6c8b1b2a0629"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2784,
+        1280
+      ],
+      "id": "a1b079f9-7c61-49e5-87fa-2982a293ca9b",
+      "name": "Aggregate2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const attached_media = $input.first().json.data.map(item => (JSON.stringify({media_fbid: item.id})));\n\nconst payload = {\n  message: $('When Executed by Another Workflow').first().json.caption,\n  attached_media,\n  access_token: $('Loop Over Items4').first().json.access_token\n};\n\nreturn {\n  payload\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2960,
+        1280
+      ],
+      "id": "2cfdc4fc-9f40-46e1-b061-5bec5da4eee8",
+      "name": "Code in JavaScript9"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/{{ $vars.FACEBOOK_API_VERSION }}/{{ $('Loop Over Items4').item.json.id }}/feed",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.payload }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3152,
+        1280
+      ],
+      "id": "c8ffa5d7-1b74-42b6-aff1-08c112a20e7e",
+      "name": "Publish Content Images"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.linkedin.com/v2/assets?action=registerUpload",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Loop Over Items4').item.json.access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"registerUploadRequest\": {\n        \"recipes\": [\n            \"urn:li:digitalmediaRecipe:feedshare-image\"\n        ],\n        \"owner\": \"urn:li:{{ $('Loop Over Items4').item.json.account_type === \"personal\" ? \"person\": \"organization\" }}:{{ $('Loop Over Items4').item.json.id }}\",\n        \"serviceRelationships\": [\n            {\n                \"relationshipType\": \"OWNER\",\n                \"identifier\": \"urn:li:userGeneratedContent\"\n            }\n        ]\n    }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2592,
+        832
+      ],
+      "id": "8431f31a-3b43-4b86-9382-45d0b58dc5ba",
+      "name": "Generate image upload url1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "61192e44-4148-48f6-9ae1-fba7dddf7863",
+              "leftValue": "={{ $('Loop Over Items4').item.json.type }}",
+              "rightValue": "linkedin",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1680,
+        1056
+      ],
+      "id": "1c478e4e-2a9b-462a-9538-2ba4728063ff",
+      "name": "If linkedin"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  images: $('When Executed by Another Workflow').first().json.images\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1936,
+        704
+      ],
+      "id": "1e73d167-8f3b-4b2f-8cba-421dfb779913",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "const accountTypes = $input.first().json.account.map(ac => ac.type);\n\nconst needUploadToS3 = accountTypes.some(\n  type => ['instagram', 'facebook'].includes(type)\n);\n\nconst hasLinkedin = accountTypes.includes('linkedin');\n\nreturn {\n  needUploadToS3,\n  hasLinkedin,\n  images: $input.first().json.images\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        368,
+        608
+      ],
+      "id": "e17f8f49-addb-46eb-8d0c-25aba6a62ada",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d922fc57-0b21-4a12-882f-d5051fbcdbbc",
+              "leftValue": "={{ $json.needUploadToS3 }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        576,
+        608
+      ],
+      "id": "5683f702-8010-42fb-a53a-1194cdf9ab8e",
+      "name": "If need to upload to s3 first"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  account: $('When Executed by Another Workflow').first().json.account\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        736
+      ],
+      "id": "02c2d375-a053-4515-af68-80f4c3dc1b4a",
+      "name": "Code in JavaScript10"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "images",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        2144,
+        704
+      ],
+      "id": "e91ceda2-daff-4829-b77e-7a0e5ea2d36e",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": "={{ $prevNode.name === 'Split Out' }}"
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2352,
+        704
+      ],
+      "id": "be1f35e0-f0a2-4baa-a417-2dfecc99859b",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map((item, index) => {\n  return {\n    json: item.json,\n    binary: {\n      image: {\n        data: $('Loop Over Items').all()[index].json.data,\n        mimeType: $('Loop Over Items').all()[index].json.mime || 'image/jpeg',\n        fileName: 'image.jpg'\n      }\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2784,
+        832
+      ],
+      "id": "c45cc29e-e134-44ff-8393-b2a5384b28d3",
+      "name": "Code in JavaScript11"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.value.uploadMechanism['com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest'].uploadUrl }}",
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "image",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2960,
+        832
+      ],
+      "id": "fde0c36f-21a4-44fa-a581-1b60da64dbd3",
+      "name": "Upload image1"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        3168,
+        832
+      ],
+      "id": "9beff24f-2c45-4a15-ba5c-f05cb8c3ea5e",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3344,
+        832
+      ],
+      "id": "796a2416-282a-4f8f-8850-dd03e6ec4198",
+      "name": "Wait1",
+      "webhookId": "7cb6322e-2d83-4631-ba68-6c8b1b2a0629"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2592,
+        624
+      ],
+      "id": "db2ef813-4f39-4a95-a112-5f6a6ecec3bb",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.linkedin.com/v2/ugcPosts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Restli-Protocol-Version",
+              "value": "2.0.0"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Loop Over Items4').item.json.access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"author\": \"urn:li:{{ $('Loop Over Items4').item.json.account_type === \"personal\" ? \"person\": \"organization\" }}:{{ $('Loop Over Items4').item.json.id }}\",\n    \"lifecycleState\": \"PUBLISHED\",\n    \"specificContent\": {\n        \"com.linkedin.ugc.ShareContent\": {\n            \"shareCommentary\": {\n                \"text\": {{ JSON.stringify($('When Executed by Another Workflow').item.json.caption) }}\n            },\n            \"shareMediaCategory\": \"IMAGE\",\n            \"media\": {{ JSON.stringify($json.data.map(item => ({\"status\": \"READY\", \"media\": item.value.asset}))) }}\n        }\n    },\n    \"visibility\": {\n        \"com.linkedin.ugc.MemberNetworkVisibility\": \"PUBLIC\"\n    }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2784,
+        624
+      ],
+      "id": "3e211af7-6f0b-4312-ab16-d7a38bad6d97",
+      "name": "Share content image1"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "={{ $vars.CLOUDFLARE_R2_BUCKET }}",
+        "fileName": "=job_listing_agent_{{ $('When Executed by Another Workflow').item.json.license }}/{{ $input.item.binary.image.fileName }}",
+        "binaryPropertyName": "image",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [
+        1376,
+        272
+      ],
+      "id": "aa28e868-dbdb-4815-9973-aa190081892f",
+      "name": "Upload a file",
+      "credentials": {
+        "s3": {
+          "id": "AIXo2wxUCjaHKlfc",
+          "name": "SF - R2 Cloudflare Storage"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b4aea86d-38b8-4062-b070-e94106fa0b3b",
+              "leftValue": "={{ $('Code in JavaScript1').item.json.needUploadToS3 }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1664,
+        608
+      ],
+      "id": "f959bd0e-f903-43cf-828f-dd59ba087671",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "operation": "delete",
+        "bucketName": "={{ $vars.CLOUDFLARE_R2_BUCKET }}",
+        "folderKey": "=job_listing_agent_{{ $('When Executed by Another Workflow').item.json.license }}"
+      },
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [
+        1872,
+        512
+      ],
+      "id": "259c49d5-da22-4d75-9452-8d600dd9ae3d",
+      "name": "Delete a folder",
+      "credentials": {
+        "s3": {
+          "id": "AIXo2wxUCjaHKlfc",
+          "name": "SF - R2 Cloudflare Storage"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        []
+      ]
+    },
+    "Create carousel container": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Post to IG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to IG": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out3": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items3": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript5": {
+      "main": [
+        [
+          {
+            "node": "Upload a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript6": {
+      "main": [
+        [
+          {
+            "node": "Split Out4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items4": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If linkedin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out4": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Create Child Container1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Upload content image1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript7": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript8": {
+      "main": [
+        [
+          {
+            "node": "Split Out5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out5": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items5": {
+      "main": [
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Child Container1": {
+      "main": [
+        [
+          {
+            "node": "Wait3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait3": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch2": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Aggregate2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Create carousel container",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload content image1": {
+      "main": [
+        [
+          {
+            "node": "Wait4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait4": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript9": {
+      "main": [
+        [
+          {
+            "node": "Publish Content Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish Content Images": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If linkedin": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "If need to upload to s3 first",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If need to upload to s3 first": {
+      "main": [
+        [
+          {
+            "node": "Split Out3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript10": {
+      "main": [
+        [
+          {
+            "node": "Split Out4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate image upload url1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript11": {
+      "main": [
+        [
+          {
+            "node": "Upload image1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate image upload url1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Code in JavaScript11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload image1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Share content image1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share content image1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload a file": {
+      "main": [
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Delete a folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "4otmc6jILN7VL0Z9"
+  },
+  "triggerCount": 0,
+  "versionId": "dcae4c15-96de-432e-993b-4135e040f009",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "8iF3VS4uHwCV47XQ",
+  "isArchived": false
+}

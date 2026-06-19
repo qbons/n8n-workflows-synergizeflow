@@ -1,0 +1,525 @@
+{
+  "id": "QFT8mRQOae0sqZXd",
+  "name": "Coordinator",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "generic-agent/coordinator",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -304,
+        144
+      ],
+      "id": "fb319ff8-74ae-47a2-b389-db250afd0bb7",
+      "name": "Webhook",
+      "webhookId": "b2651556-cf75-4d50-ba39-2dc6bf8344c4"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5520edc4-1465-4e28-94e5-2deb4ca14e74",
+              "name": "id",
+              "value": "={{ $('Webhook').item.json.body.id }}",
+              "type": "number"
+            },
+            {
+              "id": "22523df0-a611-4e94-acb7-e6f4b95b5f1f",
+              "name": "code",
+              "value": "={{ $('Webhook').item.json.body.license_key }}",
+              "type": "string"
+            },
+            {
+              "id": "e0dc1ad9-3312-46fa-ad1e-4d84e951b137",
+              "name": "domain",
+              "value": "={{ $('Webhook').item.json.body.domain_name }}",
+              "type": "string"
+            },
+            {
+              "id": "dd4212b5-7221-4634-93e7-66f09054b905",
+              "name": "type",
+              "value": "={{ $('Webhook').item.json.body.type }}",
+              "type": "string"
+            },
+            {
+              "id": "46673e8c-84b5-48f1-afa3-81ff2f48c355",
+              "name": "process",
+              "value": "={{ $('Webhook').item.json.body.process }}",
+              "type": "string"
+            },
+            {
+              "id": "e234bed7-cefc-4b34-8c68-0cb479e44696",
+              "name": "data",
+              "value": "={{ $('Webhook').item.json.body.data }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        368,
+        -144
+      ],
+      "id": "9a1615b5-373d-426d-a0a5-8198054ad065",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "const type = {\n  job_agent: \"job\"\n}\nreturn {\n  domain: $input.first().json.domain,\n  code: $input.first().json.code,\n  webhook:$input.first().json.webhook,\n  id: $input.first().json.id,\n  type:$input.first().json.type,\n  data: $input.first().json.data[type[$input.first().json.type]],\n  config: $input.first().json.data[$input.first().json.process]\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        592,
+        -144
+      ],
+      "id": "cc5ac2f4-6b3b-4f18-a7dc-b8adceb7d38c",
+      "name": "Parse Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.body.domain_name }}wp-json/synergize/v1/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "code",
+              "value": "={{ $json.body.license_key }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -80,
+        48
+      ],
+      "id": "97d0d88c-50a7-4943-8f77-f4d083a6d82a",
+      "name": "Check if license is valid"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "60458c94-986c-49cd-8b69-4b5616163eb3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f910b52-842c-4b6a-a862-e6914c883764",
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        144,
+        48
+      ],
+      "id": "3bab8c4e-3495-48ce-8854-8ee1c94d56e6",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "website",
+              "value": "={{ $('Webhook').item.json.body.domain_name }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        -80,
+        240
+      ],
+      "id": "3c74e347-5a10-4aa2-9529-aecc407b0a94",
+      "name": "Execution Data"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Prepare Data').item.json.process }}",
+                    "rightValue": "blog",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "3c3951dc-04f4-4127-98ea-57b54d1d0ddd"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "blog"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "ec622baa-6935-4791-bbff-8ff69b53f5c0",
+                    "leftValue": "={{ $('Prepare Data').item.json.process }}",
+                    "rightValue": "page_builder",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "page_builder"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "ff41f1ee-ee60-4b6e-8db3-313ac38ab59b",
+                    "leftValue": "={{ $('Prepare Data').item.json.process }}",
+                    "rightValue": "social_media",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "social_media"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        816,
+        -160
+      ],
+      "id": "33598078-0863-433f-9af9-cac7aebb8a2d",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "Dm7Wzg1aPnvc6cvd",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/Dm7Wzg1aPnvc6cvd",
+          "cachedResultName": "SynergizeFlow — Generic Blog Process"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1040,
+        -240
+      ],
+      "id": "1fef7b0a-d7e3-4464-a7af-9d5732af9f9c",
+      "name": "Call 'Generic Blog Process'"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SAAS_API }}/api/webhook/generic-agent",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "service_id",
+              "value": "={{ $('Webhook').item.json.body.id }}"
+            },
+            {
+              "name": "status",
+              "value": "=fail"
+            },
+            {
+              "name": "type",
+              "value": "={{ $('Webhook').item.json.body.type }}_builder"
+            },
+            {
+              "name": "process",
+              "value": "={{ $('Webhook').item.json.body.process }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        368,
+        48
+      ],
+      "id": "b4fca2c1-f98f-45f6-94df-d3ae6e2af16e",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "dpIuyCCUBTzKp1wx",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/dpIuyCCUBTzKp1wx",
+          "cachedResultName": "SynergizeFlow — Generic Page Builder Process"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1040,
+        -48
+      ],
+      "id": "e8185214-3095-4aaf-86f0-f2408a0b9d5e",
+      "name": "Call 'Generic Page Builder Process'"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "D2MVtI37SF55UChd",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/D2MVtI37SF55UChd",
+          "cachedResultName": "SynergizeFlow — Generic Social Media Process"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1040,
+        144
+      ],
+      "id": "e1fb8375-d9eb-4d91-871e-ae620b839db6",
+      "name": "Call 'Generic Social Media'"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Parse Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if license is valid": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Data": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Call 'Generic Blog Process'",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call 'Generic Page Builder Process'",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call 'Generic Social Media'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "saveDataSuccessExecution": "all"
+  },
+  "triggerCount": 1,
+  "versionId": "b1fe4386-5895-4bc6-9b86-133dd1a6443d",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "8iF3VS4uHwCV47XQ",
+  "isArchived": false
+}

@@ -404,6 +404,7 @@
       ],
       "id": "10156992-7b10-4107-9039-281a7e4bca5a",
       "name": "Analyze audio",
+      "retryOnFail": true,
       "credentials": {
         "googlePalmApi": {
           "id": "aLrGZCRV8oKLBNjE",
@@ -1096,7 +1097,7 @@
     "callerPolicy": "workflowsFromSameOwner"
   },
   "triggerCount": 2,
-  "versionId": "36f08d12-eb12-4d11-bff3-ec23b0e9935a",
+  "versionId": "c7340b63-56b5-4990-9a80-69740cf03b68",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

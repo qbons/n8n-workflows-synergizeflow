@@ -121,6 +121,12 @@
               "name": "language",
               "value": "={{ $json.body.language || 'English' }}",
               "type": "string"
+            },
+            {
+              "id": "673ba9f8-b30d-4b7b-9bb0-331c59756505",
+              "name": "image_urls",
+              "value": "={{ $json.body.image_urls }}",
+              "type": "array"
             }
           ]
         },
@@ -387,6 +393,31 @@
               },
               "renameOutput": true,
               "outputKey": "business_internal_article"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a636c7ac-76b2-4c83-a540-11a4f4de05d1",
+                    "leftValue": "={{ $json.content_type }}",
+                    "rightValue": "carousel",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "carousel"
             }
           ]
         },
@@ -715,7 +746,7 @@
       "typeVersion": 1,
       "position": [
         -2272,
-        -1088
+        -1056
       ],
       "id": "a91d4fd0-20db-4c3c-b7d9-f7835f4804a4",
       "name": "Google Vertex Chat Model",
@@ -804,8 +835,8 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -3296,
-        -752
+        -3248,
+        -256
       ],
       "typeVersion": 1,
       "id": "7f9ac3ae-12ba-4f1c-b1d1-d5b9b5bc7cb0",
@@ -840,8 +871,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -2064,
-        -768
+        -2016,
+        -272
       ],
       "id": "30b9edc3-74fe-4571-bce5-f9d1c7e1fd44",
       "name": "Share business content text"
@@ -875,8 +906,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -2448,
-        -560
+        -2400,
+        -64
       ],
       "id": "d6f87e72-fd7e-41d1-b154-4da7124e18f1",
       "name": "Generate business image upload url"
@@ -895,8 +926,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -2192,
-        -560
+        -2144,
+        -64
       ],
       "id": "cbc18eea-e0b0-4a3e-a7c8-92bb9084bd71",
       "name": "Download business image"
@@ -913,8 +944,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -1952,
-        -560
+        -1904,
+        -64
       ],
       "id": "2dfa2133-82d1-4281-be4c-5809b731b37c",
       "name": "Upload business image"
@@ -948,8 +979,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -1712,
-        -560
+        -1664,
+        -64
       ],
       "id": "58e4353c-287d-4e11-bcad-3cc14dd4bb56",
       "name": "Share business content image"
@@ -968,8 +999,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -2752,
-        -352
+        -2704,
+        144
       ],
       "id": "656f2bda-8e6b-4297-9e98-cad9c1b82e35",
       "name": "Download business video"
@@ -997,8 +1028,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -2560,
-        -352
+        -2512,
+        144
       ],
       "id": "d3abf5a1-23af-4b4f-9617-a0e9b6475f73",
       "name": "Get business video binary"
@@ -1010,8 +1041,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2352,
-        -352
+        -2304,
+        144
       ],
       "id": "06fd2e8d-dd66-480b-b469-3393034632c9",
       "name": "Get video size"
@@ -1045,8 +1076,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -2160,
-        -352
+        -2112,
+        144
       ],
       "id": "0d385ba7-8a9e-45a1-a8a3-2ba441345edc",
       "name": "Generate business video upload url"
@@ -1068,8 +1099,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -1968,
-        -352
+        -1920,
+        144
       ],
       "id": "624202c9-43b3-4048-bd46-388f77760ddc",
       "name": "Prepare video binary"
@@ -1092,8 +1123,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -1776,
-        -352
+        -1728,
+        144
       ],
       "id": "0fc5facb-e5dd-4a6d-b59a-5aa722e1786c",
       "name": "Upload business video"
@@ -1127,8 +1158,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -1600,
-        -352
+        -1552,
+        144
       ],
       "id": "ced87804-0da0-4903-8a1a-1e5bde9f1576",
       "name": "Finalize Video Upload"
@@ -1162,8 +1193,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -1408,
-        -352
+        -1360,
+        144
       ],
       "id": "8aa9e349-fd55-4ab3-9a7a-2e045c014535",
       "name": "Share business content video"
@@ -1179,8 +1210,8 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3,
       "position": [
-        -3104,
-        96
+        -3056,
+        592
       ],
       "id": "8d22c7ea-34c7-4e11-a9d8-e7edde069939",
       "name": "AI Agent2"
@@ -1199,8 +1230,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleVertex",
       "typeVersion": 1,
       "position": [
-        -3104,
-        240
+        -3056,
+        736
       ],
       "id": "edad742b-ff0f-4995-8e16-b1f4bc42b142",
       "name": "Google Vertex Chat Model2",
@@ -1233,8 +1264,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -2960,
-        -112
+        -2912,
+        384
       ],
       "id": "5c68769d-3b25-4507-99db-6fc471a3b9cf",
       "name": "Get post business content"
@@ -1246,8 +1277,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2752,
-        -112
+        -2704,
+        384
       ],
       "id": "18e9e19a-7872-4c25-bcff-7a8972f2dd85",
       "name": "Format content"
@@ -1293,8 +1324,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -2544,
-        -112
+        -2496,
+        384
       ],
       "id": "71e1ea97-0a15-49c3-a437-93bdfb483fdc",
       "name": "Config content"
@@ -1306,8 +1337,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2352,
-        -112
+        -2304,
+        384
       ],
       "id": "06f39b94-2d1b-4fd6-b4c5-1e4a614a25c5",
       "name": "Check image exist"
@@ -1340,8 +1371,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -2192,
-        -112
+        -2144,
+        384
       ],
       "id": "1397aec3-f8b6-40d8-b957-312f9965da3b",
       "name": "If image exist"
@@ -1375,8 +1406,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -1984,
-        -128
+        -1936,
+        368
       ],
       "id": "03ead526-8463-4790-a35c-d28fa2d9a004",
       "name": "Generate image article upload url",
@@ -1396,8 +1427,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -1792,
-        -128
+        -1744,
+        368
       ],
       "id": "f6f465b8-6259-4e15-8b3f-56d12d05f06d",
       "name": "Download article image",
@@ -1415,8 +1446,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -1616,
-        -128
+        -1568,
+        368
       ],
       "id": "25eae3be-dbc9-472a-9cfb-0ec2cf9ade1a",
       "name": "Upload article image",
@@ -1429,8 +1460,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1424,
-        -128
+        -1376,
+        368
       ],
       "id": "76c96903-0c46-485c-bab7-9628f5990b1c",
       "name": "Article image payload formater"
@@ -1464,8 +1495,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -1232,
-        -128
+        -1184,
+        368
       ],
       "id": "b3f5383d-baca-4c93-94a0-65260b9ebf36",
       "name": "Share business content article"
@@ -1477,8 +1508,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1712,
-        80
+        -1664,
+        576
       ],
       "id": "c92cfd28-bff0-45e2-907c-da91a81ce934",
       "name": "Article without image payload formater"
@@ -1490,8 +1521,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2752,
-        96
+        -2704,
+        592
       ],
       "id": "e1b3c476-cd09-49a3-8c64-f02875bb8098",
       "name": "Format internat content"
@@ -1518,8 +1549,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -3264,
-        96
+        -3216,
+        592
       ],
       "id": "5cb9ae11-42a6-4e7a-b95d-4c533d2eb245",
       "name": "Get internal post business content"
@@ -1541,8 +1572,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -3248,
-        544
+        -3200,
+        1040
       ],
       "id": "ff88655c-8aa6-410c-9215-1ec0fd1e7878",
       "name": "Edit Fields"
@@ -1561,8 +1592,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleVertex",
       "typeVersion": 1,
       "position": [
-        -3072,
-        688
+        -3024,
+        1184
       ],
       "id": "aa634f40-84c5-4e51-a25c-26c0d361631d",
       "name": "Google Vertex Chat Model3",
@@ -1584,11 +1615,177 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3,
       "position": [
-        -3072,
-        544
+        -3024,
+        1040
       ],
       "id": "66a97087-56ae-4863-ae85-17d17cfa73f7",
       "name": "AI Agent3"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "image_urls",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -2912,
+        -816
+      ],
+      "id": "fe24bc9c-29a1-4a68-a436-136f95d24336",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -2704,
+        -816
+      ],
+      "id": "f8c54d2b-3d4d-467b-9f6c-32ba03aa9633",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.linkedin.com/v2/assets?action=registerUpload",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Configuration post settings').item.json.access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"registerUploadRequest\": {\n        \"recipes\": [\n            \"urn:li:digitalmediaRecipe:feedshare-image\"\n        ],\n        \"owner\": \"urn:li:person:{{ $('Configuration post settings').item.json.linkedin_id }}\",\n        \"serviceRelationships\": [\n            {\n                \"relationshipType\": \"OWNER\",\n                \"identifier\": \"urn:li:userGeneratedContent\"\n            }\n        ]\n    }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -2448,
+        -768
+      ],
+      "id": "70bdb62b-5b1b-482a-8eb9-af85e1958095",
+      "name": "Generate image upload url1"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Configuration post settings').item.json.image_urls[$runIndex] }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -2192,
+        -816
+      ],
+      "id": "f786ccb4-a64d-4b0f-a975-e76585edcb95",
+      "name": "Download image1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.value.uploadMechanism['com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest'].uploadUrl }}",
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1952,
+        -816
+      ],
+      "id": "ef3aedeb-c5e6-45c8-9881-29270a37739d",
+      "name": "Upload image1"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -1584,
+        -816
+      ],
+      "id": "51997d9c-d203-4751-bd85-5618d58b527e",
+      "name": "Wait",
+      "webhookId": "7cb6322e-2d83-4631-ba68-6c8b1b2a0629"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -1392,
+        -816
+      ],
+      "id": "fae17418-d7e2-46cb-8c25-c072cebaa6a0",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -1760,
+        -720
+      ],
+      "id": "43129b74-f23b-4dcf-b74b-6aad9ef538d0",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.linkedin.com/v2/ugcPosts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Restli-Protocol-Version",
+              "value": "2.0.0"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Configuration post settings').item.json.access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"author\": \"urn:li:person:{{ $('Configuration post settings').item.json.linkedin_id }}\",\n    \"lifecycleState\": \"PUBLISHED\",\n    \"specificContent\": {\n        \"com.linkedin.ugc.ShareContent\": {\n            \"shareCommentary\": {\n                \"text\": {{ JSON.stringify($('Configuration post settings').item.json.text) }}\n            },\n            \"shareMediaCategory\": \"IMAGE\",\n            \"media\": {{ JSON.stringify($json.data.map(item => ({\"status\": \"READY\", \"media\": item.value.asset}))) }}\n        }\n    },\n    \"visibility\": {\n        \"com.linkedin.ugc.MemberNetworkVisibility\": \"{{ $('Configuration post settings').item.json.content_visibility }}\"\n    }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1168,
+        -816
+      ],
+      "id": "a927e2d5-512a-470d-9c02-bc6a4758ac9c",
+      "name": "Share content image1"
     }
   ],
   "connections": {
@@ -1671,6 +1868,13 @@
         [
           {
             "node": "Get internal post business content",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Split Out",
             "type": "main",
             "index": 0
           }
@@ -2214,6 +2418,117 @@
           }
         ]
       ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate image upload url1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate image upload url1": {
+      "main": [
+        [
+          {
+            "node": "Download image1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Download image1": {
+      "main": [
+        [
+          {
+            "node": "Upload image1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload image1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Share content image1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share content image1": {
+      "main": [
+        [
+          {
+            "node": "Callback publish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -2223,10 +2538,11 @@
     "timeSavedMode": "fixed",
     "errorWorkflow": "4otmc6jILN7VL0Z9",
     "callerPolicy": "workflowsFromSameOwner",
-    "saveDataSuccessExecution": "all"
+    "saveDataSuccessExecution": "all",
+    "saveManualExecutions": true
   },
   "triggerCount": 1,
-  "versionId": "53962e34-fbe0-43f6-8003-22ede2cc3e40",
+  "versionId": "c9caeb19-77ab-40b2-8f9d-749161c663b0",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

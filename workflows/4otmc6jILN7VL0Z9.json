@@ -21,7 +21,7 @@
       "typeVersion": 2.3,
       "position": [
         288,
-        -96
+        0
       ],
       "id": "887ad239-eee0-4a65-8f03-e41914f83afc",
       "name": "Send a message",
@@ -42,7 +42,8 @@
         -96
       ],
       "id": "553ef27f-13b0-485a-aec6-290fcd5271d1",
-      "name": "Error Trigger"
+      "name": "Error Trigger",
+      "notesInFlow": false
     },
     {
       "parameters": {
@@ -77,6 +78,12 @@
               "name": "timestamp",
               "value": "={{ $now.toISO() }}",
               "type": "string"
+            },
+            {
+              "id": "61e585c6-0ba4-4c03-b561-ed5f58e63e09",
+              "name": "execution_id",
+              "value": "={{ $json.execution.id }}",
+              "type": "string"
             }
           ]
         },
@@ -90,6 +97,111 @@
       ],
       "id": "0794e951-4d22-4027-8d53-f96c18d20c3f",
       "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SAAS_API }}/api/webhook/generic-error",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "service_id",
+              "value": "={{ $json.data.resultData.runData.Webhook[0].data.main[0][0].json.body.service_id }}"
+            },
+            {
+              "name": "error_message",
+              "value": "={{ $json.data?.resultData?.error?.description || $json.data?.resultData?.error?.message }}"
+            },
+            {
+              "name": "optimization_id",
+              "value": "={{ $json.data.resultData.runData.Webhook[0].data.main[0][0].json.body.optimization_id }}"
+            },
+            {
+              "name": "old_id",
+              "value": "={{ $json.data.resultData.runData.get_blog_content_detail[0].data.main[0][0].json.blog.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        768,
+        -160
+      ],
+      "id": "0d7be5e5-be1d-4af3-8cbe-caa4fb47c44b",
+      "name": "webhook"
+    },
+    {
+      "parameters": {
+        "url": "={{ $vars.N8N_URL }}/api/v1/executions/{{ $json.execution_id }}?includeData=true&redactExecutionData=false",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-N8N-API-KEY",
+              "value": "=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3MzVhZWQyNS1hMjZmLTQwZjAtYTI5Ny0yNTYwMGM5N2RhNzciLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiYTg5OTliYWUtMTBkZS00OTI0LTkyNWYtNTZjYmVkODY2OTFkIiwiaWF0IjoxNzgwNjQ2ODk3fQ.QZ0PI_m-qcQUCP35i3Xcf_73N8W26jI9lfJ2zs10jZQ"
+            },
+            {
+              "name": "CF-Access-Client-Id",
+              "value": "df7b356ab8469e73180a34f316943468.access"
+            },
+            {
+              "name": "CF-Access-Client-Secret",
+              "value": "ce5fe761d797f0712211aee26d2ae52cc51d9d629bf8a3f13e9c7c47c166783c"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        288,
+        -144
+      ],
+      "id": "38b89b53-2601-4e62-925f-6a6f0d985412",
+      "name": "get_execution_data"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6f78a75f-f101-4d88-b66f-b1e2bf817383",
+              "leftValue": "={{ $json.data.resultData.runData.Webhook[0].data.main[0][0].json.body.service_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        496,
+        -144
+      ],
+      "id": "d51eb416-edfb-416b-8a1f-089a6a939d2a",
+      "name": "If"
     }
   ],
   "connections": {
@@ -111,6 +223,38 @@
             "node": "Send a message",
             "type": "main",
             "index": 0
+          },
+          {
+            "node": "get_execution_data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    },
+    "get_execution_data": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "webhook",
+            "type": "main",
+            "index": 0
           }
         ]
       ]
@@ -119,10 +263,13 @@
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "availableInMCP": false
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner"
   },
   "triggerCount": 0,
-  "versionId": "dccd8e2e-edaa-43bb-90ca-1887f7ffd723",
+  "versionId": "947a1633-90f6-40b4-b4fb-99071f2cb62a",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

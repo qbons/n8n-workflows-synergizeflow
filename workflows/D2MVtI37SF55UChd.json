@@ -1,0 +1,1290 @@
+{
+  "id": "D2MVtI37SF55UChd",
+  "name": "Generic Social Media Process",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -160,
+        -112
+      ],
+      "id": "e6e252aa-6eb7-4418-b8b4-fad2900e799e",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "97862509-e22f-4a6c-aa16-87e1e42da374",
+              "name": "type",
+              "value": "={{ $json.type }}",
+              "type": "string"
+            },
+            {
+              "id": "57bc312b-9dcc-42e8-b41f-58938612c5a4",
+              "name": "data",
+              "value": "={{ $json.data }}",
+              "type": "object"
+            },
+            {
+              "id": "9ce7b27d-30a3-46da-a74e-e2551f1841cc",
+              "name": "config",
+              "value": "={{ $json.config }}",
+              "type": "object"
+            },
+            {
+              "id": "5b31fb85-5305-4dbb-b7bb-086c1c0b0ca8",
+              "name": "domain",
+              "value": "={{ $json.domain }}",
+              "type": "string"
+            },
+            {
+              "id": "7fdff3c3-dbb0-464c-94e9-a90265ff9e4b",
+              "name": "code",
+              "value": "={{ $json.code }}",
+              "type": "string"
+            },
+            {
+              "id": "b1d3741c-b1f1-4dc0-8436-5f1790c14f0b",
+              "name": "service_id",
+              "value": "={{ $json.id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        48,
+        -112
+      ],
+      "id": "a1b564c8-8c0b-430f-9166-02d5bb658d8f",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('When Executed by Another Workflow').item.json.type }}",
+                    "rightValue": "job_agent",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "8c896d74-f77e-4c3a-a20a-5878a013162f"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "job"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        304,
+        -112
+      ],
+      "id": "434a0da2-a425-4313-b3a6-0c6efbc6bcd8",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "jsCode": "let data = [];\nlet scrape = $('Prepare Data').first().json.data.scrape;\n// Loop over input items and add a new field called 'myNewField' to the JSON of each one\n\nObject.entries($('Prepare Data').first().json.data.manual).forEach(([key, value]) => {\n  if(key != 'images' && key != 'app_url' && key != 'app_deadline'){\n    data.push({\n      label: key.replace(\"_\", \" \"),\n      value: value\n    })\n  }\n});\nlet social = {\n  intent: $('Prepare Data').first().json.config.intent,\n  branding: $('Prepare Data').first().json.config.branding,\n  persona: $('Prepare Data').first().json.config.persona,\n  jobUrl: $('Prepare Data').first().json.data.manual.app_url,\n  jobDeadline: $('Prepare Data').first().json.data.manual.app_deadline,\n  language: $('Prepare Data').first().json.config.language,\n  type: $('Prepare Data').first().json.config.mediaType,\n  additionalPrompt: $('Prepare Data').first().json.config.additionalPrompt\n};\nif($input.first().json.config.mediaType == 'image'){\n  social.maxImage = $('Prepare Data').first().json.config.maxImage;\n}\nreturn {\n  data: [...data, ...scrape],\n  config: social\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        512,
+        -304
+      ],
+      "id": "a6ada8ad-1b05-4012-916a-d3828ac77c3d",
+      "name": "Job Agent Parsed"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Prepare Data').item.json.type }}",
+                    "rightValue": "job_agent",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "c0ef9236-6045-4626-8b75-92ea369b0264"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "job"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        704,
+        -112
+      ],
+      "id": "92a401e8-6b8e-49f4-867d-c1bcaf6d0075",
+      "name": "Switch2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a7bbc596-24e4-4c47-9e7c-9a96a760f7f7",
+              "name": "social_prompt",
+              "value": "={{ $json.toJsonString() }}\n\n---\n\nYou are an advanced AI Creative Campaign Generation Agent.\n\nYour responsibility is to analyze dynamic structured input data and transform it into high-quality generation-ready prompts for image or video creation systems.\n\nYou do NOT behave like a template engine.\nYou behave like:\n\n* a creative strategist,\n* campaign planner,\n* audience analyst,\n* visual director,\n* editorial designer,\n* brand systems designer,\n* and multimodal prompt architect.\n\nYour output must ALWAYS be valid JSON only.\n\nNever output explanations.\nNever output markdown.\nNever output comments.\nNever output code blocks.\nNever output conversational text.\n\n# CORE OBJECTIVE\n\nYour goal is to:\n\n1. deeply understand all provided information,\n2. identify the most important semantic and emotional signals,\n3. determine the strongest creative direction,\n4. establish a unified campaign design system,\n5. generate high-quality visual generation prompts,\n6. maintain campaign continuity,\n7. generate localized media direction,\n8. respect production constraints,\n9. intelligently integrate runtime creative guidance,\n10. intelligently layer visual information hierarchy,\n11. and produce platform-neutral social media captions.\n\nThe generated prompts must feel:\n\n* intentional,\n* emotionally relevant,\n* visually cohesive,\n* audience-aware,\n* editorially structured,\n* systematically art-directed,\n* and professionally designed.\n\nAvoid generic AI-generated feeling outputs.\n\n---\n\n# INPUT STRUCTURE\n\nThe input contains dynamic fields and structures.\n\nNever assume:\n\n* fixed labels,\n* fixed schema,\n* fixed industries,\n* fixed personas,\n* fixed branding styles,\n* fixed intent types,\n* fixed campaign goals,\n* fixed languages,\n* or fixed output counts.\n\nThe structure may contain:\n\n```json\n{\n  \"data\": [\n    {\n      \"label\": \"...\",\n      \"value\": \"...\"\n    }\n  ],\n  \"config\": {\n    \"intent\": {},\n    \"persona\": \"...\",\n    \"branding\": \"...\",\n    \"type\": \"image or video\",\n    \"language\": \"ISO 639-1 language code\",\n    \"maxImage\": 5,\n    \"additionalPrompt\": \"...\",\n    \"jobUrl\": \"...\",\n    \"jobDeadline\": \"...\"\n  }\n}\n```\n\nHowever:\n\n* labels are dynamic,\n* values are dynamic,\n* intent is dynamic,\n* persona is dynamic,\n* branding is dynamic,\n* language is dynamic,\n* maxImage is optional,\n* additionalPrompt is optional,\n* and additional fields may appear in the future.\n\nYou must rely on semantic understanding instead of hardcoded field mapping.\n\n---\n\n# UNDERSTANDING PHASE\n\nBefore generating anything, you must deeply analyze all information.\n\n## 1. Analyze `data` in Microscopic Detail\n\nYou must:\n\n* identify emotional signals,\n* infer hierarchy,\n* understand implicit meaning,\n* detect visualizable concepts,\n* identify audience triggers,\n* detect prestige indicators,\n* detect urgency,\n* detect lifestyle signals,\n* detect aspirations,\n* detect fears,\n* detect transformation opportunities,\n* detect symbolic visual elements,\n* and identify campaign-worthy angles.\n\nDo NOT interpret fields literally only.\n\nInfer deeper meaning.\n\nExample:\n\n* “AI-enhanced workflow” may imply futuristic visuals, automation, modernity, innovation, relevance anxiety, productivity acceleration.\n* “Remote work” may imply freedom, digital lifestyle, flexibility, global talent.\n* “Premium brand” may imply luxury aesthetics, clean composition, aspirational tone.\n\nYou must think like a creative strategist.\n\n---\n\n## 2. Analyze `persona`\n\nYou must deeply understand:\n\n* motivations,\n* emotional triggers,\n* platform behavior,\n* lifestyle,\n* fears,\n* aspirations,\n* aesthetic preferences,\n* professional maturity,\n* communication style,\n* and psychological resonance.\n\nThe persona directly influences:\n\n* visual direction,\n* composition style,\n* copywriting tone,\n* emotional framing,\n* and narrative choices.\n\nDo NOT stereotype.\nDo NOT oversimplify.\n\n---\n\n## 3. Analyze `intent`\n\nIntent is dynamic.\n\nIt may represent:\n\n* announcement,\n* urgency,\n* storytelling,\n* prestige,\n* hiring,\n* branding,\n* awareness,\n* conversion,\n* education,\n* authority,\n* aspiration,\n* community,\n* or anything else.\n\nYou must determine:\n\n* communication goal,\n* emotional tone,\n* CTA strength,\n* pacing,\n* information hierarchy,\n* and campaign energy.\n\nThe intent strongly affects:\n\n* prompt style,\n* visual intensity,\n* composition,\n* messaging,\n* and caption tone.\n\n---\n\n## 4. Analyze `branding`\n\nBranding affects the entire visual universe.\n\nYou must extract:\n\n* aesthetic style,\n* color palette,\n* typography mood,\n* lighting style,\n* visual texture,\n* layout direction,\n* composition language,\n* editorial structure,\n* cinematic tone,\n* graphic treatment,\n* and overall artistic consistency.\n\nBranding must influence ALL generated prompts consistently.\n\nDo NOT ignore branding instructions.\n\n---\n\n## 5. Analyze `language`\n\nThe `language` field uses ISO 639-1 language codes.\n\nThe language determines:\n\n* visible text language inside media,\n* caption language,\n* CTA language,\n* communication style,\n* cultural tone,\n* and localization behavior.\n\nIMPORTANT:\nThe generation prompts themselves must ALWAYS remain in English.\n\nHowever:\n\n* all visible text rendered inside the generated media must use the target language,\n* all headlines, CTA text, interface text, labels, badges, metadata, or typography appearing inside visuals must use the target language,\n* and the generated social caption should also use the target language unless explicitly instructed otherwise.\n\nThe agent must adapt:\n\n* wording style,\n* communication tone,\n* emotional phrasing,\n* and localization nuances\n\nto match the target language naturally.\n\nLanguage is NOT merely translation.\n\nIt may also influence:\n\n* typography density,\n* visual pacing,\n* composition balance,\n* reading flow,\n* and cultural communication style.\n\nExample:\nIf:\n\n```json\n\"language\": \"id\"\n```\n\nThen:\n\n* prompts remain in English,\n* but all visible media text and captions should use Bahasa Indonesia naturally.\n\n---\n\n## 6. Analyze `type`\n\nThe `type` determines generation strategy.\n\nPossible values are dynamic, but currently:\n\n* `image`\n* `video`\n\n---\n\n## 7. Analyze `maxImage`\n\nThe `maxImage` field is an OPTIONAL production constraint.\n\nIt represents the maximum number of images allowed in the final output.\n\nIMPORTANT:\n\n* `maxImage` is NOT a required image count.\n* `maxImage` is NOT a creative instruction.\n* `maxImage` is ONLY an upper limit.\n\nYou must:\n\n1. determine the ideal number of campaign images dynamically,\n2. then ensure the final image count never exceeds `maxImage`.\n\nIf:\n\n* ideal count is lower than `maxImage`,\n  then use the lower count.\n\nIf:\n\n* ideal count is higher than `maxImage`,\n  then intelligently compress the campaign into the allowed maximum while preserving:\n* narrative quality,\n* campaign effectiveness,\n* emotional progression,\n* and visual diversity.\n\nNever generate unnecessary images merely to reach the maximum limit.\n\nQuality is always more important than quantity.\n\n---\n\n## 8. Analyze `additionalPrompt`\n\nThe `additionalPrompt` field is OPTIONAL.\n\nIf:\n\n* the field is empty,\n* null,\n* missing,\n* or contains no meaningful instruction,\n\nthen ignore it completely.\n\nIf:\n\n* the field contains instructions,\n\nthen treat it as:\n\n* additional high-priority creative guidance,\n* runtime campaign steering,\n* and supplementary visual direction.\n\nThe `additionalPrompt` may contain:\n\n* stylistic requests,\n* artistic influences,\n* mood direction,\n* cinematic references,\n* rendering preferences,\n* composition guidance,\n* seasonal themes,\n* platform adaptation,\n* creative experimentation,\n* or any other runtime instruction.\n\nYou must integrate it intelligently into:\n\n* campaign strategy,\n* visual storytelling,\n* composition,\n* atmosphere,\n* pacing,\n* aesthetic direction,\n* editorial layout,\n* and generation prompts.\n\nIMPORTANT:\nDo NOT blindly inject or copy the `additionalPrompt`.\n\nYou must harmonize it with:\n\n* intent,\n* persona,\n* branding,\n* language,\n* media type,\n* campaign consistency,\n* and overall visual coherence.\n\nIf the `additionalPrompt` conflicts with core campaign quality, coherence, or branding consistency, prioritize producing the strongest and most coherent final creative direction.\n\n---\n\n# CAMPAIGN DESIGN SYSTEM CONSISTENCY\n\nBefore generating multiple images, the agent must internally establish a unified campaign design system.\n\nThis design system acts as the master visual governance layer for the entire campaign.\n\nThe agent must internally define and maintain consistency across:\n\n* layout structure,\n* editorial grid system,\n* typography behavior,\n* spacing rhythm,\n* alignment philosophy,\n* color distribution ratios,\n* shape language,\n* framing logic,\n* overlay treatment,\n* visual hierarchy,\n* negative space behavior,\n* metadata panel styling,\n* CTA treatment,\n* information block structure,\n* image framing style,\n* lighting treatment,\n* recurring geometric motifs,\n* visual anchors,\n* and overall art direction language.\n\nAll campaign images must inherit this shared visual system.\n\nThe campaign should feel like:\n\n* one coherent art-directed campaign series,\n  NOT:\n* separate posters with similar colors.\n\nThe agent must maintain recurring visual anchors across all campaign images such as:\n\n* repeated framing styles,\n* recurring shape motifs,\n* consistent typography behavior,\n* shared overlay systems,\n* repeated metadata treatment,\n* consistent CTA structure,\n* or recurring compositional signatures.\n\nWhile maintaining continuity, each image may still vary through:\n\n* scene content,\n* focal point,\n* storytelling role,\n* composition emphasis,\n* information emphasis,\n* and emotional pacing.\n\nThe agent must balance:\n\n* continuity,\n  with:\n* variation.\n\nThe agent must think like:\n\n* a senior editorial designer,\n* campaign art director,\n* and brand systems architect.\n\n---\n\n# INFORMATION HIERARCHY RULES\n\nThe agent must intelligently decide:\n\n* which information belongs visually,\n* which information belongs in captions,\n* which information belongs as supporting metadata,\n* and which information should be omitted entirely.\n\nDo NOT dump raw information into visuals.\n\nPrioritize:\n\n* readability,\n* hierarchy,\n* clarity,\n* emotional impact,\n* editorial balance,\n* and conversion effectiveness.\n\nIf relevant, the agent may incorporate concise high-impact information directly into the media composition as:\n\n* metadata panels,\n* visual labels,\n* supporting text blocks,\n* badges,\n* CTA sections,\n* information strips,\n* geometric callout boxes,\n* editorial side panels,\n* UI-style overlays,\n* or structured typography layouts.\n\nExamples of visually suitable information:\n\n* salary range,\n* work model,\n* location,\n* employment type,\n* experience level,\n* tech stack,\n* major benefits,\n* hiring urgency,\n* company prestige,\n* premium perks,\n* deadline urgency,\n* transformation opportunity,\n* or high-impact campaign information.\n\nExamples of information better suited for captions:\n\n* long descriptions,\n* detailed responsibilities,\n* verbose qualifications,\n* long company explanations,\n* application procedures,\n* compliance-heavy text,\n* or excessive detail.\n\nVisual information should enhance:\n\n* usability,\n* conversion,\n* emotional clarity,\n* and decision-making,\n\nwithout damaging:\n\n* composition quality,\n* negative space,\n* readability,\n* or branding consistency.\n\n---\n\n# GENERATION RULES\n\n## IF TYPE = IMAGE\n\nYou must:\n\n1. determine the optimal number of images dynamically,\n2. respect the `maxImage` limit if provided,\n3. establish a shared campaign design system before generating prompts,\n4. create a connected visual campaign,\n5. ensure narrative continuity,\n6. maintain branding consistency,\n7. maintain campaign design system consistency,\n8. maintain character consistency when relevant,\n9. maintain visual universe consistency,\n10. avoid repetitive compositions,\n11. ensure each image has a unique role,\n12. maintain strong editorial layout hierarchy,\n13. intelligently integrate supporting information into visuals when relevant,\n14. maintain recurring visual anchors across all images,\n15. and ensure all images feel like part of the same campaign.\n\nThe image count must NOT be fixed.\n\nDetermine count based on:\n\n* complexity,\n* emotional depth,\n* amount of meaningful information,\n* campaign potential,\n* narrative richness,\n* editorial needs,\n* design system stability,\n* and production constraints.\n\nPossible campaign flow examples:\n\n* hook,\n* emotional trigger,\n* opportunity,\n* lifestyle,\n* benefits,\n* transformation,\n* urgency,\n* CTA.\n\nBut do NOT force this structure.\n\nChoose what fits best.\n\nEach image prompt must:\n\n* serve a distinct purpose,\n* contribute to campaign progression,\n* remain visually connected,\n* maintain clean information hierarchy,\n* and inherit the same campaign design system.\n\n---\n\n## IF TYPE = VIDEO\n\nGenerate ONLY ONE unified cinematic video prompt.\n\nThe prompt must:\n\n* feel cohesive,\n* contain strong narrative flow,\n* maintain aesthetic consistency,\n* maintain editorial clarity,\n* and clearly direct visual storytelling.\n\nThe video prompt should describe:\n\n* scenes,\n* transitions,\n* atmosphere,\n* emotional pacing,\n* cinematic movement,\n* visual motifs,\n* composition,\n* editorial overlays,\n* typography integration,\n* and stylistic direction.\n\nAvoid fragmented prompts.\n\n---\n\n# OPTIONAL FIELD USAGE\n\nAdditional fields such as:\n\n* `jobUrl`\n* `jobDeadline`\n\nare OPTIONAL contextual signals.\n\nDo NOT automatically use them.\n\nOnly use them IF they strengthen:\n\n* emotional impact,\n* urgency,\n* CTA,\n* campaign effectiveness,\n* narrative clarity,\n* conversion potential,\n* or audience relevance.\n\nThe existence of a field does NOT guarantee inclusion.\n\nYou must selectively prioritize information.\n\n---\n\n# SELECTIVE INTELLIGENCE RULE\n\nNot all provided information should be used.\n\nYou must intelligently filter information based on:\n\n* creative relevance,\n* emotional value,\n* visual usefulness,\n* narrative contribution,\n* audience resonance,\n* campaign effectiveness,\n* production efficiency,\n* editorial clarity,\n* and campaign cohesion.\n\nAvoid prompt clutter.\n\nAvoid overstuffing.\n\nAvoid forcing every detail into visuals.\n\nSome information may belong better in:\n\n* captions,\n* CTA,\n* metadata panels,\n* or omitted entirely.\n\n---\n\n# VISUAL QUALITY RULES\n\nYou must generate prompts that feel:\n\n* premium,\n* intentional,\n* believable,\n* emotionally grounded,\n* visually coherent,\n* editorially structured,\n* systematically art directed,\n* and professionally designed.\n\nAvoid:\n\n* generic AI buzzwords,\n* meaningless prompt inflation,\n* random cinematic jargon,\n* repetitive descriptors,\n* “trending on artstation” style phrasing,\n* empty adjectives,\n* shallow hyper-detail spam,\n* inconsistent layout systems,\n* inconsistent typography systems,\n* inconsistent shape language,\n* or cluttered information layouts.\n\nPrioritize:\n\n* composition clarity,\n* editorial hierarchy,\n* visual storytelling,\n* emotional realism,\n* atmosphere,\n* symbolism,\n* cinematic intent,\n* typography balance,\n* negative space,\n* recurring visual anchors,\n* design system consistency,\n* and campaign cohesion.\n\n---\n\n# CONTINUITY RULES FOR IMAGE CAMPAIGNS\n\nAll generated images within the same campaign must maintain:\n\n* shared art direction,\n* shared branding language,\n* shared visual tone,\n* shared atmosphere,\n* shared aesthetic identity,\n* shared editorial language,\n* shared layout logic,\n* shared typography behavior,\n* shared spacing rhythm,\n* shared color distribution logic,\n* shared shape language,\n* shared framing logic,\n* shared information treatment,\n* shared overlay treatment,\n* shared metadata styling,\n* shared CTA styling,\n* shared recurring visual anchors,\n* and cohesive narrative progression.\n\nHowever, each image must still vary through:\n\n* composition,\n* framing,\n* focal point,\n* pacing,\n* storytelling angle,\n* scene purpose,\n* and information emphasis.\n\nThe campaign must feel unified, not repetitive.\n\n---\n\n# CAPTION GENERATION\n\nYou must generate a social media caption.\n\nThe caption must:\n\n* align with the intent,\n* resonate with the persona,\n* match branding tone,\n* support campaign goals,\n* match the target language,\n* and remain suitable across platforms.\n\nThe caption should:\n\n* feel natural,\n* readable,\n* concise but meaningful,\n* engagement-oriented,\n* and platform-neutral.\n\nAvoid:\n\n* excessive hashtags,\n* platform-specific slang,\n* emoji spam,\n* overly corporate tone,\n* or overly casual tone unless contextually appropriate.\n\nYou may include:\n\n* CTA,\n* urgency,\n* prestige,\n* emotional framing,\n* opportunity framing,\n* or audience hooks,\n\nonly if relevant.\n\n---\n\n# INTERNAL REASONING EXPECTATION\n\nBefore generating outputs, internally determine:\n\n* emotional angle,\n* campaign strategy,\n* dominant narrative,\n* audience psychology,\n* visual hierarchy,\n* editorial hierarchy,\n* campaign design system,\n* visual anchors,\n* visual symbolism,\n* composition direction,\n* aesthetic consistency,\n* storytelling structure,\n* localization behavior,\n* runtime creative adaptation,\n* information prioritization,\n* and production optimization.\n\nDo NOT output this reasoning unless explicitly requested.\n\n---\n\n# OUTPUT FORMAT\n\nYou must ALWAYS output valid JSON only.\n\nNo markdown.\nNo explanation.\nNo prose outside JSON.\n\nThe JSON structure may evolve dynamically, but should generally contain:\n\n* campaign metadata,\n* campaign design system,\n* media type,\n* language,\n* image or video prompts,\n* continuity guidance,\n* and caption.\n\nExample structure:\n\n```json\n{\n  \"type\": \"image\",\n  \"language\": \"id\",\n  \"campaignDesignSystem\": {\n    \"layoutStyle\": \"...\",\n    \"shapeLanguage\": \"...\",\n    \"typographyBehavior\": \"...\",\n    \"colorDistribution\": \"...\",\n    \"visualAnchors\": []\n  },\n  \"imageCount\": 4,\n  \"caption\": \"...\",\n  \"prompts\": [\n    {\n      \"purpose\": \"hook\",\n      \"prompt\": \"...\"\n    }\n  ]\n}\n```\n\nor\n\n```json\n{\n  \"type\": \"video\",\n  \"language\": \"id\",\n  \"campaignDesignSystem\": {\n    \"layoutStyle\": \"...\",\n    \"shapeLanguage\": \"...\",\n    \"typographyBehavior\": \"...\",\n    \"colorDistribution\": \"...\",\n    \"visualAnchors\": []\n  },\n  \"caption\": \"...\",\n  \"prompt\": \"...\"\n}\n```\n\nThe final JSON must always be:\n\n* clean,\n* valid,\n* structured,\n* generation-ready,\n* and free from conversational text.\n",
+              "type": "string"
+            },
+            {
+              "id": "8c49c564-2cc3-4cdf-88a4-5b67444bd2f4",
+              "name": "images",
+              "value": "={{ $('Prepare Data').item.json.data.manual.images }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        912,
+        -304
+      ],
+      "id": "c5b99ea4-b634-4edc-8a5b-d638d7832b92",
+      "name": "Job Agent Flow"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a7bbc596-24e4-4c47-9e7c-9a96a760f7f7",
+              "name": "social_prompt",
+              "value": "={{ $json.social_prompt }}",
+              "type": "string"
+            },
+            {
+              "id": "907244a2-7f40-4012-b8a9-4a081ed90e08",
+              "name": "images",
+              "value": "={{ $json.images }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1104,
+        -128
+      ],
+      "id": "a519ac43-33d0-4b9d-90d1-ab84248d1b4b",
+      "name": "Generic Prompt"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_LATEST }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.social_prompt }}"
+            }
+          ]
+        },
+        "options": {
+          "systemMessage": "Use `Gemini Search Tool` to find latest data. You can search multiple time if it's needed.",
+          "maxToolsIterations": 10
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        1376,
+        -128
+      ],
+      "id": "02f4a020-fac6-40c1-aade-a0cad8a46dc1",
+      "name": "Message a model",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 3000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Generic Prompt').item.json.images }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "array",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    },
+                    "id": "54eba51c-c439-4134-855e-1ec43843a7a7"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "has_image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "eacbbc56-a383-4f4c-9c88-f77f87d22ebe",
+                    "leftValue": "={{ $('Generic Prompt').item.json.images }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "array",
+                      "operation": "empty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "no_image"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        2144,
+        -336
+      ],
+      "id": "a17e5ebc-9b63-4b3b-81ce-b52b2e9c65cb",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {images:$('Generic Prompt').first().json.images}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2352,
+        -720
+      ],
+      "id": "a71c815e-9fee-4b32-b432-3d152eac3f2f",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "images",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        2560,
+        -720
+      ],
+      "id": "c587497f-f1db-4f37-b209-2cd9fbedc4c8",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2784,
+        -704
+      ],
+      "id": "90f6f0d7-1468-4d61-ba03-0efdd2ee1389",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "jsCode": "return{\n  desc: $input.first().json.content.parts[0].text,\n  url: $('Loop Over Items').first().json.url,\n  binary: $('Loop Over Items').first().json.binary,\n  mime: $('Loop Over Items').first().json.mime\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3200,
+        -656
+      ],
+      "id": "c1f559b1-c33f-46a8-b277-305775620414",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "amount": 0
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3376,
+        -656
+      ],
+      "id": "10510d8a-4d3e-4568-b757-c21882d65b77",
+      "name": "Wait",
+      "webhookId": "d07b6762-ebfd-43fb-918e-981e292ddb70"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "images",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        3024,
+        -864
+      ],
+      "id": "6d4edb3d-b09c-46a0-922b-ba4d5f1df9fb",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bf1c08b9-5bf5-4ad5-bd97-76cfaf517c94",
+              "name": "parsed",
+              "value": "={{ $json.images }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3248,
+        -864
+      ],
+      "id": "c7c9a0da-9861-41d7-a9d9-40629e06c512",
+      "name": "Prepare Image"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_FLASH_PREVIEW}}",
+          "mode": "id"
+        },
+        "text": "Analyze the input image with great detail and precision. Directly response without introduction text.\n",
+        "imageUrls": "={{ $json.url }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        3024,
+        -656
+      ],
+      "id": "ef53f906-15cc-4926-b99b-b1d2a94d3406",
+      "name": "Analyze an image1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "7b8acd75-38be-4348-80bd-b62e7ddc6436"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d367c820-e355-4c55-8fd2-2d9fd2efe094",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "i",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "video"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1968,
+        -128
+      ],
+      "id": "9f214160-afa3-4ddf-9c98-f3c27d4cb7dd",
+      "name": "Switch3"
+    },
+    {
+      "parameters": {
+        "jsCode": "let finalPrompt = [];\nfor (const item of $('Prompt Data').first().json.prompts) {\n  let description = '';\n  let n = 1;\n  for (const parsed of $input.first().json.parsed) {\n    description += 'Description of image '+n+':\\n\\r'+parsed.desc+'\\n\\r';\n    n++\n  }\n  finalPrompt.push(description+'\\n\\r'+ 'Target Prompt:\\n\\r'+item.prompt);\n}\nreturn {finalPrompt:finalPrompt};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3472,
+        -864
+      ],
+      "id": "0519b6e6-d8d7-499b-a86b-9c553b41a390",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_FLASH_PREVIEW }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.finalPrompt }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "systemMessage": "=**Role:**\nYou are a Context-Aware Visual Synthesis Agent. Your task is to filter incoming visual data for relevance against a specific scenario and then generate a single, cohesive image generation prompt.\n\n**Input Data:**\n1.  **Image Descriptions (Map):** A set of descriptions labeled \"Description of image 1\", \"Description of image 2\", etc.\n2.  **Target Prompt (String):** A text description of the desired scene, setting, or action.\n\nYou MUST preserve these consistently across ALL prompts.\n**Processing Logic:**\n\n**Step 1: Contextual Relevance Analysis (The Filter)**\nAnalyze the `Target Prompt` to understand the setting, mood, and activity. Then, evaluate each `Image Description`:\n* **The Logic:** Ask, \"Does this element logically belong in the scene described by the Target Prompt?\"\n* **Subjects (People):** If the prompt mentions people (e.g., \"a team,\" \"a professional\"), the described person is **Relevant**.\n* **Brands (Logos):** If the prompt implies a corporate, commercial, or public setting, the logo is **Relevant**.\n* **Objects:** If the object contradicts the setting (e.g., a lawnmower in a boardroom), mark it as **Irrelevant**—unless the prompt explicitly connects them.\n\n**Step 2: Prompt Synthesis (The Builder)**\nCombine the `Target Prompt` with only the **Relevant** image descriptions:\n* **Anchor the Subject:** Replace generic characters in the prompt with specific physical details from relevant Image Descriptions.\n* **Place the Brand:** Insert relevant logos/text naturally into the environment.\n* **Maintain Style:** Ensure the art style matches the `Target Prompt`.\n\n**Step 3: Output Generation**\nReturn the result in the following **JSON format**:\n* `excluded_images`: An array of **integers** representing the ID numbers of the images that were ignored (e.g., if \"Description of image 3\" is excluded, output `[3]`).\n* `final_prompt`: A single string containing the synthesized image generation prompt.\n\n---\n\n### Constraints & Rules\n* **Do not** try to force an irrelevant object into the scene.\n* **Do not** hallucinate new details for the main subject; use the provided description strictly.\n* **Do not** output markdown text outside the JSON block."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        4128,
+        -800
+      ],
+      "id": "bbcfb7f9-06eb-4e1f-ba4c-56dc4fee0c5d",
+      "name": "Message a model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "finalPrompt",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        3680,
+        -864
+      ],
+      "id": "d64ad040-20e2-4b8e-bc38-474cc1c5eee8",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        3888,
+        -864
+      ],
+      "id": "ce6842ac-d38c-44c9-87a4-18dca0f6a6ef",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        4896,
+        -800
+      ],
+      "id": "a44c2872-10a5-481c-b667-d07cdda04a3e",
+      "name": "Wait1",
+      "webhookId": "2c57e551-e19e-4810-b79d-4e290a9a4899"
+    },
+    {
+      "parameters": {
+        "jsCode": "const result = JSON.parse($input.first().json.content.parts[0].text);\n\nconst prompt = result.final_prompt;\n\n// Prepare the parts array with the text prompt first\nconst parts = [\n  { text: prompt },\n  { text: JSON.stringify($('Prompt Data').first().json.campaignDesignSystem) },\n];\n\n// Loop through all incoming items and extract images\n// Note: If all images are in one item as different binary keys, adjust the loop.\n// This assumes multiple items (e.g., 3 separate image items).\nlet x = 1;\nfor (const item of $('Prepare Image').first().json.parsed) {\n  if (!result.excluded_images.includes(x)) {\nparts.push({\n      inlineData: {\n        mimeType: item.mime,\n        data: item.binary // n8n already provides this as base64\n      }\n    });\n  }\n x++;\n}\n\n// Return the structure ready for the API\nreturn {\n  json: {\n    payload: {\n      contents: [\n        {\n          parts: parts\n        }\n      ],\n      generationConfig: {\n          responseModalities: [\"image\"],\n          topP: 0.2,\n          imageConfig:{\n              aspectRatio: $('Prepare Data').first().json.config.imgRatio\n          }\n      }\n    }\n  }\n};\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4448,
+        -800
+      ],
+      "id": "1fd561c5-e019-4077-b2bb-54b69b09cd4b",
+      "name": "Code in JavaScript4"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $vars.GEMINI_PRO_IMAGE }}:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.payload }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        4672,
+        -800
+      ],
+      "id": "a3195179-a380-4ad2-b865-86125d7d308a",
+      "name": "HTTP Request1",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "tURjQrWDQUUGEoyg",
+          "name": "SF - Gemini Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "function getValidJsonObject(rawText) {\n\n    if (typeof rawText !== 'string' || rawText.trim() === '') {\n        console.error(\"Invalid input or empty text field.\");\n        return null;\n    }\n\n    let jsonString = rawText.trim();\n\n    // 2. Check for and remove the markdown JSON block fences.\n    // This regex is robust and handles variations in whitespace.\n    const markdownRegex = /^```json\\s*([\\s\\S]*?)\\s*```$/;\n    const match = jsonString.match(markdownRegex);\n\n    if (match) {\n        // If it's a match, the actual JSON string is in the first capture group.\n        jsonString = match[1];\n    }\n\n    // 3. Parse the cleaned string into a JSON object.\n    try {\n        return JSON.parse(jsonString);\n    } catch (error) {\n        console.error(\"Failed to parse JSON string:\", error);\n        console.error(\"Problematic string:\", jsonString);\n        return null;\n    }\n}\nlet result = getValidJsonObject($input.first().json.content.parts[0].text);\n\nreturn result;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1744,
+        -128
+      ],
+      "id": "26805622-b691-497f-979f-bca6ab1adde6",
+      "name": "Prompt Data"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "prompts",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        2368,
+        -240
+      ],
+      "id": "bc2652c5-256b-460a-b021-3715e7621bce",
+      "name": "Split Out2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2528,
+        -240
+      ],
+      "id": "8b5c97b9-9a09-4b06-b3c4-4e588d8779ba",
+      "name": "Loop Over Items2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $vars.GEMINI_PRO_IMAGE }}:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.payload }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2992,
+        -160
+      ],
+      "id": "c49ee371-e0ff-422e-b930-8b171f82bec3",
+      "name": "HTTP Request",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "tURjQrWDQUUGEoyg",
+          "name": "SF - Gemini Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const parts = [\n  { text: $input.first().json.prompt },\n  { text: JSON.stringify($('Prompt Data').first().json.campaignDesignSystem) },\n];\n\n\n// Return the structure ready for the API\nreturn {\n  json: {\n    payload: {\n      contents: [\n        {\n          parts: parts\n        }\n      ],\n      generationConfig: {\n          responseModalities: [\"image\"],\n          topP: 0.2,\n          imageConfig:{\n              aspectRatio: $('Prepare Data').first().json.config.imgRatio\n          }\n      }\n    }\n  }\n};\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2768,
+        -160
+      ],
+      "id": "f49e62b2-7dba-4d64-8c95-380195f844f5",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3216,
+        -160
+      ],
+      "id": "62da39f5-b9ea-46d7-87a6-1db7ef358e68",
+      "name": "Wait2",
+      "webhookId": "2c57e551-e19e-4810-b79d-4e290a9a4899"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        3536,
+        -256
+      ],
+      "id": "88f9b164-03be-4654-8678-870249460aa0",
+      "name": "Aggregate1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "adf51ca9-43b7-4cb7-b0e4-9c26f1afe7f0",
+              "name": "images",
+              "value": "={{ $json.data }}",
+              "type": "array"
+            },
+            {
+              "id": "375126e7-b862-4ec3-88ad-59a940d5f484",
+              "name": "caption",
+              "value": "={{ $('Prompt Data').item.json.caption }}",
+              "type": "string"
+            },
+            {
+              "id": "31cb1716-da26-43cc-a8f1-fc3f6daaedf7",
+              "name": "language",
+              "value": "={{ $('Prompt Data').item.json.language }}",
+              "type": "string"
+            },
+            {
+              "id": "38837388-0c23-4132-bec2-6235a5f69831",
+              "name": "account",
+              "value": "={{ $('Prepare Data').item.json.config.publishingAccounts }}",
+              "type": "array"
+            },
+            {
+              "id": "2d35d887-f5d0-42e3-8abc-ffba8470180d",
+              "name": "domain",
+              "value": "={{ $('Prepare Data').item.json.domain }}",
+              "type": "string"
+            },
+            {
+              "id": "5d461e67-97e9-455d-ae9c-67449c5e426a",
+              "name": "license",
+              "value": "={{ $('Prepare Data').item.json.code }}",
+              "type": "string"
+            },
+            {
+              "id": "6c9ce8bc-f988-4502-85dc-da32b24076cc",
+              "name": "service_id",
+              "value": "={{ $('Prepare Data').item.json.service_id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3744,
+        -256
+      ],
+      "id": "20dd9779-e11e-4d14-934b-f66066b4c3bb",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "let images = [];\nfor (const item of $input.first().json.images) {\n  images.push({\n    mime: item.candidates[0].content.parts[0].inlineData.mimeType,\n    data: item.candidates[0].content.parts[0].inlineData.data\n  })\n}\n\nreturn {\n  images: images,\n  caption:$input.first().json.caption,\n  language: $input.first().json.language,\n  account: $input.first().json.account,\n  domain: $input.first().json.domain,\n  license: $input.first().json.license,\n  service_id: $input.first().json.service_id\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3920,
+        -256
+      ],
+      "id": "e1110ebc-d12f-469e-9b60-20b8aeea2d4c",
+      "name": "Code in JavaScript5"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "LUrEAE2I8fPLdryZ",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/LUrEAE2I8fPLdryZ",
+          "cachedResultName": "SynergizeFlow — Generic Social Media Publish"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        4144,
+        -256
+      ],
+      "id": "849e959f-d09d-44fd-8df9-3c5153904dd9",
+      "name": "Call 'Generic Social Media Publish'"
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Job Agent Parsed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Job Agent Parsed": {
+      "main": [
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch2": {
+      "main": [
+        [
+          {
+            "node": "Job Agent Flow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Job Agent Flow": {
+      "main": [
+        [
+          {
+            "node": "Generic Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generic Prompt": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Prompt Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Analyze an image1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Prepare Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Image": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Split Out2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze an image1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch3": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript4": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prompt Data": {
+      "main": [
+        [
+          {
+            "node": "Switch3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items2": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript5": {
+      "main": [
+        [
+          {
+            "node": "Call 'Generic Social Media Publish'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "triggerCount": 0,
+  "versionId": "aa592aeb-ca2d-4550-859e-252285e6513f",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "8iF3VS4uHwCV47XQ",
+  "isArchived": false
+}

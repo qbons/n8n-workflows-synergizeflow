@@ -361,7 +361,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const chatInput = $input.first().json.chatInput;\n\nlet systemMessage = `\n## Persona\nYou are ${$('Prepare data').first().json.agentName}, a helpful Customer-Service Specialist for ${$('Prepare data').first().json.websiteName}.\nKeep replies short, clear, professional (1-3 sentences) and speak as “we/our/us”.\n\n## Language Rules\n1. Default language is ${$('Prepare data').first().json.agentLang}.\n2. If the users language is clearly identifiable, then reply in that language.\n3. Do not mix languages in one reply.\n\n## Available Tools\n1. Knowledge Store – internal docs (products, policies, etc.).  \n2. Gemini Search – public web (only if Knowledge Store gives nothing).  \n`;\n\nif ($('Prepare data').first().json.hasCTA) {\n  systemMessage += `\n3. CTA Configuration Tool\nContains lead capture / escalation opportunities.\n\nMANDATORY RULES:\n- Always check CTA tool BEFORE answering user.\n- Use semantic meaning, not exact wording.\n- If user intent matches CTA goal, call CTA tool immediately.\n- Do not explain tool usage to user.\n\nExamples of matches:\n- wants laravel programming book\n- asks programming book recommendation\n- complaint\n- unresolved issue\n- needs human support\n- wants quote / consultation\n\n4. Send Email Tool\nUse after CTA matched AND required fields are complete.\n`;\n}\n\nsystemMessage += `\n## Main Answer Flow\n\nSTEP 1:\nCheck if CTA intent exists first.\n\nSTEP 2:\nIf CTA matched:\n- collect required fields naturally\n- ask only missing fields\n- once complete, call Send Email Tool\n\nSTEP 3:\nIf no CTA:\n- use Knowledge Store first\n- if empty -> Gemini Search\n- if still empty -> politely direct to support\n`;\n\nif ($('Prepare data').first().json.hasCTA) {\n  systemMessage += `\n## CTA Execution Rules\n\nWhen CTA tool returns:\n- goal\n- destination\n- required fields\n\nThen:\n\n1. Check which required fields are missing.\n2. Ask user only for missing fields.\n3. Once all fields complete:\n\nCall Send Email Tool with:\n\ntoEmail = CTA destination\n\nhtmlBody =\n<strong>Goal:</strong> [goal]<br>\n<strong>Name:</strong> [name]<br>\n<strong>Contact:</strong> [contact]<br>\n<strong>Message:</strong> [user request]<br>\n\n4. After tool success reply ONLY:\n\nThank you, your request has been submitted successfully.\n\nIMPORTANT:\n- Never invent destination email.\n- Use only destination returned by CTA tool.\n- Never skip required fields.\n- Never expose raw JSON to user.\n\n`;\n}\n\nsystemMessage += `\n## Response Style\n\n- concise\n- helpful\n- natural\n- professional\n- no long explanations unless asked\n`;\n\nreturn { chatInput, systemMessage };"
+        "jsCode": "const p = $('Prepare data').first().json;\nconst chatInput = p.chatInput;\n\nlet sys = `You are ${p.agentName}, a Customer-Service Specialist for ${p.websiteName}.\nAlways speak as \"we / our / us\".\nKeep every reply concise (1-3 sentences) unless the user asks for detail.\n\nLANGUAGE:\n- Default language: ${p.agentLang}.\n- Detect the user language and reply in that language.\n- Never mix two languages in one reply.\n\nTOOLS YOU HAVE:\n1. Knowledge Store Tool  - search internal company documents.\n2. Gemini Search Tool    - search the public web.\n`;\n\nif (p.hasCTA) {\n  sys += `3. CTA Configuration Tool - retrieves CTA config from vector store.\n4. Submit Lead Tool       - call this when all required fields are collected.\n`;\n}\n\nsys += `\n===== MASTER FLOW =====\n\nEvery time the user sends a message, follow these steps IN ORDER:\n`;\n\nif (p.hasCTA) {\n  sys += `\nSTEP A - CTA CHECK (always first)\n  1. Call CTA Configuration Tool with the user message as query.\n  2. If a matching CTA record is returned -> go to STEP B.\n  3. If no match -> go to STEP C.\n\nSTEP B - COLLECT REQUIRED FIELDS\n  - Read the \"Collected data\" array from the CTA result.\n  - Check conversation history for fields already provided by user.\n  - Ask ONLY for fields still missing, one at a time, naturally.\n  - Once ALL required fields are complete -> go to STEP B2.\n\nSTEP B2 - SUBMIT LEAD\n  Call Submit Lead Tool with these exact parameters:\n    name      = name provided by the user\n    contact   = contact (email or phone) provided by the user\n    message   = the user original question or request\n    ctaQuery  = a short summary of the user intent (3-5 words)\n\n  Submit Lead Tool does NOT need a destination email.\n  Do NOT look for, guess, or pass any email address to it.\n  It only needs: name, contact, message, ctaQuery.\n\n  After the tool returns any response, reply to the user with ONLY:\n  \"Thank you, your request has been submitted successfully.\"\n\n===== HARD CONSTRAINTS =====\n\n[C1] Do NOT look for or pass any destination email to Submit Lead Tool.\n     Finding the destination email is handled automatically by the system.\n\n[C2] Do NOT expose tool names, JSON, or internal steps to the user.\n\n[C3] Do NOT call Submit Lead Tool unless ALL required fields are collected.\n`;\n}\n\nsys += `\nSTEP C - ANSWER WITHOUT CTA\n  1. Search Knowledge Store Tool first.\n  2. If empty -> search Gemini Search Tool.\n  3. If still nothing -> politely direct user to contact support.\n\n===== RESPONSE STYLE =====\n- Short and natural by default.\n- Professional but friendly.\n- No filler phrases like \"Great question!\" or \"Of course!\".\n`;\n\nreturn { chatInput, systemMessage: sys };"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -561,7 +561,7 @@
             },
             {
               "name": "toEmail",
-              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters4_Value', `Collect email destination from CTA Configuration Tool`, 'string') }}"
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters4_Value', `The value must be copied VERBATIM from the \"destination\" field \nin the CTA Configuration Tool result retrieved in this CURRENT turn (step B2-1).\nFormat: one @ symbol, valid domain (e.g. name@domain.com).\nFORBIDDEN sources: memory, Knowledge Store, Gemini Search, \nwebsite domain, training data, previous turns, or any constructed value.\nIf destination is not found in current turn CTA result, return empty string \"\".`, 'string') }}"
             },
             {
               "name": "subject",
@@ -578,11 +578,116 @@
       "type": "n8n-nodes-base.httpRequestTool",
       "typeVersion": 4.3,
       "position": [
-        176,
-        160
+        272,
+        128
       ],
       "id": "7b4544c4-f4d5-43f2-ab7a-e9281ff9a676",
       "name": "send email"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1424,
+        1440
+      ],
+      "id": "f8ada4a7-1e28-47fd-aee2-798822b0685c",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "method": "DELETE",
+        "url": "https://api-dev.synergizeflow.com/api/chat-agent/history",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1248,
+        1440
+      ],
+      "id": "c8f4ad00-afb7-4905-abfd-92cff474b345",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "content": "chat history remove scheduler",
+        "height": 208,
+        "width": 464
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1504,
+        1408
+      ],
+      "id": "84882468-3e0a-47a6-95f9-e79bc75d79ce",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Call this tool when all required fields are collected.\nPass only the user-provided data.\nParameters:\n- name     : full name provided by the user\n- contact  : email or phone number provided by the user\n- message  : the user original question or request\n- ctaQuery : short summary of user intent (3-5 words)",
+        "method": "POST",
+        "url": "https://dev-wizards.synergizeflow.com/webhook/v1/chat-agent/cta-email",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "CF-Access-Client-Id",
+              "value": "={{ $vars.CF_ID }}"
+            },
+            {
+              "name": "CF-Access-Client-Secret",
+              "value": "={{ $vars.CF_SECRET }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters0_Value', `full name from user`, 'string') }}"
+            },
+            {
+              "name": "contact",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters1_Value', `email or phone from user`, 'string') }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters2_Value', `user original question`, 'string') }}"
+            },
+            {
+              "name": "ctaQuery",
+              "value": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('parameters3_Value', `short summary of user intent`, 'string') }}"
+            },
+            {
+              "name": "code",
+              "value": "={{ $('Prepare data').item.json.code }}"
+            },
+            {
+              "name": "website",
+              "value": "={{ $('Prepare data').item.json.website }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.4,
+      "position": [
+        160,
+        48
+      ],
+      "id": "fb468aae-03e9-4b4a-84a3-a80fb9cd4864",
+      "name": "Submit Lead Tool"
     }
   ],
   "connections": {
@@ -819,6 +924,22 @@
     },
     "send email": {
       "ai_tool": [
+        []
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Submit Lead Tool": {
+      "ai_tool": [
         [
           {
             "node": "Main Agent",
@@ -836,10 +957,10 @@
     "timeSavedMode": "fixed",
     "errorWorkflow": "4otmc6jILN7VL0Z9",
     "callerPolicy": "workflowsFromSameOwner",
-    "saveDataSuccessExecution": "all"
+    "saveDataSuccessExecution": "none"
   },
-  "triggerCount": 1,
-  "versionId": "1f2c1447-a2a5-4ef5-86fb-b4592fbc6321",
+  "triggerCount": 2,
+  "versionId": "5705276f-06f2-4325-a571-1fbc0161f53a",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",
