@@ -246,7 +246,7 @@
     },
     {
       "parameters": {
-        "jsCode": "var total = $('Prepare Data').first().json.images.length;\nif(total > 1){\n  var binary = '';\n  for(var i = 0; i<total;i++){\n    binary += i == 0 ? 'image' : ',image_'+i;\n  }\n  return {\n    binary:binary,\n    images: $('Prepare Data').first().json.images\n  };\n}else{\n  return {binary:'image',images: $('Prepare Data').first().json.images };\n}"
+        "jsCode": "var imgs = '';\nvar n = 1;\nfor (const item of  $('Prepare Data').first().json.images) {\n  imgs += n == 1 ? item : ','+item;\n  n++;\n}\nreturn {\n  imgs:imgs,\n}\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -330,8 +330,8 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        -1008,
-        -80
+        -2624,
+        848
       ],
       "id": "d8392f7e-76c0-4aa3-94be-843b8fdfe09a",
       "name": "Split Out"
@@ -343,8 +343,8 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        -784,
-        -80
+        -2384,
+        848
       ],
       "id": "16a01367-0777-47cb-99b7-2f3e96d20518",
       "name": "Loop Over Items"
@@ -366,8 +366,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -560,
-        16
+        -2160,
+        1056
       ],
       "id": "dcd4c338-1a3e-4ba1-a13d-d6a0c1ec64ae",
       "name": "Edit Fields"
@@ -382,8 +382,8 @@
       "type": "n8n-nodes-base.convertToFile",
       "typeVersion": 1.1,
       "position": [
-        -112,
-        96
+        -1824,
+        1056
       ],
       "id": "4048c553-6453-43fc-a9ea-6f7ead00d18b",
       "name": "Convert to File"
@@ -395,8 +395,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -336,
-        16
+        -1984,
+        1056
       ],
       "id": "46c7dab0-610b-41e9-8e46-a95680319902",
       "name": "Code in JavaScript"
@@ -411,8 +411,8 @@
       "type": "n8n-nodes-base.aggregate",
       "typeVersion": 1,
       "position": [
-        -560,
-        -176
+        -2176,
+        768
       ],
       "id": "c44470cd-2d71-4911-a344-fd712600a98b",
       "name": "Aggregate"
@@ -427,15 +427,14 @@
           "mode": "id"
         },
         "text": "={{ $('Prepare Data').item.json.prompt }}",
-        "inputType": "binary",
-        "binaryPropertyName": "={{ $('Code in JavaScript1').item.json.binary }}",
+        "imageUrls": "={{ $json.imgs }}",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1,
       "position": [
-        -336,
-        -176
+        -1024,
+        -80
       ],
       "id": "97c93011-c29a-4a59-b0bc-7b1dff36a890",
       "name": "Analyze an image",
@@ -453,8 +452,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -112,
-        -176
+        -816,
+        -80
       ],
       "id": "03b0bc65-bdb0-4bf9-97d3-87e68de6c710",
       "name": "Code in JavaScript2"
@@ -485,8 +484,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        112,
-        -176
+        -624,
+        -80
       ],
       "id": "63a66b82-92bc-4494-9b72-e938ab13b57f",
       "name": "HTTP Request1"
@@ -595,7 +594,7 @@
       "main": [
         [
           {
-            "node": "Split Out",
+            "node": "Analyze an image",
             "type": "main",
             "index": 0
           }
@@ -684,13 +683,7 @@
     },
     "Aggregate": {
       "main": [
-        [
-          {
-            "node": "Analyze an image",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "Analyze an image": {
@@ -714,6 +707,11 @@
           }
         ]
       ]
+    },
+    "HTTP Request1": {
+      "main": [
+        []
+      ]
     }
   },
   "settings": {
@@ -722,7 +720,7 @@
     "availableInMCP": false
   },
   "triggerCount": 1,
-  "versionId": "4ad42d21-f1e9-4d5f-ab4e-5ff22d51461d",
+  "versionId": "88446807-abe4-46e3-9824-dff8d03fbce9",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

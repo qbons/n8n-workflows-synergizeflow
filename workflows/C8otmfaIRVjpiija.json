@@ -1,0 +1,1361 @@
+{
+  "id": "C8otmfaIRVjpiija",
+  "name": "SF - Animation Explainer Video Generation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v1/animation-explainer/video-generation",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -48,
+        0
+      ],
+      "id": "aaf10d96-e214-4308-9ae2-aa509111d1b6",
+      "name": "Webhook",
+      "webhookId": "5c1e3ef5-fdab-424b-8f26-d326a5179177"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "body.steps",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "c29b7167-ba30-4526-bb76-b1419287648f",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6b0c17e3-886b-4d17-a1d1-2cbaa18d80a0",
+              "name": "image.kie_ai_image_url",
+              "value": "={{ $json.image.kie_ai_image_url }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        384,
+        -432
+      ],
+      "id": "57a187b8-24ff-42d1-b245-cb21280db3ac",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        576,
+        -432
+      ],
+      "id": "e6fd56f3-30eb-420a-b32e-7906ebe678e7",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.image.kie_ai_image_url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        784,
+        -336
+      ],
+      "id": "37a7a8f3-6316-47a8-8a8c-68060e6edad6",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "command": "=cd ../../shared\nrm -rf {{ $json.body.folderName }}\nmkdir -p {{ $json.body.folderName }}"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        208,
+        -256
+      ],
+      "id": "6ddde7b3-d043-4668-a2e1-74d8123fa50c",
+      "name": "Execute Command"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ $json.tts }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        384,
+        0
+      ],
+      "id": "0bc731a0-4d6f-4ffb-a9ea-5bf86bd5d65c",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "batchSize": 3,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        576,
+        0
+      ],
+      "id": "4a3ae859-ef2a-49b5-ad60-e0c2837c355d",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://texttospeech.googleapis.com/v1/text:synthesize",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        784,
+        160
+      ],
+      "id": "6a1f1499-937b-450c-afd1-2d0bf3c4872f",
+      "name": "HTTP Request1",
+      "credentials": {
+        "googleApi": {
+          "id": "C4Bh0vq2T0s7HIDk",
+          "name": "SF - Vertex API Service Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "audioContent",
+        "binaryPropertyName": "={{ ($runIndex * 3) + $itemIndex + 1 }}",
+        "options": {
+          "fileName": "={{ `${($runIndex * 3) + $itemIndex + 1}.mp3` }}"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        976,
+        160
+      ],
+      "id": "ebc61f3f-ccd0-4b90-84d5-4646f3d4ed9b",
+      "name": "Convert base64 to File"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1376,
+        160
+      ],
+      "id": "21d4d86e-2fec-4da7-b086-39c88e7611b4",
+      "name": "Wait",
+      "webhookId": "19a186b7-fcb5-46e2-a7f4-6548850c745f"
+    },
+    {
+      "parameters": {
+        "jsCode": "const lines = items.map(item => {\n  const binaryKey = Object.keys(item.binary)[0];\n\n  return `file '${item.binary[binaryKey].fileName}'`;\n});\n\nconst content = lines.join('\\n');\n\nreturn [\n  {\n    json: {},\n    binary: {\n      data: {\n        data: Buffer.from(content).toString('base64'),\n        mimeType: 'text/plain',\n        fileName: 'list.txt',\n      }\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        784,
+        0
+      ],
+      "id": "20c53ae7-cb73-47bd-8a51-d73549eaa0fc",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/shared/{{ $('Webhook').item.json.body.folderName }}/{{ String($runIndex + 1) }}.png",
+        "dataPropertyName": "=data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        976,
+        -336
+      ],
+      "id": "11380377-a5f0-4d88-b71d-6e941e5aad63",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/shared/{{ $('Webhook').item.json.body.folderName }}/{{ $input.item.binary[`${($runIndex * 3) + $itemIndex + 1}`].fileName }}",
+        "dataPropertyName": "={{ String(($runIndex * 3) + $itemIndex + 1) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        1168,
+        160
+      ],
+      "id": "943000d1-e427-4bb3-8f6c-b3c335434b81",
+      "name": "Read/Write Files from Disk1"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/shared/{{ $('Webhook').item.json.body.folderName }}/list.txt",
+        "dataPropertyName": "=data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        976,
+        0
+      ],
+      "id": "8581ed9e-daf8-4f92-b453-8f4450c5e326",
+      "name": "Read/Write Files from Disk2"
+    },
+    {
+      "parameters": {
+        "command": "=cd ../../shared/{{ $('Webhook').item.json.body.folderName }}\nffmpeg -f concat -safe 0 -i list.txt -c copy audio.mp3"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1168,
+        0
+      ],
+      "id": "4d83dd91-1905-4890-a529-58e367e16952",
+      "name": "Execute Command1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "fd05be8f-02e9-4d03-91e9-e5b6dcef2ca8",
+              "leftValue": "={{ $('Webhook').item.json.body.orientation }}",
+              "rightValue": "horizontal",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1936,
+        -432
+      ],
+      "id": "24f5082d-ff27-4d91-93fd-8eded5035a2b",
+      "name": "If horizontal"
+    },
+    {
+      "parameters": {
+        "content": "## Generate voice\n**Generate voice and save it",
+        "height": 464,
+        "width": 1168
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        368,
+        -80
+      ],
+      "typeVersion": 1,
+      "id": "84c8232d-68bc-43d6-966b-e5afbd7e2fce",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Download image \n**Download images from KIE AI",
+        "height": 384,
+        "width": 832,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        368,
+        -512
+      ],
+      "typeVersion": 1,
+      "id": "cb9ce773-f5a1-495f-8135-5ef5d463f96b",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "fileSelector": "=/shared/{{ $('Webhook').item.json.body.folderName }}/audio.mp3",
+        "options": {
+          "fileName": "audio.mp3"
+        }
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        2160,
+        -288
+      ],
+      "id": "890f9535-fd82-4cb8-b953-c179be0fa377",
+      "name": "Read/Write Files from Disk3"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{$vars.GEMINI_PRO_LATEST}}",
+          "mode": "id"
+        },
+        "text": "=**SYSTEM DIRECTIVE: RAW DATA OUTPUT MODE**\n\nYou are a specialized audio-to-subtitle parsing engine. Your only function is to convert an audio file into a raw `.ass` subtitle string suitable for programmatic parsing. Your output is consumed directly by an automated system, which will fail if any extraneous characters or formatting are present.\n\n**INPUT:**\nAn audio file will be provided.\n\n**OUTPUT PROTOCOL:**\n1.  Your entire response MUST be a single, raw `.ass` script string.\n2.  There must be absolutely no extraneous characters, whitespace, or newlines before the `[Script Info]` header or after the final `Dialogue` line.\n3.  **CRITICAL:** Do not include Markdown fences. The string ` ``` ` is forbidden in your output. Do not output any explanatory text. The response must be the `.ass` script and nothing else.\n\n**`.ass` SCRIPT REQUIREMENTS:**\n1.  **Header:** The string must begin with the exact `.ass` header block.\n2.  **Events:** After the header, generate a `Dialogue` event for every single word in the audio.\n3.  **Word-by-Word Timing:** Each `Dialogue` line must contain only one word, timed precisely to its start and end in the audio (`h:mm:ss.cs`). Punctuation must be appended to the word it follows.\n\n**EXAMPLE OF THE REQUIRED RAW OUTPUT:**\n[Script Info]\nTitle: Default Aegisub file\nScriptType: v4.00+\nWrapStyle: 0\nScaledBorderAndShadow: yes\nYCbCr Matrix: None\n\n[Aegisub Advanced SSA/ASS Style V4+]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\nStyle: Default,Arial,28,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1\n\n[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\nDialogue: 0,0:00:00.30,0:00:00.55,Default,,0,0,0,,Stop\nDialogue: 0,0:00:00.55,0:00:01.05,Default,,0,0,0,,searching\nDialogue: 0,0:00:01.05,0:00:01.30,Default,,0,0,0,,for\n\nExecute this directive. Failure to adhere to the raw output protocol will result in system error.",
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        2384,
+        -288
+      ],
+      "id": "eb8edb0f-956f-425f-9ac5-db4411e3815c",
+      "name": "Analyze audio",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ca5b28fe-fc75-40f5-8f40-65d58483503b",
+              "name": "subtitle",
+              "value": "={{ $json.content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2608,
+        -288
+      ],
+      "id": "e4811d50-2bcd-4ccc-849f-368e777e1fb0",
+      "name": "Speech text"
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "subtitle",
+        "binaryPropertyName": "subtitle_file",
+        "options": {
+          "encoding": "utf8",
+          "fileName": "subtitle.ass"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        2800,
+        -288
+      ],
+      "id": "edcb5c9f-3a72-4779-b434-460eb4176621",
+      "name": "Convert to File",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/shared/{{ $('Webhook').item.json.body.folderName }}/subtitle.ass",
+        "dataPropertyName": "=subtitle_file",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        3456,
+        -432
+      ],
+      "id": "fac8c7cb-f182-40b4-abe3-03163dd1fb6c",
+      "name": "Read/Write Files from Disk4"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c95fbba0-80e9-43f6-b707-a87607b54202",
+              "name": "steps",
+              "value": "={{ $('Webhook').item.json.body.steps }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2160,
+        -752
+      ],
+      "id": "89a730c0-3973-4797-874d-7b74c0770aa7",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "steps",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        2368,
+        -752
+      ],
+      "id": "8626c959-5c32-433d-b88d-59c278b63c14",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2576,
+        -752
+      ],
+      "id": "797546e6-de61-424b-b5f0-ae7508dd92eb",
+      "name": "Loop Over Items2"
+    },
+    {
+      "parameters": {
+        "command": "=cd ../../shared/{{ $('Webhook').item.json.body.folderName }}\nffprobe -v error -show_entries format=duration -of csv=p=0 {{ $json.step }}.mp3"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        2784,
+        -656
+      ],
+      "id": "0a1b9b21-c29b-45ab-af62-45ee9f9de87c",
+      "name": "Execute Command2"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"step\": {{ $('Loop Over Items2').item.json.step }},\n  \"audio_duration\": {{ $json.stdout }},\n  \"subtitle\": \"{{ $('Loop Over Items2').item.json.subtitle }}\"\n\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2992,
+        -656
+      ],
+      "id": "01884123-8080-4946-bd7f-5b01f6becd4b",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Input: items array dimana setiap item memiliki:\n//   - $json.subtitle (teks subtitle dari AI Agent)\n//   - $json.audio_duration (durasi dalam detik, dari ffprobe)\n//   - $json.step (nomor step)\n\nconst header = `[Script Info]\nTitle: Generated Subtitle\nScriptType: v4.00+\nWrapStyle: 0\nScaledBorderAndShadow: yes\nYCbCr Matrix: None\nPlayResX: 1920\nPlayResY: 1080\n\n[V4+ Styles]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\nStyle: Default,Arial,52,&H00FFFFFF,&H000000FF,&H00000000,&H80000000,-1,0,0,0,100,100,0,0,1,3,1,2,20,20,40,1\n\n[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text`;\n\nfunction formatTime(seconds) {\n  const h = Math.floor(seconds / 3600);\n  const m = Math.floor((seconds % 3600) / 60);\n  const s = Math.floor(seconds % 60);\n  const cs = Math.round((seconds % 1) * 100);\n  return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}.${String(cs).padStart(2, '0')}`;\n}\n\nlet currentTime = 0;\nconst dialogueLines = [];\n\nfor (const item of items) {\n  const duration = parseFloat(item.json.audio_duration);\n  const startTime = formatTime(currentTime);\n  const endTime = formatTime(currentTime + duration);\n  const text = item.json.subtitle;\n  \n  dialogueLines.push(`Dialogue: 0,${startTime},${endTime},Default,,0,0,0,,${text}`);\n  currentTime += duration;\n}\n\nconst assContent = header + '\\n' + dialogueLines.join('\\n');\n\nreturn [\n  {\n    json: {},\n    binary: {\n      subtitle_file: {\n        data: Buffer.from(assContent).toString('base64'),\n        mimeType: 'text/plain',\n        fileName: 'subtitle.ass',\n      }\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2784,
+        -848
+      ],
+      "id": "01f0296a-538f-41c5-acee-cfff470d0068",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "content": "## Generate subtitle \n**Double click** to edit me. [Guide](https://docs.n8n.io/workflows/components/sticky-notes/)",
+        "height": 816,
+        "width": 1808,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1856,
+        -896
+      ],
+      "typeVersion": 1,
+      "id": "68664b31-3968-473d-9662-fd623bebb2ac",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "command": "=cd ../../shared/{{ $('Webhook').item.json.body.folderName }}\nmkdir -p video_build"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        4016,
+        16
+      ],
+      "id": "16ef30f0-e9cf-4c27-a69a-1edbd411daae",
+      "name": "Execute Command3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "197faeb8-7b95-4495-a8ce-dd41c354884b",
+              "name": "steps",
+              "value": "={{ $('Webhook').item.json.body.steps }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4224,
+        16
+      ],
+      "id": "a48593be-0aac-4e7b-83c7-15df2e00de3b",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "steps",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        4432,
+        16
+      ],
+      "id": "dcbd310b-47ba-4f0c-bdf0-875fccccb926",
+      "name": "Split Out2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        4640,
+        16
+      ],
+      "id": "b3418e7b-3a73-4641-80e1-f745339fe1ad",
+      "name": "Loop Over Items3"
+    },
+    {
+      "parameters": {
+        "command": "=cd ../../shared/{{ $('Webhook').item.json.body.folderName }}\nffprobe -v error -show_entries format=duration -of csv=p=0 {{ $json.step }}.mp3"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        4848,
+        112
+      ],
+      "id": "93a40f9b-69a2-40b4-a4b4-f866466a727d",
+      "name": "Execute Command4"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"step\": {{ $('Loop Over Items3').item.json.step }},\n  \"motion_effect\": \"{{ $('Loop Over Items3').item.json.motion_effect }}\",\n  \"transition\": \"{{ $('Loop Over Items3').item.json.transition }}\",\n  \"audio_duration\": {{ $json.stdout }},\n  \"image_path\": \"{{ $('Loop Over Items3').item.json.step }}.png\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        5056,
+        112
+      ],
+      "id": "280abc7f-3305-479c-b2d3-97a3f2007e49",
+      "name": "Edit Fields5"
+    },
+    {
+      "parameters": {
+        "jsCode": "const orientation = $('Webhook').first().json.body.orientation;\nconst withSubtitle = $('Webhook').first().json.body.with_subtitle;\nconst audioPath = 'audio.mp3';\nconst subtitlePath = 'subtitle.ass';\nconst outputPath = 'output.mp4';\nconst workDir = 'video_build';\n\n// Resolution based on orientation\nconst width = orientation === 'horizontal' ? 1920 : 1080;\nconst height = orientation === 'horizontal' ? 1080 : 1920;\nconst fps = 30;\n\n// ── Motion Effect Filters ──────────────────────────────────────\n// Each effect returns a zoompan filter string\n// 'd' = total frames for this clip\nfunction getMotionFilter(effect, totalFrames, w, h) {\n  const filters = {\n    // Zoom in: start at 1.0, end at 1.3\n    zoom_in: `zoompan=z='min(zoom+0.0010,1.3)':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=${totalFrames}:s=${w}x${h}:fps=${fps}`,\n    \n    // Zoom out: start at 1.3, end at 1.0\n    zoom_out: `zoompan=z='if(eq(on,1),1.3,max(zoom-0.0010,1.0))':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=${totalFrames}:s=${w}x${h}:fps=${fps}`,\n    \n    // Pan left: zoom 1.3, move from right to left\n    pan_left: `zoompan=z='1.3':x='if(eq(on,1),iw/zoom/2,min(x+1.5,iw-iw/zoom))':y='ih/2-(ih/zoom/2)':d=${totalFrames}:s=${w}x${h}:fps=${fps}`,\n    \n    // Pan right: zoom 1.3, move from left to right\n    pan_right: `zoompan=z='1.3':x='if(eq(on,1),iw-iw/zoom,max(x-1.5,0))':y='ih/2-(ih/zoom/2)':d=${totalFrames}:s=${w}x${h}:fps=${fps}`,\n    \n    // Pan up: zoom 1.3, move from bottom to top\n    pan_up: `zoompan=z='1.3':x='iw/2-(iw/zoom/2)':y='if(eq(on,1),ih-ih/zoom,max(y-1.5,0))':d=${totalFrames}:s=${w}x${h}:fps=${fps}`,\n    \n    // Pan down: zoom 1.3, move from top to bottom\n    pan_down: `zoompan=z='1.3':x='iw/2-(iw/zoom/2)':y='if(eq(on,1),0,min(y+1.5,ih-ih/zoom))':d=${totalFrames}:s=${w}x${h}:fps=${fps}`,\n    \n    // Ken Burns in: diagonal zoom in with slight pan\n    ken_burns_in: `zoompan=z='min(zoom+0.0008,1.25)':x='if(eq(on,1),0,min(x+0.5,iw-iw/zoom))':y='if(eq(on,1),0,min(y+0.3,ih-ih/zoom))':d=${totalFrames}:s=${w}x${h}:fps=${fps}`,\n    \n    // Ken Burns out: diagonal zoom out with slight pan\n    ken_burns_out: `zoompan=z='if(eq(on,1),1.25,max(zoom-0.0008,1.0))':x='if(eq(on,1),iw/zoom/4,max(x-0.5,0))':y='if(eq(on,1),ih/zoom/4,max(y-0.3,0))':d=${totalFrames}:s=${w}x${h}:fps=${fps}`,\n  };\n  return filters[effect] || filters['zoom_in'];\n}\n\n// ── Transition duration ────────────────────────────────────────\nconst transitionDuration = 0.8; // seconds\n// ── Build commands ─────────────────────────────────────────────\nconst commands = [];\nconst clipFiles = [];\n\n// Phase 1: Generate individual clips with Ken Burns effects\n// NOTE: Each clip (except the last) is extended by transitionDuration to\n// compensate for xfade overlap. Without this, each xfade transition \"eats\"\n// transitionDuration from total video length, making video shorter than audio.\nfor (let idx = 0; idx < items.length; idx++) {\n  const item = items[idx];\n  const step = item.json.step;\n  const duration = parseFloat(item.json.audio_duration);\n  const effect = item.json.motion_effect || 'zoom_in';\n  const imagePath = item.json.image_path || `${step}.png`;\n  const clipPath = `${workDir}/clip_${step}.mp4`;\n  // Extend clip duration to compensate for xfade overlap\n  // Last clip doesn't need extension (no transition after it)\n  const isLastClip = (idx === items.length - 1);\n  const extraDuration = (isLastClip || items.length === 1) ? 0 : transitionDuration;\n  const effectiveDuration = duration + extraDuration;\n  const totalFrames = Math.ceil(effectiveDuration * fps);\n  const motionFilter = getMotionFilter(effect, totalFrames, width, height);\n  // Generate clip: image + zoompan effect\n  const cmd = `ffmpeg -y -loop 1 -i \"${imagePath}\" -vf \"${motionFilter}\" -t ${effectiveDuration.toFixed(2)} -c:v libx264 -pix_fmt yuv420p -r ${fps} \"${clipPath}\"`;\n  \n  commands.push(cmd);\n  clipFiles.push({ step, clipPath, duration: effectiveDuration, transition: item.json.transition || 'none' });\n}\n\n// Phase 2: Concatenate clips with transitions\n// Build complex filtergraph for xfade transitions\nlet phase2Command = '';\nif (clipFiles.length === 1) {\n  // Single clip, no transitions needed\n  phase2Command = `ffmpeg -y -i \"${clipFiles[0].clipPath}\" -i \"${audioPath}\" -c:v libx264 -c:a aac \"${outputPath}\"`;\n} else {\n  // Build xfade filter chain\n  const inputFlags = clipFiles.map(c => `-i \"${c.clipPath}\"`).join(' ');\n  \n  let filterChain = '';\n  let currentLabel = '[0:v]';\n  let cumulativeOffset = 0;\n  \n  for (let i = 0; i < clipFiles.length - 1; i++) {\n    const clip = clipFiles[i];\n    const nextLabel = i === clipFiles.length - 2 ? '[vout]' : `[v${i}]`;\n    const transition = clip.transition;\n    \n    // Calculate offset: where the transition starts\n    // offset = cumulative duration of all previous clips minus transition overlaps\n    if (i === 0) {\n      cumulativeOffset = clip.duration - transitionDuration;\n    } else {\n      cumulativeOffset += clip.duration - transitionDuration;\n    }\n    \n    // Map transition type to ffmpeg xfade transition name\n    const xfadeMap = {\n      crossfade: 'fade',\n      fade_black: 'fadeblack',\n      wipe_left: 'wipeleft',\n      wipe_right: 'wiperight',\n      none: 'fade', // fallback to fade for \"none\" in middle (last step handled separately)\n    };\n    \n    const xfadeType = xfadeMap[transition] || 'fade';\n    \n    filterChain += `${currentLabel}[${i + 1}:v]xfade=transition=${xfadeType}:duration=${transitionDuration}:offset=${cumulativeOffset.toFixed(2)}${nextLabel};`;\n    \n    currentLabel = nextLabel;\n  }\n  \n  // Remove trailing semicolon\n  filterChain = filterChain.replace(/;$/, '');\n  \n  // Final command: clips + transitions + audio + subtitle\n  phase2Command = `ffmpeg -y ${inputFlags} -i \"${audioPath}\" -filter_complex \"${filterChain}\" -map \"[vout]\" -map \"${clipFiles.length}:a\" -c:v libx264 -pix_fmt yuv420p -c:a aac \"${outputPath}\"`;\n}\ncommands.push(phase2Command);\n// Phase 3: Add subtitles (burn in)\nconst finalOutput = outputPath.replace('.mp4', '_final.mp4');\n\nif (withSubtitle) {\n  commands.push(`ffmpeg -y -i \"${outputPath}\" -vf \"ass=${subtitlePath}\" -c:v libx264 -c:a copy \"${finalOutput}\"`);\n} else {\n  // Rename/copy output.mp4 → output_final.mp4 tanpa subtitle\n  commands.push(`ffmpeg -y -i \"${outputPath}\" -c copy \"${finalOutput}\"`);\n}\n\n// ── Return commands ────────────────────────────────────────────\nreturn [\n  {\n    json: {\n      orientation,\n      resolution: `${width}x${height}`,\n      total_steps: items.length,\n      total_commands: commands.length,\n      commands: commands,\n      commands_joined: commands.join(' && '),\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4848,
+        -80
+      ],
+      "id": "39eb26f0-2a46-4958-89ad-c9a28ba32d3d",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "commands",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        5056,
+        -80
+      ],
+      "id": "2f50563e-eee1-40d6-aee0-89c6b5148294",
+      "name": "Split Out3"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        5264,
+        -80
+      ],
+      "id": "cc701185-c8e0-4ee6-8027-48032ba9f10d",
+      "name": "Loop Over Items4"
+    },
+    {
+      "parameters": {
+        "command": "=cd ../../shared/{{ $('Webhook').item.json.body.folderName }}\n{{ $json.commands }}"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        5472,
+        16
+      ],
+      "id": "b5a1b5d7-1735-47ee-b9f0-1d0bcaf4038b",
+      "name": "Execute Command5"
+    },
+    {
+      "parameters": {
+        "content": "## Generate video\n**Double click** to edit me. [Guide](https://docs.n8n.io/workflows/components/sticky-notes/)",
+        "height": 640,
+        "width": 2480,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3968,
+        -240
+      ],
+      "typeVersion": 1,
+      "id": "c67a4b39-8c07-4b85-b972-fddbe4bad051",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "fileSelector": "=/shared/{{ $('Webhook').item.json.body.folderName }}/output_final.mp4",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        5680,
+        -192
+      ],
+      "id": "7c9ad608-83ae-4ccf-a8fd-2a91bd543958",
+      "name": "Read/Write Files from Disk5"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "={{ $vars.CLOUDFLARE_R2_BUCKET }}",
+        "fileName": "=explainer/{{ $('Webhook').item.json.body.folderName }}.mp4",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [
+        5888,
+        -192
+      ],
+      "id": "cc7dc765-0edd-4106-bc45-3db5f348432f",
+      "name": "Upload a file",
+      "credentials": {
+        "s3": {
+          "id": "AIXo2wxUCjaHKlfc",
+          "name": "SF - R2 Cloudflare Storage"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SAAS_API }}/api/explainer/video",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "folderName",
+              "value": "={{ $('Webhook').item.json.body.folderName }}"
+            },
+            {
+              "name": "video_url",
+              "value": "=https://assets.synergizeflow.com/explainer/{{ $('Webhook').item.json.body.folderName }}.mp4"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        6064,
+        -192
+      ],
+      "id": "6154e9de-0d29-477b-9e89-5bb6deedb96e",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "command": "=cd ../../shared\nrm -rf {{ $('Webhook').item.json.body.folderName }}"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        6256,
+        -192
+      ],
+      "id": "19321b23-c49b-4389-8721-739e8e3db5d5",
+      "name": "Execute Command6"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        5488,
+        -192
+      ],
+      "id": "b85a74e6-e1fb-4e54-885a-3719d3568afe",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "97e73b9b-5af3-4a13-a500-b387927deda4",
+              "leftValue": "={{ $('Webhook').item.json.body.with_subtitle }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1568,
+        0
+      ],
+      "id": "07ddb386-09cb-4b6b-b732-8be3ad3afe0e",
+      "name": "If with subtitle"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command": {
+      "main": [
+        []
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Convert base64 to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert base64 to File": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk1": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk2": {
+      "main": [
+        [
+          {
+            "node": "Execute Command1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command1": {
+      "main": [
+        [
+          {
+            "node": "If with subtitle",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If horizontal": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Read/Write Files from Disk3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk3": {
+      "main": [
+        [
+          {
+            "node": "Analyze audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze audio": {
+      "main": [
+        [
+          {
+            "node": "Speech text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Speech text": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Execute Command2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk4": {
+      "main": [
+        [
+          {
+            "node": "Execute Command3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command3": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields4": {
+      "main": [
+        [
+          {
+            "node": "Split Out2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items3": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Execute Command4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command4": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields5": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Split Out3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out3": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items4": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Execute Command5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command5": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk5": {
+      "main": [
+        [
+          {
+            "node": "Upload a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload a file": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Execute Command6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If with subtitle": {
+      "main": [
+        [
+          {
+            "node": "If horizontal",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Execute Command3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "saveManualExecutions": true,
+    "errorWorkflow": "4otmc6jILN7VL0Z9",
+    "saveDataSuccessExecution": "all"
+  },
+  "triggerCount": 1,
+  "versionId": "39829383-fe9c-4761-8006-79ba284c213a",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "xaH2LdkpgOsNAAj6",
+  "isArchived": false
+}

@@ -285,7 +285,7 @@
     },
     {
       "parameters": {
-        "jsCode": "function getValidJsonObject(rawText) {\n\n    if (typeof rawText !== 'string' || rawText.trim() === '') {\n        console.error(\"Invalid input or empty text field.\");\n        return null;\n    }\n\n    let jsonString = rawText.trim();\n\n    // 2. Check for and remove the markdown JSON block fences.\n    // This regex is robust and handles variations in whitespace.\n    const markdownRegex = /^```json\\s*([\\s\\S]*?)\\s*```$/;\n    const match = jsonString.match(markdownRegex);\n\n    if (match) {\n        // If it's a match, the actual JSON string is in the first capture group.\n        jsonString = match[1];\n    }\n\n    // 3. Parse the cleaned string into a JSON object.\n    try {\n        return JSON.parse(jsonString);\n    } catch (error) {\n        console.error(\"Failed to parse JSON string:\", error);\n        console.error(\"Problematic string:\", jsonString);\n        return null;\n    }\n}\n\n// Combine the 'text' from all parts into a single string.\nconst combinedText = $input.first().json.content.parts.map(part => part.text).join('');\n\nreturn {data: getValidJsonObject(combinedText)};"
+        "jsCode": "function getValidJsonObject(rawText) {\n\n    if (typeof rawText !== 'string' || rawText.trim() === '') {\n        console.error(\"Invalid input or empty text field.\");\n        return {};\n    }\n\n    let jsonString = rawText.trim();\n\n    // 2. Check for and remove the markdown JSON block fences.\n    // This regex is robust and handles variations in whitespace.\n    const markdownRegex = /^```json\\s*([\\s\\S]*?)\\s*```$/;\n    const match = jsonString.match(markdownRegex);\n\n    if (match) {\n        // If it's a match, the actual JSON string is in the first capture group.\n        jsonString = match[1];\n    }\n\n    // 3. Parse the cleaned string into a JSON object.\n    try {\n        return JSON.parse(jsonString);\n    } catch (error) {\n        console.error(\"Failed to parse JSON string:\", error);\n        console.error(\"Problematic string:\", jsonString);\n        return {};\n    }\n}\n\n// Combine the 'text' from all parts into a single string.\nconst combinedText = $input.first().json.content.parts.map(part => part.text).join('');\n\nreturn {data: getValidJsonObject(combinedText)};"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -327,8 +327,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        720,
-        -96
+        1008,
+        -176
       ],
       "id": "5215ffa0-359d-4d5f-a6ad-a4b36eeed0dd",
       "name": "Send content"
@@ -369,24 +369,11 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        944,
-        16
+        1216,
+        48
       ],
       "id": "1154903d-1cef-4b26-8d5b-ee1e49fdbc77",
       "name": "Code in JavaScript"
-    },
-    {
-      "parameters": {
-        "jsCode": "return {\n  status: 'fail',\n  id: $('Edit Fields').first().json.id,\n  title: $('Edit Fields').first().json.title,\n  faq: []\n}"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        720,
-        96
-      ],
-      "id": "ae0c245c-86dd-4f3f-900e-cf8b8e485d33",
-      "name": "Code in JavaScript1"
     },
     {
       "parameters": {
@@ -396,8 +383,8 @@
       "type": "n8n-nodes-base.aggregate",
       "typeVersion": 1,
       "position": [
-        -304,
-        -192
+        -288,
+        -240
       ],
       "id": "984bc29e-10f7-4f1a-a64e-77a072c8cd66",
       "name": "Aggregate"
@@ -405,21 +392,17 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "url": "={{ $vars.SAAS_API }}/api/webhook/blog-faq-completed",
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
             {
-              "name": "status",
-              "value": "ok"
-            },
-            {
-              "name": "data",
-              "value": "={{ $json.data }}"
-            },
-            {
               "name": "faq_id",
               "value": "={{ $('Prepare Data').item.json.faq_id }}"
+            },
+            {
+              "name": "license_key",
+              "value": "={{ $('Prepare Data').item.json.license_key }}"
             }
           ]
         },
@@ -428,8 +411,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -80,
-        -192
+        -64,
+        -240
       ],
       "id": "8f6d2175-6b1e-4dac-b961-b92438d36d64",
       "name": "HTTP Request1"
@@ -453,6 +436,142 @@
       ],
       "id": "240056e7-94d8-4249-b38b-7d7cbcaf783a",
       "name": "Execution Data"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    },
+                    "id": "81bb8987-50dd-4a1c-918f-d5b03f5862ff"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "ab55fd68-1707-4d1b-b9e0-c9cfd987fc21",
+                    "leftValue": "={{ $json.data }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "empty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "back"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        704,
+        -160
+      ],
+      "id": "b39ca749-6e4a-4960-82de-ee6e39ac438d",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1d616c0e-b93d-4119-b144-986fc366fa80",
+              "name": "id",
+              "value": "={{ $('Edit Fields').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "1deab333-9d34-413d-99c8-1a077b502860",
+              "name": "title",
+              "value": "={{ $('Edit Fields').item.json.title }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1024,
+        384
+      ],
+      "id": "fff83bac-04db-4d92-b968-a8580630e201",
+      "name": "retry"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SAAS_API }}/api/webhook/blog-faq-success-singular",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "faq_id",
+              "value": "={{ $('Prepare Data').item.json.faq_id }}"
+            },
+            {
+              "name": "license_key",
+              "value": "={{ $('Prepare Data').item.json.license_key }}"
+            },
+            {
+              "name": "blog_id",
+              "value": "={{ $('Edit Fields').item.json.id }}"
+            },
+            {
+              "name": "blog_title",
+              "value": "={{ $('Edit Fields').item.json.title }}"
+            },
+            {
+              "name": "faq_display",
+              "value": "={{ $('Switch1').item.json.data.faq_display }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1344,
+        -176
+      ],
+      "id": "fc7a8725-3bfd-4e7a-a713-6dc16c3c55bf",
+      "name": "HTTP Request2"
     }
   ],
   "connections": {
@@ -567,14 +686,14 @@
       "main": [
         [
           {
-            "node": "Send content",
+            "node": "Switch1",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Code in JavaScript1",
+            "node": "retry",
             "type": "main",
             "index": 0
           }
@@ -586,6 +705,11 @@
         [
           {
             "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request2",
             "type": "main",
             "index": 0
           }
@@ -614,17 +738,6 @@
         ]
       ]
     },
-    "Code in JavaScript1": {
-      "main": [
-        [
-          {
-            "node": "Loop Over Items",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Aggregate": {
       "main": [
         [
@@ -635,6 +748,40 @@
           }
         ]
       ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Send content",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "retry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "retry": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        []
+      ]
     }
   },
   "settings": {
@@ -643,10 +790,11 @@
     "availableInMCP": false,
     "timeSavedMode": "fixed",
     "errorWorkflow": "4otmc6jILN7VL0Z9",
-    "callerPolicy": "workflowsFromSameOwner"
+    "callerPolicy": "workflowsFromSameOwner",
+    "saveDataSuccessExecution": "all"
   },
   "triggerCount": 1,
-  "versionId": "c19ec31e-d735-4a30-98b6-8bcff04fe624",
+  "versionId": "ecf844ce-493c-4301-a634-8132d78593f5",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

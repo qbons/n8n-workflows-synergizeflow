@@ -81,12 +81,6 @@
               "name": "agent_id",
               "value": "={{ $json.body.agent_id }}",
               "type": "string"
-            },
-            {
-              "id": "66c5d142-6139-4adc-9f47-886f35b501c6",
-              "name": "token_bearer",
-              "value": "={{ $json.headers.authorization }}",
-              "type": "string"
             }
           ]
         },
@@ -488,12 +482,7 @@
         "url": "={{ $('Prepare Data').item.json.backend }}/api/keyword-research-agent/result",
         "sendHeaders": true,
         "headerParameters": {
-          "parameters": [
-            {
-              "name": "Authorization",
-              "value": "={{ $('Prepare Data').item.json.token_bearer }}"
-            }
-          ]
+          "parameters": []
         },
         "sendBody": true,
         "bodyParameters": {
@@ -857,7 +846,7 @@
     "callerPolicy": "workflowsFromSameOwner"
   },
   "triggerCount": 1,
-  "versionId": "11dfaf73-e7d9-4c02-bf62-8e6ccf9c9fe3",
+  "versionId": "08844319-f333-4906-bf5b-61bc6df1dcba",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

@@ -1,0 +1,261 @@
+{
+  "id": "vSip8GcPEy72xgo1",
+  "name": "SF - Animation Explainer Image Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v1/animation-explainer/image-generation",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -240,
+        -16
+      ],
+      "id": "08cb7f26-c7e7-41d2-84a4-6282789f2fb0",
+      "name": "Weebhook",
+      "webhookId": "0f16cebd-602c-45db-b81d-9d2c5888c6ab"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ {...$json.image, seed: 12345, output_format: \"png\" } }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        176,
+        -16
+      ],
+      "id": "c7cd573e-f6c1-4c95-a9dd-ce282e5d6bc4",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        384,
+        -16
+      ],
+      "id": "23727d3f-46d0-4422-92a5-686a18d2b986",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.kie.ai/api/v1/jobs/createTask",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n   \"model\": \"qwen/text-to-image\",\n  \"callBackUrl\": \"{{ $vars.SAAS_API }}/api/explainer/kieai-callback\",\n   \"input\": {\n      \"prompt\": \"{{ $json.prompt }}\",\n      \"image_size\": \"{{ $json.image_size }}\",\n      \"guidance_scale\": 10,\n      \"enable_safety_checker\": true,\n      \"output_format\": \"{{ $json.output_format }}\",\n      \"negative_prompt\": \"{{ $json.negative_prompt }}\",\n      \"seed\": {{ $json.seed }}\n   }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        592,
+        128
+      ],
+      "id": "f707d494-afc0-4aa0-9bbf-f659a7898468",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "SFhjYsXsyVcRhxXr",
+          "name": "SF - KIE AI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        992,
+        128
+      ],
+      "id": "5eb654d5-aea4-4517-8b1a-dadb8a4b6e0b",
+      "name": "Wait",
+      "webhookId": "8e188987-4a02-4d7c-abea-a05be40e5093"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "steps",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        592,
+        -16
+      ],
+      "id": "ceaadf6b-c024-4999-8c80-8e539fa6e3e2",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "jsCode": "const step = $('Split Out').all().at($runIndex)?.json;\n\nif (!step) {\n  throw new Error(`Step tidak ditemukan untuk runIndex ${$runIndex}`);\n}\n\nconst taskId = $input.first().json.data.taskId;\n\nreturn [{\n  ...step,\n  image: {\n    ...step.image,\n    kie_ai_task_id: taskId,\n  },\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        784,
+        128
+      ],
+      "id": "4db4936d-74f5-43de-86d7-cedca5c7f551",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        784,
+        -16
+      ],
+      "id": "68b61eed-c391-4aad-96d4-e5bb5001f154",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "body.steps",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        -16
+      ],
+      "id": "fad8a464-d5a5-4ad9-a6f6-c184b5b786a4",
+      "name": "Split Out"
+    }
+  ],
+  "connections": {
+    "Weebhook": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "4otmc6jILN7VL0Z9",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "triggerCount": 1,
+  "versionId": "2226ac24-5c4c-441c-98b6-6cc2e162edfc",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "xaH2LdkpgOsNAAj6",
+  "isArchived": false
+}
