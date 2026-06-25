@@ -15,10 +15,6 @@
   ],
   "mappings": [
     {
-      "workflowId": "e3x2NsyUGS1p6DMS",
-      "tagId": "JCgbb9dap96CSHpy"
-    },
-    {
       "workflowId": "DasJPlKGqQxi76ZJ",
       "tagId": "JCgbb9dap96CSHpy"
     },
@@ -32,6 +28,10 @@
     },
     {
       "workflowId": "7nhr3tq5y4GLNURu",
+      "tagId": "MeqZKzutwXqF3y6B"
+    },
+    {
+      "workflowId": "iFX7kpuHuvn6F8n5",
       "tagId": "MeqZKzutwXqF3y6B"
     },
     {
@@ -111,11 +111,11 @@
       "tagId": "JCgbb9dap96CSHpy"
     },
     {
-      "workflowId": "iFX7kpuHuvn6F8n5",
-      "tagId": "MeqZKzutwXqF3y6B"
+      "workflowId": "WBagi0zsrH1s0zUq",
+      "tagId": "JCgbb9dap96CSHpy"
     },
     {
-      "workflowId": "WBagi0zsrH1s0zUq",
+      "workflowId": "e3x2NsyUGS1p6DMS",
       "tagId": "JCgbb9dap96CSHpy"
     },
     {

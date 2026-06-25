@@ -5,7 +5,7 @@
     {
       "parameters": {
         "mode": "raw",
-        "jsonOutput": "={\n  \"name\": {{ $json.body.name }},\n  \"contact\": {{ $json.body.contact }},\n  \"message\": {{ $json.body.message }},\n  \"ctaQuery\": {{ $json.body.ctaQuery }},\n  \"code\": {{ $json.body.code }},\n  \"website\": {{ $json.body.website }}\n}",
+        "jsonOutput": "={\n  \"name\": {{ JSON.stringify($json.body.name) }},\n  \"contact\": {{ JSON.stringify($json.body.contact) }},\n  \"message\": {{ JSON.stringify($json.body.message) }},\n  \"ctaQuery\": {{ JSON.stringify($json.body.ctaQuery) }},\n  \"code\": {{ JSON.stringify($json.body.code) }},\n  \"website\": {{ JSON.stringify($json.body.website) }}\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.set",
@@ -192,7 +192,7 @@
     "binaryMode": "separate"
   },
   "triggerCount": 1,
-  "versionId": "ce755108-0c2a-4d14-a788-fdb8489bbd01",
+  "versionId": "7fcd2f9f-72d4-43fd-975a-d9f0f5fa834f",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

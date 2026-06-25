@@ -89,12 +89,6 @@
               "name": "video_title",
               "value": "={{ $json.body.video_title }}",
               "type": "string"
-            },
-            {
-              "id": "2d046ee6-72c7-4dee-bd30-3a34e45dab30",
-              "name": "image_urls",
-              "value": "={{ $json.body.image_urls }}",
-              "type": "array"
             }
           ]
         },
@@ -236,31 +230,6 @@
               },
               "renameOutput": true,
               "outputKey": "internal_article"
-            },
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 2
-                },
-                "conditions": [
-                  {
-                    "id": "e00ef22c-39e9-45e7-9496-3995d15b0101",
-                    "leftValue": "={{ $json.content_type }}",
-                    "rightValue": "carousel",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals",
-                      "name": "filter.operator.equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": true,
-              "outputKey": "carousel"
             }
           ]
         },
@@ -534,110 +503,6 @@
       "id": "e4aec4ee-510b-4652-b0ee-1874aa2793d5",
       "name": "Webhook",
       "webhookId": "b4ef3c26-7a2d-490c-b693-cd4368ac2ec2"
-    },
-    {
-      "parameters": {
-        "fieldToSplitOut": "image_urls",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.splitOut",
-      "typeVersion": 1,
-      "position": [
-        -464,
-        848
-      ],
-      "id": "e26543fc-0c25-4a91-a6de-970533be6f49",
-      "name": "Split Out"
-    },
-    {
-      "parameters": {
-        "options": {}
-      },
-      "type": "n8n-nodes-base.splitInBatches",
-      "typeVersion": 3,
-      "position": [
-        -272,
-        848
-      ],
-      "id": "aa213d7a-5a88-4408-a311-d8bc64cb92de",
-      "name": "Loop Over Items"
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "=https://graph.facebook.com/{{ $vars.FACEBOOK_API_VERSION }}/{{ $('Configuration').item.json.fb_page_id }}/photos",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n  \"url\": \"{{ $json.image_urls }}\",\n  \"published\": false,\n  \"access_token\": \"{{ $('Configuration').item.json.access_token }}\"\n}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.3,
-      "position": [
-        -48,
-        848
-      ],
-      "id": "bc19f832-c241-4e15-b758-2ad4551de7b3",
-      "name": "Upload content image"
-    },
-    {
-      "parameters": {
-        "aggregate": "aggregateAllItemData",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.aggregate",
-      "typeVersion": 1,
-      "position": [
-        288,
-        848
-      ],
-      "id": "eb5e9221-2f2e-45c2-8947-788b0f15a9f5",
-      "name": "Aggregate"
-    },
-    {
-      "parameters": {
-        "jsCode": "const attached_media = $input.first().json.data.map(item => (JSON.stringify({media_fbid: item.id})));\n\nconst payload = {\n  message: $('Configuration').first().json.text,\n  attached_media,\n  access_token: $('Configuration').first().json.access_token\n};\n\nif (!$('Configuration').first().json.published) {\n  payload.published = false;\n  payload.scheduled_publish_time =\n    $('Configuration').first().json.scheduled_publish_time;\n}\n\nreturn {\n  payload\n};"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        496,
-        848
-      ],
-      "id": "7e092df0-2bc1-4209-b617-86a024b7205b",
-      "name": "Code in JavaScript"
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "=https://graph.facebook.com/{{ $vars.FACEBOOK_API_VERSION }}/{{ $('Configuration').item.json.fb_page_id }}/feed",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ $json.payload }}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.3,
-      "position": [
-        704,
-        848
-      ],
-      "id": "cf4db642-7c39-4ed9-b662-4463b6539e31",
-      "name": "Publish Content Images"
-    },
-    {
-      "parameters": {
-        "amount": 1
-      },
-      "type": "n8n-nodes-base.wait",
-      "typeVersion": 1.1,
-      "position": [
-        112,
-        848
-      ],
-      "id": "73810592-8181-4836-8525-c550206594ea",
-      "name": "Wait",
-      "webhookId": "7cb6322e-2d83-4631-ba68-6c8b1b2a0629"
     }
   ],
   "connections": {
@@ -685,13 +550,6 @@
         [
           {
             "node": "Get post content",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Split Out",
             "type": "main",
             "index": 0
           }
@@ -847,79 +705,6 @@
           }
         ]
       ]
-    },
-    "Split Out": {
-      "main": [
-        [
-          {
-            "node": "Loop Over Items",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Loop Over Items": {
-      "main": [
-        [
-          {
-            "node": "Aggregate",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Upload content image",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Upload content image": {
-      "main": [
-        [
-          {
-            "node": "Wait",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Aggregate": {
-      "main": [
-        [
-          {
-            "node": "Code in JavaScript",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Code in JavaScript": {
-      "main": [
-        [
-          {
-            "node": "Publish Content Images",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Wait": {
-      "main": [
-        [
-          {
-            "node": "Loop Over Items",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
     }
   },
   "settings": {
@@ -928,10 +713,11 @@
     "availableInMCP": false,
     "timeSavedMode": "fixed",
     "errorWorkflow": "4otmc6jILN7VL0Z9",
-    "callerPolicy": "workflowsFromSameOwner"
+    "callerPolicy": "workflowsFromSameOwner",
+    "saveDataSuccessExecution": "all"
   },
   "triggerCount": 1,
-  "versionId": "78fe09c4-b873-426e-b0f4-9349be8ac728",
+  "versionId": "ac95f146-43ae-4c85-aff4-e64fff97e301",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",
