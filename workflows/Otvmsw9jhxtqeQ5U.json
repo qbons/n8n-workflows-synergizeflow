@@ -546,7 +546,7 @@
             },
             {
               "name": "image",
-              "value": "=data:image/{{ $json.candidates[0].content.parts[0].inlineData.mimeType == 'image/jpeg' ? 'jpeg' : 'png' }};base64,{{ $json.candidates[0].content.parts[0].inlineData.data }}"
+              "value": "={{ $json.image }}"
             },
             {
               "name": "keyword",
@@ -559,8 +559,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        320,
-        -64
+        768,
+        64
       ],
       "id": "1afd7698-97b0-4ceb-8000-1c12ac4a2c82",
       "name": "Insert data to website",
@@ -613,8 +613,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        544,
-        -160
+        960,
+        0
       ],
       "id": "27c93c00-2a9a-40be-bba1-2dd939559698",
       "name": "Send Callback"
@@ -645,8 +645,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        544,
-        32
+        976,
+        208
       ],
       "id": "8def747e-a1d3-4ac4-889a-9ad802e8f262",
       "name": "Error Insert Blog"
@@ -823,6 +823,160 @@
       ],
       "id": "95865eb1-7819-4642-aeb4-8731a3b1644b",
       "name": "SF - Image Vaults Converter"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.promptFeedback }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "9275a1a2-30ed-4847-9ac4-febe90bfbfa0"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "blocked"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f5ffc1b5-84de-4154-a640-025f35250ba7",
+                    "leftValue": "={{ $json.promptFeedback }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "notExists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "not_blocked"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        320,
+        -64
+      ],
+      "id": "99967b95-b285-4860-bff4-78def74ba244",
+      "name": "Switch4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const parts = [\n  { text: $('Code2').item.json.image }\n];\nreturn {\n  json: {\n    payload: {\n      contents: [\n        {\n          parts: parts\n        }\n      ],\n      generationConfig: {\n          responseModalities: [\"image\"],\n          topP: 0.96,\n          max_output_tokens: 32768,\n          imageConfig:{\n               aspectRatio: \"16:9\"\n          }\n      }\n    }\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        -208
+      ],
+      "id": "bc3efe4e-73aa-4674-9332-5281bd7e1224",
+      "name": "Code in JavaScript4"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $vars.GEMINI_PRO_IMAGE }}:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.payload }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        640,
+        -208
+      ],
+      "id": "b5eba0c2-7128-40b5-96b4-36c035d63eb6",
+      "name": "HTTP Request",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "tURjQrWDQUUGEoyg",
+          "name": "SF - Gemini Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "04e41122-f616-4c0e-9482-f06f7c09ea0b",
+              "name": "image",
+              "value": "=data:image/{{ $json.candidates[0].content.parts[0].inlineData.mimeType == 'image/jpeg' ? 'jpeg' : 'png' }};base64,{{ $json.candidates[0].content.parts[0].inlineData.data }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        512,
+        64
+      ],
+      "id": "cdffabf6-5f78-4068-b24a-36c5c13359f9",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "04e41122-f616-4c0e-9482-f06f7c09ea0b",
+              "name": "image",
+              "value": "=data:image/{{ $json.candidates[0].content.parts[0].inlineData.mimeType == 'image/jpeg' ? 'jpeg' : 'png' }};base64,{{ $json.candidates[0].content.parts[0].inlineData.data }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        784,
+        -208
+      ],
+      "id": "038f4557-2b71-48dc-9ecd-227f04aba061",
+      "name": "Edit Fields1"
     }
   ],
   "connections": {
@@ -1036,7 +1190,7 @@
       "main": [
         [
           {
-            "node": "Insert data to website",
+            "node": "Switch4",
             "type": "main",
             "index": 0
           }
@@ -1111,6 +1265,68 @@
           }
         ]
       ]
+    },
+    "Switch4": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript4": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Insert data to website",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Insert data to website",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -1123,7 +1339,7 @@
     "saveDataSuccessExecution": "all"
   },
   "triggerCount": 1,
-  "versionId": "06d1c793-c252-4a29-b597-6e56167c267f",
+  "versionId": "753b6a0a-61be-4a11-a3d5-82168569a9a7",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

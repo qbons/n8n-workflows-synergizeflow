@@ -62,7 +62,7 @@
       "typeVersion": 3.2,
       "position": [
         -2640,
-        240
+        8
       ],
       "id": "3668bf2b-9730-4b04-b23a-dfef93c0108e",
       "name": "Switch"
@@ -86,7 +86,7 @@
       "typeVersion": 4.2,
       "position": [
         -2864,
-        240
+        8
       ],
       "id": "d410f2b4-f4df-42fc-bea4-ca93ff160ec4",
       "name": "Check if license is valid"
@@ -106,8 +106,8 @@
       "name": "Image Scrapper",
       "type": "n8n-nodes-base.httpRequest",
       "position": [
-        2592,
-        240
+        3328,
+        64
       ],
       "typeVersion": 4.2,
       "credentials": {
@@ -165,8 +165,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        2816,
-        144
+        3552,
+        -32
       ],
       "id": "956f6f7a-3910-410b-8f98-336f3ad61681",
       "name": "Edit Fields3"
@@ -225,8 +225,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        3040,
-        48
+        3792,
+        -184
       ],
       "id": "7d648e69-201d-412f-9d33-93275fd006a3",
       "name": "Insert data to website",
@@ -251,7 +251,7 @@
       "typeVersion": 3.4,
       "position": [
         -1296,
-        48
+        -184
       ],
       "id": "a2ff2fd0-de37-490e-be6d-a4ed90582515",
       "name": "Prepare prompt"
@@ -358,7 +358,7 @@
       "typeVersion": 3.4,
       "position": [
         -2192,
-        144
+        -88
       ],
       "id": "a2c71feb-46a4-4e8d-a37d-e8c13c600620",
       "name": "Prepare Data"
@@ -372,7 +372,7 @@
       "typeVersion": 4.2,
       "position": [
         -2416,
-        144
+        -88
       ],
       "id": "2efde892-e32d-410b-8350-ac564cec98e8",
       "name": "Get Onboarding Data"
@@ -385,7 +385,7 @@
       "typeVersion": 2,
       "position": [
         -720,
-        144
+        -88
       ],
       "id": "80598aef-5b78-480f-b798-53dbaae23db3",
       "name": "Code2"
@@ -405,7 +405,7 @@
       "typeVersion": 4.2,
       "position": [
         -1744,
-        144
+        -88
       ],
       "id": "cbbb3679-1544-4ba8-a2ce-44c6c4a4d931",
       "name": "Keyword Research",
@@ -437,7 +437,7 @@
       "typeVersion": 3.4,
       "position": [
         -1968,
-        144
+        -88
       ],
       "id": "6826b075-c775-4399-97d6-f6560b0e1f2f",
       "name": "Keyword Prompt"
@@ -465,7 +465,7 @@
       "typeVersion": 1,
       "position": [
         -1072,
-        144
+        -88
       ],
       "id": "17b49b67-28b9-45fb-b4cb-66b221bfae0a",
       "name": "Message a model",
@@ -495,8 +495,8 @@
       "type": "n8n-nodes-gemini-search.geminiSearchToolTool",
       "typeVersion": 1,
       "position": [
-        -1008,
-        368
+        -1000,
+        136
       ],
       "id": "02e65d64-4848-43f9-b897-8a167024bcea",
       "name": "Gemini Search Tool",
@@ -530,7 +530,7 @@
       "typeVersion": 4.3,
       "position": [
         752,
-        144
+        -88
       ],
       "id": "d508b7c0-9880-4139-89d4-07f6ced3374d",
       "name": "HTTP Request"
@@ -542,8 +542,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1120,
-        144
+        1200,
+        -88
       ],
       "id": "a3b257e6-0fcf-40a4-8c39-c01efe3bd74e",
       "name": "Code in JavaScript"
@@ -607,8 +607,8 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.3,
       "position": [
-        1344,
-        144
+        1424,
+        -88
       ],
       "id": "b43cf77a-e02f-4d2f-b518-8b5476c40d42",
       "name": "Switch1"
@@ -636,8 +636,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1568,
-        -48
+        1648,
+        -280
       ],
       "id": "239ce00c-a293-456c-9ac6-ed860e936477",
       "name": "Prepare Image"
@@ -649,8 +649,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1792,
-        -48
+        1872,
+        -280
       ],
       "id": "e8148559-4fa7-4f8e-bfa4-0d7ee5a1c035",
       "name": "Code in JavaScript1"
@@ -677,8 +677,8 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1,
       "position": [
-        2016,
-        -48
+        2096,
+        -272
       ],
       "id": "eb742ee7-b716-4f13-9c02-2b4216fd5270",
       "name": "Message a model1",
@@ -696,8 +696,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2368,
-        -48
+        2448,
+        -272
       ],
       "id": "191e981f-0f87-4e82-9ecb-7730c2b19c1c",
       "name": "Code in JavaScript2"
@@ -716,8 +716,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        2592,
-        -48
+        2672,
+        -272
       ],
       "id": "9d1e17bc-e8f3-4bd7-b883-4cdfcb9b9a2d",
       "name": "HTTP Request1",
@@ -777,8 +777,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        2816,
-        -48
+        3552,
+        -224
       ],
       "id": "6b17ae81-3eb4-4e08-9730-dc6a50eb06d5",
       "name": "Edit Fields4"
@@ -810,7 +810,7 @@
       "typeVersion": 4.3,
       "position": [
         -2416,
-        336
+        104
       ],
       "id": "8304a7e1-9b38-46b0-8d0f-5ebd3f74ad79",
       "name": "HTTP Request3"
@@ -841,8 +841,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        2816,
-        336
+        3552,
+        160
       ],
       "id": "a6c07e66-eb19-4207-836b-19b96f28fa8b",
       "name": "HTTP Request2"
@@ -873,8 +873,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        3264,
-        144
+        4016,
+        -88
       ],
       "id": "7828e0de-dd96-4bc9-bd55-d93dea6c76b6",
       "name": "HTTP Request4"
@@ -905,8 +905,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        3264,
-        -48
+        4064,
+        -288
       ],
       "id": "c7da47d6-3f4f-4bae-b3f1-d3e5679f7200",
       "name": "HTTP Request5"
@@ -923,7 +923,7 @@
       "typeVersion": 2.1,
       "position": [
         -3088,
-        336
+        104
       ],
       "id": "1073cc15-3e91-4f95-ade2-c2fca45b9fd7",
       "name": "Webhook",
@@ -990,7 +990,7 @@
       "typeVersion": 3.3,
       "position": [
         -272,
-        144
+        -88
       ],
       "id": "37b771eb-7d33-4dc0-bd05-05a69961c164",
       "name": "Switch2"
@@ -1018,7 +1018,7 @@
       "typeVersion": 1,
       "position": [
         -48,
-        -112
+        -340
       ],
       "id": "f7b3aa2e-ff34-4091-90bf-fe2ff8f5039f",
       "name": "Message a model2",
@@ -1049,8 +1049,8 @@
       "type": "n8n-nodes-gemini-search.geminiSearchToolTool",
       "typeVersion": 1,
       "position": [
-        32,
-        112
+        24,
+        -116
       ],
       "id": "c588d161-61ee-4291-8a7b-4002244e6965",
       "name": "Gemini Search Tool1",
@@ -1088,7 +1088,7 @@
       "typeVersion": 4.2,
       "position": [
         -496,
-        144
+        -88
       ],
       "id": "67f1bf06-e358-4aa8-ba1b-4e6d954b1a67",
       "name": "Get Related Posts"
@@ -1101,7 +1101,7 @@
       "typeVersion": 2,
       "position": [
         304,
-        144
+        -88
       ],
       "id": "4f5c64a2-eed1-47f5-96f0-63ff551effb6",
       "name": "Code"
@@ -1114,7 +1114,7 @@
       "typeVersion": 2,
       "position": [
         528,
-        144
+        -88
       ],
       "id": "aa5973a8-a3bf-4ae1-8ab8-70b61234b919",
       "name": "Post Data"
@@ -1142,7 +1142,7 @@
       "typeVersion": 1,
       "position": [
         -48,
-        288
+        64
       ],
       "id": "94eb7d4e-862e-4e12-97e2-4798364993fd",
       "name": "Message a model3",
@@ -1168,7 +1168,7 @@
       "typeVersion": 1.1,
       "position": [
         -2864,
-        432
+        200
       ],
       "id": "c16c4610-82d5-4886-a96d-1a25dffb142d",
       "name": "Execution Data"
@@ -1233,7 +1233,7 @@
       "typeVersion": 3.4,
       "position": [
         -1520,
-        144
+        -88
       ],
       "id": "931b9478-3177-47d8-9afb-ead9e6e161ba",
       "name": "Switch3"
@@ -1256,7 +1256,7 @@
       "typeVersion": 3.4,
       "position": [
         -1296,
-        240
+        8
       ],
       "id": "a248e8df-a3ab-47cf-aaae-554edacfdc36",
       "name": "Prepare prompt1"
@@ -1285,11 +1285,172 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
       "position": [
-        944,
-        144
+        976,
+        -88
       ],
       "id": "7d406075-7af8-4eaf-8a84-50ed631d091a",
       "name": "SF - Image Vaults Converter"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.promptFeedback }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "9275a1a2-30ed-4847-9ac4-febe90bfbfa0"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "blocked"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f5ffc1b5-84de-4154-a640-025f35250ba7",
+                    "leftValue": "={{ $json.promptFeedback }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "notExists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "not_blocked"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        2896,
+        -288
+      ],
+      "id": "427c1989-849c-45c0-8ab5-d758d50ae222",
+      "name": "Switch4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const parts = [\n  { text: $('Post Data').first().json.image  }\n];\nreturn {\n  json: {\n    payload: {\n      contents: [\n        {\n          parts: parts\n        }\n      ],\n      generationConfig: {\n          responseModalities: [\"image\"],\n          topP: 0.96,\n          max_output_tokens: 32768,\n          imageConfig:{\n               aspectRatio: \"16:9\"\n          }\n      }\n    }\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3120,
+        -384
+      ],
+      "id": "15cb2d79-2c02-47a4-ba2a-5a374af95f58",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $vars.GEMINI_PRO_IMAGE }}:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.payload }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3344,
+        -384
+      ],
+      "id": "9fac193d-e301-4d43-81a5-7356f72966d8",
+      "name": "HTTP Request6",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "tURjQrWDQUUGEoyg",
+          "name": "SF - Gemini Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8ee5a866-7fe1-45be-8e1a-60a13ee3fbf8",
+              "name": "image",
+              "value": "=data:image/{{ $json.candidates[0].content.parts[0].inlineData.mimeType == 'image/jpeg' ? 'jpeg' : 'png' }};base64,{{ $json.candidates[0].content.parts[0].inlineData.data }}",
+              "type": "string"
+            },
+            {
+              "id": "29c81488-142a-40dd-af9e-0eb1004b153c",
+              "name": "title",
+              "value": "={{ $('Post Data').item.json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "fa758b99-67ae-45b2-ad02-e1b704fdd403",
+              "name": "keyword",
+              "value": "={{ $('Post Data').item.json.keyword }}",
+              "type": "string"
+            },
+            {
+              "id": "38bc61c4-34f8-4e5e-9b3b-70779aea7aa9",
+              "name": "content",
+              "value": "={{ $('Post Data').item.json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "23c71d05-3ca8-4f5e-b4d3-7c03d4b440c7",
+              "name": "key",
+              "value": "={{$vars.STATIC_TOKEN}}",
+              "type": "string"
+            },
+            {
+              "id": "0b7d5b13-c05f-42a1-9e2d-0dfec25de1d3",
+              "name": "=excerpt",
+              "value": "={{ $('Post Data').item.json.excerpt }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3552,
+        -384
+      ],
+      "id": "3f291d68-2cdb-4162-8d39-a77ce84f7e9a",
+      "name": "Edit Fields"
     }
   ],
   "connections": {
@@ -1545,7 +1706,7 @@
       "main": [
         [
           {
-            "node": "Edit Fields4",
+            "node": "Switch4",
             "type": "main",
             "index": 0
           }
@@ -1707,6 +1868,57 @@
           }
         ]
       ]
+    },
+    "Switch4": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request6": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Insert data to website",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -1721,7 +1933,7 @@
     "saveManualExecutions": true
   },
   "triggerCount": 1,
-  "versionId": "57bd3026-4fc9-45ce-b266-743ab9d37ebc",
+  "versionId": "2ce33122-24a5-43cb-9c39-36b02143048f",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

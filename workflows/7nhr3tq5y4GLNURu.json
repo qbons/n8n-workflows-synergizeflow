@@ -165,8 +165,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1328,
-        96
+        1968,
+        128
       ],
       "id": "80040c6e-17ae-4fd3-ae0b-cc2e1431b9dd",
       "name": "Edit Fields3"
@@ -221,8 +221,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1600,
-        0
+        2240,
+        32
       ],
       "id": "0fcf51d8-79fd-4ef4-832c-884751a458d8",
       "name": "Insert data to website",
@@ -796,8 +796,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1328,
-        -96
+        1968,
+        -64
       ],
       "id": "2f36305a-7508-41eb-b8e6-8ae1d1e600df",
       "name": "Edit Fields4"
@@ -892,8 +892,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        1824,
-        96
+        2464,
+        128
       ],
       "id": "78195f20-b579-401f-954b-43d7a8c991b0",
       "name": "HTTP Request4"
@@ -924,8 +924,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        1824,
-        -96
+        2464,
+        -64
       ],
       "id": "e3dddf51-c748-4597-bd18-e8788b3557d0",
       "name": "HTTP Request5"
@@ -1099,6 +1099,167 @@
       ],
       "id": "9ed3c62a-8d2e-4f2e-99ba-803cfbe87089",
       "name": "SF - Image Vaults Converter"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.promptFeedback }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "9275a1a2-30ed-4847-9ac4-febe90bfbfa0"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "blocked"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f5ffc1b5-84de-4154-a640-025f35250ba7",
+                    "leftValue": "={{ $json.promptFeedback }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "notExists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "not_blocked"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1312,
+        -224
+      ],
+      "id": "cf27bfe6-4c4f-44e8-9707-e0de5fcb27c6",
+      "name": "Switch4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const parts = [\n  { text: $('Code2').item.json.image }\n];\nreturn {\n  json: {\n    payload: {\n      contents: [\n        {\n          parts: parts\n        }\n      ],\n      generationConfig: {\n          responseModalities: [\"image\"],\n          topP: 0.96,\n          max_output_tokens: 32768,\n          imageConfig:{\n               aspectRatio: \"16:9\"\n          }\n      }\n    }\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1504,
+        -336
+      ],
+      "id": "cb250029-b438-4273-aa13-f0b596c797e2",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $vars.GEMINI_PRO_IMAGE }}:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.payload }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1712,
+        -336
+      ],
+      "id": "42642bc0-2ff4-4212-832b-003bb5be867e",
+      "name": "HTTP Request7",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "tURjQrWDQUUGEoyg",
+          "name": "SF - Gemini Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8ee5a866-7fe1-45be-8e1a-60a13ee3fbf8",
+              "name": "image",
+              "value": "=data:image/{{ $json.candidates[0].content.parts[0].inlineData.mimeType == 'image/jpeg' ? 'jpeg' : 'png' }};base64,{{ $json.candidates[0].content.parts[0].inlineData.data }}",
+              "type": "string"
+            },
+            {
+              "id": "29c81488-142a-40dd-af9e-0eb1004b153c",
+              "name": "title",
+              "value": "={{ $('Code2').item.json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "fa758b99-67ae-45b2-ad02-e1b704fdd403",
+              "name": "keyword",
+              "value": "={{ $('Code2').item.json.keywords }}",
+              "type": "string"
+            },
+            {
+              "id": "38bc61c4-34f8-4e5e-9b3b-70779aea7aa9",
+              "name": "content",
+              "value": "={{ $('Code2').item.json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "23c71d05-3ca8-4f5e-b4d3-7c03d4b440c7",
+              "name": "key",
+              "value": "={{$vars.STATIC_TOKEN}}",
+              "type": "string"
+            },
+            {
+              "id": "0b7d5b13-c05f-42a1-9e2d-0dfec25de1d3",
+              "name": "excerpt",
+              "value": "={{ $('Code2').item.json.excerpt }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1936,
+        -336
+      ],
+      "id": "1f5e99db-1fa4-42bb-bccf-62cecb24d007",
+      "name": "Edit Fields5"
     }
   ],
   "connections": {
@@ -1377,7 +1538,7 @@
       "main": [
         [
           {
-            "node": "Edit Fields4",
+            "node": "Switch4",
             "type": "main",
             "index": 0
           }
@@ -1444,6 +1605,57 @@
       "main": [
         []
       ]
+    },
+    "Switch4": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request7": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields5": {
+      "main": [
+        [
+          {
+            "node": "Insert data to website",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -1458,7 +1670,7 @@
     "saveManualExecutions": true
   },
   "triggerCount": 1,
-  "versionId": "fd5bf3a2-f3b2-40b5-b1e0-21d1c0efa87c",
+  "versionId": "7f55efc1-103e-426b-ab8d-12164863f07c",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",
