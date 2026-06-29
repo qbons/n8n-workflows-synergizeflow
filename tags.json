@@ -23,10 +23,6 @@
   ],
   "mappings": [
     {
-      "workflowId": "iFX7kpuHuvn6F8n5",
-      "tagId": "Xxb4WCYbR42r1WiR"
-    },
-    {
       "workflowId": "DasJPlKGqQxi76ZJ",
       "tagId": "JCgbb9dap96CSHpy"
     },
@@ -137,6 +133,10 @@
     {
       "workflowId": "1c97n1MJyGDnyIJW",
       "tagId": "JCgbb9dap96CSHpy"
+    },
+    {
+      "workflowId": "iFX7kpuHuvn6F8n5",
+      "tagId": "Xxb4WCYbR42r1WiR"
     }
   ]
 }

@@ -62,7 +62,7 @@
       "typeVersion": 3.2,
       "position": [
         -2640,
-        8
+        16
       ],
       "id": "3668bf2b-9730-4b04-b23a-dfef93c0108e",
       "name": "Switch"
@@ -86,7 +86,7 @@
       "typeVersion": 4.2,
       "position": [
         -2864,
-        8
+        16
       ],
       "id": "d410f2b4-f4df-42fc-bea4-ca93ff160ec4",
       "name": "Check if license is valid"
@@ -226,7 +226,7 @@
       "typeVersion": 4.2,
       "position": [
         3792,
-        -184
+        -192
       ],
       "id": "7d648e69-201d-412f-9d33-93275fd006a3",
       "name": "Insert data to website",
@@ -251,7 +251,7 @@
       "typeVersion": 3.4,
       "position": [
         -1296,
-        -184
+        -192
       ],
       "id": "a2ff2fd0-de37-490e-be6d-a4ed90582515",
       "name": "Prepare prompt"
@@ -358,7 +358,7 @@
       "typeVersion": 3.4,
       "position": [
         -2192,
-        -88
+        -96
       ],
       "id": "a2c71feb-46a4-4e8d-a37d-e8c13c600620",
       "name": "Prepare Data"
@@ -372,7 +372,7 @@
       "typeVersion": 4.2,
       "position": [
         -2416,
-        -88
+        -96
       ],
       "id": "2efde892-e32d-410b-8350-ac564cec98e8",
       "name": "Get Onboarding Data"
@@ -385,7 +385,7 @@
       "typeVersion": 2,
       "position": [
         -720,
-        -88
+        -96
       ],
       "id": "80598aef-5b78-480f-b798-53dbaae23db3",
       "name": "Code2"
@@ -405,7 +405,7 @@
       "typeVersion": 4.2,
       "position": [
         -1744,
-        -88
+        -96
       ],
       "id": "cbbb3679-1544-4ba8-a2ce-44c6c4a4d931",
       "name": "Keyword Research",
@@ -437,7 +437,7 @@
       "typeVersion": 3.4,
       "position": [
         -1968,
-        -88
+        -96
       ],
       "id": "6826b075-c775-4399-97d6-f6560b0e1f2f",
       "name": "Keyword Prompt"
@@ -465,7 +465,7 @@
       "typeVersion": 1,
       "position": [
         -1072,
-        -88
+        -96
       ],
       "id": "17b49b67-28b9-45fb-b4cb-66b221bfae0a",
       "name": "Message a model",
@@ -495,8 +495,8 @@
       "type": "n8n-nodes-gemini-search.geminiSearchToolTool",
       "typeVersion": 1,
       "position": [
-        -1000,
-        136
+        -1008,
+        144
       ],
       "id": "02e65d64-4848-43f9-b897-8a167024bcea",
       "name": "Gemini Search Tool",
@@ -530,7 +530,7 @@
       "typeVersion": 4.3,
       "position": [
         752,
-        -88
+        -96
       ],
       "id": "d508b7c0-9880-4139-89d4-07f6ced3374d",
       "name": "HTTP Request"
@@ -543,7 +543,7 @@
       "typeVersion": 2,
       "position": [
         1200,
-        -88
+        -96
       ],
       "id": "a3b257e6-0fcf-40a4-8c39-c01efe3bd74e",
       "name": "Code in JavaScript"
@@ -608,7 +608,7 @@
       "typeVersion": 3.3,
       "position": [
         1424,
-        -88
+        -96
       ],
       "id": "b43cf77a-e02f-4d2f-b518-8b5476c40d42",
       "name": "Switch1"
@@ -637,7 +637,7 @@
       "typeVersion": 3.4,
       "position": [
         1648,
-        -280
+        -288
       ],
       "id": "239ce00c-a293-456c-9ac6-ed860e936477",
       "name": "Prepare Image"
@@ -650,7 +650,7 @@
       "typeVersion": 2,
       "position": [
         1872,
-        -280
+        -288
       ],
       "id": "e8148559-4fa7-4f8e-bfa4-0d7ee5a1c035",
       "name": "Code in JavaScript1"
@@ -671,7 +671,7 @@
         },
         "jsonOutput": true,
         "options": {
-          "systemMessage": "=**Role:**\nYou are a Context-Aware Visual Synthesis Agent. Your task is to filter incoming visual data for relevance against a specific scenario and then generate a single, cohesive image generation prompt.\n\n**Input Data:**\n1.  **Image Descriptions (Map):** A set of descriptions labeled \"Description of image 1\", \"Description of image 2\", etc.\n2.  **Target Prompt (String):** A text description of the desired scene, setting, or action.\n\n**Processing Logic:**\n\n**Step 1: Contextual Relevance Analysis (The Filter)**\nAnalyze the `Target Prompt` to understand the setting, mood, and activity. Then, evaluate each `Image Description`:\n* **The Logic:** Ask, \"Does this element logically belong in the scene described by the Target Prompt?\"\n* **Subjects (People):** If the prompt mentions people (e.g., \"a team,\" \"a professional\"), the described person is **Relevant**.\n* **Brands (Logos):** If the prompt implies a corporate, commercial, or public setting, the logo is **Relevant**.\n* **Objects:** If the object contradicts the setting (e.g., a lawnmower in a boardroom), mark it as **Irrelevant**—unless the prompt explicitly connects them.\n\n**Step 2: Prompt Synthesis (The Builder)**\nCombine the `Target Prompt` with only the **Relevant** image descriptions:\n* **Anchor the Subject:** Replace generic characters in the prompt with specific physical details from relevant Image Descriptions.\n* **Place the Brand:** Insert relevant logos/text naturally into the environment.\n* **Maintain Style:** Ensure the art style matches the `Target Prompt`.\n\n**Step 3: Output Generation**\nReturn the result in the following **JSON format**:\n* `excluded_images`: An array of **integers** representing the ID numbers of the images that were ignored (e.g., if \"Description of image 3\" is excluded, output `[3]`).\n* `final_prompt`: A single string containing the synthesized image generation prompt.\n\n---\n\n### Constraints & Rules\n* **Do not** try to force an irrelevant object into the scene.\n* **Do not** hallucinate new details for the main subject; use the provided description strictly.\n* **Do not** output markdown text outside the JSON block."
+          "systemMessage": "=# Role\n\nYou are a **Context-Aware Visual Synthesis Agent**.\n\nYour task is to analyze multiple image descriptions, determine which are relevant to a target scene, and produce a single, cohesive image generation prompt.\n\n**IMPORTANT:** Your response will be consumed directly by an automated system using `JSON.parse()`. Producing invalid JSON will cause the workflow to fail. Therefore, your final response **must** be a syntactically valid JSON object with no surrounding text.\n\n---\n\n# Input\n\nYou will receive:\n\n1. **Image Descriptions**\n\n   * A collection of descriptions labeled:\n\n     * Description of image 1\n     * Description of image 2\n     * Description of image 3\n     * etc.\n\n2. **Target Prompt**\n\n   * A text description of the desired scene, environment, subject, or action.\n\n---\n\n# Step 1 — Contextual Relevance Analysis\n\nCarefully analyze the Target Prompt to understand:\n\n* scene\n* environment\n* activity\n* mood\n* artistic style\n* intended subject\n\nThen evaluate every image description independently.\n\nFor every image ask:\n\n> \"Would this element naturally belong in the Target Prompt?\"\n\nOnly include elements that logically fit the intended scene.\n\n---\n\n## People\n\nIf the Target Prompt refers to:\n\n* a person\n* a character\n* a team\n* an employee\n* a customer\n* a professional\n* a family\n* a child\n* etc.\n\nthen any matching person description is considered relevant.\n\nUse only the provided physical characteristics.\n\nNever invent additional appearance details.\n\n---\n\n## Brands\n\nIf the Target Prompt naturally represents:\n\n* an office\n* a company\n* a retail store\n* a public venue\n* a product\n* a commercial environment\n* a sponsored scene\n\nthen relevant logos, signage, branding, uniforms, packaging, or company names may be incorporated naturally.\n\nDo not force branding into scenes where it would feel unnatural.\n\n---\n\n## Objects\n\nObjects should only be included when they naturally support the scene.\n\nExamples:\n\nRelevant:\n\n* laptop inside an office\n* bicycle in a park\n* coffee mug in a café\n* books inside a library\n\nIrrelevant:\n\n* lawnmower inside a meeting room\n* surfboard inside a hospital\n* chainsaw inside a classroom\n\nUnless the Target Prompt explicitly requires them.\n\n---\n\n# Step 2 — Build the Final Prompt\n\nConstruct one cohesive image-generation prompt.\n\nUse the Target Prompt as the primary source.\n\nThen enrich it only with relevant image descriptions.\n\n---\n\n## Subject\n\nReplace generic subject descriptions with the matching provided descriptions whenever possible.\n\nMaintain consistency.\n\nNever merge conflicting people into one character.\n\n---\n\n## Environment\n\nIntegrate relevant objects naturally into the environment.\n\nNever overload the prompt with unnecessary details.\n\n---\n\n## Branding\n\nIf branding is relevant:\n\n* integrate logos naturally\n* place signs realistically\n* preserve provided text exactly\n\nDo not exaggerate branding.\n\n---\n\n## Artistic Style\n\nPreserve the artistic style implied by the Target Prompt.\n\nDo not replace the requested style.\n\n---\n\n# Step 3 — Excluded Images\n\nEvery image description that is determined to be irrelevant must be listed in:\n\n`excluded_images`\n\nUse only integer image IDs.\n\nExample:\n\n[2,5,7]\n\nIf every image is relevant:\n\n[]\n\nIf no images are relevant:\n\nReturn all image IDs in `excluded_images`.\n\nStill generate the best possible prompt using only the Target Prompt.\n\n---\n\n# Step 4 — Generate the Final Prompt\n\nGenerate one high-quality image-generation prompt.\n\nThe prompt should be:\n\n* cohesive\n* visually consistent\n* physically plausible\n* free of contradictions\n* suitable for modern AI image generation models\n* concise but descriptive\n\nDo not describe excluded images.\n\nDo not mention filtering.\n\nDo not explain your reasoning.\n\n---\n\n# Output Format (STRICT REQUIREMENTS)\n\nYour response **MUST** consist of **exactly one valid JSON object** and **nothing else**.\n\n## Mandatory Rules\n\n* Return only the JSON object.\n* Do NOT output any text before the JSON.\n* Do NOT output any text after the JSON.\n* Do NOT use Markdown.\n* Do NOT use triple backticks.\n* Do NOT include explanations.\n* Do NOT include comments.\n* Do NOT include notes.\n* Do NOT include reasoning.\n* Do NOT include apologies.\n* Do NOT include examples.\n* Do NOT include trailing commas.\n* Do NOT append any extra characters after the closing `}`.\n* Do NOT prepend any characters before the opening `{`.\n\nThe output **must** be directly parsable using:\n\n```javascript\nJSON.parse(response)\n```\n\nwithout requiring any preprocessing.\n\nThe JSON object must contain **exactly two top-level properties** in this exact order:\n\n1. `excluded_images`\n2. `final_prompt`\n\n---\n\n# Required JSON Schema\n\n{\n\"excluded_images\": [1, 3],\n\"final_prompt\": \"A single cohesive image-generation prompt.\"\n}\n\n---\n\n## Property Requirements\n\n### excluded_images\n\n* Must always exist.\n* Must be a JSON array.\n* Every item must be an integer.\n* No duplicate values.\n* Values should be sorted in ascending order.\n* Use an empty array (`[]`) if no images are excluded.\n\n### final_prompt\n\n* Must always exist.\n* Must be a JSON string.\n* Must contain exactly one image-generation prompt.\n* Must not contain markdown.\n* Must not contain line breaks.\n* Must not reference excluded images.\n* Escape quotation marks, backslashes, and control characters according to the JSON specification.\n\n---\n\n# Final Validation (Perform Internally Before Responding)\n\nBefore generating your final answer, internally verify all of the following:\n\n1. The response starts with `{`.\n2. The response ends with `}`.\n3. There is exactly one top-level JSON object.\n4. The object contains exactly two keys in this order:\n\n   * `excluded_images`\n   * `final_prompt`\n5. `excluded_images` is a valid JSON array of integers.\n6. `final_prompt` is a valid JSON string.\n7. There is no text before `{`.\n8. There is no text after the final `}`.\n9. There are no Markdown code fences.\n10. There are no comments.\n11. There are no trailing commas.\n12. The JSON is syntactically valid.\n13. The output can be parsed successfully using `JSON.parse()` without modification.\n\nIf any validation fails, regenerate the entire response until it is valid.\n\nYour final response must be **only** the JSON object.\n"
         }
       },
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
@@ -688,19 +688,6 @@
           "name": "SF - Gemini API Account"
         }
       }
-    },
-    {
-      "parameters": {
-        "jsCode": "const result = JSON.parse($input.first().json.content.parts[0].text);\n\nconst prompt = result.final_prompt;\n\n// Prepare the parts array with the text prompt first\nconst parts = [\n  { text: prompt }\n];\n\n// Loop through all incoming items and extract images\n// Note: If all images are in one item as different binary keys, adjust the loop.\n// This assumes multiple items (e.g., 3 separate image items).\nlet x = 1;\nfor (const item of $('Prepare Image').first().json.parsed) {\n  if (!result.excluded_images.includes(x)) {\nparts.push({\n      inlineData: {\n        mimeType: item.mime,\n        data: item.data // n8n already provides this as base64\n      }\n    });\n  }\n x++;\n}\n\n// Return the structure ready for the API\nreturn {\n  json: {\n    payload: {\n      contents: [\n        {\n          parts: parts\n        }\n      ],\n      generationConfig: {\n          responseModalities: [\"image\"],\n          topP: 0.96,\n          max_output_tokens: 32768,\n          imageConfig:{\n               aspectRatio: \"16:9\"\n          }\n      }\n    }\n  }\n};\n\n"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        2448,
-        -272
-      ],
-      "id": "191e981f-0f87-4e82-9ecb-7730c2b19c1c",
-      "name": "Code in JavaScript2"
     },
     {
       "parameters": {
@@ -810,7 +797,7 @@
       "typeVersion": 4.3,
       "position": [
         -2416,
-        104
+        112
       ],
       "id": "8304a7e1-9b38-46b0-8d0f-5ebd3f74ad79",
       "name": "HTTP Request3"
@@ -874,7 +861,7 @@
       "typeVersion": 4.3,
       "position": [
         4016,
-        -88
+        -96
       ],
       "id": "7828e0de-dd96-4bc9-bd55-d93dea6c76b6",
       "name": "HTTP Request4"
@@ -923,7 +910,7 @@
       "typeVersion": 2.1,
       "position": [
         -3088,
-        104
+        112
       ],
       "id": "1073cc15-3e91-4f95-ade2-c2fca45b9fd7",
       "name": "Webhook",
@@ -990,7 +977,7 @@
       "typeVersion": 3.3,
       "position": [
         -272,
-        -88
+        -96
       ],
       "id": "37b771eb-7d33-4dc0-bd05-05a69961c164",
       "name": "Switch2"
@@ -1018,7 +1005,7 @@
       "typeVersion": 1,
       "position": [
         -48,
-        -340
+        -336
       ],
       "id": "f7b3aa2e-ff34-4091-90bf-fe2ff8f5039f",
       "name": "Message a model2",
@@ -1049,8 +1036,8 @@
       "type": "n8n-nodes-gemini-search.geminiSearchToolTool",
       "typeVersion": 1,
       "position": [
-        24,
-        -116
+        32,
+        -112
       ],
       "id": "c588d161-61ee-4291-8a7b-4002244e6965",
       "name": "Gemini Search Tool1",
@@ -1088,7 +1075,7 @@
       "typeVersion": 4.2,
       "position": [
         -496,
-        -88
+        -96
       ],
       "id": "67f1bf06-e358-4aa8-ba1b-4e6d954b1a67",
       "name": "Get Related Posts"
@@ -1101,7 +1088,7 @@
       "typeVersion": 2,
       "position": [
         304,
-        -88
+        -96
       ],
       "id": "4f5c64a2-eed1-47f5-96f0-63ff551effb6",
       "name": "Code"
@@ -1114,7 +1101,7 @@
       "typeVersion": 2,
       "position": [
         528,
-        -88
+        -96
       ],
       "id": "aa5973a8-a3bf-4ae1-8ab8-70b61234b919",
       "name": "Post Data"
@@ -1168,7 +1155,7 @@
       "typeVersion": 1.1,
       "position": [
         -2864,
-        200
+        208
       ],
       "id": "c16c4610-82d5-4886-a96d-1a25dffb142d",
       "name": "Execution Data"
@@ -1233,7 +1220,7 @@
       "typeVersion": 3.4,
       "position": [
         -1520,
-        -88
+        -96
       ],
       "id": "931b9478-3177-47d8-9afb-ead9e6e161ba",
       "name": "Switch3"
@@ -1256,7 +1243,7 @@
       "typeVersion": 3.4,
       "position": [
         -1296,
-        8
+        16
       ],
       "id": "a248e8df-a3ab-47cf-aaae-554edacfdc36",
       "name": "Prepare prompt1"
@@ -1286,7 +1273,7 @@
       "typeVersion": 1.3,
       "position": [
         976,
-        -88
+        -96
       ],
       "id": "7d406075-7af8-4eaf-8a84-50ed631d091a",
       "name": "SF - Image Vaults Converter"
@@ -1451,6 +1438,45 @@
       ],
       "id": "3f291d68-2cdb-4162-8d39-a77ce84f7e9a",
       "name": "Edit Fields"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2656,
+        -64
+      ],
+      "id": "8d3da4ac-6764-417e-a577-5b7c7a5fc049",
+      "name": "Wait",
+      "webhookId": "1f1e19a0-d7f6-4ec8-8a3d-535145de5b53"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  desc: $('Code in JavaScript1').first().json.desc\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2160,
+        -16
+      ],
+      "id": "983265aa-9c42-4891-9222-874ec8326201",
+      "name": "Code in JavaScript4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const result = JSON.parse($input.first().json.content.parts[0].text);\n\nconst prompt = result.final_prompt;\n\n// Prepare the parts array with the text prompt first\nconst parts = [\n  { text: prompt }\n];\n\n// Loop through all incoming items and extract images\n// Note: If all images are in one item as different binary keys, adjust the loop.\n// This assumes multiple items (e.g., 3 separate image items).\nlet x = 1;\nfor (const item of $('Prepare Image').first().json.parsed) {\n  if (!result.excluded_images.includes(x)) {\nparts.push({\n      inlineData: {\n        mimeType: item.mime,\n        data: item.data // n8n already provides this as base64\n      }\n    });\n  }\n x++;\n}\n\n// Return the structure ready for the API\nreturn {\n  json: {\n    payload: {\n      contents: [\n        {\n          parts: parts\n        }\n      ],\n      generationConfig: {\n          responseModalities: [\"image\"],\n          topP: 0.96,\n          max_output_tokens: 32768,\n          imageConfig:{\n               aspectRatio: \"16:9\"\n          }\n      }\n    }\n  }\n};\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2432,
+        -272
+      ],
+      "id": "8ec596e4-1753-4fb0-a559-1047916a90d0",
+      "name": "Code in JavaScript2",
+      "onError": "continueErrorOutput"
     }
   ],
   "connections": {
@@ -1691,17 +1717,6 @@
         ]
       ]
     },
-    "Code in JavaScript2": {
-      "main": [
-        [
-          {
-            "node": "HTTP Request1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "HTTP Request1": {
       "main": [
         [
@@ -1919,6 +1934,46 @@
           }
         ]
       ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript4": {
+      "main": [
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -1933,7 +1988,7 @@
     "saveManualExecutions": true
   },
   "triggerCount": 1,
-  "versionId": "2ce33122-24a5-43cb-9c39-36b02143048f",
+  "versionId": "f06f499d-8528-49e8-a2ab-ad398933df44",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",
