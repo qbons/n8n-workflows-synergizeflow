@@ -370,8 +370,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1504,
-        0
+        1664,
+        -48
       ],
       "id": "09460d1b-e0a1-4351-a768-96883c8eacd8",
       "name": "Text to speech",
@@ -399,8 +399,8 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1,
       "position": [
-        1840,
-        0
+        2000,
+        -48
       ],
       "id": "10156992-7b10-4107-9039-281a7e4bca5a",
       "name": "Analyze audio",
@@ -412,19 +412,6 @@
         }
       },
       "onError": "continueErrorOutput"
-    },
-    {
-      "parameters": {
-        "jsCode": "var obj = JSON.parse($input.first().json.content.parts[0].text)\n\nobj.script = obj.script + ' ' + $('Prepare data').first().json.suffix;\nreturn obj;"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        1344,
-        0
-      ],
-      "id": "d000a77e-7793-4d52-b8a5-212e52268d6e",
-      "name": "Text speech"
     },
     {
       "parameters": {
@@ -443,8 +430,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        2016,
-        0
+        2176,
+        -48
       ],
       "id": "79cd505c-4ba0-45f5-ac52-6b6ae4893502",
       "name": "Speech text"
@@ -458,8 +445,8 @@
       "type": "n8n-nodes-base.convertToFile",
       "typeVersion": 1.1,
       "position": [
-        1680,
-        0
+        1840,
+        -48
       ],
       "id": "fa8dafac-7b9e-4114-ae28-a02401212b55",
       "name": "Convert base64 to File",
@@ -478,8 +465,8 @@
       "type": "n8n-nodes-base.convertToFile",
       "typeVersion": 1.1,
       "position": [
-        2192,
-        0
+        2352,
+        -48
       ],
       "id": "6bfcb8c5-3661-467f-a5f6-58f6dc8ef444",
       "name": "Convert to File",
@@ -495,8 +482,8 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1,
       "position": [
-        2368,
-        0
+        2528,
+        -48
       ],
       "id": "2fd93843-e474-4949-952f-a548fdbbc62d",
       "name": "Extract from File",
@@ -509,8 +496,8 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        3072,
-        0
+        3232,
+        -48
       ],
       "id": "a1dc1798-ced3-4db4-ad0c-5f87cae8b559",
       "name": "Wait",
@@ -558,8 +545,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2880,
-        0
+        3040,
+        -48
       ],
       "id": "6fdf0d41-0a6e-41d5-9a58-5175c9f19ef3",
       "name": "Callback prepared url"
@@ -578,8 +565,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2720,
-        0
+        2880,
+        -48
       ],
       "id": "52f8f7d8-d6c9-4000-ae5f-3d115d20e435",
       "name": "Generate video",
@@ -639,8 +626,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2560,
-        0
+        2720,
+        -48
       ],
       "id": "84c88615-3f70-4ee7-bb43-9f50c85a1e6e",
       "name": "Format model"
@@ -740,6 +727,45 @@
       "id": "8da827d0-414a-4f79-a463-9e67e5b122a1",
       "name": "Execution Data",
       "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "var obj = JSON.parse($input.first().json.content.parts[0].text)\n\nobj.script = obj.script + ' ' + $('Prepare data').first().json.suffix;\nreturn obj;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1392,
+        -16
+      ],
+      "id": "8ed8266c-2dd4-4793-b560-d02388436c8e",
+      "name": "Text speech",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1552,
+        240
+      ],
+      "id": "dbe71ccc-a2f7-4d3c-a823-f823b4ae2a14",
+      "name": "Wait1",
+      "webhookId": "5bf266d2-0995-488a-8c38-cdc2f6c61549"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  img_desc: $('Img Desc').first().json.img_desc\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        256
+      ],
+      "id": "a4eaf13e-3f64-4c19-a7f2-b44d2b9f2be2",
+      "name": "Code in JavaScript"
     }
   ],
   "connections": {
@@ -860,7 +886,7 @@
         ],
         [
           {
-            "node": "HTTP Request",
+            "node": "Wait1",
             "type": "main",
             "index": 0
           }
@@ -915,17 +941,6 @@
         [
           {
             "node": "HTTP Request",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Text speech": {
-      "main": [
-        [
-          {
-            "node": "Text to speech",
             "type": "main",
             "index": 0
           }
@@ -1085,6 +1100,46 @@
       "main": [
         []
       ]
+    },
+    "Text speech": {
+      "main": [
+        [
+          {
+            "node": "Text to speech",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -1097,7 +1152,7 @@
     "callerPolicy": "workflowsFromSameOwner"
   },
   "triggerCount": 2,
-  "versionId": "4b89e0e7-709f-4256-be13-36f26bf9f91e",
+  "versionId": "3e628770-4756-414f-a478-c79e3b38b0a0",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",
