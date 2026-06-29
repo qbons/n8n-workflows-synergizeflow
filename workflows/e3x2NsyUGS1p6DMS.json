@@ -431,10 +431,10 @@
             },
             {
               "name": "msg",
-              "value": "invalid_license"
+              "value": "unable_process_image"
             },
             {
-              "name": "unable_process_image",
+              "name": "task_id",
               "value": "={{ $('Prepare Data').item.json.task_id }}"
             }
           ]
@@ -603,7 +603,7 @@
     "saveDataSuccessExecution": "all"
   },
   "triggerCount": 1,
-  "versionId": "0f2213c5-2d77-4ae2-90ee-92878fead650",
+  "versionId": "ddf33319-b9d7-43ad-ac16-eac5ae3abf57",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

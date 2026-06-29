@@ -272,6 +272,41 @@
       ],
       "id": "82e48acc-69af-48e5-9e87-a44b7bfdffab",
       "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "55ea306b-90dc-409c-b2d3-d69e796834f5",
+              "name": "status",
+              "value": "={{ $json.status }}",
+              "type": "string"
+            },
+            {
+              "id": "ac7528cb-ff34-43cd-bafc-e48087b31492",
+              "name": "website",
+              "value": "={{ $json.website_name }}",
+              "type": "string"
+            },
+            {
+              "id": "8f1c974d-39a6-4a46-82fb-f388001e6705",
+              "name": "parsed",
+              "value": "=[]",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        432,
+        128
+      ],
+      "id": "aa08e5f3-c05d-4379-83fe-c8403c1439b7",
+      "name": "Edit Fields3"
     }
   ],
   "connections": {
@@ -295,7 +330,13 @@
             "index": 0
           }
         ],
-        []
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Edit Fields": {
@@ -392,7 +433,7 @@
     "availableInMCP": false
   },
   "triggerCount": 0,
-  "versionId": "bde55a89-d2d6-4c8d-98cc-5d2c8b4ce8d5",
+  "versionId": "c3ef280f-015b-4e43-bb49-f39bbef1fa76",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",
