@@ -137,13 +137,11 @@
     {
       "parameters": {
         "url": "={{ $vars.N8N_URL }}/api/v1/executions/{{ $json.execution_id }}?includeData=true&redactExecutionData=false",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
-            {
-              "name": "X-N8N-API-KEY",
-              "value": "=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3MzVhZWQyNS1hMjZmLTQwZjAtYTI5Ny0yNTYwMGM5N2RhNzciLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiYTg5OTliYWUtMTBkZS00OTI0LTkyNWYtNTZjYmVkODY2OTFkIiwiaWF0IjoxNzgwNjQ2ODk3fQ.QZ0PI_m-qcQUCP35i3Xcf_73N8W26jI9lfJ2zs10jZQ"
-            },
             {
               "name": "CF-Access-Client-Id",
               "value": "df7b356ab8469e73180a34f316943468.access"
@@ -167,7 +165,13 @@
         -144
       ],
       "id": "38b89b53-2601-4e62-925f-6a6f0d985412",
-      "name": "get_execution_data"
+      "name": "get_execution_data",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2hCmYkPk4c38hqCz",
+          "name": "n8n API Key"
+        }
+      }
     },
     {
       "parameters": {
@@ -269,7 +273,7 @@
     "callerPolicy": "workflowsFromSameOwner"
   },
   "triggerCount": 0,
-  "versionId": "c01d8a6a-f5e8-43f3-8200-f86c88dda14d",
+  "versionId": "e6939a64-c912-485a-bc24-39d4f95cd3d4",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

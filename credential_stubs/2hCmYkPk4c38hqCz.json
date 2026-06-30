@@ -1,0 +1,15 @@
+{
+  "id": "2hCmYkPk4c38hqCz",
+  "name": "n8n API Key",
+  "type": "httpHeaderAuth",
+  "data": {
+    "name": "",
+    "value": ""
+  },
+  "ownedBy": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "isGlobal": false
+}
