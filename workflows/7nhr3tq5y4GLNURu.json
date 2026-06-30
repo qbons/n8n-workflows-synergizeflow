@@ -106,8 +106,8 @@
       "name": "Image Scrapper",
       "type": "n8n-nodes-base.httpRequest",
       "position": [
-        1104,
-        192
+        1632,
+        256
       ],
       "typeVersion": 4.2,
       "credentials": {
@@ -718,7 +718,8 @@
         -96
       ],
       "id": "c7e6f452-36b5-41d9-b48a-84df1cc604f3",
-      "name": "Code in JavaScript2"
+      "name": "Code in JavaScript2",
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -860,8 +861,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        1328,
-        288
+        1856,
+        352
       ],
       "id": "6c5de34d-20ba-4e51-b17a-13f2197d3ad2",
       "name": "HTTP Request2"
@@ -1260,6 +1261,31 @@
       ],
       "id": "1f5e99db-1fa4-42bb-bccf-62cecb24d007",
       "name": "Edit Fields5"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        960,
+        112
+      ],
+      "id": "05f31e4b-abba-4c7e-87b7-e73f6c9d7881",
+      "name": "Wait",
+      "webhookId": "1f1e19a0-d7f6-4ec8-8a3d-535145de5b53"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  desc: $('Code in JavaScript1').first().json.desc\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        224
+      ],
+      "id": "a08b894d-e1b9-4ab0-83fb-97c4b1b3e868",
+      "name": "Code in JavaScript4"
     }
   ],
   "connections": {
@@ -1531,6 +1557,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -1656,6 +1689,28 @@
           }
         ]
       ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript4": {
+      "main": [
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -1670,7 +1725,7 @@
     "saveManualExecutions": true
   },
   "triggerCount": 1,
-  "versionId": "7f55efc1-103e-426b-ab8d-12164863f07c",
+  "versionId": "da8d94fd-701c-4b6c-8ae6-85230bb0568a",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",
