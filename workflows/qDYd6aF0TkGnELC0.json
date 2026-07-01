@@ -49,7 +49,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -1424,
+        -1216,
         160
       ],
       "id": "e4c6bfc8-afc8-4ec0-a8ba-de09422ba814",
@@ -64,7 +64,7 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -1648,
+        -1472,
         160
       ],
       "id": "c0e16b9d-2f5c-4aee-8514-5e9c790aa5cc",
@@ -89,7 +89,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -1200,
+        -992,
         160
       ],
       "id": "86b278f6-b8aa-490b-b636-3d2fecb94b77",
@@ -154,7 +154,7 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.2,
       "position": [
-        -976,
+        -768,
         160
       ],
       "id": "a02103be-ee0d-4a2e-ad1f-14712f58f7d7",
@@ -186,7 +186,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -752,
+        -544,
         256
       ],
       "id": "91e645b3-ed3a-41ec-b98d-d1b078cbdd3c",
@@ -199,7 +199,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -752,
+        -544,
         64
       ],
       "id": "8be1e710-d5c1-4cbd-9674-6e56283db368",
@@ -212,7 +212,7 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        -528,
+        -320,
         64
       ],
       "id": "c7529711-fb4c-4f90-8feb-f6ff02b5065c",
@@ -240,7 +240,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -80,
+        128,
         0
       ],
       "id": "58c247e3-1fc3-467e-8b97-c0e10e95478c",
@@ -268,7 +268,7 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1,
       "position": [
-        144,
+        336,
         0
       ],
       "id": "87ecb18a-86c4-4a28-835e-7ec9b724ca61",
@@ -290,7 +290,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        496,
+        688,
         0
       ],
       "id": "60250ef0-c007-4787-8676-de5e424b2bf3",
@@ -327,7 +327,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1008,
+        1200,
         -176
       ],
       "id": "5215ffa0-359d-4d5f-a6ad-a4b36eeed0dd",
@@ -356,7 +356,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -304,
+        -96,
         0
       ],
       "id": "378c6c88-29fd-4466-9a72-b57b23168661",
@@ -369,7 +369,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1216,
+        1408,
         48
       ],
       "id": "1154903d-1cef-4b26-8d5b-ee1e49fdbc77",
@@ -383,7 +383,7 @@
       "type": "n8n-nodes-base.aggregate",
       "typeVersion": 1,
       "position": [
-        -288,
+        -80,
         -240
       ],
       "id": "984bc29e-10f7-4f1a-a64e-77a072c8cd66",
@@ -411,7 +411,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -64,
+        144,
         -240
       ],
       "id": "8f6d2175-6b1e-4dac-b961-b92438d36d64",
@@ -431,7 +431,7 @@
       "type": "n8n-nodes-base.executionData",
       "typeVersion": 1.1,
       "position": [
-        -1440,
+        -1264,
         368
       ],
       "id": "240056e7-94d8-4249-b38b-7d7cbcaf783a",
@@ -498,7 +498,7 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        704,
+        896,
         -160
       ],
       "id": "b39ca749-6e4a-4960-82de-ee6e39ac438d",
@@ -527,7 +527,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        1024,
+        1216,
         384
       ],
       "id": "fff83bac-04db-4d92-b968-a8580630e201",
@@ -567,7 +567,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        1344,
+        1536,
         -176
       ],
       "id": "fc7a8725-3bfd-4e7a-a713-6dc16c3c55bf",
@@ -590,12 +590,12 @@
       "main": [
         [
           {
-            "node": "Prepare Data",
+            "node": "Execution Data",
             "type": "main",
             "index": 0
           },
           {
-            "node": "Execution Data",
+            "node": "Prepare Data",
             "type": "main",
             "index": 0
           }
@@ -794,7 +794,7 @@
     "saveDataSuccessExecution": "all"
   },
   "triggerCount": 1,
-  "versionId": "ecf844ce-493c-4301-a634-8132d78593f5",
+  "versionId": "ad6b8c14-7c2a-4fa3-bb59-727ab90cec09",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

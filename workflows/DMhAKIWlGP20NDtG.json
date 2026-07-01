@@ -1,0 +1,19 @@
+{
+  "id": "DMhAKIWlGP20NDtG",
+  "name": "test node postiz",
+  "nodes": [],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "triggerCount": 0,
+  "versionId": "c3e443ef-8558-4595-a33b-1ad0744dce21",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "AURBti6UOHYSkrHu",
+  "isArchived": false
+}

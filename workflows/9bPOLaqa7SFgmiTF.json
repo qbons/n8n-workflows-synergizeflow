@@ -311,7 +311,7 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.2,
       "position": [
-        -384,
+        -368,
         144
       ],
       "id": "efccceae-c9dd-4202-af03-56975fd904fd",
@@ -339,7 +339,7 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1,
       "position": [
-        -160,
+        -144,
         -112
       ],
       "id": "d376691b-2065-4665-81b4-4ea9b4714398",
@@ -374,7 +374,7 @@
       "type": "n8n-nodes-gemini-search.geminiSearchToolTool",
       "typeVersion": 1,
       "position": [
-        -80,
+        -64,
         112
       ],
       "id": "b3896dc8-1a59-4378-be1e-fcf9fda6643c",
@@ -393,7 +393,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        192,
+        208,
         144
       ],
       "id": "ad48563d-cdcd-47bf-8315-18c879be1dd2",
@@ -450,7 +450,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        416,
+        432,
         48
       ],
       "id": "89799d37-81f5-4297-857a-4bf372a02ebd",
@@ -463,7 +463,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        656,
+        672,
         176
       ],
       "id": "5d604d2a-c26d-4a40-8580-6073fe9702b3",
@@ -490,7 +490,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        416,
+        432,
         288
       ],
       "id": "ef4098e0-340e-44bb-9489-63882d0755b5",
@@ -582,7 +582,7 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1,
       "position": [
-        -160,
+        -144,
         288
       ],
       "id": "20ba6e59-fac6-4072-923d-9d7e3cf8f079",
@@ -679,7 +679,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        896,
+        912,
         176
       ],
       "id": "6f518b93-a85f-40c7-b7ec-3c69e01b43c3",
@@ -933,7 +933,7 @@
     "saveDataSuccessExecution": "all"
   },
   "triggerCount": 1,
-  "versionId": "92c1b7da-d987-47c9-b655-55842a27ef6d",
+  "versionId": "71ed9085-c661-4b0b-9061-57343e2aa3a1",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",
