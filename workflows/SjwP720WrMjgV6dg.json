@@ -11,7 +11,7 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -192,
+        0,
         -32
       ],
       "id": "1c181e87-2cb4-48fa-a873-14a2bc6d68f6",
@@ -43,7 +43,7 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1.1,
       "position": [
-        432,
+        640,
         -32
       ],
       "id": "d4b8ada8-7eb1-4b40-bf6a-90e1a290b7b7",
@@ -74,7 +74,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        208,
+        400,
         -32
       ],
       "id": "7f7fdae9-6701-420e-b7a8-cb06ac97a5e8",
@@ -108,7 +108,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        784,
+        992,
         -32
       ],
       "id": "e8ae7389-9046-4e34-a821-b0cf0f17eac1",
@@ -156,7 +156,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        1008,
+        1216,
         -32
       ],
       "id": "71c1c449-a58b-4cdd-a44d-31f75e30d584",
@@ -188,7 +188,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        0,
+        192,
         -32
       ],
       "id": "b600db04-4df0-4627-9e38-7ada344c462b",
@@ -269,10 +269,12 @@
     "availableInMCP": false,
     "timeSavedMode": "fixed",
     "saveDataSuccessExecution": "all",
-    "callerPolicy": "workflowsFromSameOwner"
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "4otmc6jILN7VL0Z9",
+    "saveExecutionProgress": true
   },
   "triggerCount": 1,
-  "versionId": "8ff38687-f748-472f-a57f-d8da2efed598",
+  "versionId": "cbd00756-b28b-419d-b040-c6f953a06dd7",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

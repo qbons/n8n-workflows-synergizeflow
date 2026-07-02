@@ -578,8 +578,8 @@
       "type": "n8n-nodes-base.httpRequestTool",
       "typeVersion": 4.3,
       "position": [
-        272,
-        128
+        560,
+        16
       ],
       "id": "7b4544c4-f4d5-43f2-ab7a-e9281ff9a676",
       "name": "send email"
@@ -635,7 +635,7 @@
       "parameters": {
         "toolDescription": "Call this tool when all required fields are collected.\nPass only the user-provided data.\nParameters:\n- name     : full name provided by the user\n- contact  : email or phone number provided by the user\n- message  : the user original question or request\n- ctaQuery : short summary of user intent (3-5 words)",
         "method": "POST",
-        "url": "https://dev-wizards.synergizeflow.com/webhook/v1/chat-agent/cta-email",
+        "url": "={{ $vars.N8N_URL }}/webhook/v1/chat-agent/cta-email",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -960,7 +960,7 @@
     "saveDataSuccessExecution": "none"
   },
   "triggerCount": 2,
-  "versionId": "5705276f-06f2-4325-a571-1fbc0161f53a",
+  "versionId": "974d53c5-898d-4da2-ac56-33320ebef01b",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

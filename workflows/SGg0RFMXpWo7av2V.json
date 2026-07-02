@@ -477,6 +477,14 @@
             {
               "name": "sessionId",
               "value": "={{ $('Prepare Data').item.json.sessionId }}"
+            },
+            {
+              "name": "flow_type",
+              "value": "submit_elementor"
+            },
+            {
+              "name": "service_id",
+              "value": "={{ $('Prepare Data').item.json.service_id }}"
             }
           ]
         },
@@ -778,7 +786,7 @@
     "callerPolicy": "workflowsFromSameOwner"
   },
   "triggerCount": 1,
-  "versionId": "a887198b-968b-4f5f-997b-87931adc39f1",
+  "versionId": "4630e267-a674-4100-8a57-6e986f00a07f",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

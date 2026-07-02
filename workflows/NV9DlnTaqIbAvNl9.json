@@ -79,7 +79,7 @@
       "typeVersion": 3.2,
       "position": [
         -656,
-        144
+        168
       ],
       "id": "bea504d2-6152-4def-9112-acae2a8a8bdf",
       "name": "Switch"
@@ -103,10 +103,11 @@
       "typeVersion": 4.2,
       "position": [
         -880,
-        144
+        240
       ],
       "id": "ddf11d13-5135-4a9e-9287-21916acc54e6",
-      "name": "Check if license is valid"
+      "name": "Check if license is valid",
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -144,7 +145,7 @@
       "typeVersion": 3.4,
       "position": [
         -1104,
-        144
+        240
       ],
       "id": "58942ddb-2768-463a-a786-b98200096636",
       "name": "Prepare data"
@@ -157,7 +158,7 @@
       "typeVersion": 1.4,
       "position": [
         -208,
-        240
+        336
       ],
       "id": "f428dc62-c6bf-4c12-822e-6c344ef1c7f6",
       "name": "Respond to Webhook"
@@ -186,7 +187,7 @@
       "typeVersion": 3.4,
       "position": [
         -432,
-        240
+        336
       ],
       "id": "d2676da1-39c8-4a7c-9111-751a67a71536",
       "name": "Edit Fields"
@@ -218,7 +219,7 @@
       "typeVersion": 4.2,
       "position": [
         -432,
-        48
+        120
       ],
       "id": "9ad70548-e690-4ffa-9cf3-6641870c593c",
       "name": "Get website data"
@@ -231,7 +232,7 @@
       "typeVersion": 1.4,
       "position": [
         -208,
-        48
+        120
       ],
       "id": "29907b08-dc1e-4198-99d4-de34d900de54",
       "name": "Respond to Webhook1"
@@ -251,7 +252,7 @@
       "typeVersion": 1.1,
       "position": [
         -1104,
-        352
+        48
       ],
       "id": "ec892963-fbbe-4692-9c29-f22b5bd14002",
       "name": "Execution Data"
@@ -262,12 +263,12 @@
       "main": [
         [
           {
-            "node": "Prepare data",
+            "node": "Execution Data",
             "type": "main",
             "index": 0
           },
           {
-            "node": "Execution Data",
+            "node": "Prepare data",
             "type": "main",
             "index": 0
           }
@@ -297,6 +298,13 @@
         [
           {
             "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
             "type": "main",
             "index": 0
           }
@@ -346,7 +354,7 @@
     "callerPolicy": "workflowsFromSameOwner"
   },
   "triggerCount": 1,
-  "versionId": "174c3a7a-0beb-40f1-bd6d-5367811053fa",
+  "versionId": "2dca4b4a-1068-4724-892b-5df3d87a75f1",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

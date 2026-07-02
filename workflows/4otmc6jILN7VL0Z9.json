@@ -120,6 +120,10 @@
             {
               "name": "old_id",
               "value": "={{ $json?.data?.resultData?.runData?.get_blog_content_detail?.[0]?.data?.main?.[0]?.[0]?.json?.blog?.id || '' }}"
+            },
+            {
+              "name": "flow_type",
+              "value": "={{ $json.data.resultData.runData.Webhook[0].data.main[0][0].json.body.flow_type }}"
             }
           ]
         },
@@ -273,7 +277,7 @@
     "callerPolicy": "workflowsFromSameOwner"
   },
   "triggerCount": 0,
-  "versionId": "e6939a64-c912-485a-bc24-39d4f95cd3d4",
+  "versionId": "a0a6bdf5-7475-44dc-a5af-228ab984a7e7",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",
