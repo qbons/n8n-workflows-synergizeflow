@@ -22,7 +22,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -160,
+        -1008,
         0
       ],
       "id": "d7242397-c99b-47e3-a2cc-b175be0795b8",
@@ -35,8 +35,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        416,
-        0
+        0,
+        -32
       ],
       "id": "d6af087b-5c97-4f3c-ad0f-70053d7cca35",
       "name": "Format array posts"
@@ -49,8 +49,8 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        624,
-        0
+        208,
+        -32
       ],
       "id": "b169e136-19f3-4370-a777-f4853481f335",
       "name": "Loop Over Items"
@@ -77,7 +77,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        864,
+        768,
         16
       ],
       "id": "d4c06aa6-af03-4955-9d4a-69bba0868782",
@@ -169,7 +169,7 @@
           "value": "=models/{{$vars.GEMINI_FLASH_TEXT}}",
           "mode": "id"
         },
-        "imageUrls": "={{ $('HTTP Request').item.json.image }}",
+        "imageUrls": "={{ $('Data Blog').item.json.img }}",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
@@ -298,7 +298,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const model =  $('Prepare data').first().json.model;\nconst callback = $vars.SAAS_API + '/api/social-agent/process';\nconst obj = JSON.parse($input.first().json.content.parts[0].text);\nconst prompt = obj.prompt;\n\nif(model == 'veo3_fast'){\n  return {\n    \"url\": \"https://api.kie.ai/api/v1/veo/generate\",\n    \"config\": {\n      \"prompt\": prompt,\n      \"model\": model,\n      \"callBackUrl\": callback,\n      \"aspectRatio\": \"9:16\",\n      \"imageUrls\": [\n        $('HTTP Request').first().json.image\n      ]\n    } \n  }\n}else if(model == 'runway-duration-10-generate'){\n  return {\n    \"url\": \"https://api.kie.ai/api/v1/runway/generate\",\n    \"config\": {\n      \"prompt\": prompt,\n      \"model\": model,\n      \"callBackUrl\": callback,\n      \"aspectRatio\": \"9:16\",\n      \"quality\": \"720p\",\n      \"duration\": \"10\",\n      \"imageUrl\": $('HTTP Request').first().json.image\n    } \n  }\n   \n}else if(model == 'sora-2-text-to-video'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      //\"model\": model,\n      \"model\": \"sora-2-image-to-video\",\n      \"callBackUrl\": callback,\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_urls\": [$('HTTP Request').first().json.image],\n        \"aspect_ratio\": \"portrait\",\n        \"n_frames\": \"15\",\n        \"remove_watermark\": true\n      }\n    }\n  }\n}else if(model == 'kling-2.6/image-to-video'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": model,\n      \"callBackUrl\": callback,\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_urls\": [\n          $('HTTP Request').first().json.image\n        ],\n        \"sound\": false,\n        \"duration\": \"10\"\n      }\n    }\n  }\n}else if(model == 'bytedance/seedance-1.5-pro'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": model,\n      \"callBackUrl\": callback,\n      \"input\":{\n        \"prompt\": prompt,\n        \"input_urls\": [\n          $('HTTP Request').first().json.image\n        ],\n        \"aspect_ratio\": \"9:16\",\n        \"duration\": \"8\",\n        \"resolution\": \"480p\"\n      }\n    }\n  }\n}else if(model == 'grok-imagine/image-to-video'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": model,\n      \"callBackUrl\": callback,\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_urls\": [\n          $('HTTP Request').first().json.image\n        ],\n        \"duration\": \"10\",\n        \"resolution\": \"480p\",\n        \"mode\": \"normal\",\n      }\n    }\n  }\n}else if(model == 'hailuo/2-3-image-to-video-standard'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": model,\n      \"callBackUrl\": callback,\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_url\": $('HTTP Request').first().json.image,\n        \"duration\": \"10\",\n        \"resolution\": \"768P\"\n      }\n    }\n  }\n}else if(model == 'wan/2-2-a14b-image-to-video-turbo'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": model,\n      \"callBackUrl\": callback,\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_url\": $('HTTP Request').first().json.image,\n        \"enable_prompt_expansion\": false,\n        \"acceleration\": \"none\",\n        \"resolution\": \"480p\"\n      }\n    }\n  }\n}else if(model == 'midjourney'){\n  return {\n    url: \"https://api.kie.ai/api/v1/mj/generate\",\n    config: {\n      \"taskType\": \"mj_video\",\n      \"prompt\": prompt,\n      \"fileUrls\": [$('HTTP Request').first().json.image],\n      \"aspectRatio\": \"9:16\",\n      \"waterMark\": \"\",\n      \"callBackUrl\": callback,\n    }\n  }\n}"
+        "jsCode": "const model =  $('Prepare data').first().json.model;\nconst callback = $vars.SAAS_API + '/api/social-agent/process';\nconst obj = JSON.parse($input.first().json.content.parts[0].text);\nconst prompt = obj.prompt;\n\nif(model == 'veo3_fast'){\n  return {\n    \"url\": \"https://api.kie.ai/api/v1/veo/generate\",\n    \"config\": {\n      \"prompt\": prompt,\n      \"model\": model,\n      \"callBackUrl\": callback,\n      \"aspectRatio\": \"9:16\",\n      \"imageUrls\": [\n       $('Data Blog').first().json.img\n      ]\n    } \n  }\n}else if(model == 'runway-duration-10-generate'){\n  return {\n    \"url\": \"https://api.kie.ai/api/v1/runway/generate\",\n    \"config\": {\n      \"prompt\": prompt,\n      \"model\": model,\n      \"callBackUrl\": callback,\n      \"aspectRatio\": \"9:16\",\n      \"quality\": \"720p\",\n      \"duration\": \"10\",\n      \"imageUrl\": $('Data Blog').first().json.img\n    } \n  }\n   \n}else if(model == 'sora-2-text-to-video'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      //\"model\": model,\n      \"model\": \"sora-2-image-to-video\",\n      \"callBackUrl\": callback,\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_urls\": [$('Data Blog').first().json.img],\n        \"aspect_ratio\": \"portrait\",\n        \"n_frames\": \"15\",\n        \"remove_watermark\": true\n      }\n    }\n  }\n}else if(model == 'kling-2.6/image-to-video'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": model,\n      \"callBackUrl\": callback,\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_urls\": [\n          $('HTTP Request').first().json.image\n        ],\n        \"sound\": false,\n        \"duration\": \"10\"\n      }\n    }\n  }\n}else if(model == 'bytedance/seedance-1.5-pro'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": model,\n      \"callBackUrl\": callback,\n      \"input\":{\n        \"prompt\": prompt,\n        \"input_urls\": [\n          $('HTTP Request').first().json.image\n        ],\n        \"aspect_ratio\": \"9:16\",\n        \"duration\": \"8\",\n        \"resolution\": \"480p\"\n      }\n    }\n  }\n}else if(model == 'grok-imagine/image-to-video'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": model,\n      \"callBackUrl\": callback,\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_urls\": [\n          $('HTTP Request').first().json.image\n        ],\n        \"duration\": \"10\",\n        \"resolution\": \"480p\",\n        \"mode\": \"normal\",\n      }\n    }\n  }\n}else if(model == 'hailuo/2-3-image-to-video-standard'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": model,\n      \"callBackUrl\": callback,\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_url\": $('HTTP Request').first().json.image,\n        \"duration\": \"10\",\n        \"resolution\": \"768P\"\n      }\n    }\n  }\n}else if(model == 'wan/2-2-a14b-image-to-video-turbo'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": model,\n      \"callBackUrl\": callback,\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_url\": $('HTTP Request').first().json.image,\n        \"enable_prompt_expansion\": false,\n        \"acceleration\": \"none\",\n        \"resolution\": \"480p\"\n      }\n    }\n  }\n}else if(model == 'midjourney'){\n  return {\n    url: \"https://api.kie.ai/api/v1/mj/generate\",\n    config: {\n      \"taskType\": \"mj_video\",\n      \"prompt\": prompt,\n      \"fileUrls\": [$('HTTP Request').first().json.image],\n      \"aspectRatio\": \"9:16\",\n      \"waterMark\": \"\",\n      \"callBackUrl\": callback,\n    }\n  }\n}"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -382,11 +382,11 @@
           "parameters": [
             {
               "name": "post_id",
-              "value": "={{ $('HTTP Request').item.json.id }}"
+              "value": "={{ $('Data Blog').item.json.id }}"
             },
             {
               "name": "license_key",
-              "value": "={{ $('Prepare data').item.json.code }}"
+              "value": "={{ $('Prepare data').item.json.license_key }}"
             }
           ]
         },
@@ -419,8 +419,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        16,
-        0
+        -464,
+        16
       ],
       "id": "f881257f-7cdf-4129-b3e8-eca1ebaa821d",
       "name": "Check if license is valid"
@@ -484,8 +484,8 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.2,
       "position": [
-        192,
-        0
+        -224,
+        -32
       ],
       "id": "02cc6569-c97f-4aed-92b0-6e35b7dcb2a3",
       "name": "Switch"
@@ -504,7 +504,7 @@
       "type": "n8n-nodes-base.executionData",
       "typeVersion": 1.1,
       "position": [
-        -336,
+        -1056,
         160
       ],
       "id": "025da6b2-dbfc-43e9-9eb5-217d647d3818",
@@ -520,8 +520,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -544,
-        0
+        -1232,
+        32
       ],
       "id": "f9921066-1985-46b9-9a73-b13ff6a0cdad",
       "name": "Webhook",
@@ -551,6 +551,287 @@
       ],
       "id": "6ed83d69-8e35-483e-93a3-eb2451ded661",
       "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b4466003-ede7-4509-ac8b-2611e7a6a53d",
+              "leftValue": "={{ $('Webhook').item.json.body.web_type }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -848,
+        -112
+      ],
+      "id": "5c412251-8ca1-4ed7-823e-e1312d951b72",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Webhook').item.json.body.web_type }}",
+                    "rightValue": "laravel",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "3d525976-a143-4ecc-bca9-2a405bfe620d"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "laravel"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "e0ee3638-64c0-4864-9b1a-e1dc53640ef6",
+                    "leftValue": "={{ $('Webhook').item.json.body.web_type }}",
+                    "rightValue": "=laravel",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "other"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -656,
+        -192
+      ],
+      "id": "fef62755-3cfb-4b86-af02-ed4d8c74bc73",
+      "name": "Switch2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SAAS_API }}/api/webhook/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "domain",
+              "value": "={{ $('Prepare data').item.json.website }}"
+            },
+            {
+              "name": "code",
+              "value": "={{ $('Prepare data').item.json.license_key }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -448,
+        -208
+      ],
+      "id": "037e87e0-7cda-4bae-99a6-d0ac3dd80777",
+      "name": "Check if license is valid1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b4466003-ede7-4509-ac8b-2611e7a6a53d",
+              "leftValue": "={{ $('Webhook').item.json.body.web_type }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        400,
+        -160
+      ],
+      "id": "0ea19b05-76dc-4924-abe0-8e78f6af8b5a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Webhook').item.json.body.web_type }}",
+                    "rightValue": "laravel",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "3d525976-a143-4ecc-bca9-2a405bfe620d"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "laravel"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "e0ee3638-64c0-4864-9b1a-e1dc53640ef6",
+                    "leftValue": "={{ $('Webhook').item.json.body.web_type }}",
+                    "rightValue": "=laravel",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "other"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        592,
+        -208
+      ],
+      "id": "97a56a6c-e854-43ac-b8fc-85cd38ce5413",
+      "name": "Switch3"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Prepare data').item.json.website }}/blog/get-post/{{ $json.id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        832,
+        -224
+      ],
+      "id": "cf1702ed-9a28-42e2-ae3f-9a95bf6313e8",
+      "name": "Get post content laravel"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2edddd94-6d56-4737-93ee-c66624919873",
+              "name": "id",
+              "value": "={{ $('Format array posts').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "3b34b29c-c4a7-48bf-a81f-75d8f4d52c8b",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "cf5bcc4a-907e-4d4b-873d-2c11f5305f18",
+              "name": "content",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "20633dc1-fa4b-407d-907e-bbb00045df61",
+              "name": "img",
+              "value": "={{ $json.image }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        976,
+        16
+      ],
+      "id": "3c9095d9-0644-4ab9-8a5f-3ee73851b18d",
+      "name": "Data Blog"
     }
   ],
   "connections": {
@@ -563,7 +844,7 @@
       "main": [
         [
           {
-            "node": "Check if license is valid",
+            "node": "If2",
             "type": "main",
             "index": 0
           }
@@ -586,7 +867,7 @@
         [],
         [
           {
-            "node": "HTTP Request",
+            "node": "If",
             "type": "main",
             "index": 0
           }
@@ -597,7 +878,7 @@
       "main": [
         [
           {
-            "node": "Music Agent",
+            "node": "Data Blog",
             "type": "main",
             "index": 0
           }
@@ -843,6 +1124,111 @@
           }
         ]
       ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch2": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if license is valid1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Switch3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch3": {
+      "main": [
+        [
+          {
+            "node": "Get post content laravel",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get post content laravel": {
+      "main": [
+        [
+          {
+            "node": "Data Blog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Data Blog": {
+      "main": [
+        [
+          {
+            "node": "Music Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -853,10 +1239,11 @@
     "errorWorkflow": "4otmc6jILN7VL0Z9",
     "callerPolicy": "workflowsFromSameOwner",
     "saveDataSuccessExecution": "all",
-    "saveManualExecutions": true
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true
   },
   "triggerCount": 1,
-  "versionId": "dadc9256-297f-4dd3-bc81-44ef62cb3395",
+  "versionId": "ef5fb223-1a0d-432a-bcea-e156664aa592",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

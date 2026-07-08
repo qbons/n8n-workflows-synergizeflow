@@ -1,0 +1,195 @@
+{
+  "id": "weLUupPWGXPFocjt",
+  "name": "SF - Explainer Reference Image Analyzer",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v1/animation-explainer/reference-image/analyze",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "dafbbbe9-4e32-44c0-af24-ecb1f09ff6fb",
+      "name": "Webhook",
+      "webhookId": "ede128de-41f8-4dd5-89ca-55711888ad09"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_FLASH_PREVIEW}}",
+          "mode": "id"
+        },
+        "text": "=You are analyzing a user-uploaded reference image for an animated explainer video generator.\n\nThe image may be:\n- company logo\n- person/founder/team member\n- product photo\n- app screenshot\n- office/building/place\n- mascot/character\n- document\n- other brand asset\n\nUse the explainer context if available:\nDescription: {{ $json.body.explainer.description }}\nVisual style: {{ $json.body.explainer.visual_style }}\nOrientation: {{ $json.body.explainer.orientation }}\n\nReturn JSON only. No markdown. No explanation.\n\nSchema:\n{\n  \"type\": \"logo | person | product | screenshot | place | mascot | document | other\",\n  \"label\": \"short human-readable label, max 60 chars\",\n  \"description\": \"detailed visual description useful for image generation prompts\",\n  \"usage_note\": \"how this reference should be used in explainer scenes\",\n  \"sensitive_note\": \"optional warning about preserving logo, face, text, UI, or brand accuracy\"\n}\n\nRules:\n- If image contains a logo or wordmark, type must be \"logo\".\n- If image is a person portrait/team photo, type must be \"person\".\n- If image is app UI/dashboard/website screen, type must be \"screenshot\".\n- If image is a physical product, type must be \"product\".\n- If image is a building/office/location, type must be \"place\".\n- Keep label short and clear.\n- description must describe visible colors, objects, text, layout, style, and identity cues.\n- usage_note must tell the storyboard generator when to use it.\n- sensitive_note should mention risks if exact text/logo/face/UI preservation matters.",
+        "imageUrls": "={{ $json.body.image.url }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "3a6a4cd2-e97d-4a72-b6d9-50898705ae13",
+      "name": "Analyze an image",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json.content?.parts?.[0]?.text || \"\";\n\nfunction parseJson(rawText) {\n  let text = String(rawText || \"\").trim();\n  text = text.replace(/^```json\\s*/i, \"\").replace(/^```\\s*/i, \"\").replace(/```\\s*$/i, \"\").trim();\n\n  try {\n    return JSON.parse(text);\n  } catch {\n    const match = text.match(/\\{[\\s\\S]*\\}/);\n    if (!match) throw new Error(\"No JSON object found in Gemini response\");\n    return JSON.parse(match[0]);\n  }\n}\n\ntry {\n  const parsed = parseJson(raw);\n  const image = $('Webhook').first().json.body.image;\n\n  return [{\n    json: {\n      success: true,\n      reference_image_id: image.id || null,\n      type: parsed.type || \"other\",\n      label: parsed.label || image.filename || \"Reference image\",\n      description: parsed.description || \"\",\n      usage_note: parsed.usage_note || \"\",\n      sensitive_note: parsed.sensitive_note || \"\"\n    }\n  }];\n} catch (error) {\n  const image = $('Webhook').first().json.body.image || {};\n\n  return [{\n    json: {\n      success: false,\n      reference_image_id: image.id || null,\n      stage: \"reference_image_analysis\",\n      error: error.message,\n      raw_preview: raw.slice(0, 500)\n    }\n  }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ],
+      "id": "d7c4cf82-9dac-4fbe-b834-41632abb89d6",
+      "name": "Parse AI JSON Output"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        912,
+        112
+      ],
+      "id": "187d8945-0d02-4f11-826f-bed774e694a9",
+      "name": "Agent Response"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b742cc6b-3df0-41e9-b0d4-043462634016",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        656,
+        0
+      ],
+      "id": "cb95ecec-7f74-4473-ab83-5d17a6525f52",
+      "name": "If error"
+    },
+    {
+      "parameters": {
+        "options": {
+          "responseCode": 500
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        912,
+        -112
+      ],
+      "id": "5d529f63-a4d5-463f-ab9a-8c7fc1d9f05a",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Analyze an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI JSON Output": {
+      "main": [
+        [
+          {
+            "node": "If error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If error": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Agent Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze an image": {
+      "main": [
+        [
+          {
+            "node": "Parse AI JSON Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "4otmc6jILN7VL0Z9",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "triggerCount": 1,
+  "versionId": "d2079805-00ab-440c-8c01-3ca1e76bb1e2",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "xaH2LdkpgOsNAAj6",
+  "isArchived": false
+}

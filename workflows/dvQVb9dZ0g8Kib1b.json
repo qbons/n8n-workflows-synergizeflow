@@ -20,7 +20,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -384,
+        -528,
         144
       ],
       "id": "e63fec9b-8294-4d35-bd26-1c78d378e583",
@@ -85,8 +85,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -592,
-        144
+        -1104,
+        64
       ],
       "id": "4dde24ac-6db3-49c7-8e9d-ba5da4ee00e0",
       "name": "Prepare data"
@@ -100,8 +100,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -976,
-        144
+        -1376,
+        64
       ],
       "id": "beba95a4-6d32-4071-b0d0-fb65b39f3ae5",
       "name": "Webhook",
@@ -180,8 +180,8 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        176,
-        0
+        144,
+        -160
       ],
       "id": "a3ebcbdb-9e78-44fe-9ea1-5273c281f26d",
       "name": "Loop Over Items"
@@ -193,8 +193,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        0,
-        0
+        -64,
+        -160
       ],
       "id": "93217dcf-0a23-4ffe-aedc-709abf66552a",
       "name": "format array posts"
@@ -221,7 +221,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        400,
+        784,
         0
       ],
       "id": "6ccd232a-8e37-440c-a383-75c125426615",
@@ -262,8 +262,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        544,
-        0
+        1072,
+        16
       ],
       "id": "0f108b36-0f4d-43f1-9177-894f5cc0b30f",
       "name": "Data Blog"
@@ -285,8 +285,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        880,
-        0
+        1408,
+        16
       ],
       "id": "68ae3a7d-8bca-41e5-b228-15be5e1291e7",
       "name": "Img Desc"
@@ -313,8 +313,8 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1,
       "position": [
-        1040,
-        0
+        1568,
+        16
       ],
       "id": "d3ba1a8a-5995-4697-8048-d6a5769b527a",
       "name": "Message a model",
@@ -341,8 +341,8 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1,
       "position": [
-        704,
-        0
+        1232,
+        16
       ],
       "id": "89f4a49e-32e6-4d52-8917-830d864f6679",
       "name": "Analyze image",
@@ -370,8 +370,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1664,
-        -48
+        2192,
+        -32
       ],
       "id": "09460d1b-e0a1-4351-a768-96883c8eacd8",
       "name": "Text to speech",
@@ -399,8 +399,8 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1,
       "position": [
-        2000,
-        -48
+        2528,
+        -32
       ],
       "id": "10156992-7b10-4107-9039-281a7e4bca5a",
       "name": "Analyze audio",
@@ -430,8 +430,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        2176,
-        -48
+        2704,
+        -32
       ],
       "id": "79cd505c-4ba0-45f5-ac52-6b6ae4893502",
       "name": "Speech text"
@@ -445,8 +445,8 @@
       "type": "n8n-nodes-base.convertToFile",
       "typeVersion": 1.1,
       "position": [
-        1840,
-        -48
+        2368,
+        -32
       ],
       "id": "fa8dafac-7b9e-4114-ae28-a02401212b55",
       "name": "Convert base64 to File",
@@ -465,8 +465,8 @@
       "type": "n8n-nodes-base.convertToFile",
       "typeVersion": 1.1,
       "position": [
-        2352,
-        -48
+        2880,
+        -32
       ],
       "id": "6bfcb8c5-3661-467f-a5f6-58f6dc8ef444",
       "name": "Convert to File",
@@ -482,8 +482,8 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1,
       "position": [
-        2528,
-        -48
+        3056,
+        -32
       ],
       "id": "2fd93843-e474-4949-952f-a548fdbbc62d",
       "name": "Extract from File",
@@ -496,8 +496,8 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        3232,
-        -48
+        3760,
+        -32
       ],
       "id": "a1dc1798-ced3-4db4-ad0c-5f87cae8b559",
       "name": "Wait",
@@ -545,8 +545,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        3040,
-        -48
+        3568,
+        -32
       ],
       "id": "6fdf0d41-0a6e-41d5-9a58-5175c9f19ef3",
       "name": "Callback prepared url"
@@ -565,8 +565,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2880,
-        -48
+        3408,
+        -32
       ],
       "id": "52f8f7d8-d6c9-4000-ae5f-3d115d20e435",
       "name": "Generate video",
@@ -600,8 +600,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        512,
-        304
+        1040,
+        320
       ],
       "id": "d99c6e60-2d0d-418b-8b2a-8df1d6d4fd08",
       "name": "HTTP Request"
@@ -613,8 +613,8 @@
       "type": "n8n-nodes-base.stopAndError",
       "typeVersion": 1,
       "position": [
-        784,
-        304
+        1312,
+        320
       ],
       "id": "9b7f8e53-23fa-42a7-915d-0973dc3d44bd",
       "name": "Stop and Error"
@@ -626,8 +626,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2720,
-        -48
+        3248,
+        -32
       ],
       "id": "84c88615-3f70-4ee7-bb43-9f50c85a1e6e",
       "name": "Format model"
@@ -684,7 +684,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        1888,
+        2016,
         576
       ],
       "id": "f196c8b3-0416-417e-8408-a3ef32c8806d",
@@ -701,7 +701,7 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        1680,
+        1808,
         576
       ],
       "id": "26e8838c-816b-4e17-8fe3-ba17a59cf436",
@@ -721,8 +721,8 @@
       "type": "n8n-nodes-base.executionData",
       "typeVersion": 1.1,
       "position": [
-        -768,
-        384
+        -1168,
+        352
       ],
       "id": "8da827d0-414a-4f79-a463-9e67e5b122a1",
       "name": "Execution Data",
@@ -735,8 +735,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1392,
-        -16
+        1920,
+        0
       ],
       "id": "8ed8266c-2dd4-4793-b560-d02388436c8e",
       "name": "Text speech",
@@ -747,8 +747,8 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        1552,
-        240
+        2080,
+        256
       ],
       "id": "dbe71ccc-a2f7-4d3c-a823-f823b4ae2a14",
       "name": "Wait1",
@@ -761,11 +761,251 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1120,
-        256
+        1648,
+        272
       ],
       "id": "a4eaf13e-3f64-4c19-a7f2-b44d2b9f2be2",
       "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b4466003-ede7-4509-ac8b-2611e7a6a53d",
+              "leftValue": "={{ $('Webhook').item.json.body.web_type }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -944,
+        64
+      ],
+      "id": "37f39bee-1e7d-47cf-a866-4a83f46cdea4",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Webhook').item.json.body.web_type }}",
+                    "rightValue": "laravel",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "3d525976-a143-4ecc-bca9-2a405bfe620d"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "laravel"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "e0ee3638-64c0-4864-9b1a-e1dc53640ef6",
+                    "leftValue": "={{ $('Webhook').item.json.body.web_type }}",
+                    "rightValue": "=laravel",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "other"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -768,
+        -48
+      ],
+      "id": "50d4727c-247c-4fdc-b6da-df2aab53c252",
+      "name": "Switch2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SAAS_API }}/api/webhook/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "domain",
+              "value": "={{ $('Prepare data').item.json.website }}"
+            },
+            {
+              "name": "code",
+              "value": "={{ $('Prepare data').item.json.code }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -528,
+        -64
+      ],
+      "id": "0f018eef-93d7-4c4e-93e7-6fb489ec0f33",
+      "name": "Check if license is valid1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b4466003-ede7-4509-ac8b-2611e7a6a53d",
+              "leftValue": "={{ $('Webhook').item.json.body.web_type }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        400,
+        -144
+      ],
+      "id": "72e065e8-cf49-49ac-9990-667670bf1c81",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Webhook').item.json.body.web_type }}",
+                    "rightValue": "laravel",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "3d525976-a143-4ecc-bca9-2a405bfe620d"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "laravel"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "e0ee3638-64c0-4864-9b1a-e1dc53640ef6",
+                    "leftValue": "={{ $('Webhook').item.json.body.web_type }}",
+                    "rightValue": "=laravel",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "other"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        592,
+        -192
+      ],
+      "id": "4ea3fef6-9742-4024-98ea-f90082dbabcc",
+      "name": "Switch3"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Prepare data').item.json.website }}/blog/get-post/{{ $json.id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        784,
+        -208
+      ],
+      "id": "dfcaca01-340f-4a02-a5e4-02d63c71c46f",
+      "name": "Get post content laravel"
     }
   ],
   "connections": {
@@ -784,7 +1024,7 @@
       "main": [
         [
           {
-            "node": "Check if license is valid",
+            "node": "If2",
             "type": "main",
             "index": 0
           }
@@ -824,7 +1064,7 @@
         [],
         [
           {
-            "node": "Get post content",
+            "node": "If",
             "type": "main",
             "index": 0
           }
@@ -1140,6 +1380,100 @@
           }
         ]
       ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch2": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if license is valid1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Switch3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get post content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch3": {
+      "main": [
+        [
+          {
+            "node": "Get post content laravel",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get post content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get post content laravel": {
+      "main": [
+        [
+          {
+            "node": "Data Blog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -1152,7 +1486,7 @@
     "callerPolicy": "workflowsFromSameOwner"
   },
   "triggerCount": 2,
-  "versionId": "3e628770-4756-414f-a478-c79e3b38b0a0",
+  "versionId": "c41c6647-426e-445e-baff-89c7a2c94b78",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

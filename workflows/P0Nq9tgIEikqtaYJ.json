@@ -1,0 +1,215 @@
+{
+  "id": "P0Nq9tgIEikqtaYJ",
+  "name": "SF - Error Animation Explainer",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "9c504895-dff0-4136-aba5-60723ffa4951",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "const execution = $('get_execution_data').first().json;\nconst runData = execution.data.resultData.runData;\n\nconst webhookNode = runData[\"Webhook\"];\nconst webhookBody = webhookNode[0].data.main[0][0].json.body;\n\nconst failedNode = execution.data.resultData.error.node.name;\n\nreturn [{ json: {\n  folderName: webhookBody.folderName,\n  status: \"failed\",\n  stage: \"video_generation\",\n  error: execution.data.resultData.error.message,\n  node: failedNode\n} }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "7129293e-409e-44ae-bd05-e237bea9fc63",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "url": "={{ $vars.N8N_URL }}/api/v1/executions/{{ $json.execution.id }}?includeData=true&redactExecutionData=false",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "CF-Access-Client-Id",
+              "value": "df7b356ab8469e73180a34f316943468.access"
+            },
+            {
+              "name": "CF-Access-Client-Secret",
+              "value": "ce5fe761d797f0712211aee26d2ae52cc51d9d629bf8a3f13e9c7c47c166783c"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        192,
+        0
+      ],
+      "id": "f171846b-139a-46c4-89b3-7eab539fa551",
+      "name": "get_execution_data",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2hCmYkPk4c38hqCz",
+          "name": "n8n API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SAAS_API }}/api/explainer/video",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "folderName",
+              "value": "={{ $json.folderName }}"
+            },
+            {
+              "name": "status",
+              "value": "={{ $json.status }}"
+            },
+            {
+              "name": "error",
+              "value": "={{ $json.error }}"
+            },
+            {
+              "name": "node",
+              "value": "={{ $json.node }}"
+            },
+            {
+              "name": "stage",
+              "value": "={{ $json.stage }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        640,
+        128
+      ],
+      "id": "e73ead27-384e-41e7-9a7b-559553b61efd",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "command": "=cd ../../shared\nrm -rf {{ $json.folderName }}"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        640,
+        -96
+      ],
+      "id": "5b311f6a-dab2-4c67-9d95-93c101d8cdf3",
+      "name": "Execute Command"
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0A81N03JKS",
+          "mode": "list",
+          "cachedResultName": "sf-error-monitoring"
+        },
+        "text": "=*Environtment:* n8n Development\n*Workflow:* {{ $json.workflow.name }}\n*Execution:* {{ $json.execution.url }}\n*Node:* {{ $json.execution.lastNodeExecuted }}\n*Time:* {{ $now }}\n*Message:* {{ $json.execution.error.message }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false,
+          "mrkdwn": true
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        192,
+        208
+      ],
+      "id": "0ced3df0-d406-42e0-940e-20ff7f245289",
+      "name": "Send a message",
+      "webhookId": "88b03bcb-f4b4-40e2-86dc-382fbe8c85d3",
+      "credentials": {
+        "slackApi": {
+          "id": "OLSn2aic7DIB7E1z",
+          "name": "SF - Slack Bot"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "get_execution_data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_execution_data": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "triggerCount": 0,
+  "versionId": "a167ac73-3e8e-4be0-96f5-8b35b3f375d1",
+  "owner": {
+    "type": "team",
+    "teamId": "UNcEOCawQV9ZsxYR",
+    "teamName": "SynergizeFlow"
+  },
+  "parentFolderId": "xaH2LdkpgOsNAAj6",
+  "isArchived": false
+}

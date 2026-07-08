@@ -282,8 +282,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        1936,
-        -432
+        2096,
+        288
       ],
       "id": "24f5082d-ff27-4d91-93fd-8eded5035a2b",
       "name": "If horizontal"
@@ -329,8 +329,8 @@
       "type": "n8n-nodes-base.readWriteFile",
       "typeVersion": 1,
       "position": [
-        2160,
-        -288
+        2320,
+        432
       ],
       "id": "890f9535-fd82-4cb8-b953-c179be0fa377",
       "name": "Read/Write Files from Disk3"
@@ -351,8 +351,8 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1,
       "position": [
-        2384,
-        -288
+        2544,
+        432
       ],
       "id": "eb8edb0f-956f-425f-9ac5-db4411e3815c",
       "name": "Analyze audio",
@@ -381,8 +381,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        2608,
-        -288
+        2768,
+        432
       ],
       "id": "e4811d50-2bcd-4ccc-849f-368e777e1fb0",
       "name": "Speech text"
@@ -400,8 +400,8 @@
       "type": "n8n-nodes-base.convertToFile",
       "typeVersion": 1.1,
       "position": [
-        2800,
-        -288
+        2960,
+        432
       ],
       "id": "edcb5c9f-3a72-4779-b434-460eb4176621",
       "name": "Convert to File",
@@ -440,8 +440,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        2160,
-        -752
+        2224,
+        -336
       ],
       "id": "89a730c0-3973-4797-874d-7b74c0770aa7",
       "name": "Edit Fields2"
@@ -454,8 +454,8 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        2368,
-        -752
+        2432,
+        -336
       ],
       "id": "8626c959-5c32-433d-b88d-59c278b63c14",
       "name": "Split Out1"
@@ -467,8 +467,8 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        2576,
-        -752
+        2640,
+        -336
       ],
       "id": "797546e6-de61-424b-b5f0-ae7508dd92eb",
       "name": "Loop Over Items2"
@@ -480,8 +480,8 @@
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
       "position": [
-        2784,
-        -656
+        2848,
+        -240
       ],
       "id": "0a1b9b21-c29b-45ab-af62-45ee9f9de87c",
       "name": "Execute Command2"
@@ -495,21 +495,21 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        2992,
-        -656
+        3056,
+        -240
       ],
       "id": "01884123-8080-4946-bd7f-5b01f6becd4b",
       "name": "Edit Fields3"
     },
     {
       "parameters": {
-        "jsCode": "// Input: items array dimana setiap item memiliki:\n//   - $json.subtitle (teks subtitle dari AI Agent)\n//   - $json.audio_duration (durasi dalam detik, dari ffprobe)\n//   - $json.step (nomor step)\n\nconst header = `[Script Info]\nTitle: Generated Subtitle\nScriptType: v4.00+\nWrapStyle: 0\nScaledBorderAndShadow: yes\nYCbCr Matrix: None\nPlayResX: 1920\nPlayResY: 1080\n\n[V4+ Styles]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\nStyle: Default,Arial,52,&H00FFFFFF,&H000000FF,&H00000000,&H80000000,-1,0,0,0,100,100,0,0,1,3,1,2,20,20,40,1\n\n[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text`;\n\nfunction formatTime(seconds) {\n  const h = Math.floor(seconds / 3600);\n  const m = Math.floor((seconds % 3600) / 60);\n  const s = Math.floor(seconds % 60);\n  const cs = Math.round((seconds % 1) * 100);\n  return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}.${String(cs).padStart(2, '0')}`;\n}\n\nlet currentTime = 0;\nconst dialogueLines = [];\n\nfor (const item of items) {\n  const duration = parseFloat(item.json.audio_duration);\n  const startTime = formatTime(currentTime);\n  const endTime = formatTime(currentTime + duration);\n  const text = item.json.subtitle;\n  \n  dialogueLines.push(`Dialogue: 0,${startTime},${endTime},Default,,0,0,0,,${text}`);\n  currentTime += duration;\n}\n\nconst assContent = header + '\\n' + dialogueLines.join('\\n');\n\nreturn [\n  {\n    json: {},\n    binary: {\n      subtitle_file: {\n        data: Buffer.from(assContent).toString('base64'),\n        mimeType: 'text/plain',\n        fileName: 'subtitle.ass',\n      }\n    }\n  }\n];\n"
+        "jsCode": "const orientation = $('Webhook').first().json.body.orientation;\nconst isHorizontal = orientation === 'horizontal';\n\nconst width = isHorizontal ? 1920 : 1080;\nconst height = isHorizontal ? 1080 : 1920;\nconst fontSize = isHorizontal ? 40 : 42;\nconst marginL = isHorizontal ? 80 : 50;\nconst marginR = isHorizontal ? 80 : 50;\nconst marginV = isHorizontal ? 70 : 120;\nconst maxChars = isHorizontal ? 52 : 30;\nconst maxWords = isHorizontal ? 7 : 5;\nconst subtitleDelay = 0.15;\n\nconst header = `[Script Info]\nTitle: Generated Subtitle\nScriptType: v4.00+\nWrapStyle: 0\nScaledBorderAndShadow: yes\nYCbCr Matrix: None\nPlayResX: ${width}\nPlayResY: ${height}\n\n[V4+ Styles]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\nStyle: Default,Arial,${fontSize},&H00FFFFFF,&H000000FF,&H00000000,&H80000000,-1,0,0,0,100,100,0,0,1,3,1,2,${marginL},${marginR},${marginV},1\n\n[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text`;\n\nfunction formatTime(seconds) {\n  const safe = Math.max(0, seconds);\n  const h = Math.floor(safe / 3600);\n  const m = Math.floor((safe % 3600) / 60);\n  const s = Math.floor(safe % 60);\n  const cs = Math.round((safe % 1) * 100);\n  return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}.${String(cs).padStart(2, '0')}`;\n}\n\nfunction cleanText(value) {\n  return String(value || '')\n    .replace(/[{}]/g, '')\n    .replace(/\\[[^\\]]+\\]/g, '')\n    .replace(/\\s+/g, ' ')\n    .trim();\n}\n\nfunction chunkText(text) {\n  const words = cleanText(text).split(' ').filter(Boolean);\n  const chunks = [];\n  let chunk = [];\n\n  for (const word of words) {\n    const next = [...chunk, word];\n    const nextText = next.join(' ');\n\n    if (chunk.length && (next.length > maxWords || nextText.length > maxChars)) {\n      chunks.push(chunk.join(' '));\n      chunk = [word];\n    } else {\n      chunk = next;\n    }\n  }\n\n  if (chunk.length) chunks.push(chunk.join(' '));\n  return chunks;\n}\n\nlet currentTime = 0;\nconst dialogueLines = [];\n\nfor (const item of items) {\n  const duration = parseFloat(item.json.audio_duration);\n  const chunks = chunkText(item.json.subtitle);\n  const usableStart = currentTime + subtitleDelay;\n  const usableEnd = currentTime + duration;\n  const usableDuration = Math.max(0.1, usableEnd - usableStart);\n  const chunkDuration = usableDuration / Math.max(1, chunks.length);\n\n  chunks.forEach((chunk, index) => {\n    const start = usableStart + index * chunkDuration;\n    const end = index === chunks.length - 1\n      ? usableEnd\n      : usableStart + (index + 1) * chunkDuration;\n\n    dialogueLines.push(`Dialogue: 0,${formatTime(start)},${formatTime(end)},Default,,0,0,0,,${chunk}`);\n  });\n\n  currentTime += duration;\n}\n\nconst assContent = header + '\\n' + dialogueLines.join('\\n');\n\nreturn [\n  {\n    json: {},\n    binary: {\n      subtitle_file: {\n        data: Buffer.from(assContent).toString('base64'),\n        mimeType: 'text/plain',\n        fileName: 'subtitle.ass',\n      }\n    }\n  }\n];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2784,
-        -848
+        2848,
+        -432
       ],
       "id": "01f0296a-538f-41c5-acee-cfff470d0068",
       "name": "Code in JavaScript1"
@@ -517,14 +517,14 @@
     {
       "parameters": {
         "content": "## Generate subtitle \n**Double click** to edit me. [Guide](https://docs.n8n.io/workflows/components/sticky-notes/)",
-        "height": 816,
+        "height": 480,
         "width": 1808,
         "color": 3
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        1856,
-        -896
+        1872,
+        -496
       ],
       "typeVersion": 1,
       "id": "68664b31-3968-473d-9662-fd623bebb2ac",
@@ -740,6 +740,10 @@
             {
               "name": "video_url",
               "value": "=https://assets.synergizeflow.com/explainer/{{ $('Webhook').item.json.body.folderName }}.mp4"
+            },
+            {
+              "name": "status",
+              "value": "success"
             }
           ]
         },
@@ -1007,13 +1011,7 @@
     },
     "If horizontal": {
       "main": [
-        [
-          {
-            "node": "Edit Fields2",
-            "type": "main",
-            "index": 0
-          }
-        ],
+        [],
         [
           {
             "node": "Read/Write Files from Disk3",
@@ -1059,13 +1057,7 @@
     },
     "Convert to File": {
       "main": [
-        [
-          {
-            "node": "Read/Write Files from Disk4",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "Edit Fields2": {
@@ -1324,7 +1316,7 @@
       "main": [
         [
           {
-            "node": "If horizontal",
+            "node": "Edit Fields2",
             "type": "main",
             "index": 0
           }
@@ -1346,11 +1338,11 @@
     "callerPolicy": "workflowsFromSameOwner",
     "availableInMCP": false,
     "saveManualExecutions": true,
-    "errorWorkflow": "4otmc6jILN7VL0Z9",
+    "errorWorkflow": "P0Nq9tgIEikqtaYJ",
     "saveDataSuccessExecution": "all"
   },
   "triggerCount": 1,
-  "versionId": "39829383-fe9c-4761-8006-79ba284c213a",
+  "versionId": "51858180-5901-40c4-a9ba-67d035da3979",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

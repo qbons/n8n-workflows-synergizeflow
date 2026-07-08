@@ -457,7 +457,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -2112,
+        -1824,
         -1984
       ],
       "id": "95d9333c-ea12-4cc8-88f4-73bdf5027891",
@@ -484,7 +484,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -2480,
+        -2192,
         -1808
       ],
       "id": "44991346-703b-432e-9474-acab455d2fd2",
@@ -504,7 +504,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -2224,
+        -1936,
         -1808
       ],
       "id": "4fcb86dc-6559-47ab-b0df-7bd19d0eb3dd",
@@ -522,7 +522,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -1984,
+        -1696,
         -1808
       ],
       "id": "e897ef99-4f2a-49dc-9ac2-b9cd0d496891",
@@ -553,7 +553,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -1744,
+        -1456,
         -1408
       ],
       "id": "7a7176f1-3e35-41e1-9116-7faf3a2d74c6",
@@ -584,7 +584,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -1744,
+        -1456,
         -1808
       ],
       "id": "cf01ed6c-98d7-4494-92ac-5be844b368e2",
@@ -611,7 +611,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -2480,
+        -2192,
         -1600
       ],
       "id": "29dc984a-214f-4d03-9df5-954eb4cced35",
@@ -631,7 +631,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -2224,
+        -1936,
         -1600
       ],
       "id": "4e1d412a-18d4-48d8-8786-ab0bf7d6c72f",
@@ -649,7 +649,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -1984,
+        -1696,
         -1600
       ],
       "id": "f017adb3-e1ef-42ec-9725-fc4f0bc61bad",
@@ -680,7 +680,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -1744,
+        -1456,
         -1600
       ],
       "id": "de64666d-87e4-4881-804f-ec25dce895f0",
@@ -708,8 +708,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -2480,
-        -1408
+        -2192,
+        -1344
       ],
       "id": "63b7a65b-c99e-4cf0-9496-5b9501cf43db",
       "name": "Get post content"
@@ -725,8 +725,8 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3,
       "position": [
-        -2272,
-        -1232
+        -1840,
+        -1136
       ],
       "id": "cd8aea8f-418b-4e75-81fd-c8016ec63868",
       "name": "AI Agent"
@@ -745,8 +745,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleVertex",
       "typeVersion": 1,
       "position": [
-        -2272,
-        -1056
+        -1984,
+        -976
       ],
       "id": "a91d4fd0-20db-4c3c-b7d9-f7835f4804a4",
       "name": "Google Vertex Chat Model",
@@ -779,8 +779,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -2480,
-        -1232
+        -2192,
+        -1056
       ],
       "id": "cc71988b-f4fb-44f6-a2a6-3e99331afebb",
       "name": "Get internal post content"
@@ -792,7 +792,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2096,
+        -1808,
         -1408
       ],
       "id": "0fd6d960-ad89-42e9-8c76-6b67a86a6de4",
@@ -800,13 +800,13 @@
     },
     {
       "parameters": {
-        "jsCode": "const payload = {\n  status: \"READY\",\n  originalUrl: $('Get internal post content').first().json.link,\n  title: {\n    text: $('Get internal post content').first().json.title\n  },\n};\n\nif ($('Get internal post content').first().json.image !== false) {\n  payload['thumbnails'] = [{\n    url:  $('Get internal post content').first().json.image\n  }]\n}\n\nreturn [\n  {\n    json: {\n      author: \"urn:li:person:\" + $('Configuration post settings').first().json.linkedin_id,\n      lifecycleState: \"PUBLISHED\",\n      specificContent: {\n        \"com.linkedin.ugc.ShareContent\": {\n            \"shareCommentary\": {\n                \"text\": $input.first().json.output\n            },\n            \"shareMediaCategory\": \"ARTICLE\",\n            \"media\": [\n                payload\n            ]\n        }\n    },\n    \"visibility\": {\n        \"com.linkedin.ugc.MemberNetworkVisibility\": $('Configuration post settings').first().json.content_visibility\n    }\n}\n  },\n];"
+        "jsCode": "const payload = {\n  status: \"READY\",\n  originalUrl: $('merge node').first().json.link,\n  title: {\n    text: $('merge node').first().json.title\n  },\n};\n\nif ($('merge node').first().json.image !== false) {\n  payload['thumbnails'] = [{\n    url:  $('merge node').first().json.image\n  }]\n}\n\nreturn [\n  {\n    json: {\n      author: \"urn:li:person:\" + $('Configuration post settings').first().json.linkedin_id,\n      lifecycleState: \"PUBLISHED\",\n      specificContent: {\n        \"com.linkedin.ugc.ShareContent\": {\n            \"shareCommentary\": {\n                \"text\": $input.first().json.output\n            },\n            \"shareMediaCategory\": \"ARTICLE\",\n            \"media\": [\n                payload\n            ]\n        }\n    },\n    \"visibility\": {\n        \"com.linkedin.ugc.MemberNetworkVisibility\": $('Configuration post settings').first().json.content_visibility\n    }\n}\n  },\n];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1952,
-        -1232
+        -1552,
+        -1136
       ],
       "id": "93894966-69ee-4dba-ba19-75f87b40de4b",
       "name": "Internal article payload formater"
@@ -814,13 +814,13 @@
     {
       "parameters": {
         "content": "### Publish to personal account",
-        "height": 1072,
-        "width": 944
+        "height": 1200,
+        "width": 1312
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -2512,
-        -2000
+        -2576,
+        -2048
       ],
       "typeVersion": 1,
       "id": "b73e4766-3b7b-4a42-ab2b-b222a4efd69a",
@@ -829,14 +829,14 @@
     {
       "parameters": {
         "content": "### Publish to business page",
-        "height": 1152,
-        "width": 2256,
+        "height": 1216,
+        "width": 2832,
         "color": 5
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -3248,
-        -256
+        -3824,
+        -320
       ],
       "typeVersion": 1,
       "id": "7f9ac3ae-12ba-4f1c-b1d1-d5b9b5bc7cb0",
@@ -1210,8 +1210,8 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3,
       "position": [
-        -3056,
-        592
+        -2896,
+        544
       ],
       "id": "8d22c7ea-34c7-4e11-a9d8-e7edde069939",
       "name": "AI Agent2"
@@ -1516,13 +1516,13 @@
     },
     {
       "parameters": {
-        "jsCode": "return [\n  {\n    json: {\n      title: $('Get internal post business content').first().json.title,\n      content: $('Get internal post business content').first().json.content,\n      image: $('Get internal post business content').first().json.image,\n      link: $('Get internal post business content').first().json.link,\n      text: $input.first().json.output\n    }\n  }\n]"
+        "jsCode": "return [\n  {\n    json: {\n      title: $('merge node1').first().json.title,\n      content: $('merge node1').first().json.content,\n      image: $('merge node1').first().json.image,\n      link: $('merge node1').first().json.link,\n      text: $input.first().json.output\n    }\n  }\n]"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2704,
-        592
+        -2608,
+        544
       ],
       "id": "e1b3c476-cd09-49a3-8c64-f02875bb8098",
       "name": "Format internat content"
@@ -1786,6 +1786,427 @@
       ],
       "id": "a927e2d5-512a-470d-9c02-bc6a4758ac9c",
       "name": "Share content image1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b4466003-ede7-4509-ac8b-2611e7a6a53d",
+              "leftValue": "={{ $('Publish receiver').item.json.body.web_type }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2544,
+        -1424
+      ],
+      "id": "c6ef37eb-f34e-4c94-9818-725b5991de74",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Publish receiver').item.json.body.web_type }}",
+                    "rightValue": "laravel",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "3d525976-a143-4ecc-bca9-2a405bfe620d"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "laravel"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "e0ee3638-64c0-4864-9b1a-e1dc53640ef6",
+                    "leftValue": "={{ $('Publish receiver').item.json.body.web_type }}",
+                    "rightValue": "=laravel",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "other"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -2400,
+        -1472
+      ],
+      "id": "20fde46e-01f3-45ac-8a41-61bfcaa0dec6",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.domain_name }}/blog/get-post/{{ $('Configuration post settings').item.json.article_id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2192,
+        -1472
+      ],
+      "id": "8070161a-d36d-424d-9b5c-c82c88aca586",
+      "name": "Get post content laravel"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b4466003-ede7-4509-ac8b-2611e7a6a53d",
+              "leftValue": "={{ $('Publish receiver').item.json.body.web_type }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2544,
+        -1168
+      ],
+      "id": "cd0663ae-e672-45db-8e1b-41e0042a113b",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Publish receiver').item.json.body.web_type }}",
+                    "rightValue": "laravel",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "3d525976-a143-4ecc-bca9-2a405bfe620d"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "laravel"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "e0ee3638-64c0-4864-9b1a-e1dc53640ef6",
+                    "leftValue": "={{ $('Publish receiver').item.json.body.web_type }}",
+                    "rightValue": "=laravel",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "other"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -2400,
+        -1232
+      ],
+      "id": "4d8eb33e-530b-4c11-bf67-a158ef14f5b0",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b4466003-ede7-4509-ac8b-2611e7a6a53d",
+              "leftValue": "={{ $('Publish receiver').item.json.body.web_type }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -3568,
+        544
+      ],
+      "id": "cfc388b2-8cc2-4882-8f18-2348930d2fa7",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Publish receiver').item.json.body.web_type }}",
+                    "rightValue": "laravel",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "3d525976-a143-4ecc-bca9-2a405bfe620d"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "laravel"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "e0ee3638-64c0-4864-9b1a-e1dc53640ef6",
+                    "leftValue": "={{ $('Publish receiver').item.json.body.web_type }}",
+                    "rightValue": "=laravel",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "other"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -3392,
+        448
+      ],
+      "id": "fb80a47b-e97c-4218-ba21-eb12946100bd",
+      "name": "Switch2"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.domain_name }}/blog/get-post/{{ $('Configuration post settings').item.json.article_id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -3216,
+        416
+      ],
+      "id": "62926a34-47a7-4a06-9dc5-fbd8a9bbd5d3",
+      "name": "Get post content laravel2"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.domain_name }}/blog/get-post/{{ $('Configuration post settings').item.json.article_id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2192,
+        -1200
+      ],
+      "id": "3fb76548-f1fb-4e07-8e33-9f614aa12c40",
+      "name": "Get post content laravel1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "28530808-b555-4cd9-90c7-726701b8e899",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "ae1c1bcb-e4d0-4c08-95ac-398abf0227e1",
+              "name": "content",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "25d44ca1-fe50-4540-abe2-919e31534bcf",
+              "name": "image",
+              "value": "={{ $json.image }}",
+              "type": "string"
+            },
+            {
+              "id": "b526b566-0faf-4c60-acf3-05495d3ea470",
+              "name": "link",
+              "value": "={{ $json.link }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2016,
+        -1136
+      ],
+      "id": "1936037a-dc95-438b-862b-bf44272ef34d",
+      "name": "merge node"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "28530808-b555-4cd9-90c7-726701b8e899",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "ae1c1bcb-e4d0-4c08-95ac-398abf0227e1",
+              "name": "content",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "25d44ca1-fe50-4540-abe2-919e31534bcf",
+              "name": "image",
+              "value": "={{ $json.image }}",
+              "type": "string"
+            },
+            {
+              "id": "b526b566-0faf-4c60-acf3-05495d3ea470",
+              "name": "link",
+              "value": "={{ $json.link }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3056,
+        544
+      ],
+      "id": "a2fa710d-d71a-4492-9911-e6745e97bde3",
+      "name": "merge node1"
     }
   ],
   "connections": {
@@ -1825,14 +2246,14 @@
         ],
         [
           {
-            "node": "Get post content",
+            "node": "If",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Get internal post content",
+            "node": "If1",
             "type": "main",
             "index": 0
           }
@@ -1867,7 +2288,7 @@
         ],
         [
           {
-            "node": "Get internal post business content",
+            "node": "If2",
             "type": "main",
             "index": 0
           }
@@ -2028,7 +2449,7 @@
       "main": [
         [
           {
-            "node": "AI Agent",
+            "node": "merge node",
             "type": "main",
             "index": 0
           }
@@ -2379,7 +2800,7 @@
       "main": [
         [
           {
-            "node": "AI Agent2",
+            "node": "merge node1",
             "type": "main",
             "index": 0
           }
@@ -2529,6 +2950,169 @@
           }
         ]
       ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get post content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Get post content laravel",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get post content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get post content laravel": {
+      "main": [
+        [
+          {
+            "node": "Article payload formater",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get internal post content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Get post content laravel1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get internal post content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get internal post business content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch2": {
+      "main": [
+        [
+          {
+            "node": "Get post content laravel2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get internal post business content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get post content laravel2": {
+      "main": [
+        [
+          {
+            "node": "merge node1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get post content laravel1": {
+      "main": [
+        [
+          {
+            "node": "merge node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "merge node": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "merge node1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -2542,7 +3126,7 @@
     "saveManualExecutions": true
   },
   "triggerCount": 1,
-  "versionId": "c9caeb19-77ab-40b2-8f9d-749161c663b0",
+  "versionId": "4b9a6a76-a2a1-40cb-9d29-65c53f946614",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",
