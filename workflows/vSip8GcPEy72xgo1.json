@@ -1,12 +1,11 @@
 {
   "id": "vSip8GcPEy72xgo1",
-  "name": "SF - Animation Explainer Image Generator",
+  "name": "3. SF - Animation Explainer Image Generator",
   "nodes": [
     {
       "parameters": {
         "httpMethod": "POST",
         "path": "v1/animation-explainer/image-generation",
-        "responseMode": "responseNode",
         "options": {}
       },
       "type": "n8n-nodes-base.webhook",
@@ -28,8 +27,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        176,
-        -16
+        160,
+        272
       ],
       "id": "c7cd573e-f6c1-4c95-a9dd-ce282e5d6bc4",
       "name": "Edit Fields"
@@ -49,87 +48,6 @@
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "https://api.kie.ai/api/v1/jobs/createTask",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={\n   \"model\": \"qwen/text-to-image\",\n  \"callBackUrl\": \"{{ $vars.SAAS_API }}/api/explainer/kieai-callback?explainer_id={{ $('Weebhook').item.json.body.explainer_id }}&step={{ $runIndex+1 }}\",\n   \"input\": {\n      \"prompt\": {{ JSON.stringify($json.prompt) }},\n      \"image_size\": {{ JSON.stringify($json.image_size) }},\n      \"guidance_scale\": 10,\n      \"enable_safety_checker\": true,\n      \"output_format\": {{ JSON.stringify($json.output_format) }},\n      \"negative_prompt\": {{ JSON.stringify($json.negative_prompt) }},\n      \"seed\": {{ $json.seed }}\n   }\n}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.4,
-      "position": [
-        592,
-        128
-      ],
-      "id": "f707d494-afc0-4aa0-9bbf-f659a7898468",
-      "name": "HTTP Request",
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "SFhjYsXsyVcRhxXr",
-          "name": "SF - KIE AI"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "amount": 1
-      },
-      "type": "n8n-nodes-base.wait",
-      "typeVersion": 1.1,
-      "position": [
-        992,
-        128
-      ],
-      "id": "5eb654d5-aea4-4517-8b1a-dadb8a4b6e0b",
-      "name": "Wait",
-      "webhookId": "8e188987-4a02-4d7c-abea-a05be40e5093"
-    },
-    {
-      "parameters": {
-        "aggregate": "aggregateAllItemData",
-        "destinationFieldName": "steps",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.aggregate",
-      "typeVersion": 1,
-      "position": [
-        592,
-        -16
-      ],
-      "id": "ceaadf6b-c024-4999-8c80-8e539fa6e3e2",
-      "name": "Aggregate"
-    },
-    {
-      "parameters": {
-        "jsCode": "const step = $('Split Out').all().at($runIndex)?.json;\nconst response = $input.first().json;\n\nif (!step) {\n  return [{\n    json: {\n      step: null,\n      image: {\n        kie_ai_status: \"failed\",\n        kie_ai_error: `Step tidak ditemukan untuk runIndex ${$runIndex}`\n      }\n    }\n  }];\n}\n\nconst taskId = response?.data?.taskId;\nconst code = response?.code;\nconst msg = response?.msg || \"Unknown KieAI error\";\n\nif (code !== 200 || !taskId) {\n  return [{\n    json: {\n      ...step,\n      image: {\n        ...step.image,\n        kie_ai_status: \"failed\",\n        kie_ai_error: `KieAI createTask failed: ${msg}`,\n        kie_ai_response: response\n      }\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    ...step,\n    image: {\n      ...step.image,\n      kie_ai_task_id: taskId,\n      kie_ai_status: \"pending\"\n    }\n  }\n}];"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        784,
-        128
-      ],
-      "id": "4db4936d-74f5-43de-86d7-cedca5c7f551",
-      "name": "Code in JavaScript"
-    },
-    {
-      "parameters": {
-        "options": {}
-      },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.5,
-      "position": [
-        1232,
-        128
-      ],
-      "id": "68b61eed-c391-4aad-96d4-e5bb5001f154",
-      "name": "Respond to Webhook"
-    },
-    {
-      "parameters": {
         "fieldToSplitOut": "body.steps",
         "options": {}
       },
@@ -144,16 +62,16 @@
     },
     {
       "parameters": {
-        "jsCode": "const steps = $json.steps || [];\n\nconst failedSteps = steps\n  .filter(step => step.image?.kie_ai_status === \"failed\")\n  .map(step => ({\n    step: step.step,\n    error: step.image?.kie_ai_error || \"Unknown image generation error\"\n  }));\n\nif (failedSteps.length > 0) {\n  return [{\n    json: {\n      success: false,\n      stage: \"image_generation\",\n      error: \"One or more image tasks failed to start\",\n      failed_steps: failedSteps,\n      steps\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    success: true,\n    steps\n  }\n}];"
+        "jsCode": "return $input.all().map((item) => {\n  const step = item.json;\n\n  return {\n    json: {\n      ...step,\n      step: Number(step.step),\n      image: {\n        ...(step.image || {}),\n    reference_images: Array.isArray(step.image?.reference_images) ?step.image.reference_images : [],\n    reference_usage:step.image?.reference_usage || \"\",\n    reference_strength:step.image?.reference_strength || \"subtle\",\n    seed: 12345,\n    output_format: \"png\"\n  },\n  has_reference_images: Array.isArray(step.image?.reference_images) && step.image.reference_images.length > 0\n    },\n  };\n});"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        800,
+        176,
         -16
       ],
-      "id": "64bbc139-f473-45f9-a32a-5b8b388437f8",
-      "name": "Code in JavaScript1"
+      "id": "5cc69e10-0932-481c-8035-a14beb3eef60",
+      "name": "Normalize Step"
     },
     {
       "parameters": {
@@ -166,9 +84,9 @@
           },
           "conditions": [
             {
-              "id": "48be23e4-cae0-45bb-ae2f-e0e37e05e0c4",
-              "leftValue": "={{ $json.success }}",
-              "rightValue": false,
+              "id": "805143bc-7da6-4b7a-b6c4-60bd3cb81901",
+              "leftValue": "={{ $json.has_reference_images }}",
+              "rightValue": true,
               "operator": {
                 "type": "boolean",
                 "operation": "equals"
@@ -182,26 +100,291 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        992,
-        -16
+        592,
+        288
       ],
-      "id": "f0f48052-279e-4916-854d-87d9fee022fd",
-      "name": "If error"
+      "id": "2b5f6b6a-3d13-492f-94a7-56b873bea332",
+      "name": "If Has Reference"
     },
     {
       "parameters": {
-        "options": {
-          "responseCode": 500
-        }
+        "method": "POST",
+        "url": "https://api.kie.ai/api/v1/jobs/createTask",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n   \"model\": \"qwen/text-to-image\",\n  \"callBackUrl\": \"{{ $vars.SAAS_API }}/api/explainer/kieai-callback?explainer_id={{ $('Weebhook').item.json.body.explainer_id }}&step={{ $json.step }}\",\n   \"input\": {\n      \"prompt\": {{ JSON.stringify($json.image.prompt) }},\n      \"image_size\": {{ JSON.stringify($json.image.image_size) }},\n      \"guidance_scale\": 10,\n      \"enable_safety_checker\": true,\n      \"output_format\": {{ JSON.stringify($json.image.output_format) }},\n      \"negative_prompt\": {{ JSON.stringify($json.image.negative_prompt) }},\n      \"seed\": {{ $json.image.seed }}\n   }\n}",
+        "options": {}
       },
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1.5,
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        800,
+        416
+      ],
+      "id": "f707d494-afc0-4aa0-9bbf-f659a7898468",
+      "name": "Qwen Text To Image",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "SFhjYsXsyVcRhxXr",
+          "name": "SF - KIE AI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const step = $json;\nconst body = $('Weebhook').first().json.body || {};\n\nconst allReferences = Array.isArray(body.reference_images)\n  ? body.reference_images\n  : [];\n\nconst selectedIds = Array.isArray(step.image?.reference_images)\n  ? step.image.reference_images\n  : [];\n\nconst maxReferencesPerScene = 4;\n\nconst selectedReferences = selectedIds\n  .map((id) => allReferences.find((ref) => String(ref.id) === String(id)))\n  .filter(Boolean)\n  .slice(0, maxReferencesPerScene);\n\nif (!selectedReferences.length) {\n  return [{\n    json: {\n      step_data: step,\n      reference_error: \"No matching reference image details found\"\n    }\n  }];\n}\n\nreturn selectedReferences.map((reference, index) => ({\n  json: {\n    step_data: step,\n    reference,\n    reference_index: index + 1,\n    total_references: selectedReferences.length,\n    reference_warning: selectedIds.length > maxReferencesPerScene\n      ? `Only first ${maxReferencesPerScene} reference images were used for this scene`\n      : \"\"\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        128
+      ],
+      "id": "32eac140-afc6-4b43-9fb9-40777facf08e",
+      "name": "Prepare Reference Downloads"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f5448f7c-6545-41cf-9a5f-4ca1c5b614b3",
+              "leftValue": "={{ !!$json.reference_error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1008,
+        128
+      ],
+      "id": "daec9eff-e1a7-4a72-bdeb-0c1325a6b27d",
+      "name": "If Reference Error"
+    },
+    {
+      "parameters": {
+        "jsCode": "const step = $json.step_data || $json;\nconst body = $('Weebhook').first().json.body || {};\nconst explainerId = body.explainer_id;\n\nconst error = $json.reference_error || 'Reference preparation failed';\n\nconst image = {\n  ...(step?.image || {}),\n  kie_ai_status: 'failed',\n  kie_ai_error: error,\n  generation_model: 'gemini',\n};\n\nreturn [{\n  json: {\n    explainer_id: explainerId,\n    step: step?.step || null,\n    provider: 'gemini',\n    status: 'failed',\n    image_url: null,\n    key: null,\n    error,\n    image,\n    step_payload: step\n      ? {\n          ...step,\n          image,\n        }\n      : null,\n  },\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1264,
+        64
+      ],
+      "id": "c573c598-82cb-4bad-9826-8ef738a00523",
+      "name": "Map Gemini Failed"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.reference.url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1280,
+        224
+      ],
+      "id": "f15e72cf-25a8-4756-9a48-1f7de4f2e215",
+      "name": "Download Reference Image"
+    },
+    {
+      "parameters": {
+        "jsCode": "const source = $json.step_data\n  ? $json\n  : $('Prepare Reference Downloads').all()[$itemIndex]?.json;\n\nconst binary = $input.first().binary?.data;\n\nif (!source?.step_data || !binary) {\n  return [{\n    json: {\n      step_data: source?.step_data,\n      reference_error: `Reference binary missing for ${source?.reference?.id || \"unknown\"}`\n    }\n  }];\n}\n\nconst buffer = await this.helpers.getBinaryDataBuffer(0, \"data\");\nconst base64 = buffer.toString(\"base64\");\n\nreturn [{\n  json: {\n    step_data: source.step_data,\n    reference: source.reference,\n    reference_index: source.reference_index,\n    total_references: source.total_references,\n    reference_warning: source.reference_warning || \"\",\n    part: {\n      inlineData: {\n        mimeType: source.reference?.mime || binary.mimeType || \"image/png\",\n        data: base64\n      }\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1488,
+        224
+      ],
+      "id": "30768385-b1b2-4a43-b66c-3e1ed708c54e",
+      "name": "Prepare Reference Part"
+    },
+    {
+      "parameters": {
+        "jsCode": "const references = $json.references || [];\nconst first = references[0];\nconst step = first?.step_data;\n\nif (!step) {\n  return [{\n    json: {\n      image: {\n        kie_ai_status: \"failed\",\n        kie_ai_error: \"Step data missing while preparing Gemini payload\"\n      }\n    }\n  }];\n}\n\nconst body = $('Weebhook').first().json.body || {};\nconst orientation = body.orientation || \"horizontal\";\nconst visualStyle = body.visual_style || \"\";\nconst aspectRatio = orientation === \"vertical\" ? \"9:16\" : \"16:9\";\n\nconst referenceSummary = references.map((item, index) => {\n  const ref = item.reference || {};\n  return [\n    `Reference ${index + 1}:`,\n    `ID: ${ref.id}`,\n    `Type: ${ref.type || \"other\"}`,\n    `Label: ${ref.label || \"\"}`,\n    `Description: ${ref.description || \"\"}`,\n    `Usage note: ${ref.usage_note || \"\"}`,\n    `Sensitive note: ${ref.sensitive_note || \"\"}`\n  ].join(\"\\n\");\n}).join(\"\\n\\n\");\n\nconst prompt = [\n  \"Create one image for an animated explainer scene.\",\n  \"\",\n  `Visual style: ${visualStyle}`,\n  `Scene prompt: ${step.image.prompt}`,\n  `Reference usage instruction: ${step.image.reference_usage || \"\"}`,\n  `Reference strength: ${step.image.reference_strength || \"normal\"}`,\n  \"\",\n  \"Reference image metadata:\",\n  referenceSummary,\n  \"\",\n  \"Use all attached reference images as visual guidance.\",\n  \"Integrate only the elements requested in the reference usage instruction.\",\n  \"Do not create a collage unless explicitly requested.\",\n  \"Preserve important identity cues such as logo colors, mascot shape, face identity, product UI, and readable brand text as much as possible.\",\n  \"If references conflict, prioritize the scene prompt and reference_usage instruction.\",\n  \"Generate one clean final scene image only. No explanation.\"\n].join(\"\\n\");\n\nconst parts = [\n  { text: prompt },\n  ...references\n    .map((item) => item.part)\n    .filter(Boolean)\n];\n\nreturn [{\n  json: {\n    ...step,\n    gemini_payload: {\n      contents: [\n        { parts }\n      ],\n      generationConfig: {\n        responseModalities: [\"image\"],\n        imageConfig: {\n          aspectRatio\n        }\n      }\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1904,
+        224
+      ],
+      "id": "21e2b28b-9fbe-4983-82bf-f19652171c2b",
+      "name": "Prepare Gemini Payload"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "references",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1696,
+        224
+      ],
+      "id": "c433cbfd-b301-43f6-978a-27f88912e593",
+      "name": "Aggregate Reference Parts"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $vars.GEMINI_PRO_IMAGE }}:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.gemini_payload) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2128,
+        224
+      ],
+      "id": "b5bce9ab-4932-4953-878d-d45fdaad4cce",
+      "name": "Gemini Generate Image",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "tURjQrWDQUUGEoyg",
+          "name": "SF - Gemini Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const step = $('Prepare Gemini Payload').all()[$itemIndex]?.json;\nconst response = $input.first().json;\n\nconst parts = response?.candidates?.[0]?.content?.parts || [];\nconst imagePart = parts.find((part) => part.inlineData?.data);\n\nif (!step) {\n  return [{\n    json: {\n      image: {\n        kie_ai_status: \"failed\",\n        kie_ai_error: `Step data not found for Gemini itemIndex ${$itemIndex}`\n      }\n    }\n  }];\n}\n\nif (!imagePart) {\n  return [{\n    json: {\n      ...step,\n      image: {\n        ...step.image,\n        kie_ai_status: \"failed\",\n        kie_ai_error: \"Gemini did not return an image\",\n        gemini_response: response\n      }\n    }\n  }];\n}\n\nreturn [{\n  json: {\n    ...step,\n    generated_image: {\n      mime: imagePart.inlineData.mimeType || \"image/png\",\n      data: imagePart.inlineData.data\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2336,
+        224
+      ],
+      "id": "47778bb3-0ffc-4276-af51-fde2b85543fc",
+      "name": "Extract Gemini Image"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$vars.SAAS_API}}/api/explainer/{{$('Weebhook').first().json.body.explainer_id}}/generated-images",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\nJSON.stringify({\n  step: $json.step,\n  mime: $json.generated_image.mime,\n  data: $json.generated_image.data\n})\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2544,
+        224
+      ],
+      "id": "36faaf9f-3ac6-43cd-8b5c-8c6a75315af5",
+      "name": "Upload Generated Image"
+    },
+    {
+      "parameters": {
+        "jsCode": "const step = $('If Has Reference').all()[$itemIndex]?.json;\nconst response = $input.first().json;\nconst body = $('Weebhook').first().json.body || {};\n\nconst explainerId = body.explainer_id;\n\nif (!step) {\n  return [{\n    json: {\n      explainer_id: explainerId,\n      step: null,\n      provider: 'qwen',\n      status: 'failed',\n      task_id: null,\n      error: `Step data not found for itemIndex ${$itemIndex}`,\n      image: {\n        kie_ai_status: 'failed',\n        kie_ai_error: `Step data not found for itemIndex ${$itemIndex}`,\n        generation_model: 'qwen',\n      },\n    },\n  }];\n}\n\nconst taskId = response?.data?.taskId;\nconst code = response?.code;\nconst msg = response?.msg || 'Unknown KieAI error';\n\nif (code !== 200 || !taskId) {\n  const error = `KieAI createTask failed: ${msg}`;\n\n  return [{\n    json: {\n      explainer_id: explainerId,\n      step: step.step,\n      provider: 'qwen',\n      status: 'failed',\n      task_id: null,\n      error,\n      response,\n      image: {\n        ...step.image,\n        kie_ai_status: 'failed',\n        kie_ai_error: error,\n        kie_ai_response: response,\n        generation_model: 'qwen',\n      },\n      step_payload: {\n        ...step,\n        image: {\n          ...step.image,\n          kie_ai_status: 'failed',\n          kie_ai_error: error,\n          kie_ai_response: response,\n          generation_model: 'qwen',\n        },\n      },\n    },\n  }];\n}\n\nconst image = {\n  ...step.image,\n  kie_ai_task_id: taskId,\n  kie_ai_status: 'pending',\n  generation_model: 'qwen',\n};\n\nreturn [{\n  json: {\n    explainer_id: explainerId,\n    step: step.step,\n    provider: 'qwen',\n    status: 'pending',\n    task_id: taskId,\n    image,\n    step_payload: {\n      ...step,\n      image,\n    },\n  },\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1024,
+        416
+      ],
+      "id": "812a02a1-0025-4c5a-99f0-39588b2462aa",
+      "name": "Map Qwen Callback Payload"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$vars.SAAS_API}}/api/explainer/image-generation-callback",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
       "position": [
         1232,
-        -16
+        416
       ],
-      "id": "8a1f6799-742f-43fb-b7d3-75314943baf3",
-      "name": "Respond to Webhook1"
+      "id": "d3909f1e-45de-4296-9e24-f93f088f2ba9",
+      "name": "Callback Backend - Qwen"
+    },
+    {
+      "parameters": {
+        "jsCode": "const step = $('Extract Gemini Image').all()[$itemIndex]?.json;\nconst response = $input.first().json;\nconst body = $('Weebhook').first().json.body || {};\n\nconst explainerId = body.explainer_id;\nconst url = response?.url || response?.data?.url;\nconst key = response?.key || response?.data?.key;\n\nif (!step || !url) {\n  const error = !step\n    ? `Step data not found for Gemini itemIndex ${$itemIndex}`\n    : 'Generated image upload failed';\n\n  return [{\n    json: {\n      explainer_id: explainerId,\n      step: step?.step || null,\n      provider: 'gemini',\n      status: 'failed',\n      image_url: null,\n      key: key || null,\n      error,\n      response,\n      image: {\n        ...(step?.image || {}),\n        kie_ai_status: 'failed',\n        kie_ai_error: error,\n        upload_response: response,\n        generation_model: 'gemini',\n      },\n      step_payload: step\n        ? {\n            ...step,\n            generated_image: undefined,\n            gemini_payload: undefined,\n            selected_references: undefined,\n            image: {\n              ...step.image,\n              kie_ai_status: 'failed',\n              kie_ai_error: error,\n              upload_response: response,\n              generation_model: 'gemini',\n            },\n          }\n        : null,\n    },\n  }];\n}\n\nconst image = {\n  ...step.image,\n  kie_ai_status: 'done',\n  kie_ai_image_url: url,\n  generation_model: 'gemini',\n};\n\nreturn [{\n  json: {\n    explainer_id: explainerId,\n    step: step.step,\n    provider: 'gemini',\n    status: 'done',\n    image_url: url,\n    key: key || null,\n    image,\n    step_payload: {\n      ...step,\n      selected_references: undefined,\n      generated_image: undefined,\n      gemini_payload: undefined,\n      image,\n    },\n  },\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2752,
+        224
+      ],
+      "id": "5a6f4854-1560-40f0-87df-ffa4eaa5ce5a",
+      "name": "Map Gemini Callback Payload"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$vars.SAAS_API}}/api/explainer/image-generation-callback",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2944,
+        224
+      ],
+      "id": "dee71389-4880-47dc-97a4-c1450dd2b84f",
+      "name": "Callback Backend - Gemini"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$vars.SAAS_API}}/api/explainer/image-generation-callback",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1488,
+        64
+      ],
+      "id": "7467cfbe-c5af-416f-9fa5-04984adbcaf4",
+      "name": "Callback Backend - Gemini Failed"
     }
   ],
   "connections": {
@@ -218,71 +401,15 @@
     },
     "Edit Fields": {
       "main": [
-        [
-          {
-            "node": "Loop Over Items",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "Loop Over Items": {
       "main": [
+        [],
         [
           {
-            "node": "Aggregate",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "HTTP Request",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "HTTP Request": {
-      "main": [
-        [
-          {
-            "node": "Code in JavaScript",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Wait": {
-      "main": [
-        [
-          {
-            "node": "Loop Over Items",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Aggregate": {
-      "main": [
-        [
-          {
-            "node": "Code in JavaScript1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Code in JavaScript": {
-      "main": [
-        [
-          {
-            "node": "Wait",
+            "node": "If Has Reference",
             "type": "main",
             "index": 0
           }
@@ -293,36 +420,219 @@
       "main": [
         [
           {
-            "node": "Edit Fields",
+            "node": "Normalize Step",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Code in JavaScript1": {
+    "Normalize Step": {
       "main": [
         [
           {
-            "node": "If error",
+            "node": "Loop Over Items",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "If error": {
+    "If Has Reference": {
       "main": [
         [
           {
-            "node": "Respond to Webhook1",
+            "node": "Prepare Reference Downloads",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Respond to Webhook",
+            "node": "Qwen Text To Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qwen Text To Image": {
+      "main": [
+        [
+          {
+            "node": "Map Qwen Callback Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Reference Downloads": {
+      "main": [
+        [
+          {
+            "node": "If Reference Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Reference Error": {
+      "main": [
+        [
+          {
+            "node": "Map Gemini Failed",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download Reference Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Reference Image": {
+      "main": [
+        [
+          {
+            "node": "Prepare Reference Part",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Reference Part": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Reference Parts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Reference Parts": {
+      "main": [
+        [
+          {
+            "node": "Prepare Gemini Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Gemini Payload": {
+      "main": [
+        [
+          {
+            "node": "Gemini Generate Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Generate Image": {
+      "main": [
+        [
+          {
+            "node": "Extract Gemini Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Gemini Image": {
+      "main": [
+        [
+          {
+            "node": "Upload Generated Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Generated Image": {
+      "main": [
+        [
+          {
+            "node": "Map Gemini Callback Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Gemini Failed": {
+      "main": [
+        [
+          {
+            "node": "Callback Backend - Gemini Failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Qwen Callback Payload": {
+      "main": [
+        [
+          {
+            "node": "Callback Backend - Qwen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Callback Backend - Qwen": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Gemini Callback Payload": {
+      "main": [
+        [
+          {
+            "node": "Callback Backend - Gemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Callback Backend - Gemini": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Callback Backend - Gemini Failed": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
             "type": "main",
             "index": 0
           }
@@ -340,7 +650,7 @@
     "availableInMCP": false
   },
   "triggerCount": 1,
-  "versionId": "adb7c9c6-6e42-4cff-9ee6-7fdbb97051ff",
+  "versionId": "d56662c3-02e2-472b-8fed-be64b9a81f22",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

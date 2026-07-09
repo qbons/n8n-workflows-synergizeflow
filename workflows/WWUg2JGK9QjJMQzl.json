@@ -223,7 +223,7 @@
         "messages": {
           "values": [
             {
-              "content": "={\n\"title\": {{ $('HTTP Request').item.json.title.toJsonString() }},\n\"content\": {{ $('HTTP Request').item.json.content.toJsonString() }},\n\"img_desc\": {{ $json.img_desc.toJsonString() }},\n\"music_style\": {{ $('Format prompt').item.json.data.music_style.toJsonString() }}\n}"
+              "content": "={\n\"title\": {{ $('Data Blog').item.json.title.toJsonString() }},\n\"content\": {{ $('Data Blog').item.json.content.toJsonString() }},\n\"img_desc\": {{ $json.img_desc.toJsonString() }},\n\"music_style\": {{ $('Format prompt').item.json.data.music_style.toJsonString() }}\n}"
             }
           ]
         },
@@ -1243,7 +1243,7 @@
     "saveExecutionProgress": true
   },
   "triggerCount": 1,
-  "versionId": "ef5fb223-1a0d-432a-bcea-e156664aa592",
+  "versionId": "b26a1dee-d345-41e9-983d-a16e69a1bc60",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

@@ -685,7 +685,7 @@
     },
     {
       "parameters": {
-        "jsCode": "/* Your getValidJsonObject function is good. \n  It correctly handles bad strings by returning null.\n  No changes are needed here.\n*/\nfunction getValidJsonObject(rawText) {\n\n    if (typeof rawText !== 'string' || rawText.trim() === '') {\n        console.error(\"Invalid input or empty text field.\");\n        return null;\n    }\n\n    let jsonString = rawText.trim();\n\n    // 2. Check for and remove the markdown JSON block fences.\n    const markdownRegex = /^```json\\s*([\\s\\S]*?)\\s*```$/;\n    const match = jsonString.match(markdownRegex);\n\n    if (match) {\n        jsonString = match[1];\n    }\n\n    // 3. Parse the cleaned string into a JSON object.\n    try {\n        return JSON.parse(jsonString);\n    } catch (error) {\n        // This is expected for parts that aren't JSON, like \"```\"\n        // console.error(\"Failed to parse JSON string:\", error); \n        // console.error(\"Problematic string:\", jsonString);\n        return null; // Returning null is key\n    }\n}\n\n// === NEW LOGIC ===\n\n// 1. Get the array of all parts\nconst allParts = $input.first().json.content.parts;\n\n// 2. Map each part to a parse attempt.\n//    - If part.text is valid JSON, we get the object.\n//    - If part.text is \"```\" or other non-JSON, getValidJsonObject returns null.\nconst parsedData = allParts\n    .map(part => getValidJsonObject(part.text))\n    .filter(result => result !== null); // 3. Filter out all the nulls\n\n// `parsedData` is now an array of all successfully parsed JSON objects.\n// In your example, it will be: [ [ { id: \"h3f8e9a1\", ... } ] ]\nreturn parsedData;"
+        "jsCode": "return JSON.parse($input.first().json.content.parts[0].text);\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -1068,6 +1068,31 @@
       ],
       "id": "c840a7a8-3dff-4f93-931c-b82106aa01c5",
       "name": "HTTP Request5"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: $('HTML Result').first().json\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4928,
+        112
+      ],
+      "id": "696ad329-b92b-4ba9-b93c-4c5ae646fed8",
+      "name": "Code in JavaScript4"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        5328,
+        0
+      ],
+      "id": "647f6b44-b728-417d-b23e-282e087d6c84",
+      "name": "Wait1",
+      "webhookId": "1f1e19a0-d7f6-4ec8-8a3d-535145de5b53"
     }
   ],
   "connections": {
@@ -1357,6 +1382,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -1458,6 +1490,28 @@
           }
         ]
       ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript4": {
+      "main": [
+        [
+          {
+            "node": "Message a model4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -1469,7 +1523,7 @@
     "availableInMCP": false
   },
   "triggerCount": 0,
-  "versionId": "8ea351c1-f7a6-4465-b750-0ff82071f3f7",
+  "versionId": "d309d237-feef-4b89-8ddc-cb5467e56351",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

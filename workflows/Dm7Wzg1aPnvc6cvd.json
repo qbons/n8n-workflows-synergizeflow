@@ -54,6 +54,18 @@
               "name": "service_id",
               "value": "={{ $json.id }}",
               "type": "number"
+            },
+            {
+              "id": "cc56fbbd-b825-4945-bacb-94793f9a4611",
+              "name": "category",
+              "value": "=[{{ $json.config.categories }}]",
+              "type": "array"
+            },
+            {
+              "id": "8ad7628a-c0e7-4d4d-84d3-7fa4e265a896",
+              "name": "faqCount",
+              "value": "={{ $json.config.faqCount }}",
+              "type": "number"
             }
           ]
         },
@@ -687,7 +699,7 @@
             },
             {
               "name": "category",
-              "value": "={{ $('Prepare Data').item.json.config.category }}"
+              "value": "={{ $('Prepare Data').item.json.category }}"
             },
             {
               "name": "author",
@@ -843,7 +855,7 @@
                 },
                 "conditions": [
                   {
-                    "leftValue": "={{ $('Prepare Data').item.json.config.faqCount }}",
+                    "leftValue": "={{ $('Prepare Data').item.json.faqCount }}",
                     "rightValue": 0,
                     "operator": {
                       "type": "number",
@@ -1434,7 +1446,7 @@
     "availableInMCP": false
   },
   "triggerCount": 0,
-  "versionId": "517927c8-3275-4226-a99b-f187b1680b0e",
+  "versionId": "d42fa21e-416f-417d-aa4f-f1017dccfa0e",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",

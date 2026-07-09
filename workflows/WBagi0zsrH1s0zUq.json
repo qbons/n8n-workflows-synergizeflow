@@ -266,21 +266,21 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -768,
-        192
+        -496,
+        272
       ],
       "id": "b998e077-a2ef-42da-bc0a-6581a470b0c9",
       "name": "Get post content"
     },
     {
       "parameters": {
-        "jsCode": "const payload = {\n  access_token: $('Configuration').first().json.access_token,\n};\n\nif (!$('Configuration').first().json.published) {\n  payload['published'] = false;\n  payload['scheduled_publish_time'] = $('Configuration').first().json.scheduled_publish_time;\n}\n\nif ($('Configuration').first().json.content_type === 'text') {\n  payload['message'] = $('Configuration').first().json.text;\n} else if (['article', 'internal_article'].includes($('Configuration').first().json.content_type)) {\n  payload['link'] = $('Get post content').first().json.link;\n  payload['message'] = $input.first().json.output;\n}\n\nreturn {\n  payload\n}"
+        "jsCode": "const payload = {\n  access_token: $('Configuration').first().json.access_token,\n};\n\nif (!$('Configuration').first().json.published) {\n  payload['published'] = false;\n  payload['scheduled_publish_time'] = $('Configuration').first().json.scheduled_publish_time;\n}\n\nif ($('Configuration').first().json.content_type === 'text') {\n  payload['message'] = $('Configuration').first().json.text;\n} else if (['article', 'internal_article'].includes($('Configuration').first().json.content_type)) {\n  payload['link'] = $('merge node').first().json.link;\n  payload['message'] = $input.first().json.output;\n}\n\nreturn {\n  payload\n}"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -320,
-        -112
+        96,
+        -32
       ],
       "id": "416a81df-2251-46ac-9b78-c4f8bdbca3e5",
       "name": "Feed Payload Formater"
@@ -296,8 +296,8 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3,
       "position": [
-        -592,
-        64
+        -208,
+        144
       ],
       "id": "1108e262-9ac2-4c07-bcea-541e76e9e5e4",
       "name": "AI Agent"
@@ -316,8 +316,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleVertex",
       "typeVersion": 1,
       "position": [
-        -592,
-        208
+        -208,
+        288
       ],
       "id": "97c81362-a5af-4985-b292-2879ba151a6d",
       "name": "Google Vertex Chat Model",
@@ -340,8 +340,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -112,
-        -112
+        240,
+        -32
       ],
       "id": "911f3813-78d7-4097-a336-e0dab0412fa0",
       "name": "Publish Content Feed"
@@ -503,6 +503,160 @@
       "id": "e4aec4ee-510b-4652-b0ee-1874aa2793d5",
       "name": "Webhook",
       "webhookId": "b4ef3c26-7a2d-490c-b693-cd4368ac2ec2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b4466003-ede7-4509-ac8b-2611e7a6a53d",
+              "leftValue": "={{ $('Webhook').item.json.body.web_type }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -848,
+        224
+      ],
+      "id": "e7445334-daa3-4b92-a883-6ad0079dfeb7",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Webhook').item.json.body.web_type }}",
+                    "rightValue": "laravel",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "3d525976-a143-4ecc-bca9-2a405bfe620d"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "laravel"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "e0ee3638-64c0-4864-9b1a-e1dc53640ef6",
+                    "leftValue": "={{ $('Webhook').item.json.body.web_type }}",
+                    "rightValue": "=laravel",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "other"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -672,
+        160
+      ],
+      "id": "40384fca-ae13-4a6b-a039-526ef2892fde",
+      "name": "Switch2"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.domain_name }}/blog/get-post/{{ $('Configuration').item.json.article_id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -496,
+        96
+      ],
+      "id": "1e564847-b502-46f9-baa6-302594d77c60",
+      "name": "Get post content laravel2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "28530808-b555-4cd9-90c7-726701b8e899",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "ae1c1bcb-e4d0-4c08-95ac-398abf0227e1",
+              "name": "content",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "25d44ca1-fe50-4540-abe2-919e31534bcf",
+              "name": "image",
+              "value": "={{ $json.image }}",
+              "type": "string"
+            },
+            {
+              "id": "b526b566-0faf-4c60-acf3-05495d3ea470",
+              "name": "link",
+              "value": "={{ $json.link }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -336,
+        176
+      ],
+      "id": "136a96f1-be60-4406-8032-06fc35e43e16",
+      "name": "merge node"
     }
   ],
   "connections": {
@@ -528,7 +682,7 @@
         ],
         [
           {
-            "node": "Get post content",
+            "node": "If2",
             "type": "main",
             "index": 0
           }
@@ -549,7 +703,7 @@
         ],
         [
           {
-            "node": "Get post content",
+            "node": "If2",
             "type": "main",
             "index": 0
           }
@@ -560,7 +714,7 @@
       "main": [
         [
           {
-            "node": "AI Agent",
+            "node": "merge node",
             "type": "main",
             "index": 0
           }
@@ -705,6 +859,64 @@
           }
         ]
       ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get post content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch2": {
+      "main": [
+        [
+          {
+            "node": "Get post content laravel2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get post content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get post content laravel2": {
+      "main": [
+        [
+          {
+            "node": "merge node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "merge node": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -717,7 +929,7 @@
     "saveDataSuccessExecution": "all"
   },
   "triggerCount": 1,
-  "versionId": "ac95f146-43ae-4c85-aff4-e64fff97e301",
+  "versionId": "3d92e64f-f852-408a-8088-1b0a1b967546",
   "owner": {
     "type": "team",
     "teamId": "UNcEOCawQV9ZsxYR",
