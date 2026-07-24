@@ -5,7 +5,10 @@
   "data": {
     "host": "",
     "database": "",
-    "password": ""
+    "user": "",
+    "password": "",
+    "allowUnauthorizedCerts": true,
+    "port": 6543
   },
   "ownedBy": {
     "type": "team",
