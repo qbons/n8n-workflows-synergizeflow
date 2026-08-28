@@ -1,0 +1,897 @@
+{
+  "id": "qOSpae18qHz2swKO",
+  "name": "SF - Explainer Agent - Generate Image",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -96,
+        64
+      ],
+      "id": "dbdfbb7d-36bb-4062-8cf2-e63489addcf1",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "steps",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -512,
+        64
+      ],
+      "id": "bd966972-c4d1-4b99-9b00-b514ff1776a2",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map((item) => {\n  const step = item.json;\n\n  return {\n    json: {\n      ...step,\n      step: Number(step.step),\n      image: {\n        ...(step.image || {}),\n    reference_images: Array.isArray(step.image?.reference_images) ?step.image.reference_images : [],\n    reference_usage:step.image?.reference_usage || \"\",\n    reference_strength:step.image?.reference_strength || \"subtle\"\n  },\n  has_reference_images: Array.isArray(step.image?.reference_images) && step.image.reference_images.length > 0\n    },\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -304,
+        64
+      ],
+      "id": "5e04d505-52e8-434f-8058-e6248c63e52a",
+      "name": "Normalize Step"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "805143bc-7da6-4b7a-b6c4-60bd3cb81901",
+              "leftValue": "={{ $json.has_reference_images }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        128,
+        192
+      ],
+      "id": "7072f401-3b0f-460a-be0a-d3a2ebcb3bde",
+      "name": "If Has Reference"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "CfFTrHyw35Q6kVn5",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/CfFTrHyw35Q6kVn5",
+          "cachedResultName": "SynergizeFlow.v2 — Get App Token"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -896,
+        64
+      ],
+      "id": "3294b355-76c8-45ec-a846-c7bf6348eafd",
+      "name": "Get token"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b67bcad2-e19a-4994-a602-6b9f55987d67",
+              "name": "steps",
+              "value": "={{ $('Webhook').item.json.body.steps }}",
+              "type": "array"
+            },
+            {
+              "id": "0977ca20-391a-4868-a1e3-9577998cf790",
+              "name": "token",
+              "value": "={{ $json.token }}",
+              "type": "string"
+            },
+            {
+              "id": "87311ff0-b4d1-4750-b753-1404a8ac0baa",
+              "name": "webhook",
+              "value": "={{ $('Webhook').item.json.body.webhook }}",
+              "type": "string"
+            },
+            {
+              "id": "0d45d63f-0bea-410a-8c5b-2103c7fe0953",
+              "name": "agent_id",
+              "value": "={{ $('Webhook').item.json.body.agent_id }}",
+              "type": "number"
+            },
+            {
+              "id": "ee38c951-efaa-4fc8-80dd-1457c3ede29d",
+              "name": "reference_images",
+              "value": "={{ $('Webhook').item.json.body.reference_images }}",
+              "type": "array"
+            },
+            {
+              "id": "e65b1757-c1ff-487a-8b05-99ea7a1b19f6",
+              "name": "title",
+              "value": "={{ $('Webhook').item.json.body.title }}",
+              "type": "string"
+            },
+            {
+              "id": "11370084-7ee9-4cc1-96f2-5bca8cacbe8b",
+              "name": "orientation",
+              "value": "={{ $('Webhook').item.json.body.orientation }}",
+              "type": "string"
+            },
+            {
+              "id": "f0764288-0d0f-4c02-b3c0-a17e8746823f",
+              "name": "total_steps",
+              "value": "={{ $('Webhook').item.json.body.total_steps }}",
+              "type": "number"
+            },
+            {
+              "id": "5ada8c70-915d-48cd-b993-6267866ef845",
+              "name": "visual_style",
+              "value": "={{ $('Webhook').item.json.body.visual_style }}",
+              "type": "string"
+            },
+            {
+              "id": "faddd95a-7dbb-43c6-815a-3eb0c7118e6c",
+              "name": "domain",
+              "value": "={{ $('Webhook').item.json.body.domain }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -704,
+        64
+      ],
+      "id": "ec131aca-d56a-42e1-a10e-e56a87b001b0",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v2/explainer-agent/generate-image",
+        "options": {
+          "responseData": "workflow_started"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1088,
+        64
+      ],
+      "id": "edde855e-40ce-4830-9f67-8f367d0ca807",
+      "name": "Webhook",
+      "webhookId": "0f16cebd-602c-45db-b81d-9d2c5888c6ab"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d3e64936-44b3-4903-9f07-c9a60f0f9a02",
+              "name": "prompt",
+              "value": "={{ $json.image.prompt }}\n\nNegative prompt: {{ $json.image.negative_prompt }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        336,
+        288
+      ],
+      "id": "2d146dee-9828-4b0e-844b-d37a7c439dab",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "const parts = [\n  { text: $input.first().json.prompt }\n];\n\n// Return the structure ready for the API\nreturn {\n  json: {\n    payload: {\n      contents: [\n        {\n          parts: parts\n        }\n      ],\n      generationConfig: {\n          responseModalities: [\"image\"],\n          topP: 0.2,\n          imageConfig:{\n              aspectRatio: $('Prepare Data').first().json.orientation == 'vertical' ? \"9:16\" : \"16:9\"\n          }\n      }\n    }\n  }\n};\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        288
+      ],
+      "id": "58f74de7-e26b-476d-8546-e1a393df186f",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $vars.GEMINI_PRO_IMAGE }}:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.payload }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        800,
+        288
+      ],
+      "id": "31a898f2-64b4-4898-af91-cf0c04b5ccf9",
+      "name": "HTTP Request1",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "tURjQrWDQUUGEoyg",
+          "name": "SF - Gemini Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://n8n.limesight.nl/webhook/explainer-agent/process-image",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "data",
+              "value": "={{ $json.candidates[0].content.parts[0].inlineData.data }}"
+            },
+            {
+              "name": "mime",
+              "value": "={{ $json.candidates[0].content.parts[0].inlineData.mimeType }}"
+            },
+            {
+              "name": "file_name",
+              "value": "=explainer_agent_{{ $('Prepare Data').item.json.agent_id }}_step_{{ $('Loop Over Items').item.json.step }}.{{ $json.candidates[0].content.parts[0].inlineData.mimeType == 'image/jpeg' ? 'jpg' : 'png' }}"
+            },
+            {
+              "name": "action",
+              "value": "upload"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1024,
+        288
+      ],
+      "id": "5b7396f3-4728-4fb3-8189-0a800c317f3e",
+      "name": "Save to Gdrive"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  agent_id: $('Prepare Data').first().json.agent_id,\n  step: $('If Has Reference').first().json.step,\n  status: \"ok\",\n  image: {\n    gdrive_id: $input.first().json.image_id,\n    file_name: $input.first().json.file_name,\n    mime: $input.first().json.mime,\n    config: {\n      prompt: $('Loop Over Items').first().json.image.prompt,\n      negative_prompt: $('Loop Over Items').first().json.image.negative_prompt,\n      reference_usage: $('Loop Over Items').first().json.image.reference_usage,\n      reference_images: $('Loop Over Items').first().json.image.reference_images,\n      image_size: $('Loop Over Items').first().json.image.image_size,\n      reference_strength: $('Loop Over Items').first().json.image.reference_strength\n    }\n  },\n  step_config: {\n    tts: $('Loop Over Items').first().json.tts,\n    transition: $('Loop Over Items').first().json.transition,\n    motion_effect: $('Loop Over Items').first().json.motion_effect,\n    scene_description: $('Loop Over Items').first().json.scene_description,\n    subtitle: $('Loop Over Items').first().json.subtitle\n  }\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1232,
+        288
+      ],
+      "id": "b3ef1c73-e823-4df7-b13c-d962312bf87d",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        64,
+        -240
+      ],
+      "id": "06666e6b-978a-4dec-a7e3-5f5b5bf0597a",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "jsCode": "const step = $json;\nconst body = $('Webhook').first().json.body || {};\n\nconst allReferences = Array.isArray(body.reference_images)\n  ? body.reference_images\n  : [];\n\nconst selectedIds = Array.isArray(step.image?.reference_images)\n  ? step.image.reference_images\n  : [];\n\nconst maxReferencesPerScene = 4;\n\nconst selectedReferences = selectedIds\n  .map((id) => allReferences.find((ref) => String(ref.id) === String(id)))\n  .filter(Boolean)\n  .slice(0, maxReferencesPerScene);\n\nif (!selectedReferences.length) {\n  return [{\n    json: {\n      step_data: step,\n      reference_error: \"No matching reference image details found\"\n    }\n  }];\n}\n\nreturn selectedReferences.map((reference, index) => ({\n  json: {\n    step_data: step,\n    reference,\n    reference_index: index + 1,\n    total_references: selectedReferences.length,\n    reference_warning: selectedIds.length > maxReferencesPerScene\n      ? `Only first ${maxReferencesPerScene} reference images were used for this scene`\n      : \"\"\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        576,
+        16
+      ],
+      "id": "13707c05-71e4-4e12-8782-fa4f02b34a43",
+      "name": "Prepare Reference Downloads"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f5448f7c-6545-41cf-9a5f-4ca1c5b614b3",
+              "leftValue": "={{ !!$json.reference_error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        800,
+        16
+      ],
+      "id": "1486753d-2ba7-4a06-b001-cfa82400554b",
+      "name": "If Reference Error"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  agent_id: $('Prepare Data').first().json.agent_id,\n  step: $('If Has Reference').first().json.step,\n  status: \"fail\",\n  image: {\n    gdrive_id: \"none\",\n    file_name: \"none\",\n    mime: \"none\",\n    config: {\n      prompt: $('Loop Over Items').first().json.image.prompt,\n      negative_prompt: $('Loop Over Items').first().json.image.negative_prompt,\n      reference_usage: $('Loop Over Items').first().json.image.reference_usage,\n      reference_images: $('Loop Over Items').first().json.image.reference_images,\n      image_size: $('Loop Over Items').first().json.image.image_size,\n      reference_strength: $('Loop Over Items').first().json.image.reference_strength\n    }\n  },\n  step_config: {\n    tts: $('Loop Over Items').first().json.tts,\n    transition: $('Loop Over Items').first().json.transition,\n    motion_effect: $('Loop Over Items').first().json.motion_effect,\n    scene_description: $('Loop Over Items').first().json.scene_description,\n    subtitle: $('Loop Over Items').first().json.subtitle\n  }\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        -256
+      ],
+      "id": "dcc5a390-7877-4392-aeb8-047e52d30c76",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const references = $json.references || [];\nconst first = references[0];\nconst step = first?.step_data;\n\nif (!step) {\n  return [{\n    json: {\n      image: {\n        process_status: \"failed\",\n        process_error: \"Step data missing while preparing Gemini payload\"\n      }\n    }\n  }];\n}\n\nconst body = $('Webhook').first().json.body || {};\nconst orientation = body.orientation || \"horizontal\";\nconst visualStyle = body.visual_style || \"\";\nconst aspectRatio = orientation === \"vertical\" ? \"9:16\" : \"16:9\";\n\nconst referenceSummary = references.map((item, index) => {\n  const ref = item.reference || {};\n  return [\n    `Reference ${index + 1}:`,\n    `ID: ${ref.id}`,\n    `Type: ${ref.type || \"other\"}`,\n    `Label: ${ref.label || \"\"}`,\n    `Description: ${ref.description || \"\"}`,\n    `Usage note: ${ref.usage_note || \"\"}`,\n    `Sensitive note: ${ref.sensitive_note || \"\"}`\n  ].join(\"\\n\");\n}).join(\"\\n\\n\");\n\nconst prompt = [\n  \"Create one image for an animated explainer scene.\",\n  \"\",\n  `Visual style: ${visualStyle}`,\n  `Scene prompt: ${step.image.prompt}`,\n  `Reference usage instruction: ${step.image.reference_usage || \"\"}`,\n  `Reference strength: ${step.image.reference_strength || \"normal\"}`,\n  \"\",\n  \"Reference image metadata:\",\n  referenceSummary,\n  \"\",\n  \"Use all attached reference images as visual guidance.\",\n  \"Integrate only the elements requested in the reference usage instruction.\",\n  \"Do not create a collage unless explicitly requested.\",\n  \"Preserve important identity cues such as logo colors, mascot shape, face identity, product UI, and readable brand text as much as possible.\",\n  \"If references conflict, prioritize the scene prompt and reference_usage instruction.\",\n  \"Generate one clean final scene image only. No explanation.\"\n].join(\"\\n\");\n\nconst parts = [\n  { text: prompt },\n  ...references\n    .map((item) => item.part)\n    .filter(Boolean)\n];\n\nreturn [{\n  json: {\n    ...step,\n    gemini_payload: {\n      contents: [\n        { parts }\n      ],\n      generationConfig: {\n        responseModalities: [\"image\"],\n        imageConfig: {\n          aspectRatio\n        }\n      }\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        32
+      ],
+      "id": "9894f2e2-1393-4cd9-8e4a-62d3d4a5a895",
+      "name": "Prepare Gemini Payload"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "o1OtuQfaM9GO27FN",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/o1OtuQfaM9GO27FN",
+          "cachedResultName": "SynergizeFlow.v2 — SF - Explainer Agent - Reference Image Downloader"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1280,
+        32
+      ],
+      "id": "f289ea86-3f28-4180-a460-558aad4e4fdf",
+      "name": "Download Reference Image"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        32
+      ],
+      "id": "8d3491c2-e4e1-4339-a453-f8f13e398c36",
+      "name": "Aggregate1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $vars.GEMINI_PRO_IMAGE }}:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.gemini_payload }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1776,
+        32
+      ],
+      "id": "f38193f6-4051-4d8b-90d7-4beb09552dfb",
+      "name": "HTTP Request",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "tURjQrWDQUUGEoyg",
+          "name": "SF - Gemini Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://n8n.limesight.nl/webhook/explainer-agent/process-image",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "data",
+              "value": "={{ $json.candidates[0].content.parts[0].inlineData.data }}"
+            },
+            {
+              "name": "mime",
+              "value": "={{ $json.candidates[0].content.parts[0].inlineData.mimeType }}"
+            },
+            {
+              "name": "file_name",
+              "value": "=explainer_agent_{{ $('Prepare Data').item.json.agent_id }}_step_{{ $('Loop Over Items').item.json.step }}.{{ $json.candidates[0].content.parts[0].inlineData.mimeType == 'image/jpeg' ? 'jpg' : 'png' }}"
+            },
+            {
+              "name": "action",
+              "value": "upload"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2016,
+        32
+      ],
+      "id": "38288564-18bc-442a-a23d-d2077d6195be",
+      "name": "Save to Gdrive1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  agent_id: $('Prepare Data').first().json.agent_id,\n  step: $('If Has Reference').first().json.step,\n  status: \"ok\",\n  image: {\n    gdrive_id: $input.first().json.image_id,\n    file_name: $input.first().json.file_name,\n    mime: $input.first().json.mime,\n    config: {\n      prompt: $('Loop Over Items').first().json.image.prompt,\n      negative_prompt: $('Loop Over Items').first().json.image.negative_prompt,\n      reference_usage: $('Loop Over Items').first().json.image.reference_usage,\n      reference_images: $('Loop Over Items').first().json.image.reference_images,\n      image_size: $('Loop Over Items').first().json.image.image_size,\n      reference_strength: $('Loop Over Items').first().json.image.reference_strength\n    }\n  },\n  step_config: {\n    tts: $('Loop Over Items').first().json.tts,\n    transition: $('Loop Over Items').first().json.transition,\n    motion_effect: $('Loop Over Items').first().json.motion_effect,\n    scene_description: $('Loop Over Items').first().json.scene_description,\n    subtitle: $('Loop Over Items').first().json.subtitle\n  }\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2240,
+        32
+      ],
+      "id": "ea6f2ed1-ce79-42a7-9a9d-4afdf225e701",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "domain",
+              "value": "={{ $('Webhook').item.json.body.domain }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        -896,
+        272
+      ],
+      "id": "a1b54caa-fa3b-4c97-b703-c70ab4a4ea9d",
+      "name": "Execution Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "let data = {\n  agent_id: $('Prepare Data').first().json.agent_id,\n  domain: $('Prepare Data').first().json.domain,\n  title: $('Prepare Data').first().json.title,\n  orientation: $('Prepare Data').first().json.orientation,\n  total_steps: $('Prepare Data').first().json.total_steps,\n  steps: []\n}\nfor (const item of $input.first().json.data) {\n  if(item.status == \"ok\"){\n      data.steps.push({\n        step: item.step,\n        tts: item.step_config.tts,\n        image: {\n          gdrive_id: item.image.gdrive_id,\n          file_name: item.image.file_name,\n          mime: item.image.mime\n        },\n        video: {\n          subtitle: item.step_config.subtitle,\n          transition: item.step_config.transition,\n          motion_effect: item.step_config.motion_effect\n        }\n      })\n  }\n}\nreturn {data:data}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        272,
+        -240
+      ],
+      "id": "21cd9ff0-739c-4dd6-8780-b7ca39c81371",
+      "name": "Code in JavaScript4"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "payload",
+              "value": "={{ $json.data }}"
+            },
+            {
+              "name": "status",
+              "value": "ok"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        480,
+        -240
+      ],
+      "id": "052c105a-93ce-411d-b7b2-4aa763011f14",
+      "name": "HTTP Request2"
+    }
+  ],
+  "connections": {
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If Has Reference",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Normalize Step",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Step": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Has Reference": {
+      "main": [
+        [
+          {
+            "node": "Prepare Reference Downloads",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get token": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get token",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Save to Gdrive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to Gdrive": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Reference Downloads": {
+      "main": [
+        [
+          {
+            "node": "If Reference Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Reference Error": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Reference Image": {
+      "main": [
+        [
+          {
+            "node": "Prepare Gemini Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Download Reference Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Gemini Payload": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Save to Gdrive1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to Gdrive1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript4": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "triggerCount": 1,
+  "versionId": "158d71bd-33ff-4b22-abd5-69b2a260b023",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "EU3LkrzkjMEbKN3L",
+  "isArchived": false
+}

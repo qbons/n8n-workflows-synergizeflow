@@ -1,0 +1,584 @@
+{
+  "id": "hucepNLIDhkHAr13",
+  "name": "SF - On boarding",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.domain }}wp-json/synergizeflow/v2/get-website-data/",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "={{$vars.STATIC_TOKEN}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -576,
+        224
+      ],
+      "id": "f846b2a8-8a63-4fba-bc7b-d0e47ce2e7e5",
+      "name": "Get website data"
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\n * Converts a string of HTML into Markdown.\n * @param {string} html - The HTML content to convert.\n * @returns {string} - The converted Markdown text.\n */\nfunction htmlToMarkdown(html) {\n  if (!html) return '';\n\n  let markdown = html\n    // Handle special shortcodes by removing them\n    .replace(/\\[rank_math_breadcrumb\\]/g, '')\n    .replace(/\\[archive-location\\]/g, '')\n    // Handle headings\n    .replace(/<h1>(.*?)<\\/h1>/gi, '# $1\\n')\n    .replace(/<h2>(.*?)<\\/h2>/gi, '## $1\\n')\n    .replace(/<h3>(.*?)<\\/h3>/gi, '### $1\\n')\n    .replace(/<h4>(.*?)<\\/h4>/gi, '#### $1\\n')\n    .replace(/<h5>(.*?)<\\/h5>/gi, '##### $1\\n')\n    .replace(/<h6>(.*?)<\\/h6>/gi, '###### $1\\n')\n    // Handle paragraphs\n    .replace(/<p>(.*?)<\\/p>/gi, '$1\\n\\n')\n    // Handle links\n    .replace(/<a href=\"([^\"]+)\"[^>]*>(.*?)<\\/a>/gi, '[$2]($1)')\n    // Handle unordered lists\n    .replace(/<ul>/gi, '')\n    .replace(/<\\/ul>/gi, '')\n    .replace(/<li>(.*?)<\\/li>/gi, '- $1\\n')\n    // Handle blockquotes\n    .replace(/<blockquote>/gi, '> ')\n    .replace(/<\\/blockquote>/gi, '\\n')\n    // Handle bold and strong tags\n    .replace(/<strong>(.*?)<\\/strong>/gi, '**$1**')\n    .replace(/<b>(.*?)<\\/b>/gi, '**$1**')\n    // Handle line breaks\n    .replace(/<br\\s*\\/?>/gi, '\\n')\n    // Strip any remaining HTML tags (like divs, svgs, etc.)\n    .replace(/<[^>]+>/g, '')\n    // Decode HTML entities\n    .replace(/&amp;/g, '&')\n    .replace(/&lt;/g, '<')\n    .replace(/&gt;/g, '>')\n    .replace(/&quot;/g, '\"')\n    .replace(/&#39;/g, \"'\")\n    // Clean up extra whitespace and newlines\n    .trim();\n\n  return markdown;\n}\n\n/**\n * Converts the full JSON data structure into a formatted Markdown string.\n * @param {Array} jsonData - The JSON data array.\n * @returns {string} - The complete Markdown output.\n */\nfunction convertJsonToMarkdown(jsonData) {\n  const data = jsonData;\n  if (!data) return \"No data found.\";\n\n  let markdownOutput = \"\";\n\n  // 1. Website Information\n  const siteInfo = data.website;\n  if (siteInfo) {\n    markdownOutput += `# ${siteInfo.website_name}\\n`;\n    markdownOutput += `**URL:** [${siteInfo.website_url}](${siteInfo.website_url})\\n`;\n    if (siteInfo.website_description) {\n      markdownOutput += `**Description:** ${siteInfo.website_description}\\n`;\n    }\n    markdownOutput += `**Language:** ${siteInfo.website_language}\\n\\n`;\n  }\n\n  // 2. Content Sections\n  const contentSections = data.content;\n  contentSections.forEach(section => {\n    markdownOutput += `---\\n`;\n    markdownOutput += `## ${section.name}\\n\\n`;\n\n    // Handle Posts Content with Categories\n    if (section.key === 'post' && section.category) {\n      markdownOutput += `### Categories\\n`;\n      section.category.forEach(cat => {\n        markdownOutput += `- ${cat.replace(/&amp;/g, '&')}\\n`;\n      });\n      markdownOutput += `\\n`;\n    }\n\n    // Handle all posts/pages within a section\n    if (section.posts && section.posts.length > 0) {\n      section.posts.forEach(post => {\n        // Use H3 for post titles for better hierarchy\n        markdownOutput += `### ${post.title}\\n\\n`;\n        // Convert the HTML content to Markdown\n        markdownOutput += `${htmlToMarkdown(post.content)}\\n\\n`;\n      });\n    }\n  });\n\n  return markdownOutput;\n}\n\nconst markdownResult = convertJsonToMarkdown($input.first().json.data);\nreturn {markdown: markdownResult}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -352,
+        224
+      ],
+      "id": "2ea544bd-088b-4c82-b951-39161eba4973",
+      "name": "Convert JSON to markdown"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {data:[JSON.parse($input.first().json.content.parts[0].text)]}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        192,
+        224
+      ],
+      "id": "c1de3d72-9439-46fa-91c0-d07bbf3c94a6",
+      "name": "Code",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_LATEST }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.markdown }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "systemMessage": "=You are a Senior Digital Marketing and Content Strategist AI. You will be provided with information containing unstructured content from a company's website. This content may include blog posts, static page text (like \"Home,\" \"Terms of Service\"), and product/service descriptions.\n\nYour task is to perform a comprehensive analysis of the entire text to identify the website's core identity, purpose, and content themes. Based on your analysis, you must generate a single, valid JSON object that strictly adheres to the structure and requirements outlined below.\n\n**Instructions:**\n\n1.  Read and understand all the provided text to get a holistic view of the business.\n2.  Extract and synthesize the requested information for each field in the JSON schema.\n3.  Your final output MUST be only the raw JSON object. Do not include any explanatory text, introductory sentences, or markdown formatting (like ```json) before or after the JSON block.\n\n**JSON Schema and Field Requirements:**\n\n```json\n{\n  \"websiteName\": \"string\",\n  \"websiteNiche\": \"string\",\n  \"targetAudience\": \"string\",\n  \"websiteDescription\": {\n    \"purpose\": \"string\",\n    \"strongFeaturesAndBenefits\": [\n      \"string\",\n      \"string\",\n      \"string\"\n    ]\n  },\n  \"blogSuggestions\": {\n    \"keywords\": [\n      \"string\",\n      \"string\",\n      \"string\"\n    ],\n    \"categories\": [\n      \"string\",\n      \"string\",\n      \"string\"\n    ]\n  }\n}\n```\n\n**Detailed Field Instructions:**\n\n*   **`websiteName`**: Identify the official name of the company or website from the text.\n*   **`websiteNiche`**: Provide a concise description of the website's specific market. Be precise (e.g., \"Online marketplace for flexible commercial real estate\" is better than \"Real estate website\").\n*   **`targetAudience`**: Describe the primary users the website is built for. Infer this from the services offered, the language used, and the problems addressed (e.g., \"Freelancers, startups, and enterprise-level corporations seeking flexible office solutions\").\n*   **`websiteDescription.purpose`**: In one or two sentences, summarize the website's main goal and the value it provides to its users.\n*   **`websiteDescription.strongFeaturesAndBenefits`**: Identify and list at least 5-7 of the most prominent features and their corresponding benefits mentioned on the site. Each item in the array should be a clear, concise string.\n*   **`blogSuggestions.keywords`**: Analyze the topics from the provided \"Posts content\" and other text. Generate an array of **exactly 50** relevant SEO keywords that the target audience might use. Include a mix of short-tail and long-tail keywords.\n*   **`blogSuggestions.categories`**: Based on the generated keywords and overall content themes, create an array of **exactly 10** logical and high-level blog categories to structure the website's content."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -128,
+        224
+      ],
+      "id": "29cde992-3262-4e67-8c21-6ffe85434826",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v2/util/onboarding",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1472,
+        320
+      ],
+      "id": "3b2b54dc-11c5-44d6-bf17-8b42a9840063",
+      "name": "Webhook",
+      "webhookId": "c810e951-80db-441e-b1d0-f6e2065df192"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "60458c94-986c-49cd-8b69-4b5616163eb3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f910b52-842c-4b6a-a862-e6914c883764",
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -800,
+        240
+      ],
+      "id": "e681c5e0-59f0-4cfb-972c-18b35687bd13",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.domain }}wp-json/synergizeflow/v2/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license",
+              "value": "={{ $json.license }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1024,
+        320
+      ],
+      "id": "62861b46-d166-4a2f-82fd-a2ac89c275c1",
+      "name": "Check if license is valid",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "domain",
+              "value": "={{ $json.body.domain }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        -1248,
+        528
+      ],
+      "id": "7e808cd7-632b-4ba8-8d7b-73a7b9e1d0d2",
+      "name": "Execution Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "=fail"
+            },
+            {
+              "name": "msg",
+              "value": "invalid_license"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -320,
+        400
+      ],
+      "id": "e2b346fd-1409-49dd-ad82-50f67770f63e",
+      "name": "Send error webhook"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "CfFTrHyw35Q6kVn5",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/CfFTrHyw35Q6kVn5",
+          "cachedResultName": "SynergizeFlow.v2 — Get App Token"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -544,
+        400
+      ],
+      "id": "25c42923-3c51-46cf-be4c-c71772b5f666",
+      "name": "Get token"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "CfFTrHyw35Q6kVn5",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/CfFTrHyw35Q6kVn5",
+          "cachedResultName": "SynergizeFlow.v2 — Get App Token"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        368,
+        224
+      ],
+      "id": "4c54e718-312a-40b4-b95b-6740eb3fe51a",
+      "name": "Get token1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "=ok"
+            },
+            {
+              "name": "data",
+              "value": "={{ $('Code').item.json.data }}"
+            },
+            {
+              "name": "license",
+              "value": "={{ $('Prepare Data').item.json.license }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        544,
+        224
+      ],
+      "id": "6a1e9082-7dd0-4da5-88d8-962b0ad249db",
+      "name": "Send response"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        384,
+        416
+      ],
+      "id": "4b53c36f-4777-429f-9286-52828d0e4fe8",
+      "name": "Wait",
+      "webhookId": "28f480a7-0356-41c8-aa56-a0ae34f5d08b"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  markdown: $('Convert JSON to markdown').first().json.markdown\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        192,
+        416
+      ],
+      "id": "295dfe4d-9120-42fe-a2d5-63482474f6c5",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7a5f7d9a-28cc-49e8-a1d2-e3e25ed8cd75",
+              "name": "domain",
+              "value": "={{ $json.body.domain }}",
+              "type": "string"
+            },
+            {
+              "id": "8df36920-3df2-4c4e-bc18-4c85cf59b60e",
+              "name": "license",
+              "value": "={{ $json.body.license }}",
+              "type": "string"
+            },
+            {
+              "id": "008b97ce-ac16-4f0e-9bac-df141121cdb8",
+              "name": "webhook",
+              "value": "={{ $json.body.webhook }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1248,
+        320
+      ],
+      "id": "c6b487c3-51bb-4f38-8385-d48e3d77c993",
+      "name": "Prepare Data"
+    }
+  ],
+  "connections": {
+    "Get website data": {
+      "main": [
+        [
+          {
+            "node": "Convert JSON to markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert JSON to markdown": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Get token1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Get website data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if license is valid": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get token": {
+      "main": [
+        [
+          {
+            "node": "Send error webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get token1": {
+      "main": [
+        [
+          {
+            "node": "Send response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "triggerCount": 1,
+  "versionId": "4a36af76-47b3-43c4-a683-26e063ddc06c",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "RH3pD7tYrBWa3pTv",
+  "isArchived": false
+}

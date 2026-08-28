@@ -1,0 +1,15 @@
+{
+  "id": "YaCzKK7zR9ZCFSc0",
+  "name": "SynergizeFlow Dev Blog",
+  "type": "telegramApi",
+  "data": {
+    "accessToken": ""
+  },
+  "ownedBy": {
+    "type": "personal",
+    "projectId": "CEhR2UPV92AZTois",
+    "projectName": "bayu wibi <wibi@mantab.one>",
+    "personalEmail": "wibi@mantab.one"
+  },
+  "isGlobal": false
+}

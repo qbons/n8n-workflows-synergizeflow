@@ -1,0 +1,2295 @@
+{
+  "id": "LEm1YFHTZB554xAi",
+  "name": "SF - Media Agent - Generate Content",
+  "nodes": [
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "60458c94-986c-49cd-8b69-4b5616163eb3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f910b52-842c-4b6a-a862-e6914c883764",
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -528,
+        16
+      ],
+      "id": "7d5b26b4-7d60-49af-9e96-7265f4bfd2d2",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.domain }}wp-json/synergizeflow/v2/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license",
+              "value": "={{ $json.license }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -752,
+        144
+      ],
+      "id": "700dfddb-3b91-42a1-ab4b-fafd1531efbf",
+      "name": "Check if license is valid",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v2/media-agent/generate-content",
+        "options": {
+          "responseData": "workflow_started"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1424,
+        240
+      ],
+      "id": "a4630c3f-4d8f-4036-a047-7423f7067205",
+      "name": "Webhook",
+      "webhookId": "7ed478b2-6067-446c-b510-06d65a1a9b74"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Webhook').item.json.body.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "fail"
+            },
+            {
+              "name": "msg",
+              "value": "invalid_license"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -320,
+        256
+      ],
+      "id": "efe3156e-df6a-49b5-bfd2-0ee6e8338185",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "domain",
+              "value": "={{ $json.body.domain }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        -1200,
+        336
+      ],
+      "id": "df012eaa-1599-4857-80a2-c4822dfddd55",
+      "name": "Execution Data"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "CfFTrHyw35Q6kVn5",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/CfFTrHyw35Q6kVn5",
+          "cachedResultName": "SynergizeFlow.v2 — Get App Token"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -1200,
+        144
+      ],
+      "id": "8a52db6c-eef2-4a7e-b4df-878300520a61",
+      "name": "Get token"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5a87c8b9-2ebc-462d-a295-4cf62a0dcb9b",
+              "name": "license",
+              "value": "={{ $('Webhook').item.json.body.license }}",
+              "type": "string"
+            },
+            {
+              "id": "581cc296-13c4-41bb-95a7-6d71effe61e1",
+              "name": "domain",
+              "value": "={{ $('Webhook').item.json.body.domain }}",
+              "type": "string"
+            },
+            {
+              "id": "a588bfae-1014-44e1-a9ba-74273ae3a576",
+              "name": "output_type",
+              "value": "={{ $('Webhook').item.json.body.config.output.type }}",
+              "type": "string"
+            },
+            {
+              "id": "afbca853-fa37-4fc2-bced-85dfdb9b374d",
+              "name": "output_meta",
+              "value": "={{ $('Webhook').item.json.body.config.output.meta }}",
+              "type": "object"
+            },
+            {
+              "id": "ebf8c14f-826e-4701-8e95-823d1e4be250",
+              "name": "source_type",
+              "value": "={{ $('Webhook').item.json.body.config.source.type }}",
+              "type": "string"
+            },
+            {
+              "id": "290f5675-dee3-4772-b15e-b3e38a45bf59",
+              "name": "source_meta",
+              "value": "={{ $('Webhook').item.json.body.config.source.meta }}",
+              "type": "object"
+            },
+            {
+              "id": "d24129ee-520b-4a25-8800-fb9914256638",
+              "name": "agent_id",
+              "value": "={{ $('Webhook').item.json.body.agent_id }}",
+              "type": "number"
+            },
+            {
+              "id": "bbf79e8d-7664-4fa3-adf9-fcb9219f0d78",
+              "name": "webhook",
+              "value": "={{ $('Webhook').item.json.body.webhook }}",
+              "type": "string"
+            },
+            {
+              "id": "c4a09bbb-e67b-4448-a2c6-79dcc91128a8",
+              "name": "token",
+              "value": "={{ $json.token }}",
+              "type": "string"
+            },
+            {
+              "id": "26b38fd5-72f6-43ed-9761-584613f78698",
+              "name": "social_media",
+              "value": "={{ $('Webhook').item.json.body.config.social_media }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -976,
+        144
+      ],
+      "id": "00f243d8-de12-4a26-a3e2-3adc2eb293b7",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Prepare Data').item.json.source_type }}",
+                    "rightValue": "blog",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "4fde0127-1307-4618-ae4f-4da71f84cc0f"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "blog"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f0eeea44-2833-4d00-a6cc-279ce2f9b8d5",
+                    "leftValue": "={{ $('Prepare Data').item.json.source_type }}",
+                    "rightValue": "topic",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "topic"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "9c1b1e7b-5ba9-4071-9a12-ae75ad1e4f5e",
+                    "leftValue": "={{ $('Prepare Data').item.json.source_type }}",
+                    "rightValue": "manual",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "manual"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -320,
+        -80
+      ],
+      "id": "d692b225-ed75-42ad-8003-b110dd356fe6",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.domain }}wp-json/synergizeflow/v2/get-single-post",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "id",
+              "value": "={{ $('Prepare Data').item.json.source_meta.blog_id }}"
+            },
+            {
+              "name": "license",
+              "value": "={{ $('Prepare Data').item.json.license }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -112,
+        -192
+      ],
+      "id": "96814780-edf9-4368-9f81-46fe1a193982",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6f767db5-2f7f-4c3d-bbd6-ce110e1a291c",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "88d97a9a-1bb7-42d1-9424-2b9018458c9f",
+              "name": "content",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "116ba605-81a0-40d7-b025-f773ded62c22",
+              "name": "image",
+              "value": "={{ $json.image }}",
+              "type": "string"
+            },
+            {
+              "id": "891c6120-45e4-4167-b8c9-8531063bd2df",
+              "name": "link",
+              "value": "={{ $json.link }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        64,
+        -192
+      ],
+      "id": "5cb96a47-6e4b-457b-b3cc-03bc2ce2aae0",
+      "name": "Blog Data"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{$vars.GEMINI_NANO_BANANA}}",
+          "mode": "id"
+        },
+        "imageUrls": "={{ $('Blog Data').item.json.image }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        688,
+        -192
+      ],
+      "id": "3955832a-9ca7-427a-9cab-d82e2e3ea6a6",
+      "name": "Analyze image",
+      "retryOnFail": true,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "adbaa001-7b5b-46d4-b649-5819bbf14593",
+              "name": "img_desc",
+              "value": "={{ $json.content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        960,
+        -208
+      ],
+      "id": "702ebd48-075e-426e-ab4e-2bb34fe9f30c",
+      "name": "Img Desc"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{$vars.GEMINI_PRO_LATEST}}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $('Source Data').item.json.content_data.toJsonString() }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "systemMessage": "=You are an expert content strategist, scriptwriter, and video narration director AI.\n\nYour primary goal is to transform a detailed article on any given topic into:\n\n1. A concise video script.\n2. A delivery-aware narration version of that script.\n3. A single, comprehensive cinematic video-generation prompt that visually represents the narration.\n\nIMPORTANT:\nYour output is consumed directly by an automated system using JavaScript JSON.parse().\n\nTherefore, your response MUST ALWAYS be valid JSON.\n\nA response is considered invalid if JSON.parse(response) would throw an error.\n\n==================================================\nINPUT\n==================================================\n\nYou will receive one JSON object containing these fields:\n\n- title\n- content\n- img_desc\n- language\n- aspect_ratio\n- style\n\nConceptually, the input looks like:\n\n{\n  \"title\": \"...\",\n  \"content\": \"...\",\n  \"img_desc\": \"...\",\n  \"language\": \"...\",\n  \"aspect_ratio\": \"9:16\",\n  \"style\": \"...\"\n}\n\nThe input structure is dynamic in terms of the article content, but the above fields are expected to be available.\n\n--------------------------------------------------\nFIELD DEFINITIONS\n--------------------------------------------------\n\n\"title\"\n\nThe title of the article.\n\nUse it to understand the subject and create the introductory hook.\n\n--------------------------------------------------\n\n\"content\"\n\nThe complete article content.\n\nUse it as the primary source for:\n\n- facts\n- concepts\n- insights\n- recommendations\n- key takeaways\n- narrative progression\n\nDo not invent facts that are not supported by the article.\n\n--------------------------------------------------\n\n\"img_desc\"\n\nThe visual style description.\n\nUse this EXCLUSIVELY as the visual style guide for the video prompt.\n\nIt may describe:\n\n- artistic style\n- character appearance\n- environment\n- lighting\n- atmosphere\n- color palette\n- rendering style\n- camera mood\n- visual aesthetic\n\nDo not treat img_desc as an additional source of narrative facts.\n\nThe article determines WHAT happens.\n\nimg_desc determines HOW it looks.\n\n--------------------------------------------------\n\n\"language\"\n\nThe language in which the \"script\" and \"narration\" must be written.\n\nThe value is expected to be a valid BCP-47 language code.\n\nExamples:\n\n- en\n- en-US\n- id\n- id-ID\n- fr\n- de\n- es\n\nFollow the requested language naturally.\n\nDo not translate or modify the language code itself.\n\n--------------------------------------------------\n\n\"aspect_ratio\"\n\nThe required video aspect ratio.\n\nExamples:\n\n- 9:16\n- 1:1\n- 16:9\n\nThe generated video prompt MUST explicitly specify the provided aspect ratio.\n\nDo NOT assume 9:16 unless the input specifies 9:16.\n\nDo NOT replace the provided aspect ratio with another ratio.\n\n--------------------------------------------------\n\n\"style\"\n\nDefines HOW the script should be written and HOW the narration should be delivered.\n\nExample:\n\n\"Deliver the following announcement in a clear, confident, and authoritative tone. The delivery should be professional and direct, conveying important information with credibility.\"\n\nThe style affects BOTH:\n\n- \"script\"\n- \"narration\"\n\nThe script must reflect the requested tone, voice, pacing, wording, and communication style.\n\nThe narration must additionally translate the style into delivery instructions where appropriate.\n\nDo not ignore the style field.\n\n==================================================\n1. ANALYZE THE CONTENT\n==================================================\n\nRead and understand the \"title\" and \"content\" fields.\n\nIdentify:\n\n- the core message\n- important facts\n- important concepts\n- practical insights\n- actions or recommendations\n- the overall emotional or informational direction\n- the most useful information for a short-form video\n\nUse \"style\" to determine how this information should be communicated.\n\nDo not invent facts that are not supported by the article.\n\n==================================================\n2. SYNTHESIZE KEY TAKEAWAYS\n==================================================\n\nDistill the article into exactly 5 distinct, practical, and actionable key takeaways.\n\nThe five takeaways must:\n\n- be directly supported by the article\n- be meaningfully different from one another\n- represent important information from the article\n- be suitable for concise video narration\n- follow a logical progression where possible\n\nDo not expose the five takeaways as a separate output field.\n\nThey must be incorporated into the \"script\" and \"narration\".\n\n==================================================\n3. WRITE THE VIDEO SCRIPT\n==================================================\n\nGenerate the canonical spoken script.\n\nThe script must follow these requirements.\n\nLANGUAGE:\n\nWrite the script in the language specified by \"language\".\n\nSTYLE:\n\nThe writing style MUST be influenced by the \"style\" input.\n\nAdapt:\n\n- tone\n- vocabulary\n- sentence structure\n- pacing\n- emotional intensity\n- confidence\n- formality\n- personality\n- communication approach\n\nto match the requested style.\n\nCONTENT:\n\n- Begin with one concise introductory hook inspired by the article title.\n- Immediately follow the hook with the five key takeaways.\n- Introduce the takeaways using localized equivalents of:\n  - First\n  - Second\n  - Third\n  - Fourth\n  - Finally\n- The entire script should be approximately 70 words.\n- Keep the script concise and natural.\n- Make it suitable for voice narration.\n- Preserve factual accuracy.\n- Do not introduce facts that are not supported by the article.\n\nThe \"script\" is the CANONICAL SPOKEN CONTENT.\n\nThis means:\n\n- It contains ONLY words that should be spoken.\n- It does NOT contain delivery instructions.\n- It does NOT contain stage directions.\n- It does NOT contain pauses.\n- It does NOT contain emotion tags.\n- It does NOT contain sound effects.\n- It does NOT contain camera directions.\n- It does NOT contain brackets.\n- It does NOT contain markdown.\n- It does NOT contain line breaks.\n\nThe script must be one continuous string.\n\nExample:\n\n{\n  \"script\": \"Discover why this simple idea matters. First, ... Second, ... Third, ... Fourth, ... Finally, ...\"\n}\n\n==================================================\n4. GENERATE THE NARRATION\n==================================================\n\nGenerate \"narration\" based directly on the generated \"script\".\n\nThe narration must contain the SAME CORE SPOKEN CONTENT as the script.\n\nThe narration is NOT a separate rewrite of the article.\n\nThe narration is a delivery-aware version of the script.\n\nIts purpose is to tell a text-to-speech or voice-generation system HOW the script should be delivered.\n\n--------------------------------------------------\nNARRATION RULES\n--------------------------------------------------\n\nThe narration MUST:\n\n- follow the \"style\" input\n- preserve the meaning of the script\n- preserve the factual content of the script\n- preserve the same five takeaways\n- preserve the same overall progression\n- remain in the language specified by \"language\"\n\nThe narration MAY include delivery instructions such as:\n\n- [short pause]\n- [brief pause]\n- [pause]\n- [long pause]\n- [emphasize]\n- [slower]\n- [faster]\n- [softly]\n- [firmly]\n- [confidently]\n- [with excitement]\n- [with warmth]\n- [serious tone]\n- [thoughtful tone]\n\nUse delivery instructions ONLY when they improve the intended delivery.\n\nDo not overload the narration with unnecessary instructions.\n\nDelivery instructions must be concise and natural.\n\n--------------------------------------------------\nIMPORTANT RELATIONSHIP BETWEEN SCRIPT AND NARRATION\n--------------------------------------------------\n\nThe \"script\" and \"narration\" must represent the same spoken message.\n\nThe narration may add delivery metadata, but it must NOT introduce new factual claims or additional ideas.\n\nFor example:\n\nscript:\n\n\"Next is Gin Great Today. Pouring a rich amber hue, this spirit captures the elegance of the Art Deco era in every single sip.\"\n\nnarration:\n\n\"Next is Gin Great Today. [short pause] Pouring a rich amber hue, this spirit captures the elegance of the Art Deco era in every single sip.\"\n\nThe narration may also adapt delivery based on the style.\n\nFor example, if style says:\n\n\"Deliver the following announcement in a clear, confident, and authoritative tone. The delivery should be professional and direct, conveying important information with credibility.\"\n\nThe narration could be:\n\n\"Here is what matters most. [firmly] First, the new approach improves efficiency. [short pause] Second, it reduces unnecessary complexity. [confidently] Third, it gives teams greater control. Fourth, it creates a more consistent process. [brief pause] Finally, it delivers a clearer path forward.\"\n\nThe exact delivery instructions must be appropriate to the supplied style.\n\nDo not blindly use the same delivery tags for every input.\n\n--------------------------------------------------\nNARRATION FORMAT\n--------------------------------------------------\n\nThe \"narration\" must be returned as ONE continuous JSON string.\n\nIt must NOT contain literal line breaks.\n\nIt must NOT contain markdown.\n\nIt must NOT contain XML or HTML.\n\nIt must NOT contain JSON objects.\n\nIt must NOT contain comments.\n\n==================================================\n5. GENERATE THE VIDEO PROMPT\n==================================================\n\nGenerate ONE detailed video-generation prompt in English.\n\nThe prompt must describe a continuous cinematic micro-narrative that directly visualizes the generated script and narration.\n\nThe \"script\" is the PRIMARY SOURCE for the video's:\n\n- actions\n- objects\n- emotions\n- environments\n- story progression\n- symbolism\n- visual events\n\nEverything important shown in the video prompt should correspond directly to concepts contained in the script.\n\nDo not introduce major visual concepts unrelated to the script.\n\n--------------------------------------------------\nVISUAL STYLE\n--------------------------------------------------\n\nUse \"img_desc\" exclusively as the visual style guide.\n\nIt may define:\n\n- artistic style\n- character appearance\n- environment appearance\n- lighting\n- atmosphere\n- color palette\n- rendering style\n- camera mood\n- visual aesthetic\n\nThe article and script determine WHAT happens.\n\nimg_desc determines HOW it looks.\n\nDo not allow img_desc to override the factual or narrative meaning of the script.\n\n==================================================\n6. VIDEO CONTINUITY\n==================================================\n\nThe video prompt must:\n\n- be entirely in English\n- explicitly specify the provided \"aspect_ratio\"\n- describe ONE uninterrupted continuous shot\n- describe ONE continuous visual narrative\n- never describe multiple disconnected scenes\n- never describe separate scenes\n- never describe camera cuts\n- never describe scene cuts\n- never use \"cut to\"\n- never use \"next scene\"\n- never use \"new scene\"\n- never use \"another scene\"\n- maintain visual continuity throughout the entire prompt\n\nThe narrative should naturally progress through three phases.\n\n--------------------------------------------------\nESTABLISHING PHASE\n--------------------------------------------------\n\nIntroduce the main subject while visually representing:\n\n- the introductory hook\n- the first takeaway\n\n--------------------------------------------------\nDEVELOPMENT PHASE\n--------------------------------------------------\n\nSeamlessly evolve the same continuous shot to visually represent:\n\n- the second takeaway\n- the third takeaway\n- the fourth takeaway\n\nTransitions should happen naturally through:\n\n- continuous camera movement\n- subject movement\n- environmental transformation\n- evolving action\n- changes in composition\n- visual cause and effect\n\nDo not create separate scenes.\n\n--------------------------------------------------\nRESOLUTION PHASE\n--------------------------------------------------\n\nFinish the same uninterrupted shot with a strong visual ending representing:\n\n- the final takeaway\n- the overall message\n- the emotional conclusion\n\nThe ending should provide a satisfying visual resolution.\n\n==================================================\n7. OUTPUT FORMAT\n==================================================\n\nYour response MUST contain exactly ONE JSON object.\n\nThe object MUST contain exactly four top-level properties:\n\n- \"script\"\n- \"narration\"\n- \"prompt\"\n\nNo other properties are allowed.\n\nRequired structure:\n\n{\n  \"script\": \"The canonical spoken script.\",\n  \"narration\": \"The delivery-aware narration.\",\n  \"prompt\": \"The cinematic video-generation prompt.\"\n}\n\nAll three values MUST be JSON strings.\n\n==================================================\n8. ABSOLUTE JSON RULES\n==================================================\n\nThe final response MUST:\n\n- start with {\n- end with }\n- contain exactly one top-level JSON object\n- contain exactly three top-level properties\n- contain only \"script\", \"narration\", and \"prompt\"\n- use double quotes for JSON property names\n- use double quotes for all string values\n- contain no text before the opening {\n- contain no text after the closing }\n- contain no Markdown\n- contain no ```json fences\n- contain no comments\n- contain no explanations\n- contain no notes\n- contain no reasoning\n- contain no apologies\n- contain no trailing commas\n- contain no additional properties\n\n==================================================\n9. JSON STRING ESCAPING\n==================================================\n\nThis section is CRITICAL.\n\nThe values of \"script\", \"narration\", and \"prompt\" are JSON strings.\n\nTherefore, ALL characters inside those strings MUST be escaped according to the JSON specification.\n\nIn particular:\n\n1. Every double quote character inside a string MUST be escaped as:\n\n\\\"\n\n2. Every backslash inside a string MUST be escaped as:\n\n\\\\\n\n3. Never place a literal newline inside any JSON string.\n\n4. Never place a literal carriage return inside any JSON string.\n\n5. Never place a literal tab character inside any JSON string.\n\n6. Never use unescaped control characters.\n\n7. If the generated content contains quotation marks, escape them correctly.\n\n8. Square brackets used for narration delivery instructions are allowed, but they are ordinary string characters and MUST remain inside the JSON string.\n\nExample of VALID JSON:\n\n{\n  \"script\": \"First, understand the problem. Second, identify the opportunity.\",\n  \"narration\": \"First, understand the problem. [short pause] Second, identify the opportunity.\",\n  \"prompt\": \"A cinematic continuous shot in a vertical 9:16 aspect ratio.\"\n}\n\nExample of INVALID JSON:\n\n{\n  \"script\": \"First, understand the problem.\",\n  \"narration\": \"First, [short pause]\nSecond, identify the opportunity.\",\n  \"prompt\": \"A cinematic shot.\"\n}\n\nThe second example is invalid because the narration contains a literal newline.\n\nNever produce invalid JSON.\n\n==================================================\n10. DO NOT CONFUSE SCRIPT, NARRATION, AND PROMPT\n==================================================\n\nSCRIPT:\n\nThe clean canonical spoken words.\n\nNARRATION:\n\nThe same spoken message enhanced with delivery instructions according to \"style\".\n\nPROMPT:\n\nAn English cinematic visual description based on the script and img_desc.\n\nDo not place visual instructions inside \"script\".\n\nDo not place visual instructions inside \"narration\".\n\nDo not place narration delivery instructions inside \"prompt\" unless they are necessary to describe a visible emotional or behavioral quality.\n\n==================================================\n11. FINAL INTERNAL VALIDATION\n==================================================\n\nBefore returning the response, internally perform ALL of the following checks.\n\nCHECK 1:\nThe response begins with exactly:\n\n{\n\nCHECK 2:\nThe response ends with exactly:\n\n}\n\nCHECK 3:\nThe response contains exactly one JSON object.\n\nCHECK 4:\nThe top-level object contains exactly three properties:\n\n\"script\"\n\n\"narration\"\n\n\"prompt\"\n\nCHECK 5:\nNo other top-level properties exist.\n\nCHECK 6:\nAll three properties contain JSON string values.\n\nCHECK 7:\nThe script is approximately 70 words.\n\nCHECK 8:\nThe script contains only spoken narration.\n\nCHECK 9:\nThe narration follows the script and does not introduce unsupported facts.\n\nCHECK 10:\nThe narration reflects the requested \"style\".\n\nCHECK 11:\nThe prompt is entirely in English.\n\nCHECK 12:\nThe prompt explicitly uses the provided \"aspect_ratio\".\n\nCHECK 13:\nThe prompt describes one uninterrupted continuous shot.\n\nCHECK 14:\nThe prompt does not describe multiple disconnected scenes.\n\nCHECK 15:\nEvery double quote inside \"script\" is properly escaped.\n\nCHECK 16:\nEvery double quote inside \"narration\" is properly escaped.\n\nCHECK 17:\nEvery double quote inside \"prompt\" is properly escaped.\n\nCHECK 18:\nAll backslashes inside string values are properly escaped.\n\nCHECK 19:\nNo string contains literal newline characters.\n\nCHECK 20:\nNo string contains literal control characters.\n\nCHECK 21:\nThere are no trailing commas.\n\nCHECK 22:\nThere is no Markdown.\n\nCHECK 23:\nThere is no text before the opening {.\n\nCHECK 24:\nThere is no text after the closing }.\n\nCHECK 25:\nThe entire response would successfully execute as:\n\nJSON.parse(response)\n\nwithout preprocessing, cleanup, regex replacement, or any other transformation.\n\nIf ANY check fails, regenerate the complete response internally until every check passes.\n\n==================================================\n12. FINAL RESPONSE\n==================================================\n\nReturn ONLY the final valid JSON object.\n\nDo not output anything else.\n\nThe final response MUST have exactly this structure:\n\n{\n  \"script\": \"generated canonical spoken script\",\n  \"narration\": \"generated delivery-aware narration\",\n  \"prompt\": \"generated cinematic video prompt\"\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        1792,
+        -512
+      ],
+      "id": "550d97b0-55f7-46d5-a741-681249cded91",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "var obj = JSON.parse($input.first().json.content.parts[0].text);\nvar suffix = $('Prepare Data').first().json.output_meta.suffix;\n\n// Only append if suffix exists and is not an empty string\nif (suffix) {\n    obj.script = obj.script + ' ' + suffix;\n}\n\nreturn obj;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2208,
+        -528
+      ],
+      "id": "7fbf4637-0518-4dda-b945-d2e261026d09",
+      "name": "Text speech",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2080,
+        -448
+      ],
+      "id": "1331ec09-35a1-4ee7-8496-6f88bcaa9812",
+      "name": "Wait1",
+      "webhookId": "5bf266d2-0995-488a-8c38-cdc2f6c61549"
+    },
+    {
+      "parameters": {
+        "jsCode": "const source =  $('Prepare Data').first().json.source_type;\nconst output = $('Prepare Data').first().json.output_type\nif(source === 'blog' && output === 'video'){\n  return {\n    content_data: {\n      title: $('Blog Data').first().json.title,\n      content: $('Blog Data').first().json.content,\n      img_desc: $input.first().json.img_desc,\n      img_url: $('Blog Data').first().json.image,\n      language: $('Prepare Data').first().json.output_meta.language,\n      aspect_ratio: $('Prepare Data').first().json.output_meta.aspect_ratio.replace('_',':'),\n      style: $('Prepare Data').first().json.output_meta.voice_style\n    },\n    caption_data: $('Generate Caption').first().json.social_content,\n    output_meta: $('Prepare Data').first().json.output_meta\n  }\n}\nif(source === 'blog' && output === 'music'){\n  return {\n    content_data: {\n      title: $('Blog Data').first().json.title,\n      content: $('Blog Data').first().json.content,\n      img_desc: $input.first().json.img_desc,\n      img_url: $('Blog Data').first().json.image,\n      language: $('Prepare Data').first().json.output_meta.language,\n      aspect_ratio: $('Prepare Data').first().json.output_meta.aspect_ratio.replace('_',':')\n    },\n    caption_data: $('Generate Caption').first().json.social_content,\n    output_meta: $('Prepare Data').first().json.output_meta\n  }\n}\nif(source === 'blog' && output === 'image'){\n  return {\n    prompt_data: {\n      blog_title: $('Blog Data').first().json.title,\n      blog_content: $('Blog Data').first().json.content,\n      blog_image_description: $input.first().json.img_desc,\n      aspect_ratio: $('Prepare Data').first().json.output_meta.aspect_ratio.replace('_',':')\n    },\n    content_data: {\n      img_url: $('Blog Data').first().json.image,\n      language: $('Prepare Data').first().json.output_meta.language,\n      aspect_ratio: $('Prepare Data').first().json.output_meta.aspect_ratio.replace('_',':')\n    },\n    caption_data: $('Generate Caption').first().json.social_content,\n    output_meta: $('Prepare Data').first().json.output_meta\n  }\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1296,
+        -32
+      ],
+      "id": "f905f2e7-c643-4cc0-a639-f5056a4f28ca",
+      "name": "Source Data"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Prepare Data').item.json.output_type }}",
+                    "rightValue": "video",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "c102c4be-faae-403b-83a8-8bddac9d8dac"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "video"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "36eea3c9-1a93-4645-9b7b-d8de6bd6e154",
+                    "leftValue": "={{ $('Prepare Data').item.json.output_type }}",
+                    "rightValue": "music",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "music"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "bd79b05d-6609-45d3-920b-0938cadaa211",
+                    "leftValue": "={{ $('Prepare Data').item.json.output_type }}",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1504,
+        -48
+      ],
+      "id": "9748d2cd-2773-46d6-92a6-990ab392e441",
+      "name": "Switch2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://texttospeech.googleapis.com/v1/text:synthesize",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"input\": {\n    \"prompt\": {{ $('Source Data').item.json.output_meta.voice_style.toJsonString() }},\n    \"text\": {{ $('Text speech').item.json.narration.toJsonString() }}\n  },\n  \"voice\": {\n    \"languageCode\": {{ $('Source Data').item.json.output_meta.language.toJsonString() }},\n    \"name\": {{ $('Source Data').item.json.output_meta.voice_model.toJsonString() }},\n    \"model_name\": \"{{$vars.GEMINI_FLASH_TEXT}}-tts\"\n  },\n  \"audioConfig\": {\n    \"audioEncoding\": \"MP3\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2544,
+        -544
+      ],
+      "id": "de708463-e6df-4693-9762-64e020a4f0ca",
+      "name": "Text to speech",
+      "credentials": {
+        "googleApi": {
+          "id": "C4Bh0vq2T0s7HIDk",
+          "name": "SF - Vertex API Service Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3056,
+        -352
+      ],
+      "id": "8cf40495-71a8-44a7-bbe6-0043d610d3e9",
+      "name": "Wait",
+      "webhookId": "9c8af43e-8d52-4e6d-aff2-09af7fa8cb3b"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "audioContent",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        2864,
+        -560
+      ],
+      "id": "43dfcc41-f50a-4f60-a6cb-e2950bba2c80",
+      "name": "Convert base64 to File",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Source Data').item.json.output_meta.with_subtitle }}",
+                    "rightValue": true,
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "id": "f5027c7b-0e75-4afb-99a5-a75f0723a237"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "has_subtitle"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "93ee2280-815b-4a39-a454-3c5ebce944ea",
+                    "leftValue": "={{ $('Source Data').item.json.output_meta.with_subtitle }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "false",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "no_subtitle"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        3072,
+        -656
+      ],
+      "id": "7517359a-d7a2-4526-b82c-8ffc775685c6",
+      "name": "Switch3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ca5b28fe-fc75-40f5-8f40-65d58483503b",
+              "name": "subtitle",
+              "value": "={{ $json.content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3600,
+        -736
+      ],
+      "id": "47d3b74e-7b32-41e2-b24b-8648a34608c8",
+      "name": "Speech text"
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "subtitle",
+        "binaryPropertyName": "subtitle_file",
+        "options": {
+          "encoding": "utf8",
+          "fileName": "subtitle.ass"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        3776,
+        -736
+      ],
+      "id": "56a6f429-57ab-4825-91ed-233b84f32eec",
+      "name": "Convert to File",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "binaryPropertyName": "subtitle_file",
+        "destinationKey": "subtitle_base",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        3952,
+        -736
+      ],
+      "id": "5039c8e2-c345-49e3-a989-9e1b8d46501d",
+      "name": "Extract from File",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const model =  $('Source Data').first().json.output_meta.video_model;\nconst prompt = $('Text speech').first().json.prompt;\n\nif(model == 'veo'){\n  return {\n    \"url\": \"https://api.kie.ai/api/v1/veo/generate\",\n    \"config\": {\n      \"prompt\": prompt,\n      \"model\": \"veo3_fast\",\n      \"aspect_ratio\": $('Source Data').first().json.content_data.aspect_ratio,\n      \"imageUrls\": [\n        $('Source Data').first().json.content_data.img_url\n      ],\n      \"generationType\": \"REFERENCE_2_VIDEO\",\n      \"enableFallback\": false,\n      \"enableTranslation\": false,\n      \"duration\": 8,\n      \"resolution\": \"720p\"\n    } \n  }\n}else if(model == 'runway'){\n  return {\n    \"url\": \"https://api.kie.ai/api/v1/runway/generate\",\n    \"config\": {\n      \"prompt\": prompt,\n      \"aspectRatio\": $('Source Data').first().json.content_data.aspect_ratio,\n      \"quality\": \"720p\",\n      \"duration\": \"10\",\n      \"imageUrl\": $('Source Data').first().json.content_data.img_url\n    } \n  }  \n}else if(model == 'kling'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": \"kling-2.6/image-to-video\",\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_urls\": [\n          $('Source Data').first().json.content_data.img_url\n        ],\n        \"sound\": false,\n        \"duration\": \"10\",\n        \"aspect_ratio\": $('Source Data').first().json.content_data.aspect_ratio\n      }\n    }\n  }\n}else if(model == 'seedance'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": \"bytedance/seedance-1.5-pro\",\n      \"input\":{\n        \"prompt\": prompt,\n        \"input_urls\": [\n          $('Source Data').first().json.content_data.img_url\n        ],\n        \"aspect_ratio\": $('Source Data').first().json.content_data.aspect_ratio,\n        \"duration\": 10,\n        \"resolution\": \"480p\"\n      }\n    }\n  }\n}else if(model == 'grok'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": \"grok-imagine/image-to-video\",\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_urls\": [\n          $('Source Data').first().json.content_data.img_url\n        ],\n        \"duration\": \"10\",\n        \"resolution\": \"480p\",\n        \"mode\": \"normal\",\n        \"aspect_ratio\": $('Source Data').first().json.content_data.aspect_ratio\n      }\n    }\n  }\n}else if(model == 'hailuo'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": \"hailuo/2-3-image-to-video-standard\",\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_url\": $('Source Data').first().json.content_data.img_url,\n        \"duration\": \"10\",\n        \"resolution\": \"768P\"\n      }\n    }\n  }\n}else if(model == 'wan'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": \"wan/2-2-a14b-image-to-video-turbo\",\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_url\": $('Source Data').first().json.content_data.img_url,\n        \"enable_prompt_expansion\": false,\n        \"acceleration\": \"none\",\n        \"resolution\": \"480p\",\n        \"aspect_ratio\": $('Source Data').first().json.content_data.aspect_ratio\n      }\n    }\n  }\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4240,
+        -528
+      ],
+      "id": "542b6fd1-9ae1-444c-b7a6-7c1245c53f85",
+      "name": "Format model"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        32
+      ],
+      "id": "0b5b1bb3-6f2d-4e56-9287-a09cfbefe9bd",
+      "name": "[TEMP TOPIC]"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        560,
+        256
+      ],
+      "id": "fe403034-8432-44cb-a9d6-500d26aea7dc",
+      "name": "[TEMP MANUAL]"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.config.toJsonString() }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4512,
+        -528
+      ],
+      "id": "de3f86be-3e27-44bd-b3ac-a1abf7819f5a",
+      "name": "Generate video",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "SFhjYsXsyVcRhxXr",
+          "name": "SF - KIE AI"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://dev-wizards.synergizeflow.com/webhook/v2/media-agent/kie-pooling",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "CF-Access-Client-Id",
+              "value": "={{ $vars.CF_ID }}"
+            },
+            {
+              "name": "CF-Access-Client-Secret",
+              "value": "={{ $vars.CF_SECRET }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "kie_task_id",
+              "value": "={{ $json.data.taskId }}"
+            },
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "webhook",
+              "value": "={{ $('Prepare Data').item.json.webhook }}"
+            },
+            {
+              "name": "domain",
+              "value": "={{ $('Prepare Data').item.json.domain }}"
+            },
+            {
+              "name": "output_type",
+              "value": "={{ $('Prepare Data').item.json.output_type }}"
+            },
+            {
+              "name": "audio",
+              "value": "={{ $('Text to speech').item.json.audioContent }}"
+            },
+            {
+              "name": "subtitle",
+              "value": "={{ $('Source Data').item.json.output_meta.with_subtitle ? $('Extract from File').item.json.subtitle_base : 'none' }}"
+            },
+            {
+              "name": "output_meta",
+              "value": "={{ $('Source Data').item.json.output_meta }}"
+            },
+            {
+              "name": "caption_data",
+              "value": "={{ $('Source Data').item.json.caption_data }}"
+            },
+            {
+              "name": "kie_music_task_id",
+              "value": "none"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        4784,
+        -544
+      ],
+      "id": "f42bdde8-17c9-44c1-9240-c4f8213bf4fb",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "ynYqjbVn2W3dYbuj",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/ynYqjbVn2W3dYbuj",
+          "cachedResultName": "SynergizeFlow.v2 — SF - Media Agent - Generate Captions"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        496,
+        -192
+      ],
+      "id": "73f6a431-cd63-4499-b970-73fcf60fed07",
+      "name": "Generate Caption"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c9b64766-d3cf-4bbb-ad81-819a425adb28",
+              "name": "source_type",
+              "value": "={{ $('Prepare Data').item.json.source_type }}",
+              "type": "string"
+            },
+            {
+              "id": "ecbf022b-df8d-4496-bf87-5bf587e7d2bd",
+              "name": "source_data",
+              "value": "={{ $json }}",
+              "type": "object"
+            },
+            {
+              "id": "3b8c75c7-fef0-48c2-9e5e-b20cb18ef3e3",
+              "name": "social_media",
+              "value": "={{ $('Prepare Data').item.json.social_media }}",
+              "type": "array"
+            },
+            {
+              "id": "ba71af53-190d-4de6-986b-28d41247d451",
+              "name": "language",
+              "value": "={{ $('Prepare Data').item.json.output_meta.language }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        272,
+        -192
+      ],
+      "id": "af600fd4-023a-4fbd-ad39-6319f603d3f2",
+      "name": "Prepare Caption Data"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{$vars.GEMINI_PRO_LATEST}}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $('Source Data').item.json.content_data.toJsonString() }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "systemMessage": "=You are a professional musician, composer, and AI music prompt engineer.\n\nYour task is to analyze a given blog post and generate:\n\n1. A HIGH-QUALITY POSITIVE PROMPT (what the music SHOULD include)\n2. A HIGH-QUALITY NEGATIVE PROMPT (what the music SHOULD AVOID)\n3. A CLEAR MUSIC STYLE SPECIFICATION (main genre/style of the music)\n\n## ANALYSIS INSTRUCTIONS\n\n1. Carefully read and understand the entire blog post content.\n\n2. Identify:\n\n   * Mood and emotional tone\n   * Target audience\n   * Theme, setting, and cultural context\n   * Intensity and pacing\n\n3. Based on your analysis, generate the following:\n\n### MUSIC STYLE SPECIFICATION\n\n* Define the primary genre or style.\n* Examples: Jazz, Classical, Electronic, Pop, Rock, Hip-hop, Ambient, Cinematic, Nasheed, etc.\n* Keep it short and concise.\n* Maximum 1 line.\n* A sub-genre may be included when relevant.\n* Examples: \"Ambient Cinematic\", \"Lo-fi Hip-hop\", \"Acoustic Folk\"\n\n### POSITIVE PROMPT\n\nGenerate a high-quality AI music generation prompt containing:\n\n* Suitable genre(s) aligned with the music style\n* Appropriate instruments\n* Mood and atmosphere\n* Tempo and energy level\n* Relevant stylistic characteristics or references\n* Production quality descriptors such as cinematic, ambient, warm, clean mix, spacious, organic, etc.\n* Musical elements that support the blog's subject and emotional tone\n\nRequirements:\n\n* Maximum 2–3 lines in natural text.\n* Use concise comma-separated phrases.\n* Optimize the prompt for AI music generation tools.\n* Do not include explanations.\n\n### NEGATIVE PROMPT\n\nGenerate a concise AI music negative prompt describing what should be avoided.\n\nIt should exclude:\n\n* Inappropriate genres\n* Wrong or unsuitable instruments\n* Conflicting moods or emotions\n* Distracting elements\n* Vocals when they are not suitable\n* Poor audio quality\n* Noise\n* Distortion\n* Clipping\n* Unwanted effects\n* Any musical element that contradicts the blog's tone\n\nRequirements:\n\n* Maximum 200 characters.\n* Use concise comma-separated phrases.\n* Do not repeat phrases unnecessarily.\n* Do not include explanations.\n\n## STRICT OUTPUT RULES\n\nThe response MUST satisfy ALL of the following rules:\n\n1. Return ONLY a valid JSON object.\n2. Do NOT return Markdown.\n3. Do NOT use code fences such as ```json or ```.\n4. Do NOT include explanations, comments, notes, introductions, conclusions, or any text outside the JSON object.\n5. The response MUST begin with `{`.\n6. The response MUST end with `}`.\n7. Use exactly these three top-level keys:\n   * \"music_style\"\n   * \"positive_prompt\"\n   * \"negative_prompt\"\n8. All three values MUST be JSON strings.\n9. Do NOT return arrays, nested objects, numbers, booleans, or null values.\n10. Escape all double quotes inside string values using `\\\"`.\n11. Escape backslashes using `\\\\` when necessary.\n12. Do not include literal line breaks inside JSON string values. Use a single-line string for each value.\n13. Ensure the output can be parsed directly using a standard JSON parser such as JSON.parse().\n14. Do not add trailing commas.\n15. Do not use single quotes as a replacement for JSON double quotes.\n16. Ensure the negative_prompt is no longer than 200 characters.\n17. Ensure all content is directly relevant to the blog post.\n18. Do not repeat identical phrases between positive_prompt and negative_prompt unless necessary for clarity.\n19. If the blog content is ambiguous, make the most reasonable musical interpretation without asking questions.\n20. Before returning the response, internally validate that the entire response is syntactically valid JSON.\n\n## REQUIRED OUTPUT STRUCTURE\n\n{\n  \"music_style\": \"...\",\n  \"positive_prompt\": \"...\",\n  \"negative_prompt\": \"...\"\n}\n\nIMPORTANT: The example above describes the required structure. Your actual response MUST contain only the JSON object and nothing else."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        1840,
+        -32
+      ],
+      "id": "1a951ca9-1793-480c-ad87-990dbabfd591",
+      "name": "Message a model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2128,
+        48
+      ],
+      "id": "d3f55438-ce5a-442b-9ffc-63a8341ef23a",
+      "name": "Wait2",
+      "webhookId": "5bf266d2-0995-488a-8c38-cdc2f6c61549"
+    },
+    {
+      "parameters": {
+        "jsCode": "var obj = JSON.parse($input.first().json.content.parts[0].text);\n\nreturn {obj}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2256,
+        -48
+      ],
+      "id": "bfc4056d-77e2-4b0d-920f-391366fd1510",
+      "name": "Text music",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.kie.ai/api/v1/generate",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"customMode\": true,\n  \"instrumental\": true,\n  \"model\": \"V5\",\n  \"prompt\": {{ $json.obj.positive_prompt.toJsonString() }},\n  \"negativeTags\": {{ $json.obj.negative_prompt.toJsonString() }},\n  \"style\": {{ $json.obj.music_style.toJsonString() }},\n  \"styleWeight\": 0.65,\n  \"weirdnessConstraint\": 0.5,\n  \"callBackUrl\": \"https://api.example.com/callback\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2544,
+        -64
+      ],
+      "id": "66675515-0ef7-4f14-8bdb-ccfd7079a1fd",
+      "name": "Generate Music",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "SFhjYsXsyVcRhxXr",
+          "name": "SF - KIE AI"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{$vars.GEMINI_PRO_LATEST}}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={\n  \"title\": {{ $('Source Data').item.json.content_data.title.toJsonString() }},\n  \"content\": {{ $('Source Data').item.json.content_data.content.toJsonString() }},\n  \"img_desc\": {{ $('Source Data').item.json.content_data.img_desc.toJsonString() }},\n  \"music_style\": {{ $('Text music').item.json.obj.music_style.toJsonString() }}\n}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "systemMessage": "=You are an expert visual storyteller and AI video prompt engineer.\n\nYour primary goal is to transform a detailed article into a single, high-quality video generation prompt that visually represents the content while remaining stylistically aligned with the provided music style.\n\nIMPORTANT: Your response is consumed directly by an automated system using JSON.parse(). Invalid JSON will cause the workflow to fail. Therefore, you MUST return exactly one syntactically valid JSON object and absolutely nothing else.\n\n# INPUT\n\nYou will receive one JSON object containing:\n\n{\n  \"title\": \"...\",\n  \"content\": \"...\",\n  \"img_desc\": \"...\",\n  \"music_style\": \"...\"\n}\n\nThe input structure above defines the available information. Analyze the values carefully before generating the output.\n\n# 1. ANALYZE THE CONTENT\n\nCarefully read and understand the provided \"title\" and \"content\".\n\nIdentify internally:\n\n- Primary message\n- Important concepts\n- Emotional tone\n- Visual opportunities\n- Logical story progression\n- Main subject\n- Intended emotional impact\n\nDo not output this analysis.\n\n# 2. BUILD A VISUAL NARRATIVE\n\nTransform the article into one coherent cinematic micro-story.\n\nThe narrative must contain a natural progression through three conceptual phases:\n\n## Beginning\n\nIntroduce the main subject and visually establish the article's central idea.\n\n## Development\n\nShow the evolution of the article's important concepts through continuous visual progression.\n\n## Resolution\n\nFinish with a memorable visual that represents the article's conclusion, message, or emotional impact.\n\nThese phases must flow naturally within ONE continuous shot.\n\nDo not explicitly label these phases in the generated prompt.\n\n# 3. GENERATE EXACTLY ONE VIDEO PROMPT\n\nGenerate exactly ONE video generation prompt.\n\nThe prompt MUST:\n\n- Be written entirely in English.\n- Be one continuous paragraph.\n- Describe one uninterrupted cinematic shot.\n- Describe a continuous visual progression.\n- Never describe scene cuts.\n- Never describe jump cuts.\n- Never describe transitions between separate scenes.\n- Never describe multiple disconnected scenes.\n- Never restart the story midway.\n- Never use phrases such as \"cut to\", \"transition to\", \"new scene\", \"next scene\", or \"the scene changes\".\n- Specify a Vertical 9:16 aspect ratio.\n- Maintain visual and physical continuity throughout the entire shot.\n- Use smooth, coherent camera movement.\n- Allow the environment, lighting, subject, and action to evolve naturally.\n\nThe final prompt should read like one continuous cinematic camera direction rather than a sequence of separate shots.\n\n# 4. SYNCHRONIZE WITH MUSIC STYLE\n\nThe visual storytelling must naturally align with the supplied \"music_style\".\n\nAdapt internally:\n\n- Pacing\n- Rhythm\n- Atmosphere\n- Emotional intensity\n- Camera movement\n- Visual energy\n- Cinematic mood\n- Motion intensity\n\nExamples:\n\n- Ambient → calm, slow, atmospheric movement\n- Lo-fi → cozy, intimate, relaxed movement\n- Cinematic → dramatic, emotional, controlled movement\n- Electronic → energetic, futuristic, dynamic movement\n- Orchestral → epic, majestic, sweeping movement\n\nThe generated video prompt must NOT explicitly mention synchronization with music unless the supplied content naturally requires it.\n\nDo not write phrases such as \"synchronized with the music\" or \"matching the music style\".\n\nInstead, express the musical character visually through pacing, movement, atmosphere, and emotional intensity.\n\n# 5. FOLLOW img_desc STRICTLY\n\nThe entire visual appearance MUST follow the provided \"img_desc\".\n\nUse \"img_desc\" as the primary visual reference for:\n\n- Environment\n- Architecture\n- Character appearance\n- Clothing\n- Objects\n- Rendering style\n- Lighting\n- Color palette\n- Materials\n- Textures\n- Atmosphere\n- Artistic style\n- Visual realism or stylization\n\nDo NOT invent a conflicting visual style.\n\nDo NOT replace the visual style described in \"img_desc\".\n\nIf \"img_desc\" specifies a particular character, environment, art style, color palette, lighting style, or rendering technique, preserve those characteristics throughout the video.\n\n# 6. NARRATIVE STRUCTURE\n\nThe generated prompt must naturally evolve through the following conceptual structure:\n\n## Establishing Phase\n\nIntroduce the primary subject and visually communicate the article's central idea.\n\n## Development Phase\n\nContinue the uninterrupted camera movement while progressively visualizing the article's important concepts.\n\nThe environment and action should evolve naturally.\n\nAvoid abrupt changes.\n\nAvoid disconnected imagery.\n\n## Resolution Phase\n\nConclude the continuous shot with a visually powerful and memorable moment that communicates the article's message or emotional takeaway.\n\nThe ending should feel intentional, cinematic, and satisfying.\n\nDo not introduce an unrelated subject or environment at the end.\n\n# 7. CAMERA AND MOTION\n\nUse cinematic camera language appropriate for modern AI video generation models.\n\nThe camera movement must remain physically coherent and continuous.\n\nPossible movements include:\n\n- Slow dolly forward\n- Smooth tracking shot\n- Gentle crane movement\n- Controlled orbit\n- Subtle push-in\n- Slow lateral movement\n- Natural handheld movement when appropriate\n- Cinematic follow movement\n\nSelect movements that fit the \"music_style\", article tone, and \"img_desc\".\n\nAvoid excessive camera movement that conflicts with the emotional tone.\n\nAvoid impossible camera behavior.\n\nAvoid sudden teleportation or unexplained changes in camera position.\n\n# 8. VISUAL CONTINUITY\n\nMaintain continuity throughout the entire prompt.\n\nThe following must remain logically consistent:\n\n- Character identity\n- Character appearance\n- Clothing\n- Environment\n- Architecture\n- Object placement\n- Lighting direction\n- Time of day\n- Color palette\n- Camera perspective\n- Physical movement\n\nAny evolution must happen gradually and naturally.\n\n# 9. PROMPT QUALITY\n\nThe generated prompt must be:\n\n- Highly descriptive\n- Cinematic\n- Visually rich\n- Physically coherent\n- Internally consistent\n- Suitable for modern AI video generation models\n- Clearly understandable\n- Specific enough to produce meaningful visuals\n- Free of contradictions\n- Free of unnecessary repetition\n\nAvoid:\n\n- Generic filler\n- Redundant adjectives\n- Contradictory instructions\n- Unrelated imagery\n- Abrupt changes\n- Disconnected scenes\n- Excessive camera instructions\n- Abstract instructions that cannot be visually represented\n\n# 10. LANGUAGE REQUIREMENT\n\nThe value of \"prompt\" MUST be written entirely in English.\n\nDo not translate or repeat the article in another language.\n\nUse clear cinematic English suitable for an AI video generation model.\n\n# 11. STRICT JSON OUTPUT REQUIREMENTS\n\nYour response MUST consist of EXACTLY ONE valid JSON object and NOTHING ELSE.\n\nMandatory rules:\n\n1. Return ONLY the JSON object.\n2. The first character MUST be `{`.\n3. The final character MUST be `}`.\n4. Do NOT output Markdown.\n5. Do NOT output triple backticks.\n6. Do NOT output ```json.\n7. Do NOT output explanations.\n8. Do NOT output comments.\n9. Do NOT output notes.\n10. Do NOT output reasoning.\n11. Do NOT output apologies.\n12. Do NOT output introductions.\n13. Do NOT output conclusions.\n14. Do NOT output examples.\n15. Do NOT output any text outside the JSON object.\n16. Do NOT include trailing commas.\n17. Do NOT use single quotes for JSON keys or string values.\n18. Use double quotes for all JSON keys.\n19. The JSON object MUST contain exactly one top-level property named \"prompt\".\n20. The value of \"prompt\" MUST be a JSON string.\n21. Do NOT add any additional top-level properties.\n22. Do NOT add nested objects or arrays.\n23. Do NOT use null, boolean, or numeric values.\n24. Escape all double quotation marks inside the prompt using `\\\"`.\n25. Escape backslashes according to the JSON specification.\n26. Do NOT include raw newline characters inside the \"prompt\" string.\n27. Do NOT include raw tab characters inside the \"prompt\" string.\n28. Do NOT include other unescaped control characters inside the \"prompt\" string.\n29. Keep the entire \"prompt\" value as one continuous paragraph.\n30. The output MUST be directly parsable by JSON.parse() without preprocessing.\n\n# 12. REQUIRED OUTPUT STRUCTURE\n\nThe final response MUST have exactly this structural format:\n\n{\n  \"prompt\": \"...\"\n}\n\nThe \"...\" must be replaced with the actual generated video prompt.\n\nDo not output the schema itself.\n\nDo not output placeholder text.\n\n# 13. JSON STRING SAFETY\n\nWhen generating the \"prompt\" value:\n\n- Replace any internal `\"` character with `\\\"`.\n- Escape any required backslash as `\\\\`.\n- Do not insert raw line breaks.\n- Do not insert raw tabs.\n- Do not use unescaped control characters.\n- Do not accidentally terminate the JSON string early.\n- Do not append text after the closing quotation mark.\n- Do not append any property after \"prompt\".\n\nThe generated prompt itself may contain commas, periods, parentheses, hyphens, apostrophes, colons, and other normal punctuation, provided they are valid inside a JSON string.\n\n# 14. FINAL INTERNAL VALIDATION\n\nBefore returning the response, internally validate the complete output.\n\nVerify ALL of the following:\n\n1. The response starts with `{`.\n2. The response ends with `}`.\n3. There is exactly one JSON object.\n4. There is exactly one top-level property.\n5. The property name is exactly `\"prompt\"`.\n6. The `\"prompt\"` value is a string.\n7. There are no arrays.\n8. There are no nested objects.\n9. There are no additional properties.\n10. There is no text before `{`.\n11. There is no text after `}`.\n12. There are no Markdown code fences.\n13. There are no comments.\n14. There are no trailing commas.\n15. All JSON keys use double quotes.\n16. All internal double quotes in the prompt are properly escaped.\n17. All required backslashes are properly escaped.\n18. There are no raw newline characters inside the prompt string.\n19. There are no raw tab characters inside the prompt string.\n20. The prompt is entirely in English.\n21. The prompt describes exactly one continuous shot.\n22. The prompt specifies Vertical 9:16.\n23. The prompt follows \"img_desc\".\n24. The prompt reflects the article's content.\n25. The prompt naturally reflects \"music_style\".\n26. The prompt contains a beginning, development, and resolution without separate scenes.\n27. The prompt contains no scene cuts or disconnected scenes.\n28. The complete response can be successfully parsed using JSON.parse().\n\nIf ANY validation condition fails, regenerate the entire JSON response before returning it.\n\nFINAL INSTRUCTION:\n\nReturn ONLY the valid JSON object.\n\nNothing before it.\n\nNothing after it."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        2816,
+        -80
+      ],
+      "id": "dabab501-f854-44f2-82d0-4567f0db67d5",
+      "name": "Message a model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3104,
+        -16
+      ],
+      "id": "b4c5b13f-ff1a-4341-b978-69e2c1bc184c",
+      "name": "Wait3",
+      "webhookId": "5bf266d2-0995-488a-8c38-cdc2f6c61549"
+    },
+    {
+      "parameters": {
+        "jsCode": "const model =  $('Source Data').first().json.output_meta.video_model;\nconst prompt = $input.first().json.obj.prompt\n\nif(model == 'veo'){\n  return {\n    \"url\": \"https://api.kie.ai/api/v1/veo/generate\",\n    \"config\": {\n      \"prompt\": prompt,\n      \"model\": \"veo3_fast\",\n      \"aspect_ratio\": $('Source Data').first().json.content_data.aspect_ratio,\n      \"imageUrls\": [\n        $('Source Data').first().json.content_data.img_url\n      ],\n      \"generationType\": \"REFERENCE_2_VIDEO\",\n      \"enableFallback\": false,\n      \"enableTranslation\": false,\n      \"duration\": 8,\n      \"resolution\": \"720p\"\n    } \n  }\n}else if(model == 'runway'){\n  return {\n    \"url\": \"https://api.kie.ai/api/v1/runway/generate\",\n    \"config\": {\n      \"prompt\": prompt,\n      \"aspectRatio\": $('Source Data').first().json.content_data.aspect_ratio,\n      \"quality\": \"720p\",\n      \"duration\": \"10\",\n      \"imageUrl\": $('Source Data').first().json.content_data.img_url\n    } \n  }  \n}else if(model == 'kling'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": \"kling-2.6/image-to-video\",\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_urls\": [\n          $('Source Data').first().json.content_data.img_url\n        ],\n        \"sound\": false,\n        \"duration\": \"10\",\n        \"aspect_ratio\": $('Source Data').first().json.content_data.aspect_ratio\n      }\n    }\n  }\n}else if(model == 'seedance'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": \"bytedance/seedance-1.5-pro\",\n      \"input\":{\n        \"prompt\": prompt,\n        \"input_urls\": [\n          $('Source Data').first().json.content_data.img_url\n        ],\n        \"aspect_ratio\": $('Source Data').first().json.content_data.aspect_ratio,\n        \"duration\": 10,\n        \"resolution\": \"480p\"\n      }\n    }\n  }\n}else if(model == 'grok'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": \"grok-imagine/image-to-video\",\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_urls\": [\n          $('Source Data').first().json.content_data.img_url\n        ],\n        \"duration\": \"10\",\n        \"resolution\": \"480p\",\n        \"mode\": \"normal\",\n        \"aspect_ratio\": $('Source Data').first().json.content_data.aspect_ratio\n      }\n    }\n  }\n}else if(model == 'hailuo'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": \"hailuo/2-3-image-to-video-standard\",\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_url\": $('Source Data').first().json.content_data.img_url,\n        \"duration\": \"10\",\n        \"resolution\": \"768P\"\n      }\n    }\n  }\n}else if(model == 'wan'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": \"wan/2-2-a14b-image-to-video-turbo\",\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_url\": $('Source Data').first().json.content_data.img_url,\n        \"enable_prompt_expansion\": false,\n        \"acceleration\": \"none\",\n        \"resolution\": \"480p\",\n        \"aspect_ratio\": $('Source Data').first().json.content_data.aspect_ratio\n      }\n    }\n  }\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3472,
+        -112
+      ],
+      "id": "fd10a96c-da74-4d21-878b-03c50463897e",
+      "name": "Format model1"
+    },
+    {
+      "parameters": {
+        "jsCode": "var obj = JSON.parse($input.first().json.content.parts[0].text);\n\nreturn {obj}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3264,
+        -96
+      ],
+      "id": "1b4b067f-1021-4230-a7c3-bf52a22f4c99",
+      "name": "Text video",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.config.toJsonString() }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3744,
+        -112
+      ],
+      "id": "e03a612e-2814-47e5-9991-5b1935fb88e8",
+      "name": "Generate video1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "SFhjYsXsyVcRhxXr",
+          "name": "SF - KIE AI"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://dev-wizards.synergizeflow.com/webhook/v2/media-agent/kie-pooling",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "CF-Access-Client-Id",
+              "value": "={{ $vars.CF_ID }}"
+            },
+            {
+              "name": "CF-Access-Client-Secret",
+              "value": "={{ $vars.CF_SECRET }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "kie_task_id",
+              "value": "={{ $json.data.taskId }}"
+            },
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "webhook",
+              "value": "={{ $('Prepare Data').item.json.webhook }}"
+            },
+            {
+              "name": "domain",
+              "value": "={{ $('Prepare Data').item.json.domain }}"
+            },
+            {
+              "name": "output_type",
+              "value": "={{ $('Prepare Data').item.json.output_type }}"
+            },
+            {
+              "name": "audio",
+              "value": "=none"
+            },
+            {
+              "name": "subtitle",
+              "value": "=none"
+            },
+            {
+              "name": "output_meta",
+              "value": "={{ $('Source Data').item.json.output_meta }}"
+            },
+            {
+              "name": "caption_data",
+              "value": "={{ $('Source Data').item.json.caption_data }}"
+            },
+            {
+              "name": "kie_music_task_id",
+              "value": "={{ $('Generate Music').item.json.data.taskId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        4016,
+        -128
+      ],
+      "id": "596bda82-5c76-4dd1-8bf4-700c75a5f390",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{$vars.GEMINI_PRO_LATEST}}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $('Source Data').item.json.prompt_data.toJsonString() }}"
+            }
+          ]
+        },
+        "options": {
+          "systemMessage": "=## ROLE\n\nYou are an expert **AI Image Prompt Generation Agent**.\n\nYour task is to analyze structured blog information and transform it into **one highly optimized prompt for an image-generation model**.\n\nYou are not the image generator. Your responsibility is to understand the written content, determine the strongest visual representation of that content, combine it with the provided image description, and produce a polished image-generation prompt.\n\nThe downstream image-generation model will receive the generated prompt **together with an attached/reference image**. The reference image should be used as the primary visual-style reference.\n\n---\n\n## INPUT\n\nYou will receive a JSON object with the following structure:\n\n```json\n{\n  \"blog_title\": \"Blog title example\",\n  \"blog_content\": \"Blog content example\",\n  \"blog_image_description\": \"Description of blog image\",\n  \"aspect_ratio\": \"9:16\"\n}\n```\n\nThe fields are:\n\n* `blog_title`: The title of the blog. Use it as contextual information to understand the primary subject.\n* `blog_content`: The main source of semantic information. Analyze it to understand the article's subject, core message, purpose, audience, themes, and important ideas.\n* `blog_image_description`: The visual foundation describing what the expected image should contain, including people, objects, environment, composition, camera framing, lighting, positioning, and other visual characteristics.\n* `aspect_ratio`: The required image aspect ratio. Treat this as a real compositional constraint, not merely metadata.\n\nThe input structure must be treated as authoritative. Do not assume additional fields exist.\n\n---\n\n# CORE OBJECTIVE\n\nTransform:\n\n**written article → visual concept → image-generation prompt**\n\nThe final image should communicate the **core meaning of the blog visually**, while respecting and building upon the provided `blog_image_description`.\n\nDo not simply rewrite or beautify `blog_image_description`.\n\nYou must first understand what the blog is trying to communicate, then determine how that message can be expressed naturally through a single compelling image.\n\n---\n\n# CONTENT ANALYSIS\n\nAnalyze `blog_content` internally before constructing the prompt.\n\nDetermine:\n\n* The primary subject of the article.\n* The central message.\n* The most important supporting concepts.\n* The intended emotional or practical takeaway.\n* The people, activities, environments, objects, or situations most relevant to the article.\n* Which concepts can realistically be represented visually.\n* Which concepts are abstract and therefore need to be translated into concrete visual elements.\n\nDo not attempt to visually represent every paragraph, section, or idea in the article.\n\nInstead, identify the **strongest visual story** that can communicate the article's essence in a single image.\n\nThe image should feel like a purposeful editorial or hero image for the article rather than a literal collage of every topic mentioned.\n\n---\n\n# BLOG TITLE\n\nUse `blog_title` as an additional contextual signal.\n\nThe title can help identify the article's primary topic and intended focus, but it must not override the actual meaning of `blog_content`.\n\nIf the title and content differ in emphasis, prioritize the meaning supported by the content.\n\n---\n\n# IMAGE DESCRIPTION AS VISUAL FOUNDATION\n\nTreat `blog_image_description` as the primary visual and compositional foundation.\n\nPreserve important details from it, including when present:\n\n* People\n* Approximate age\n* Gender/presentation\n* Hair characteristics\n* Clothing\n* Accessories\n* Pose\n* Facial expression\n* Body position\n* Objects\n* Environment\n* Location\n* Camera framing\n* Shot type\n* Subject positioning\n* Lighting\n* Background\n* Architectural elements\n* Important colors\n* Perspective\n* Other explicitly requested visual characteristics\n\nDo not arbitrarily replace explicitly described people or their defining characteristics.\n\nIf a person is described with specific characteristics, preserve those characteristics in the final prompt.\n\n---\n\n# CREATIVE ENRICHMENT\n\nYou are allowed and encouraged to add visual details that are not explicitly present in `blog_image_description` when those details help communicate the blog's message.\n\nAdditional details may include:\n\n* Relevant props\n* Environmental cues\n* Background activities\n* Meaningful objects\n* Contextual surroundings\n* Natural interactions\n* Subtle visual metaphors\n* Relevant workplace or lifestyle details\n* Supporting visual storytelling elements\n\nHowever, every added element must have a clear relationship to the blog's subject or message.\n\nDo not add random decorative elements simply to make the image more elaborate.\n\nThe final image should remain coherent, believable, and visually focused.\n\n---\n\n# HANDLING CONFLICTS\n\nWhen `blog_content` and `blog_image_description` do not perfectly align, follow this priority:\n\n1. Preserve explicitly described people and their defining characteristics.\n2. Preserve important subjects and the primary composition described in `blog_image_description`.\n3. Preserve important framing, pose, and visual direction where possible.\n4. Adapt or enrich the surrounding environment, supporting objects, background, actions, and contextual details to better communicate the blog.\n5. Do not completely replace the supplied visual concept with an unrelated scene.\n\nThe result should feel like a **natural, visually improved interpretation of the supplied image description**, not a completely different image.\n\n---\n\n# ABSTRACT CONCEPTS MUST BECOME VISUAL\n\nNever rely on abstract statements as visual instructions.\n\nTranslate abstract concepts into things that can actually be seen.\n\nFor example:\n\nInstead of:\n\n> \"Show work-life balance.\"\n\nTranslate it into visual behavior such as:\n\n> \"Show the subject calmly reviewing an organized work schedule while maintaining a relaxed, confident demeanor in a professional environment.\"\n\nInstead of:\n\n> \"Show financial stability.\"\n\nTranslate it into appropriate visual context such as:\n\n> \"Show a confident worker in a stable professional setting with an organized, established work environment.\"\n\nInstead of:\n\n> \"Show career advancement.\"\n\nTranslate it into visual context such as:\n\n> \"Show the subject in a progressively professional environment with subtle indications of responsibility and expertise.\"\n\nDo not write abstract marketing concepts into the final prompt when they can be represented visually.\n\n---\n\n# NO TEXT IN THE GENERATED IMAGE\n\nThe generated image must not contain textual content unless a specific piece of text is an essential, explicitly requested visual element from `blog_image_description`.\n\nBy default, instruct the image model to avoid:\n\n* Headlines\n* Captions\n* Paragraphs\n* Slogans\n* Promotional copy\n* Labels\n* Watermarks\n* Decorative typography\n* Readable signs\n* Readable interface text\n* Artificial text overlays\n\nDo not use text inside the image to explain the blog's message.\n\nIf a concept normally involves text, convert it into a visual representation instead.\n\nFor example:\n\n* Schedule → visible calendar structure without readable words\n* Job matching → person interacting with a recruitment/job-search interface without readable text\n* Career advancement → visual progression through professional context\n* Financial security → appropriate environmental and behavioral cues\n* Training → observable learning or professional preparation\n\nThe image should communicate through **subjects, actions, environments, composition, lighting, and visual context**, not written language.\n\n---\n\n# REFERENCE IMAGE STYLE\n\nThe downstream image-generation model will receive an attached/reference image.\n\nThe final prompt must explicitly instruct the image model to create the new image with a **visual style similar to the attached/reference image**.\n\nThe reference image should guide the overall visual language, including where applicable:\n\n* Overall aesthetic\n* Realism or illustration level\n* Rendering characteristics\n* Lighting treatment\n* Color treatment\n* Contrast\n* Texture\n* Atmosphere\n* Image quality\n* Photographic characteristics\n* Visual sophistication\n* Overall artistic direction\n\nDo not impose an unrelated fixed art style.\n\nDo not automatically describe the image as \"cinematic,\" \"photorealistic,\" \"3D,\" \"illustration,\" or any other specific style unless it is appropriate to the supplied visual direction.\n\nThe prompt should allow the reference image to determine the final stylistic character.\n\nUse language such as:\n\n> \"Maintain a visual style closely consistent with the attached reference image...\"\n\nor an equivalent natural instruction.\n\nThe reference image should influence **style**, while the prompt determines the **new image's subject matter and visual story**.\n\n---\n\n# CAMERA AND COMPOSITION\n\nUse the camera and composition details explicitly provided by `blog_image_description`.\n\nWhen those details are incomplete, intelligently infer appropriate visual characteristics based on the subject and intended visual story.\n\nYou may determine or refine:\n\n* Shot type\n* Camera angle\n* Camera height\n* Lens perspective\n* Focal length characteristics\n* Subject placement\n* Foreground/background relationship\n* Depth of field\n* Focus hierarchy\n* Perspective\n* Negative space\n* Visual balance\n* Leading lines\n* Framing\n* Spatial depth\n* Subject-background separation\n\nDo not add technical camera terminology merely for decoration.\n\nEvery compositional or photographic decision should support the visual story.\n\n---\n\n# ASPECT RATIO\n\nRespect the supplied `aspect_ratio`.\n\nThe aspect ratio must influence the actual composition.\n\nFor example, when the aspect ratio is `9:16`:\n\n* Design the scene vertically.\n* Arrange subjects appropriately within the vertical frame.\n* Avoid compositions that require a wide horizontal canvas.\n* Preserve important subjects and visual hierarchy within the vertical composition.\n* Ensure the primary subject has sufficient breathing room and is not awkwardly cropped.\n\nDo not merely append the aspect ratio to the end of the prompt without adapting the composition.\n\n---\n\n# VISUAL STORYTELLING\n\nThe final image should prioritize a clear visual hierarchy.\n\nGenerally:\n\n* Establish one primary subject or focal point.\n* Use secondary elements to reinforce the message.\n* Keep the scene believable.\n* Avoid visual clutter.\n* Use environmental details to provide context.\n* Use lighting and depth to guide attention.\n* Prefer subtle visual storytelling over literal symbolism.\n* Avoid trying to depict too many unrelated concepts in one frame.\n\nThe result should immediately communicate the article's general subject and emotional/contextual direction even without reading the article.\n\n---\n\n# VISUAL REALISM AND COHERENCE\n\nUnless the provided description or reference image indicates otherwise, maintain coherent physical and visual relationships.\n\nAvoid:\n\n* Impossible object placement\n* Contradictory lighting\n* Unnatural poses\n* Anatomical distortions\n* Duplicated people\n* Extra limbs or fingers\n* Deformed hands\n* Floating objects\n* Inconsistent perspective\n* Unrealistic scale\n* Excessive visual effects\n* Unnecessary fantasy elements\n* Generic stock-image appearance\n\nThe final scene should feel intentionally composed and internally consistent.\n\n---\n\n# NEGATIVE CONSTRAINTS\n\nInclude appropriate negative instructions at the end or naturally within the final prompt.\n\nAt minimum, prevent unwanted textual content and common image-generation artifacts when relevant.\n\nAppropriate negative constraints may include:\n\n* No text\n* No captions\n* No headlines\n* No readable typography\n* No watermark\n* No unwanted logos\n* No distorted anatomy\n* No extra fingers\n* No malformed hands\n* No duplicated subjects\n* No unnatural facial features\n* No awkward cropping\n* No distracting objects\n* No visual clutter\n* No artificial-looking artifacts\n\nDo not create an unnecessarily massive generic negative prompt.\n\nOnly include negative constraints that are relevant and useful for the requested image.\n\nIf `blog_image_description` explicitly requires a logo or branded element, do not automatically prohibit that required element. Follow the user's visual specification.\n\n---\n\n# PROMPT QUALITY\n\nThe final prompt should be:\n\n* Specific\n* Visually descriptive\n* Coherent\n* Concise enough to remain focused\n* Rich enough to guide a capable image-generation model\n* Natural language\n* Optimized for visual generation\n* Free from analysis or explanations\n\nAvoid:\n\n* Keyword stuffing\n* Repeating the same concept\n* Generic filler\n* Unnecessary marketing language\n* Explaining why an element was selected\n* Discussing the blog itself\n* Mentioning internal reasoning\n* Giving multiple alternative concepts\n* Giving multiple prompts\n* Using headings or structured labels\n* Using JSON\n\n---\n\n# FINAL OUTPUT FORMAT\n\nYour response must contain **only one final image-generation prompt**.\n\nDo not include:\n\n* JSON\n* Markdown\n* Code fences\n* Headings\n* Labels such as \"Prompt:\"\n* Explanations\n* Analysis\n* Notes\n* Alternatives\n* Comments before or after the prompt\n\nThe output must be directly usable as an image-generation prompt.\n\n---\n\n# FINAL GENERATION PRINCIPLE\n\nThink internally:\n\n**Understand the article → identify the core visual story → preserve the image description → enrich it with relevant content-derived details → translate abstract concepts into visible elements → optimize composition → respect aspect ratio → match the attached reference image's style → add relevant negative constraints → output one polished prompt.**\n\nNever expose this reasoning process.\n\nReturn only the final image-generation prompt.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        1840,
+        368
+      ],
+      "id": "2d921465-f4a9-43ba-a3b5-ef618f106e0a",
+      "name": "Message a model3",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2128,
+        448
+      ],
+      "id": "bb776b3c-b445-4480-b119-06514a7353f6",
+      "name": "Wait4",
+      "webhookId": "5bf266d2-0995-488a-8c38-cdc2f6c61549"
+    },
+    {
+      "parameters": {
+        "jsCode": "const url = $('Source Data').first().json.content_data.img_url;\nconst mimeType = url.includes(\"jpg\") ? \"image/jpeg\" : \"image/png\";\n\nreturn {\n  status: \"ok\",\n  website_name: \"dummy\",\n  parsed: [\n    {\n      title: \"dummy_title\",\n      description: $('Source Data').first().json.prompt_data.blog_image_description,\n      mime: mimeType,\n      url: $('Source Data').first().json.content_data.img_url,\n      category: \"dummy\"\n    }\n  ]\n\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2336,
+        352
+      ],
+      "id": "9fc85f51-9e6e-4d4d-a5b6-f65f64293e15",
+      "name": "Text image",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "lLVBwo7b4O3KXhwN",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/lLVBwo7b4O3KXhwN",
+          "cachedResultName": "SynergizeFlow.v2 — SF - Image Vaults Converter"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        2560,
+        336
+      ],
+      "id": "11201987-d90c-4cfd-b231-ac6d5046dd61",
+      "name": "Convert to Base64"
+    },
+    {
+      "parameters": {
+        "jsCode": "let prompt = $('Message a model3').first().json.content.parts[0].text + `\n\nIMPORTANT ORIENTATION AND ASPECT RATIO INSTRUCTION:\n\nUse the attached image as the visual reference/source for the generated image.\n\nPreserve the reference image's subject, visual characteristics, style, details, and overall visual identity as appropriate.\n\nHowever, the requested output aspect ratio must be treated as a native composition requirement.\n\nDo NOT rotate the reference image or rotate the entire scene to match the requested aspect ratio.\n\nDo NOT turn the reference sideways or upside down.\n\nWhen the reference image orientation differs from the requested output orientation, naturally recompose the scene for the requested orientation while keeping all people, objects, furniture, interfaces, and environmental elements correctly oriented relative to gravity.\n\nFor a 9:16 portrait output, create a genuinely upright portrait composition. The person must remain upright, with their head above their body, and objects must maintain their normal physical orientation. Reposition, resize, crop, or rearrange elements naturally as necessary to fit the portrait canvas.\n\nThe output should look like the original scene was naturally composed for 9:16, not like the reference image was rotated or mechanically converted from landscape to portrait.\n\nDo not sacrifice natural orientation or physical coherence in order to preserve the reference image's original framing.`;\n\nconst parts = [\n  { text: prompt },\n  {\n    inlineData: {\n        mimeType: $('Convert to Base64').first().json.parsed[0].mime,\n        data: $('Convert to Base64').first().json.parsed[0].data // n8n already provides this as base64\n    }\n  }\n];\n\n// Return the structure ready for the API\nreturn {\n  json: {\n    payload: {\n      contents: [\n        {\n          parts: parts\n        }\n      ],\n      generationConfig: {\n          responseModalities: [\"image\"],\n          imageConfig:{\n               aspectRatio: $('Source Data').first().json.prompt_data.aspect_ratio\n          }\n      }\n    }\n  }\n};\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2800,
+        336
+      ],
+      "id": "b4a1a964-7572-4358-8b0d-abe95d11c6cd",
+      "name": "Image Payload"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $vars.GEMINI_PRO_IMAGE }}:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.payload }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3024,
+        336
+      ],
+      "id": "fddcbcfc-2ff5-48e0-bcc4-7b1f20742164",
+      "name": "HTTP Request4",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "tURjQrWDQUUGEoyg",
+          "name": "SF - Gemini Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "candidates[0].content.parts[0].inlineData.data",
+        "binaryPropertyName": "image",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        3232,
+        336
+      ],
+      "id": "449f6d4b-946c-4203-be99-34f701a44d88",
+      "name": "Convert to File1"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "={{ $vars.CLOUDFLARE_R2_BUCKET }}",
+        "fileName": "=mediaAgentResult/mediaAgentResult-{{ $('Prepare Data').item.json.agent_id }}.jpg",
+        "binaryPropertyName": "image",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [
+        3472,
+        336
+      ],
+      "id": "a05958a6-6734-4630-9813-734b398c816c",
+      "name": "Upload a file1",
+      "credentials": {
+        "s3": {
+          "id": "AIXo2wxUCjaHKlfc",
+          "name": "SF - R2 Cloudflare Storage"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let social = $('Source Data').first().json.caption_data;\nlet result = [];\n// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of social) {\n  result.push({\n    type: item.social,\n    title: item.content.title,\n    caption: item.content.caption,\n    tags: item.content.tags,\n    media_url: [\"https://assets.synergizeflow.com/mediaAgentResult/mediaAgentResult-\"+$('Prepare Data').first().json.agent_id+\".jpg\"]\n  })\n}\n\nreturn {result: result}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3680,
+        336
+      ],
+      "id": "4cf7851d-b0f4-4fbf-83a8-afe8ffe1910e",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "ok"
+            },
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "data",
+              "value": "={{ $json.result }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3888,
+        336
+      ],
+      "id": "0995b17d-8b7c-4c8c-9b5c-f996a61c9c0f",
+      "name": "HTTP Request5",
+      "alwaysOutputData": false,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://dev-wizards.synergizeflow.com/webhook/v2/media-agent/dummy-webook",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "CF-Access-Client-Id",
+              "value": "={{ $vars.CF_ID }}"
+            },
+            {
+              "name": "CF-Access-Client-Secret",
+              "value": "={{ $vars.CF_SECRET }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "data",
+              "value": "={{ $('Code in JavaScript1').item.json.result }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        4096,
+        336
+      ],
+      "id": "26eda972-0058-434f-828d-e11bc47199b5",
+      "name": "HTTP Request6"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{$vars.GEMINI_PRO_LATEST}}",
+          "mode": "id"
+        },
+        "text": "=**SYSTEM DIRECTIVE: RAW DATA OUTPUT MODE**\n\nYou are a specialized audio-to-subtitle parsing engine. Your only function is to convert an audio file into a raw `.ass` subtitle string suitable for programmatic parsing. Your output is consumed directly by an automated system, which will fail if any extraneous characters or formatting are present.\n\n**INPUT:**\nAn audio file will be provided.\n\n**OUTPUT PROTOCOL:**\n1.  Your entire response MUST be a single, raw `.ass` script string.\n2.  There must be absolutely no extraneous characters, whitespace, or newlines before the `[Script Info]` header or after the final `Dialogue` line.\n3.  **CRITICAL:** Do not include Markdown fences. The string ` ``` ` is forbidden in your output. Do not output any explanatory text. The response must be the `.ass` script and nothing else.\n\n**`.ass` SCRIPT REQUIREMENTS:**\n1.  **Header:** The string must begin with the exact `.ass` header block.\n2.  **Events:** After the header, generate a `Dialogue` event for every single word in the audio.\n3.  **Word-by-Word Timing:** Each `Dialogue` line must contain only one word, timed precisely to its start and end in the audio (`h:mm:ss.cs`). Punctuation must be appended to the word it follows.\n\n**EXAMPLE OF THE REQUIRED RAW OUTPUT:**\n[Script Info]\nTitle: Default Aegisub file\nScriptType: v4.00+\nPlayResX: {{ $('Prepare Data').item.json.output_meta.aspect_ratio == '16_9' ? '480' : '240' }}\nPlayResY: {{ $('Prepare Data').item.json.output_meta.aspect_ratio == '16_9' ? '270' : '480' }}\nWrapStyle: 0\nScaledBorderAndShadow: yes\nYCbCr Matrix: None\n\n\n[Aegisub Advanced SSA/ASS Style V4+]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\nStyle: Default,Arial,28,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,0,0,1,2,2,2,10,10,10,1\n\n[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\nDialogue: 0,0:00:00.30,0:00:00.55,Default,,0,0,0,,Stop\nDialogue: 0,0:00:00.55,0:00:01.05,Default,,0,0,0,,searching\nDialogue: 0,0:00:01.05,0:00:01.30,Default,,0,0,0,,for\n\nExecute this directive. Failure to adhere to the raw output protocol will result in system error.",
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        3376,
+        -720
+      ],
+      "id": "dfcf229c-2e16-4d45-8f95-a7a781a8afb2",
+      "name": "Analyze audio",
+      "retryOnFail": true,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "connections": {
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if license is valid": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get token": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "[TEMP TOPIC]",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "[TEMP MANUAL]",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Blog Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Blog Data": {
+      "main": [
+        [
+          {
+            "node": "Prepare Caption Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Img Desc": {
+      "main": [
+        [
+          {
+            "node": "Source Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Text speech",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text speech": {
+      "main": [
+        [
+          {
+            "node": "Text to speech",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze image": {
+      "main": [
+        [
+          {
+            "node": "Img Desc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Source Data": {
+      "main": [
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch2": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Message a model3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text to speech": {
+      "main": [
+        [
+          {
+            "node": "Convert base64 to File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Text to speech",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert base64 to File": {
+      "main": [
+        [
+          {
+            "node": "Switch3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Speech text": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch3": {
+      "main": [
+        [
+          {
+            "node": "Analyze audio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Format model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "[TEMP TOPIC]": {
+      "main": [
+        [
+          {
+            "node": "Source Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "[TEMP MANUAL]": {
+      "main": [
+        [
+          {
+            "node": "Source Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format model": {
+      "main": [
+        [
+          {
+            "node": "Generate video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate video": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Caption": {
+      "main": [
+        [
+          {
+            "node": "Analyze image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Caption Data": {
+      "main": [
+        [
+          {
+            "node": "Generate Caption",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model1": {
+      "main": [
+        [
+          {
+            "node": "Text music",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text music": {
+      "main": [
+        [
+          {
+            "node": "Generate Music",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Music": {
+      "main": [
+        [
+          {
+            "node": "Message a model2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model2": {
+      "main": [
+        [
+          {
+            "node": "Text video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait3": {
+      "main": [
+        [
+          {
+            "node": "Message a model2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text video": {
+      "main": [
+        [
+          {
+            "node": "Format model1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate video1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format model1": {
+      "main": [
+        [
+          {
+            "node": "Generate video1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model3": {
+      "main": [
+        [
+          {
+            "node": "Text image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait4": {
+      "main": [
+        [
+          {
+            "node": "Message a model3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text image": {
+      "main": [
+        [
+          {
+            "node": "Convert to Base64",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to Base64": {
+      "main": [
+        [
+          {
+            "node": "Image Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image Payload": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request4": {
+      "main": [
+        [
+          {
+            "node": "Convert to File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload a file1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File1": {
+      "main": [
+        [
+          {
+            "node": "Upload a file1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request5": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze audio": {
+      "main": [
+        [
+          {
+            "node": "Speech text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "saveDataSuccessExecution": "all",
+    "saveExecutionProgress": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 1200,
+    "availableInMCP": false
+  },
+  "triggerCount": 1,
+  "versionId": "17c8175d-723f-46ec-bc88-4416f8d3bb5d",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "uJERJZH2lBKMHex2",
+  "isArchived": false
+}

@@ -1,0 +1,461 @@
+{
+  "id": "zohGPHKKMzzSrRyY",
+  "name": "SF - Branding Style",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v2/asset/branding-style",
+        "options": {
+          "responseData": "workflow_started"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -544,
+        304
+      ],
+      "id": "1024074e-46d4-41e1-a476-b6c4b6408851",
+      "name": "Webhook",
+      "webhookId": "b11daa86-f61e-49f2-ad23-38ad95f5e52a"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.type }}",
+                    "rightValue": "specific",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "2114fd8e-3456-4874-9cc3-1e8007672a9b"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "specific"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a5186224-ca74-4d4c-a127-5fb69ad212b8",
+                    "leftValue": "={{ $json.body.type }}",
+                    "rightValue": "specific",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "generic"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -96,
+        208
+      ],
+      "id": "ab3e1c2d-dad2-48c7-8746-1db72a69943b",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "eca4387d-5e99-4053-b171-4f3826fe6537",
+              "name": "title",
+              "value": "={{ $('Webhook').item.json.body.title }}",
+              "type": "string"
+            },
+            {
+              "id": "f11e2706-b86d-4c79-96c7-102eddeb32e6",
+              "name": "images",
+              "value": "={{ $('Webhook').item.json.body.images }}",
+              "type": "array"
+            },
+            {
+              "id": "9f7ca033-a78e-420e-bbc8-c46e686151ef",
+              "name": "prompt",
+              "value": "={{ $json.prompt }}",
+              "type": "string"
+            },
+            {
+              "id": "7d9434a0-2207-49ee-97c9-aac71ea25275",
+              "name": "webhook",
+              "value": "={{ $('Webhook').item.json.body.webhook }}",
+              "type": "string"
+            },
+            {
+              "id": "3b115572-9f0d-4f24-8932-97bd3231b729",
+              "name": "branding_style_id",
+              "value": "={{ $('Webhook').item.json.body.branding_style_id }}",
+              "type": "string"
+            },
+            {
+              "id": "3fb3c7bb-e112-4118-b515-5da16c305aba",
+              "name": "token",
+              "value": "={{ $('Get token').item.json.token }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        352,
+        208
+      ],
+      "id": "7217889c-000f-4695-9043-ed23309c1935",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f15592b8-a999-4998-a041-e89a5b0fb975",
+              "name": "prompt",
+              "value": "=You are an **expert visual reconstruction analyst and scene replication system**. Your task is to analyze reference images and convert them into **precise reconstruction instructions** that allow another system, artist, or generative model to recreate the image as faithfully as possible.\n\nYour output must describe **how to reconstruct the entire visual scene**, including subjects, objects, environments, composition, lighting, color, textures, and stylistic treatment.\n\nThe goal is to produce a **complete visual blueprint** that enables near-identical reproduction of the image without direct access to the original, while avoiding sensitive identity attributes and real-world brand references.\n\n---\n\n# Core Rules\n\n### 1. Capture all visible elements\n\nIdentify and describe **all visible components of the scene**, including:\n\n* people or characters\n* objects and props\n* environmental features\n* background and foreground elements\n* surfaces, materials, and textures\n\nDo not omit elements that contribute to the visual structure of the scene.\n\nWhen describing humans or characters, refer to them using **neutral structural terms** such as *human figure, silhouette, athlete figure, or profile silhouette*.\n\nDo **not include personal physical attributes**, including:\n\n* hair style or hair characteristics\n* facial features\n* skin tone or complexion\n* body shape or body type\n* age indicators\n* clothing details tied to identity\n\nDo **not indicate gender** or gender-coded traits.\n\nHumans should only be described in terms of:\n\n* pose or movement\n* position in the scene\n* interaction with objects\n* scale relative to other elements\n\nExample transformation:\n\n* Incorrect: *a person with short curly hair wearing sunglasses*\n* Correct: *a large human profile silhouette wearing sunglasses*\n\n---\n\n### 2. Preserve spatial relationships\n\nAccurately describe **where elements are located relative to one another**.\n\nSpecify:\n\n* foreground, midground, and background placement\n* relative scale and proportions\n* alignment and orientation\n* distance relationships between elements\n* overlap and layering\n\nMaintain the original **visual hierarchy and spatial structure**.\n\n---\n\n### 3. Describe composition and framing\n\nRecreate the **exact composition style** by explaining:\n\n* camera angle and viewpoint\n* framing and cropping\n* symmetry or asymmetry\n* focal emphasis\n* use of negative space\n* rule-of-thirds or centered composition when relevant\n\n---\n\n### 4. Reconstruct lighting design\n\nExplain how lighting shapes the scene, including:\n\n* direction of light sources\n* intensity and contrast\n* soft or hard shadows\n* rim lighting or backlighting\n* ambient illumination\n* reflections and highlights\n\nLighting should be described in a way that allows the **same visual mood and dimensionality** to be recreated.\n\n---\n\n### 5. Reproduce color and tonal structure\n\nDescribe the **color palette and grading**, including:\n\n* dominant hues\n* warm vs cool bias\n* saturation levels\n* highlight and shadow coloration\n* cinematic or stylized color grading\n\nAlso describe the **tonal range**, including contrast levels, highlight rolloff, and shadow depth.\n\n---\n\n### 6. Capture materials and textures\n\nExplain how surfaces appear and interact with light.\n\nInclude details such as:\n\n* matte vs glossy surfaces\n* rough vs smooth textures\n* reflective or translucent qualities\n* visible grain, brush strokes, or digital smoothness\n\n---\n\n### 7. Identify rendering and aesthetic style\n\nDescribe the **visual rendering approach**, such as:\n\n* photorealistic photography\n* painterly illustration\n* anime-style rendering\n* cinematic still photography\n* digital painting\n* stylized 3D rendering\n\nExplain how shading, edges, gradients, and detail contribute to the final look.\n\n---\n\n### 8. Avoid real-world brands\n\nDo **not reference specific brands, trademarks, or company names**.\n\nIf branded elements appear in the image, replace them with **generic equivalents** while preserving their visual placement and function.\n\nFor example, describe them as:\n\n* generic sports brand logos\n* stylized athletic emblems\n* generic equipment branding\n\nrather than naming a real brand.\n\n---\n\n### 9. Include camera and optical characteristics\n\nWhen relevant, specify:\n\n* depth of field\n* background blur or bokeh\n* wide-angle or telephoto perspective\n* perspective distortion\n* cinematic lens characteristics\n\n---\n\n### 10. Describe atmosphere and environmental effects\n\nInclude any visible atmospheric treatments such as:\n\n* fog or haze\n* volumetric light\n* glow or bloom\n* dust, particles, or environmental diffusion\n\nThese elements should contribute to the overall mood and depth of the scene.\n\n---\n\n### 11. Avoid hallucination\n\nOnly describe **elements that are clearly visible in the image**.\n\nDo not invent hidden or implied details.\n\nIf certain aspects are visually ambiguous, describe them conservatively using neutral phrasing.\n\n---\n\n# Writing Style Requirements\n\nConvert the visual analysis into **clear reconstruction instructions**.\n\nUse directive language such as:\n\nposition, place, render, apply, illuminate, frame, maintain, emphasize, balance, simulate.\n\nWrite like an **art director, cinematographer, or visual production designer** explaining how to rebuild the scene.\n\n---\n\n# Output Requirements\n\nWrite **one cohesive instruction block between 180–300 words**.\n\nDo **not** use bullet points.\nDo **not** include headings.\nDo **not** explain your analysis.\n\nThe output must contain **only the reconstruction instruction text**.\n\nDo **not include**:\n\n* introductions\n* summaries\n* commentary\n* references to “the image” or “the original picture”\n\nThe response must function as a **direct production guide for recreating the scene**.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        128,
+        112
+      ],
+      "id": "ecd2f42e-6be6-4f5b-9f43-91ea6d7c82ed",
+      "name": "Prepare Specific Prompt"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bb8e4ccb-69b7-4830-b2ff-2517d0941b81",
+              "name": "prompt",
+              "value": "=You are an **expert visual style analyst and art direction system**. Your task is to analyze reference images and extract their **complete visual style**, then convert that analysis into a **precise styling instruction** that can be used to recreate the same aesthetic.  Your output must describe **how to apply the visual style**, not what the image contains.  The goal is to produce an instruction that allows another system, artist, or generative model to **replicate the visual style** without knowing the original image content.  ---  # Core Rules  ### 1. Never describe objects or subjects  Do **not** mention or infer any specific items, characters, environments, or scene elements.  Do not reference things such as:  * people * animals * architecture * landscapes * vehicles * clothing * food * objects of any kind  Focus exclusively on **the stylistic treatment applied to the image as a whole**.  ---  ### 2. Convert analysis into styling instructions  Your output must read as **instructions for applying a style**, not as an observation or description.  Use directive language such as:  * apply * use * render with * emphasize * incorporate * maintain * introduce * balance * create * simulate  The text should function like an **art direction guide for reproducing the visual style**.  ---  ### 3. Analyze and translate these stylistic elements  Your instruction should incorporate as many of the following aspects as possible:  **Artistic Medium & Rendering**  * digital illustration * oil painting style * watercolor diffusion * cinematic photography * 3D render aesthetics * anime-style rendering * editorial photography style  **Rendering Characteristics**  * painterly vs photorealistic finish * stylized shading * linework characteristics * smooth gradients vs textured surfaces * brush stroke behavior  **Lighting Design**  * soft diffused lighting * dramatic directional lighting * rim lighting * volumetric lighting * studio lighting setups * cinematic contrast ratios  **Color Palette**  * dominant hues * warm vs cool bias * saturation intensity * pastel, muted, neon, or earthy palettes * cinematic color grading  **Contrast & Tonal Range**  * high contrast or low contrast * matte shadows * soft highlight rolloff * HDR-like tonal range * filmic exposure balance  **Texture & Surface Detail**  * film grain * painterly brush texture * smooth digital surfaces * subtle noise * paper-like textures * halftone patterns  **Composition Style**  * minimalist or dense layout * balanced asymmetry * strong negative space * cinematic framing  **Lens & Depth Characteristics**  * shallow depth of field * soft bokeh * wide-angle perspective * telephoto compression * cinematic lens feel  **Post-Processing**  * bloom and glow * vignette * chromatic aberration * film emulation * cinematic color grading  **Atmosphere & Mood**  * dreamy * dramatic * nostalgic * futuristic * surreal * elegant * gritty * ethereal  **Aesthetic Influences**  * cinematic still photography * editorial photography * anime aesthetic * retro film style * cyberpunk grading * renaissance painting influence * contemporary digital art  ---  ### 4. Treat the style as a unified system  Explain how lighting, color, texture, rendering, and grading should work together to produce the final aesthetic.  ---  ### 5. Use professional visual terminology  Write like a **film colorist, cinematographer, or art director** giving instructions for recreating the style.  ---  # Output Requirements  * Write **one cohesive instruction block** (150–250 words). * Do **not** use bullet points. * Do **not** include headings. * Do **not** describe objects or scene content. * Do **not** explain the analysis process.  ### The output must contain **ONLY the styling instruction text**.  Do **not include**:  * introductions * summaries * phrases like “this image shows” * phrases like “the style of the image is” * any commentary outside the styling instruction.  The response must be **only the styling instruction itself**.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        128,
+        304
+      ],
+      "id": "0233a0d5-1e70-485e-8d50-59fd4ac0fc74",
+      "name": "Prepare Generic Prompt"
+    },
+    {
+      "parameters": {
+        "jsCode": "var imgs = '';\nvar n = 1;\nfor (const item of  $('Prepare Data').first().json.images) {\n  imgs += n == 1 ? item : ','+item;\n  n++;\n}\nreturn {\n  imgs:imgs,\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        576,
+        208
+      ],
+      "id": "198df595-9241-4507-8cc3-9b2fbe93dc38",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{$vars.GEMINI_NANO_BANANA}}",
+          "mode": "id"
+        },
+        "text": "={{ $('Prepare Data').item.json.prompt }}",
+        "imageUrls": "={{ $json.imgs }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        800,
+        208
+      ],
+      "id": "affa7d08-7332-4e62-a768-dbe8b0a8c1fa",
+      "name": "Analyze an image",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  data:{ title: $('Prepare Data').first().json.title,\n  branding: $input.first().json.content.parts[0].text\n}}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1024,
+        208
+      ],
+      "id": "b1242e5d-d33e-4e4e-958a-c6416de63fac",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "ok"
+            },
+            {
+              "name": "branding_style_id",
+              "value": "={{ $('Prepare Data').item.json.branding_style_id }}"
+            },
+            {
+              "name": "data",
+              "value": "={{ $json.data }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1248,
+        208
+      ],
+      "id": "82c48a33-2003-4dfe-a58d-f30ade13e47a",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "domain",
+              "value": "={{ $json.body.domain }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        -320,
+        400
+      ],
+      "id": "9b10f95e-d64a-4b62-b9b6-e81a56eebc9a",
+      "name": "Execution Data"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "CfFTrHyw35Q6kVn5",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/CfFTrHyw35Q6kVn5",
+          "cachedResultName": "SynergizeFlow.v2 — Get App Token"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -320,
+        208
+      ],
+      "id": "b3cba28d-b8ad-474c-bc88-2fea742c37ea",
+      "name": "Get token"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Prepare Specific Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Generic Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Specific Prompt": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Generic Prompt": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Analyze an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze an image": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get token": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "triggerCount": 1,
+  "versionId": "6895a776-d786-4f2f-a43a-b05ba61425df",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "ALSbETz1ex4rFhVj",
+  "isArchived": false
+}

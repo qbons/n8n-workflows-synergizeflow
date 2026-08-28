@@ -1,0 +1,1036 @@
+{
+  "id": "plIU5fqRRZOK5hdn",
+  "name": "SF - Keyword Research",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v2/seo/keyword-research",
+        "options": {
+          "responseData": "workflow_started"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -4064,
+        272
+      ],
+      "id": "c5e5328a-0677-43da-8019-4f3d47c3ecc5",
+      "name": "Webhook",
+      "webhookId": "a1f0793e-b4a5-4f16-bd41-0036e5dddea0"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e2d5e71e-a22f-432a-b6e3-d324b927b920",
+              "name": "location_code",
+              "value": "={{ $('Webhook').item.json.body.location_code }}",
+              "type": "number"
+            },
+            {
+              "id": "f2a60442-6198-4c49-b327-1d5d902b5f59",
+              "name": "language_code",
+              "value": "={{ $('Webhook').item.json.body.language_code }}",
+              "type": "string"
+            },
+            {
+              "id": "78593182-6ce9-4a10-9d49-25a4edfbd1d8",
+              "name": "suggestion_keyword_limit",
+              "value": "={{ $('Webhook').item.json.body.suggestion_keyword_limit }}",
+              "type": "number"
+            },
+            {
+              "id": "7cfdfd13-29ef-4cc4-9fa8-7fc35a7d902b",
+              "name": "intent",
+              "value": "={{ $('Webhook').item.json.body.intent }}",
+              "type": "array"
+            },
+            {
+              "id": "fc280abf-4397-4052-a435-60d6baa36ba5",
+              "name": "keyword_difficulty",
+              "value": "={{ $('Webhook').item.json.body.keyword_difficulty }}",
+              "type": "number"
+            },
+            {
+              "id": "edea63a4-08ab-45fb-99c9-a5ab6fbacac5",
+              "name": "search_volume",
+              "value": "={{ $('Webhook').item.json.body.search_volume }}",
+              "type": "number"
+            },
+            {
+              "id": "63647260-2bc0-40dc-8dc5-661e82681e99",
+              "name": "webhook",
+              "value": "={{ $('Webhook').item.json.body.webhook }}",
+              "type": "string"
+            },
+            {
+              "id": "3936f2f2-e6d6-48fc-8da0-206ca3f2d557",
+              "name": "license",
+              "value": "={{ $('Webhook').item.json.body.license }}",
+              "type": "string"
+            },
+            {
+              "id": "1d14c467-0ca1-4462-a568-e28bebe46e8c",
+              "name": "agent_id",
+              "value": "={{ $('Webhook').item.json.body.agent_id }}",
+              "type": "string"
+            },
+            {
+              "id": "6dd3f187-cbfc-4778-80c2-903dcb959af3",
+              "name": "seed_keyword_limit",
+              "value": "={{ $('Webhook').item.json.body.seed_keyword_limit }}",
+              "type": "number"
+            },
+            {
+              "id": "974857b5-25fb-4a2f-b747-838bff02530c",
+              "name": "token",
+              "value": "={{ $json.token }}",
+              "type": "string"
+            },
+            {
+              "id": "c68100d4-0361-4e58-9380-401be8e32a02",
+              "name": "domain",
+              "value": "={{ $('Webhook').item.json.body.domain }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3632,
+        272
+      ],
+      "id": "f94cce75-090c-4e91-a1d0-7692fb71cd52",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\n * Converts a string of HTML into Markdown.\n * @param {string} html - The HTML content to convert.\n * @returns {string} - The converted Markdown text.\n */\nfunction htmlToMarkdown(html) {\n  if (!html) return '';\n\n  let markdown = html\n    // Handle special shortcodes by removing them\n    .replace(/\\[rank_math_breadcrumb\\]/g, '')\n    .replace(/\\[archive-location\\]/g, '')\n    // Handle headings\n    .replace(/<h1>(.*?)<\\/h1>/gi, '# $1\\n')\n    .replace(/<h2>(.*?)<\\/h2>/gi, '## $1\\n')\n    .replace(/<h3>(.*?)<\\/h3>/gi, '### $1\\n')\n    .replace(/<h4>(.*?)<\\/h4>/gi, '#### $1\\n')\n    .replace(/<h5>(.*?)<\\/h5>/gi, '##### $1\\n')\n    .replace(/<h6>(.*?)<\\/h6>/gi, '###### $1\\n')\n    // Handle paragraphs\n    .replace(/<p>(.*?)<\\/p>/gi, '$1\\n\\n')\n    // Handle links\n    .replace(/<a href=\"([^\"]+)\"[^>]*>(.*?)<\\/a>/gi, '[$2]($1)')\n    // Handle unordered lists\n    .replace(/<ul>/gi, '')\n    .replace(/<\\/ul>/gi, '')\n    .replace(/<li>(.*?)<\\/li>/gi, '- $1\\n')\n    // Handle blockquotes\n    .replace(/<blockquote>/gi, '> ')\n    .replace(/<\\/blockquote>/gi, '\\n')\n    // Handle bold and strong tags\n    .replace(/<strong>(.*?)<\\/strong>/gi, '**$1**')\n    .replace(/<b>(.*?)<\\/b>/gi, '**$1**')\n    // Handle line breaks\n    .replace(/<br\\s*\\/?>/gi, '\\n')\n    // Strip any remaining HTML tags (like divs, svgs, etc.)\n    .replace(/<[^>]+>/g, '')\n    // Decode HTML entities\n    .replace(/&amp;/g, '&')\n    .replace(/&lt;/g, '<')\n    .replace(/&gt;/g, '>')\n    .replace(/&quot;/g, '\"')\n    .replace(/&#39;/g, \"'\")\n    // Clean up extra whitespace and newlines\n    .trim();\n\n  return markdown;\n}\n\n/**\n * Converts the full JSON data structure into a formatted Markdown string.\n * @param {Array} jsonData - The JSON data array.\n * @returns {string} - The complete Markdown output.\n */\nfunction convertJsonToMarkdown(jsonData) {\n  const data = jsonData;\n  if (!data) return \"No data found.\";\n\n  let markdownOutput = \"\";\n\n  // 1. Website Information\n  const siteInfo = data.website;\n  if (siteInfo) {\n    markdownOutput += `# ${siteInfo.website_name}\\n`;\n    markdownOutput += `**URL:** [${siteInfo.website_url}](${siteInfo.website_url})\\n`;\n    if (siteInfo.website_description) {\n      markdownOutput += `**Description:** ${siteInfo.website_description}\\n`;\n    }\n    markdownOutput += `**Language:** ${siteInfo.website_language}\\n\\n`;\n  }\n\n  // 2. Content Sections\n  const contentSections = data.content;\n  contentSections.forEach(section => {\n    markdownOutput += `---\\n`;\n    markdownOutput += `## ${section.name}\\n\\n`;\n\n    // Handle Posts Content with Categories\n    if (section.key === 'post' && section.category) {\n      markdownOutput += `### Categories\\n`;\n      section.category.forEach(cat => {\n        markdownOutput += `- ${cat.replace(/&amp;/g, '&')}\\n`;\n      });\n      markdownOutput += `\\n`;\n    }\n\n    // Handle all posts/pages within a section\n    if (section.posts && section.posts.length > 0) {\n      section.posts.forEach(post => {\n        // Use H3 for post titles for better hierarchy\n        markdownOutput += `### ${post.title}\\n\\n`;\n        // Convert the HTML content to Markdown\n        markdownOutput += `${htmlToMarkdown(post.content)}\\n\\n`;\n      });\n    }\n  });\n\n  return markdownOutput;\n}\nconst markdownResult = convertJsonToMarkdown($('Get website data').first().json.data);\nreturn {markdown: markdownResult}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2480,
+        160
+      ],
+      "id": "2ff7d125-8eb0-46a3-9b33-435ec89a6c10",
+      "name": "Convert JSON to markdown"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_TEXT }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.markdown }}"
+            }
+          ]
+        },
+        "options": {
+          "systemMessage": "=### **Role**\n\nYou are a domain-agnostic SEO keyword generation agent specializing in the **{{ $('Prepare Data').item.json.language_code }}** market.\n\nYour task is to analyze the **user-provided data** and generate **exactly {{ $('Prepare Data').item.json.seed_keyword_limit }} high-quality SEO seed keywords** in **{{ $('Prepare Data').item.json.language_code }}**.\n\n---\n\n## **Primary Objective**\n\nGenerate **{{ $('Prepare Data').item.json.seed_keyword_limit }} SEO seed keywords** that:\n\n- Are derived from the provided input data.\n- Are strictly written in **{{ $('Prepare Data').item.json.language_code }}**.\n- Represent terminology that is commonly used by real users in the target language.\n- Are suitable for SEO keyword research, topic clustering, and content strategy.\n- Are enhanced through mandatory research using the **Gemini Search Tool**.\n- Do not contain any keyword from the exclusion list.\n\n---\n\n## **Input Characteristics**\n\nThe input may include, but is not limited to:\n\n- Blog articles\n- Product descriptions\n- Service pages\n- Category structures\n- Documentation\n- Educational content\n- Technical content\n- Mixed or unstructured text\n\nYou must automatically identify:\n\n- Core topics\n- Main entities\n- User intent\n- Important terminology\n- Industry context\n\nThe system must work for any niche.\n\n---\n\n## **Mandatory Research Using Gemini Search Tool**\n\nUsing the **Gemini Search Tool is REQUIRED** before generating keywords.\n\nYou must use the Gemini Search Tool to:\n\n- Validate terminology used by native speakers.\n- Discover the most common wording used in **{{ $('Prepare Data').item.json.language_code }}**.\n- Identify popular search phrases closely related to the provided content.\n- Confirm that generated keywords reflect current search behavior.\n- Improve localization.\n- Expand relevant terminology while remaining faithful to the provided input.\n\nThe Gemini Search Tool must **enhance** the provided content, not replace it.\n\nNever introduce topics unrelated to the user's data.\n\nDo not copy competitor-specific phrases verbatim.\n\n---\n\n## **Keyword Popularity Requirements**\n\nPrioritize keywords that are:\n\n- Frequently used by real searchers.\n- Common within the target market.\n- Natural sounding.\n- Widely recognized within the niche.\n- Valuable as parent (seed) keywords for further keyword expansion.\n\nAvoid:\n\n- Rare terminology.\n- Obscure wording.\n- Artificial phrases.\n- Awkward translations.\n- Extremely niche wording unless clearly dominant in the source material.\n\nWhen multiple synonyms exist, always prefer the version that is more commonly searched in **{{ $('Prepare Data').item.json.language_code }}** according to Gemini Search Tool research.\n\n---\n\n## **Keyword Generation Rules**\n\nGenerate **exactly {{ $('Prepare Data').item.json.seed_keyword_limit }} keywords**.\n\nEvery keyword must:\n\n- Be written entirely in **{{ $('Prepare Data').item.json.language_code }}**.\n- Contain between **2 and 6 words**.\n- Be a seed-level keyword.\n- Be human-readable.\n- Be search-oriented.\n- Be naturally phrased.\n\nAvoid:\n\n- Questions.\n- Dates.\n- Years.\n- Time-sensitive wording.\n- Duplicate keywords.\n- Near duplicates.\n- Overly generic filler terms.\n- Keywords containing excluded terms.\n\nIf an excluded keyword appears anywhere inside a candidate keyword, discard it.\n\nExcluded keywords:\n\n{{ $('Get Onboarding Data').item.json.keywords.toJsonString() }}\n\n---\n\n## **Keyword Coverage Requirements**\n\nCollectively, the generated keywords should cover:\n\n1. Core domain concepts.\n2. Supporting topics.\n3. Informational intent.\n4. Commercial intent.\n5. Strategic or decision-making intent.\n6. Contextual modifiers where appropriate.\n\nDo not assume industries or audiences unless supported by the input.\n\n---\n\n## **Output Format (Strict)**\n\nReturn **ONLY** a single valid JSON object.\n\nThe response must contain exactly one property:\n\n```json\n{\n  \"keywords\": [\n    \"keyword 1\",\n    \"keyword 2\"\n  ]\n}\n```\n\n---\n\n## **Strict JSON Rules**\n\nYour response MUST:\n\n- Be valid JSON.\n- Begin with `{`.\n- End with `}`.\n- Contain no markdown.\n- Contain no code fences.\n- Contain no comments.\n- Contain no explanations.\n- Contain no notes.\n- Contain no extra fields.\n- Contain no trailing commas.\n- Contain only the `keywords` property.\n\nIf the output is not valid JSON, regenerate it before responding.\n\n---\n\n## **Internal Validation (Do Not Output)**\n\nBefore returning the final response, verify:\n\n- Exactly {{ $('Prepare Data').item.json.seed_keyword_limit }} keywords exist.\n- The response is valid JSON.\n- All keywords are in **{{ $('Prepare Data').item.json.language_code }}**.\n- Every keyword contains 2–6 words.\n- Every keyword is naturally phrased.\n- Every keyword is popular and commonly used according to Gemini Search Tool research.\n- No keyword contains any excluded term from:\n\n{{ $('Get Onboarding Data').item.json.keywords.toJsonString() }}\n\n- No duplicates exist.\n- No near duplicates exist.\n- Every keyword is relevant to the provided input.\n- Every keyword is appropriate as a seed keyword."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -2272,
+        160
+      ],
+      "id": "6ab1054d-b423-4070-aa62-74ea1755729f",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', ``, 'string') }}",
+        "model": "={{ $vars.GEMINI_PRO_PREVIEW }}",
+        "enableUrlContext": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Enable_URL_Context_Tool', ``, 'boolean') }}",
+        "enableOrganizationContext": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Enable_Organization_Context', ``, 'boolean') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-gemini-search.geminiSearchToolTool",
+      "typeVersion": 1,
+      "position": [
+        -2192,
+        384
+      ],
+      "id": "5f983352-ba2e-4f5c-8318-73192e4a5d39",
+      "name": "Gemini Search Tool",
+      "credentials": {
+        "geminiSearchApi": {
+          "id": "HzOj98juqUxHGjsa",
+          "name": "SF - Gemini Search Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "function getValidJsonObject(rawText) {\n    if (typeof rawText !== 'string' || rawText.trim() === '') {\n        console.log(\"Invalid input or empty text field.\");\n        return null;\n    }\n    let jsonString = rawText.trim();\n    // Extract JSON from markdown code block fences if present\n    const markdownRegex = /```(?:json)?\\s*([\\s\\S]*?)\\s*```/;\n    const match = jsonString.match(markdownRegex);\n    if (match) {\n        jsonString = match[1].trim();\n    }\n    // First attempt: try parsing as-is\n    try {\n        return JSON.parse(jsonString);\n    } catch (firstError) {\n        console.log(\"First parse attempt failed, trying to fix unescaped quotes...\");\n        \n        // Fix unescaped quotes within string values\n        // Strategy: Process character by character, tracking if we're inside a JSON string\n        let fixedString = fixUnescapedQuotes(jsonString);\n        \n        try {\n            return JSON.parse(fixedString);\n        } catch (secondError) {\n            console.log(\"All parse attempts failed:\", secondError);\n            console.log(\"Problematic string (first 500 chars):\", jsonString.substring(0, 500));\n            return null;\n        }\n    }\n}\nfunction fixUnescapedQuotes(jsonString) {\n    let result = '';\n    let inString = false;\n    let i = 0;\n    \n    while (i < jsonString.length) {\n        const char = jsonString[i];\n        const prevChar = i > 0 ? jsonString[i - 1] : '';\n        const nextChar = i < jsonString.length - 1 ? jsonString[i + 1] : '';\n        \n        if (char === '\"') {\n            if (!inString) {\n                // Opening quote of a JSON string value\n                inString = true;\n                result += char;\n            } else if (prevChar === '\\\\') {\n                // Already escaped quote inside string - keep it\n                result += char;\n            } else {\n                // We're inside a string and found an unescaped quote\n                // Check if this is the closing quote or an unescaped quote in content\n                \n                // Heuristic: If next chars look like JSON structure, it's a closing quote\n                // Look for patterns like: \", or \": or \"} or \"] or just end\n                const afterQuote = jsonString.substring(i + 1, i + 3).trim();\n                const isClosingQuote = \n                    afterQuote.startsWith(',') || \n                    afterQuote.startsWith(':') || \n                    afterQuote.startsWith('}') || \n                    afterQuote.startsWith(']') ||\n                    afterQuote === '' ||\n                    afterQuote.startsWith('\\n');\n                \n                if (isClosingQuote) {\n                    // This is the actual closing quote\n                    inString = false;\n                    result += char;\n                } else {\n                    // This is an unescaped quote inside the string - escape it\n                    result += '\\\\\"';\n                }\n            }\n        } else if (char === '\\\\' && inString && nextChar === '\"') {\n            // This is an escape sequence for quote, keep as-is\n            result += char;\n        } else {\n            result += char;\n        }\n        \n        i++;\n    }\n    \n    return result;\n}\n\n// Combine the 'text' from all parts into a single string.\nconst combinedText = $input.first().json.content.parts.map(part => part.text).join('');\n\nreturn {data: getValidJsonObject(combinedText)};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1920,
+        160
+      ],
+      "id": "4870ea69-6aa3-4d21-a707-5eb9d44d8436",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bc951569-d596-4304-a37f-75183a45b13f",
+              "name": "keywords",
+              "value": "={{ $json.data.keywords }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1696,
+        160
+      ],
+      "id": "93616893-9bf2-48f7-b6a9-68c120cfc6f8",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "keywords",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -1472,
+        160
+      ],
+      "id": "e1cc3667-c583-490e-8dec-a232c9729cc4",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "batchSize": 10,
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1248,
+        160
+      ],
+      "id": "8b8d62a1-cee9-4c8e-bcf0-bc2c0404cbfc",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "734658b2-bed7-4df9-b480-c968d1b9c18b",
+              "name": "seed_keyword",
+              "value": "={{ $json.keywords }}",
+              "type": "string"
+            },
+            {
+              "id": "e34485a8-5856-40f6-bd27-c3b737f17aac",
+              "name": "location_code",
+              "value": "={{ $('Prepare Data').item.json.location_code }}",
+              "type": "number"
+            },
+            {
+              "id": "3dd74f17-e77c-4b4c-9f88-1e11155ab10c",
+              "name": "language_code",
+              "value": "={{ $('Prepare Data').item.json.language_code }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1008,
+        160
+      ],
+      "id": "0dd50694-cc99-4537-89e7-ef411f444fda",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.dataforseo.com/v3/dataforseo_labs/google/keyword_suggestions/live",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=[\n  {\n    \"keyword\": \"{{ $json.seed_keyword }}\",\n    \"location_code\": {{ $json.location_code }},\n    \"language_code\": \"{{ $json.language_code }}\",\n    \"include_seed_keyword\": true,\n    \"limit\": {{ $('Prepare Data').item.json.suggestion_keyword_limit }},\n    \"include_serp_info\": true,\n    \"ignore_synonyms\": true,\n    \"include_clickstream_data\": false,\n    \"exact_match\": false,\n    \"order_by\": [\n      \"keyword_info.search_volume_trend.monthly,desc\"\n    ]\n  }\n]",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -800,
+        160
+      ],
+      "id": "0ed7a777-6104-4e57-b993-b4081a7fed51",
+      "name": "Get Keyword Overview",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "zgTpx63oxNLMm8az",
+          "name": "SF - DataForSEO"
+        }
+      },
+      "notes": "It's cost around $0.0253 for 100 seed keyword."
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "tasks[0].result[0].items",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -576,
+        160
+      ],
+      "id": "583086a2-f39f-4646-9613-ba418e79a774",
+      "name": "Split Out1",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d9621aae-4ce8-47ec-851e-6794e416d6d7",
+              "name": "source_seed",
+              "value": "={{ $('Edit Fields1').item.json.seed_keyword }}",
+              "type": "string"
+            },
+            {
+              "id": "ff7f5e72-4294-471d-abb1-5862b120563c",
+              "name": "keyword",
+              "value": "={{ $json.keyword ?? 'Keyword not found' }}",
+              "type": "string"
+            },
+            {
+              "id": "26edad10-e0a3-4be4-b254-2015e52a71ca",
+              "name": "volume",
+              "value": "={{ $json.keyword_info.search_volume ?? 0 }}",
+              "type": "number"
+            },
+            {
+              "id": "eb89226d-b3b7-4bbb-8121-f115e2961ed5",
+              "name": "cpc",
+              "value": "={{ $json.keyword_info.cpc ?? 0 }}",
+              "type": "number"
+            },
+            {
+              "id": "613706b5-a203-4203-948d-1c1ec47691fe",
+              "name": "competition",
+              "value": "={{ $json.keyword_info.competition ?? 0 }}",
+              "type": "number"
+            },
+            {
+              "id": "7871ded9-c7aa-48dc-adfe-02ac9f1ee552",
+              "name": "competition_level",
+              "value": "={{ $json.keyword_info.competition_level ?? '0' }}",
+              "type": "string"
+            },
+            {
+              "id": "3666c87a-9106-473b-b1aa-6148df2e6330",
+              "name": "intent",
+              "value": "={{ $json.search_intent_info.main_intent ?? 'None' }}",
+              "type": "string"
+            },
+            {
+              "id": "07d6845b-6444-40dd-88b9-da4cdf01f4d7",
+              "name": "kd",
+              "value": "={{ $json.keyword_properties.keyword_difficulty ?? 0 }}",
+              "type": "number"
+            },
+            {
+              "id": "0c2db514-25f0-474b-9ab3-5eb074e0b884",
+              "name": "words",
+              "value": "={{ $json.keyword_properties.words_count ?? '0' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -352,
+        224
+      ],
+      "id": "8395e215-db45-40b8-ad48-aefbdb9c9e0d",
+      "name": "Edit Fields2",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -1024,
+        -112
+      ],
+      "id": "46029652-25cf-4cc1-bb3e-6694dcc58b52",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        -112
+      ],
+      "id": "83206528-dd99-4319-8f02-2d8f08d065c5",
+      "name": "Split Out2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "data",
+              "value": "={{ $json.data }}"
+            },
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "ok"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        176,
+        -112
+      ],
+      "id": "972e5807-5eed-435d-9bc6-52f1ce0a2ba9",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -544,
+        -112
+      ],
+      "id": "fb942e77-4145-49b4-8e96-c833f5bb5b16",
+      "name": "Aggregate1"
+    },
+    {
+      "parameters": {
+        "jsCode": "function groupBySourceSeedAsArray(data = []) {\n  const map = {};\n\n  data.forEach(item => {\n    if (!map[item.source_seed]) {\n      map[item.source_seed] = [];\n    }\n    map[item.source_seed].push(item);\n  });\n\n  return Object.entries(map).map(([source_seed, items]) => ({\n    source_seed,\n    items\n  }));\n}\n\nreturn groupBySourceSeedAsArray($input.first().json.data);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -304,
+        -112
+      ],
+      "id": "fe79e5f0-9813-462c-aa9e-7da072af4e7b",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        -112
+      ],
+      "id": "1e77eccc-25f3-44bf-a34a-b65cfbd9da60",
+      "name": "Aggregate2"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "domain",
+              "value": "={{ $('Webhook').item.json.body.domain }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        -3632,
+        480
+      ],
+      "id": "93c59642-9bda-4b37-ab6e-78ed509c5542",
+      "name": "Execution Data"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "CfFTrHyw35Q6kVn5",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/CfFTrHyw35Q6kVn5",
+          "cachedResultName": "SynergizeFlow.v2 — Get App Token"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -3840,
+        272
+      ],
+      "id": "fd6152a1-da5c-4a71-8c53-a13ff97477a2",
+      "name": "Get token"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "60458c94-986c-49cd-8b69-4b5616163eb3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f910b52-842c-4b6a-a862-e6914c883764",
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -3200,
+        176
+      ],
+      "id": "18c7020d-12bc-4413-bcec-4855112fc164",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.domain }}wp-json/synergizeflow/v2/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license",
+              "value": "={{ $json.license }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -3408,
+        272
+      ],
+      "id": "5ca9ab46-0948-4927-857f-0f5a266c7953",
+      "name": "Check if license is valid",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Webhook').item.json.body.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "fail"
+            },
+            {
+              "name": "msg",
+              "value": "invalid_license"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -3120,
+        448
+      ],
+      "id": "c7e4fad8-7db4-4fb6-9623-6418b686c669",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.domain }}wp-json/synergizeflow/v2/get-website-data/",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "={{$vars.STATIC_TOKEN}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2960,
+        160
+      ],
+      "id": "5ff13f32-43cb-4cfe-b7bf-492388727a6f",
+      "name": "Get website data"
+    },
+    {
+      "parameters": {
+        "url": "={{ $vars.SAAS_API }}api/onboarding/{{ $('Prepare Data').item.json.license }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2736,
+        160
+      ],
+      "id": "1e65ff98-fae3-483b-beba-890ae796de1e",
+      "name": "Get Onboarding Data"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert JSON to markdown": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Search Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Message a model",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Get Keyword Overview",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Keyword Overview": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Split Out2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out2": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get token": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Get website data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if license is valid": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get website data": {
+      "main": [
+        [
+          {
+            "node": "Get Onboarding Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Onboarding Data": {
+      "main": [
+        [
+          {
+            "node": "Convert JSON to markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "triggerCount": 1,
+  "versionId": "b9376092-05c4-457c-8105-2478afa028a2",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "RXioxb8mqJ3lEYEV",
+  "isArchived": false
+}

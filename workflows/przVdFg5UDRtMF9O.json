@@ -1,0 +1,261 @@
+{
+  "id": "przVdFg5UDRtMF9O",
+  "name": "SF - Explainer Agent - Analyze Image",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v2/explainer-agent/analyze-image",
+        "options": {
+          "responseData": "workflow_started"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1152,
+        -16
+      ],
+      "id": "6be64836-7d83-4c89-a0e8-ea906840f303",
+      "name": "Webhook",
+      "webhookId": "ede128de-41f8-4dd5-89ca-55711888ad09"
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json.content?.parts?.[0]?.text || \"\";\n\nfunction parseJson(rawText) {\n  let text = String(rawText || \"\").trim();\n  text = text.replace(/^```json\\s*/i, \"\").replace(/^```\\s*/i, \"\").replace(/```\\s*$/i, \"\").trim();\n\n  try {\n    return JSON.parse(text);\n  } catch {\n    const match = text.match(/\\{[\\s\\S]*\\}/);\n    if (!match) throw new Error(\"No JSON object found in Gemini response\");\n    return JSON.parse(match[0]);\n  }\n}\n\ntry {\n  const parsed = parseJson(raw);\n  const image = $('Webhook').first().json.body.image;\n\n  return [{\n    json: {\n      status: \"ok\",\n      image_id: image.id || null,\n      type: parsed.type || \"other\",\n      label: parsed.label || \"Reference image\",\n      description: parsed.description || \"\",\n      usage_note: parsed.usage_note || \"\",\n      sensitive_note: parsed.sensitive_note || \"\"\n    }\n  }];\n} catch (error) {\n  const image = $('Webhook').first().json.body.image || {};\n\n  return [{\n    json: {\n      status: \"fail\",\n      image_id: image.id || null,\n      stage: \"reference_image_analysis\",\n      error: error.message,\n      raw_preview: raw.slice(0, 500)\n    }\n  }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -528,
+        -16
+      ],
+      "id": "dfd1442e-daa4-4e09-a463-4330590e9547",
+      "name": "Parse AI JSON Output",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_FLASH_PREVIEW}}",
+          "mode": "id"
+        },
+        "text": "=You are analyzing a user-uploaded reference image for an animated explainer video generator.\n\nThe image may be:\n- company logo\n- person/founder/team member\n- product photo\n- app screenshot\n- office/building/place\n- mascot/character\n- document\n- other brand asset\n\nUse the explainer context if available:\nDescription: {{ $('Webhook').item.json.body.description }}\nVisual style: {{ $('Webhook').item.json.body.visual_style }}\nOrientation: {{ $('Webhook').item.json.body.orientation }}\n\nReturn JSON only. No markdown. No explanation.\n\nSchema:\n{\n  \"type\": \"logo | person | product | screenshot | place | mascot | document | other\",\n  \"label\": \"short human-readable label, max 60 chars\",\n  \"description\": \"detailed visual description useful for image generation prompts\",\n  \"usage_note\": \"how this reference should be used in explainer scenes\",\n  \"sensitive_note\": \"optional warning about preserving logo, face, text, UI, or brand accuracy\"\n}\n\nRules:\n- If image contains a logo or wordmark, type must be \"logo\".\n- If image is a person portrait/team photo, type must be \"person\".\n- If image is app UI/dashboard/website screen, type must be \"screenshot\".\n- If image is a physical product, type must be \"product\".\n- If image is a building/office/location, type must be \"place\".\n- Keep label short and clear.\n- description must describe visible colors, objects, text, layout, style, and identity cues.\n- usage_note must tell the storyboard generator when to use it.\n- sensitive_note should mention risks if exact text/logo/face/UI preservation matters.",
+        "imageUrls": "={{ $('Webhook').item.json.body.image.url }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        -752,
+        -16
+      ],
+      "id": "31646cab-56e2-4ccb-a9eb-ee1c35c5f969",
+      "name": "Analyze an image1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "CfFTrHyw35Q6kVn5",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/CfFTrHyw35Q6kVn5",
+          "cachedResultName": "SynergizeFlow.v2 — Get App Token"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -960,
+        -16
+      ],
+      "id": "b479ce8c-3968-40d3-88e0-5a02691b0b0b",
+      "name": "Get token"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').item.json.body.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Get token').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "={{ $json.status }}"
+            },
+            {
+              "name": "image_id",
+              "value": "={{ $json.image_id }}"
+            },
+            {
+              "name": "type",
+              "value": "={{ $json.type }}"
+            },
+            {
+              "name": "label",
+              "value": "={{ $json.label }}"
+            },
+            {
+              "name": "description",
+              "value": "={{ $json.description }}"
+            },
+            {
+              "name": "usage_note",
+              "value": "={{ $json.usage_note }}"
+            },
+            {
+              "name": "sensitive_note",
+              "value": "={{ $json.sensitive_note }}"
+            },
+            {
+              "name": "agent_id",
+              "value": "={{ $('Webhook').item.json.body.agent_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -304,
+        -32
+      ],
+      "id": "f1360754-1f4e-4367-96a5-ca17e0026909",
+      "name": "HTTP Request",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "domain",
+              "value": "={{ $('Webhook').item.json.body.domain }}"
+            },
+            {
+              "key": "type",
+              "value": "analyze_image"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        -960,
+        176
+      ],
+      "id": "8e477a8a-89f7-446e-8363-d1ba2fee2d55",
+      "name": "Execution Data"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get token",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI JSON Output": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Analyze an image1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze an image1": {
+      "main": [
+        [
+          {
+            "node": "Parse AI JSON Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get token": {
+      "main": [
+        [
+          {
+            "node": "Analyze an image1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "onQDQSO8gYYXVpPQ"
+  },
+  "triggerCount": 1,
+  "versionId": "75d0863d-50f7-4dc7-9552-8da3348f5785",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "EU3LkrzkjMEbKN3L",
+  "isArchived": false
+}

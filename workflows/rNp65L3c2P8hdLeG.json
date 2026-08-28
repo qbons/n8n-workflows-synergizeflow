@@ -1,0 +1,440 @@
+{
+  "id": "rNp65L3c2P8hdLeG",
+  "name": "SF - Image Vaults Converter",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -832,
+        416
+      ],
+      "id": "d248fe59-24dd-4dde-8d97-5249a7caa75d",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2c071ae5-2152-4053-ade3-db6b1dcfdb35",
+              "name": "status",
+              "value": "={{ $json.status }}",
+              "type": "string"
+            },
+            {
+              "id": "3a555d18-588f-4277-a1f1-f93849d83da8",
+              "name": "website_name",
+              "value": "={{ $json.website_name }}",
+              "type": "string"
+            },
+            {
+              "id": "8b37b90e-7514-470d-880c-7bdfa88d49ec",
+              "name": "parsed",
+              "value": "={{ $json.parsed }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -400,
+        336
+      ],
+      "id": "25a0ce1b-eb1e-4000-abb1-a07af871c557",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.parsed }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "array",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    },
+                    "id": "2c7107eb-6906-496f-88bf-47951e106240"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "has_image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c66adcfe-dc1d-41d1-b95e-113e263b9882",
+                    "leftValue": "={{ $json.parsed }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "array",
+                      "operation": "empty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "no_image"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -624,
+        416
+      ],
+      "id": "7be4f37d-16ff-4f7b-9da1-7f818051ca3c",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.first().json.parsed;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -176,
+        336
+      ],
+      "id": "9789ba05-d8d4-4871-9113-7b00cf63249c",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        32,
+        336
+      ],
+      "id": "d98caf1b-de55-4d19-b806-d43cb79055a7",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        240,
+        432
+      ],
+      "id": "e3ffc537-bc60-4c39-adcb-79d8ce0bb350",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        432
+      ],
+      "id": "972cfbfb-5fd2-4015-bdd1-bfc15a7e1570",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1858fdf6-052f-4e63-9a67-77208e312eec",
+              "name": "title",
+              "value": "={{ $('Loop Over Items').item.json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "90f18b45-cfb3-4359-8c74-4731caf77971",
+              "name": "description",
+              "value": "={{ $('Loop Over Items').item.json.description }}",
+              "type": "string"
+            },
+            {
+              "id": "35349ae3-8a66-47fa-b8dc-181982fb55b1",
+              "name": "mime",
+              "value": "={{ $('Loop Over Items').item.json.mime }}",
+              "type": "string"
+            },
+            {
+              "id": "1050cd5d-9d24-4efb-831a-2956ef7f9c74",
+              "name": "category",
+              "value": "={{ $('Loop Over Items').item.json.category }}",
+              "type": "string"
+            },
+            {
+              "id": "6a4c1709-d380-4ca6-9971-52041e38d3da",
+              "name": "data",
+              "value": "={{ $json.data }}",
+              "type": "string"
+            },
+            {
+              "id": "e0be01b3-adcc-48f3-9364-23aa23a9ab4b",
+              "name": "url",
+              "value": "={{ $('Loop Over Items').item.json.url }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        656,
+        432
+      ],
+      "id": "1665babe-9765-43d7-b76b-dfb5efe3d8ac",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        240,
+        240
+      ],
+      "id": "e794276c-3d96-4323-bff6-37238c8e001c",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "55ea306b-90dc-409c-b2d3-d69e796834f5",
+              "name": "status",
+              "value": "={{ $('Edit Fields').item.json.status }}",
+              "type": "string"
+            },
+            {
+              "id": "ac7528cb-ff34-43cd-bafc-e48087b31492",
+              "name": "website",
+              "value": "={{ $('Edit Fields').item.json.website_name }}",
+              "type": "string"
+            },
+            {
+              "id": "8f1c974d-39a6-4a46-82fb-f388001e6705",
+              "name": "parsed",
+              "value": "={{ $json.data }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        240
+      ],
+      "id": "429421a5-6711-43bf-9225-e5471a3537ac",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "55ea306b-90dc-409c-b2d3-d69e796834f5",
+              "name": "status",
+              "value": "={{ $json.status }}",
+              "type": "string"
+            },
+            {
+              "id": "ac7528cb-ff34-43cd-bafc-e48087b31492",
+              "name": "website",
+              "value": "={{ $json.website_name }}",
+              "type": "string"
+            },
+            {
+              "id": "8f1c974d-39a6-4a46-82fb-f388001e6705",
+              "name": "parsed",
+              "value": "=[]",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -400,
+        544
+      ],
+      "id": "fca7fdf0-c8e7-4b39-8729-88b7273ebf79",
+      "name": "Edit Fields3"
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "triggerCount": 0,
+  "versionId": "64affc23-a2c6-4b5d-8fe3-cb8626a31884",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "RH3pD7tYrBWa3pTv",
+  "isArchived": false
+}

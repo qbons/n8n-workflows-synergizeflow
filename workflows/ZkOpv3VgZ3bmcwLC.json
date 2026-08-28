@@ -1,0 +1,1735 @@
+{
+  "id": "ZkOpv3VgZ3bmcwLC",
+  "name": "SF - Chat Agent - Process Data",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v2/chat-agent/process-data",
+        "options": {
+          "responseData": "workflow_started"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        -960
+      ],
+      "id": "8179c158-6449-4f4f-8484-365da13e228b",
+      "name": "Webhook",
+      "webhookId": "b7d1bfd9-11aa-4976-bde4-fdf2bc649fc8"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.domain }}wp-json/synergizeflow/v2/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license",
+              "value": "={{ $json.license }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        672,
+        -1056
+      ],
+      "id": "9ea0aaad-d646-4377-9a71-baf1f264d63a",
+      "name": "Check if license is valid",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "domain",
+              "value": "={{ $('Webhook').item.json.body.domain }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        224,
+        -864
+      ],
+      "id": "195c32be-7f9d-45f7-8e76-00dff58f57f4",
+      "name": "Execution Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "fail"
+            },
+            {
+              "name": "msg",
+              "value": "invalid_license"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1120,
+        -960
+      ],
+      "id": "fc62a9b2-371b-42fb-982c-21a5e2aa4871",
+      "name": "Send Error License"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "CfFTrHyw35Q6kVn5",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/CfFTrHyw35Q6kVn5",
+          "cachedResultName": "SynergizeFlow.v2 — Get App Token"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        -1056
+      ],
+      "id": "1d78d0ae-30c2-4f73-9a14-714a7c4cd514",
+      "name": "Get token"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "728d8a8b-ba00-41e5-a9ad-8cd1961750fc",
+              "name": "agent_id",
+              "value": "={{ $('Webhook').item.json.body.agent_id }}",
+              "type": "number"
+            },
+            {
+              "id": "4c328f18-39cd-4a2f-8784-146933701bb4",
+              "name": "license",
+              "value": "={{ $('Webhook').item.json.body.license }}",
+              "type": "string"
+            },
+            {
+              "id": "c04004b7-898d-4cba-ab1d-55b200e81638",
+              "name": "domain",
+              "value": "={{ $('Webhook').item.json.body.domain }}",
+              "type": "string"
+            },
+            {
+              "id": "9e9d6ab3-5bcc-4874-a80b-d4495dedd8d9",
+              "name": "action",
+              "value": "={{ $('Webhook').item.json.body.action }}",
+              "type": "string"
+            },
+            {
+              "id": "0a2f9cd2-0a38-44bd-8921-8a2f756837f6",
+              "name": "agent_name",
+              "value": "={{ $('Webhook').item.json.body.agent_name }}",
+              "type": "string"
+            },
+            {
+              "id": "46464615-d7af-4c9d-b4ec-ef08beb5e6a0",
+              "name": "language",
+              "value": "={{ $('Webhook').item.json.body.language }}",
+              "type": "string"
+            },
+            {
+              "id": "b3d16eb2-4188-4152-ae7c-d8853ce2ef82",
+              "name": "persona",
+              "value": "={{ $('Webhook').item.json.body.persona }}, {{ $('Webhook').item.json.body.persona_text }}",
+              "type": "string"
+            },
+            {
+              "id": "efbf1961-1c0f-47ac-b493-70207e7bb157",
+              "name": "instruction",
+              "value": "={{ $('Webhook').item.json.body.custom_instruction }}",
+              "type": "string"
+            },
+            {
+              "id": "b71813c8-ceea-413c-8693-919ecabb970d",
+              "name": "knowledge_files",
+              "value": "={{ $('Webhook').item.json.body.knowledge_files.length > 0 ? $('Webhook').item.json.body.knowledge_files : [] }}",
+              "type": "array"
+            },
+            {
+              "id": "cf92e80d-3139-432f-b904-41b62e0f2d0e",
+              "name": "cta_items",
+              "value": "={{ $('Webhook').item.json.body.cta_items.length > 0 ? $('Webhook').item.json.body.cta_items : [] }}",
+              "type": "array"
+            },
+            {
+              "id": "96eda5f4-d9f1-40af-a12e-812e4f315369",
+              "name": "token",
+              "value": "={{ $json.token }}",
+              "type": "string"
+            },
+            {
+              "id": "ab9225f3-f798-4828-8a3c-0710de50c1d8",
+              "name": "webhook",
+              "value": "={{ $('Webhook').item.json.body.webhook }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        -1056
+      ],
+      "id": "f145b721-2ec2-4a8a-abcc-a0d7156242e4",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$(\"Check Insert Data\").item.json}}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "empty",
+                      "singleValue": true
+                    },
+                    "id": "78e9eeec-fe13-4611-9226-64a06c042bfa"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "no_data"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "b690739d-d20b-48c8-8de1-78b83e87c87f",
+                    "leftValue": "={{$(\"Check Insert Data\").item.json}}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "has_data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        3936,
+        -1408
+      ],
+      "id": "e0b1a4c9-6de1-4348-b551-b6641007faba",
+      "name": "Switch2"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "tqTaS6Yu8F1h7oGr",
+          "mode": "list",
+          "cachedResultName": "Chat Agent Data",
+          "cachedResultUrl": "/projects/0Cpv1rjP8dogQgcy/datatables/tqTaS6Yu8F1h7oGr"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "agent_id": "={{ $('Prepare Data').item.json.agent_id }}",
+            "domain": "={{ $('Prepare Data').item.json.domain }}",
+            "name": "={{ $('Prepare Data').item.json.agent_name }}",
+            "language": "={{ $('Prepare Data').item.json.language }}",
+            "persona": "={{ $('Prepare Data').item.json.persona }}",
+            "instruction": "={{ $('Prepare Data').item.json.instruction }}",
+            "knowledge_base": "={{ $('Edit Fields2').item.json.knowledge_base }}",
+            "cta": "={{ $('Prepare Data').item.json.cta_items.toJsonString() }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "agent_id",
+              "displayName": "agent_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "domain",
+              "displayName": "domain",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "language",
+              "displayName": "language",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "persona",
+              "displayName": "persona",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "instruction",
+              "displayName": "instruction",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "knowledge_base",
+              "displayName": "knowledge_base",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "cta",
+              "displayName": "cta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        4160,
+        -1504
+      ],
+      "id": "633b1ebb-8f1d-477b-b0f3-345a0ca4d740",
+      "name": "Insert row"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Prepare Data').item.json.knowledge_files }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "array",
+                      "operation": "empty",
+                      "singleValue": true
+                    },
+                    "id": "eb13a251-6662-4895-a303-65ed26bddb32"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "no_files"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "477b6203-4523-494e-8523-c0353ea4459e",
+                    "leftValue": "={{ $('Prepare Data').item.json.knowledge_files }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "array",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "has_files"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1344,
+        -1312
+      ],
+      "id": "5c63b730-7673-462c-94a2-1454268ceb8a",
+      "name": "Check if has knowledge files"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "60458c94-986c-49cd-8b69-4b5616163eb3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f910b52-842c-4b6a-a862-e6914c883764",
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        896,
+        -1120
+      ],
+      "id": "3e924230-67d8-4f7b-ba50-2d3135686580",
+      "name": "Check license"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $('Prepare Data').first().json.knowledge_files;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1568,
+        -1152
+      ],
+      "id": "dffda892-4542-49ec-8cdc-0df0888538a9",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1792,
+        -1152
+      ],
+      "id": "4bf7c895-cb2c-4f96-bb24-fb72b2aac447",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3176cd4c-de0f-4cea-ab4b-6369f70fda2b",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "bf931501-a691-459e-be72-2f11f98b08e0",
+              "name": "type",
+              "value": "={{ $json.type }}",
+              "type": "string"
+            },
+            {
+              "id": "df73de58-70b0-4d52-8c7e-15746d59e10a",
+              "name": "url",
+              "value": "={{ $json.url }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2016,
+        -1120
+      ],
+      "id": "806932e5-5f06-4564-8f09-f7faa961529c",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "UmeOnfYIyaCDbJpw",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/UmeOnfYIyaCDbJpw",
+          "cachedResultName": "SynergizeFlow.v2 — SF - Chat Agent - Extract Text From File"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        2240,
+        -1056
+      ],
+      "id": "dd6e0aaa-b3c6-4a05-a566-3d681a7de4ab",
+      "name": "Extract Text From File"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "knowldge_base",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2016,
+        -1312
+      ],
+      "id": "a73c3bd3-b9e3-4684-bc9b-4364d2f12d06",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "jsCode": "let text = \"\";\nlet knowledgeBase = $('Aggregate').first().json.knowldge_base;\nknowledgeBase.push({\n  title: $input.first().json.title,\n  text: $input.first().json.text\n})\nfor (const item of knowledgeBase) {\n  text += item.title+'\\n\\r'+item.text+'\\n\\r---\\n\\r'\n}\n\nreturn {text:text}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2688,
+        -1312
+      ],
+      "id": "678f9733-7c0e-4a2e-9896-536632dbac60",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Prepare Data').item.json.action }}",
+                    "rightValue": "insert",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "3b1ee3ba-2bd0-43be-be87-79ae0233ea39"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "insert"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "9cc16763-b544-4231-907b-75b3b7edb3eb",
+                    "leftValue": "={{ $('Prepare Data').item.json.action }}",
+                    "rightValue": "delete",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "delete"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1120,
+        -1168
+      ],
+      "id": "202cdec4-b74f-49e5-aa6d-2926ccc509f7",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_TEXT }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.text }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "systemMessage": "=# ROLE\n\nYou are an expert Knowledge Base Extraction and Normalization Agent.\n\nYour purpose is to transform one or more unstructured documents into a single, clean, normalized Markdown knowledge base that will be consumed by other AI agents.\n\nThe output is NOT a summary.\n\nThe output is a canonical knowledge document that preserves all meaningful information while organizing it into a consistent, searchable structure.\n\nThe resulting knowledge base should be optimized for AI retrieval, reasoning, question answering, content generation, and future processing.\n\n---\n\n# INPUT\n\nYou will receive one or more pieces of text.\n\nThe text may originate from any source, including but not limited to:\n\n- PDF\n- DOCX\n- TXT\n- HTML\n- Markdown\n- CSV\n- JSON\n- XML\n- Email\n- Website\n- OCR\n- Spreadsheet\n- Notes\n- Manuals\n- Policies\n- Product catalogs\n- Employee records\n- API documentation\n- Knowledge articles\n- Marketing materials\n- FAQ pages\n- Contracts\n\nThe input format is NOT fixed.\n\nDocument names may or may not exist.\n\nDo NOT rely on filenames.\n\nInstead, analyze the content itself.\n\n---\n\n# OBJECTIVE\n\nConvert all input into ONE unified Markdown knowledge base.\n\nThe output should:\n\n- Preserve all important facts.\n- Remove unnecessary repetition.\n- Merge duplicated information.\n- Normalize formatting.\n- Organize information logically.\n- Keep information easy for AI models to retrieve.\n- Never invent information.\n- Never add opinions.\n- Never rewrite facts into marketing language.\n\n---\n\n# IMPORTANT PRINCIPLES\n\n## 1. Preserve Information\n\nKeep every meaningful fact.\n\nDo NOT omit information simply because it appears unimportant.\n\nIf it may be useful later, include it.\n\n---\n\n## 2. Do Not Summarize\n\nIncorrect:\n\n\"This document explains the hiring process.\"\n\nCorrect:\n\nExtract every hiring step, requirement, duration, FAQ, and related information.\n\n---\n\n## 3. Normalize Information\n\nConvert inconsistent formatting into one consistent style.\n\nExample:\n\nBad\n\nCEO: Sarah Mitchell\n\nChief Executive Officer\nSarah Mitchell\n\nSarah Mitchell (CEO)\n\nGood\n\n## Sarah Mitchell\n\n**Role**\n\nChief Executive Officer\n\n---\n\n## 4. Merge Duplicate Information\n\nIf the same information appears multiple times:\n\nKeep only one canonical version.\n\nExample:\n\nsales@example.com appears 10 times\n\nStore it once.\n\n---\n\n## 5. Organize By Knowledge\n\nDO NOT organize by source document.\n\nBad\n\n# Hiring.pdf\n\n...\n\n# Contacts.pdf\n\n...\n\nGood\n\n# Hiring Process\n\n...\n\n# Contacts\n\n...\n\n---\n\n## 6. Preserve Relationships\n\nRecognize relationships between entities.\n\nExample\n\nPerson\n\n↓\n\nDepartment\n\n↓\n\nRole\n\n↓\n\nLocation\n\nDo not separate related information unnecessarily.\n\n---\n\n## 7. Never Invent Information\n\nIf something is not explicitly stated:\n\nDo NOT infer it.\n\nDo NOT guess.\n\nDo NOT fabricate.\n\n---\n\n## 8. Preserve Numbers\n\nKeep:\n\n- dates\n- phone numbers\n- addresses\n- IDs\n- prices\n- percentages\n- durations\n- statistics\n- version numbers\n\nexactly as provided.\n\n---\n\n## 9. Preserve Lists\n\nWhen the source contains a list:\n\nKeep it as a Markdown list whenever appropriate.\n\n---\n\n## 10. Preserve Workflows\n\nIf the document describes a process:\n\nRepresent every step.\n\nExample\n\n## Step 1\n\n...\n\n## Step 2\n\n...\n\nNever collapse multiple steps into one paragraph.\n\n---\n\n# KNOWLEDGE ORGANIZATION\n\nCreate sections only when relevant.\n\nPossible sections include:\n\n# Company Overview\n\n# Products\n\n# Services\n\n# Departments\n\n# Teams\n\n# Employees\n\n# Leadership\n\n# Contacts\n\n# Locations\n\n# Business Hours\n\n# Processes\n\n# Workflows\n\n# Requirements\n\n# Policies\n\n# Benefits\n\n# Pricing\n\n# Features\n\n# FAQ\n\n# Terminology\n\n# Technical Information\n\n# API\n\n# Statistics\n\n# Resources\n\n# References\n\nDo NOT force every section to exist.\n\nOnly create sections that are supported by the input.\n\n---\n\n# ENTITY NORMALIZATION\n\nWhenever possible normalize entities consistently.\n\nPeople\n\nUse\n\n## Full Name\n\n**Role**\n\n**Department**\n\n**Responsibilities**\n\n**Location**\n\nOrganizations\n\nUse\n\n## Organization Name\n\nDescription\n\nContacts\n\nUse\n\n## Department\n\nPhone\n\nEmail\n\nOffice\n\nLocations\n\nUse\n\n## Location Name\n\nAddress\n\nCity\n\nState\n\nCountry\n\nBusiness Hours\n\nEmployees\n\nUse\n\n## Employee Name\n\nEmployee ID\n\nPosition\n\nDepartment\n\nEmployment Type\n\nOffice\n\nStart Date\n\nFAQs\n\nUse\n\n## Question\n\nAnswer\n\nProcesses\n\nUse\n\n## Process Name\n\n### Step 1\n\n...\n\n### Step 2\n\n...\n\nRequirements\n\nUse Markdown bullet lists.\n\nBenefits\n\nUse Markdown bullet lists.\n\n---\n\n# TABLES\n\nUse Markdown tables whenever they improve readability.\n\nSuitable examples:\n\n- employee records\n- pricing\n- schedules\n- comparisons\n- statistics\n\nDo NOT force tables when lists are easier to read.\n\n---\n\n# DUPLICATE HANDLING\n\nMerge duplicate facts.\n\nMerge repeated contacts.\n\nMerge repeated locations.\n\nMerge repeated departments.\n\nMerge repeated FAQs.\n\nDo not repeat identical information.\n\n---\n\n# SOURCE REFERENCES\n\nWhen document names are available, include them only when useful.\n\nExample\n\n> Source: Hiring_Process.pdf\n\nDo NOT organize the entire output by source.\n\nSources exist only for traceability.\n\n---\n\n# MARKDOWN STYLE\n\nUse clean Markdown.\n\nPrefer:\n\n# Heading\n\n## Subheading\n\n### Subsection\n\nBullet lists\n\nNumbered lists\n\nMarkdown tables\n\nBold labels\n\nExample\n\n## Sarah Mitchell\n\n**Role**\n\nChief Executive Officer\n\n**Responsibilities**\n\nLeads company strategy.\n\nAvoid excessive bolding.\n\nAvoid decorative formatting.\n\n---\n\n# OUTPUT QUALITY\n\nThe knowledge base should be:\n\n- logically organized\n- easy to scan\n- AI-friendly\n- human-readable\n- normalized\n- deduplicated\n- complete\n- factual\n- consistent\n\n---\n\n# OUTPUT RULES\n\nReturn ONLY valid Markdown.\n\nDo NOT wrap the output in code fences.\n\nDo NOT output JSON.\n\nDo NOT explain what you extracted.\n\nDo NOT provide summaries.\n\nDo NOT include commentary.\n\nDo NOT mention your reasoning.\n\nReturn only the final knowledge base."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        2912,
+        -1408
+      ],
+      "id": "1db64a2e-173a-45d7-8811-77d4bb5f22e7",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "tqTaS6Yu8F1h7oGr",
+          "mode": "list",
+          "cachedResultName": "Chat Agent Data",
+          "cachedResultUrl": "/projects/0Cpv1rjP8dogQgcy/datatables/tqTaS6Yu8F1h7oGr"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "agent_id",
+              "keyValue": "={{ $('Prepare Data').item.json.agent_id }}"
+            }
+          ]
+        },
+        "limit": 1
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        3712,
+        -1408
+      ],
+      "id": "6d2cd8e6-3e28-4637-a070-b73a673cb07f",
+      "name": "Check Insert Data",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8c260f6a-0207-4165-8e3d-ea2fd76ff89e",
+              "name": "knowledge_base",
+              "value": "={{ $json.knowledge_base }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3488,
+        -1408
+      ],
+      "id": "ffdf324d-23e0-4b94-b7cd-e97edd4ca081",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bdfa6d96-a988-4118-b8f5-b39cbdd3d0c0",
+              "name": "knowledge_base",
+              "value": "={{ $json.content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3264,
+        -1408
+      ],
+      "id": "493b7231-67fd-4472-8f80-4d102269cf32",
+      "name": "Get Knowledge Base"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "tqTaS6Yu8F1h7oGr",
+          "mode": "list",
+          "cachedResultName": "Chat Agent Data",
+          "cachedResultUrl": "/projects/0Cpv1rjP8dogQgcy/datatables/tqTaS6Yu8F1h7oGr"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "agent_id",
+              "keyValue": "={{ $('Prepare Data').item.json.agent_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "agent_id": "={{ $('Prepare Data').item.json.agent_id }}",
+            "domain": "={{ $('Prepare Data').item.json.domain }}",
+            "name": "={{ $('Prepare Data').item.json.agent_name }}",
+            "language": "={{ $('Prepare Data').item.json.language }}",
+            "persona": "={{ $('Prepare Data').item.json.persona }}",
+            "instruction": "={{ $('Prepare Data').item.json.instruction }}",
+            "knowledge_base": "={{ $('Edit Fields2').item.json.knowledge_base }}",
+            "cta": "={{ $('Prepare Data').item.json.cta_items.toJsonString() }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "agent_id",
+              "displayName": "agent_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "domain",
+              "displayName": "domain",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "language",
+              "displayName": "language",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "persona",
+              "displayName": "persona",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "instruction",
+              "displayName": "instruction",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "knowledge_base",
+              "displayName": "knowledge_base",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "cta",
+              "displayName": "cta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        4160,
+        -1200
+      ],
+      "id": "14886aa6-9756-4ee5-8c1c-a83dd41d5fe3",
+      "name": "Update row"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "tqTaS6Yu8F1h7oGr",
+          "mode": "list",
+          "cachedResultName": "Chat Agent Data",
+          "cachedResultUrl": "/projects/0Cpv1rjP8dogQgcy/datatables/tqTaS6Yu8F1h7oGr"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "agent_id",
+              "keyValue": "={{ $('Prepare Data').item.json.agent_id }}"
+            }
+          ]
+        },
+        "limit": 1
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1632,
+        -704
+      ],
+      "id": "a649991e-861f-4811-a2c2-2246b132f0a8",
+      "name": "Check Delete Data",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{$(\"Check Delete Data\").item.json}}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "empty",
+                      "singleValue": true
+                    },
+                    "id": "78e9eeec-fe13-4611-9226-64a06c042bfa"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "no_data"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "b690739d-d20b-48c8-8de1-78b83e87c87f",
+                    "leftValue": "={{$(\"Check Delete Data\").item.json}}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "has_data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        2080,
+        -704
+      ],
+      "id": "04e97d48-4d12-4b7c-ba38-e42bad6e3c38",
+      "name": "Switch3"
+    },
+    {
+      "parameters": {
+        "operation": "deleteRows",
+        "dataTableId": {
+          "__rl": true,
+          "value": "tqTaS6Yu8F1h7oGr",
+          "mode": "list",
+          "cachedResultName": "Chat Agent Data",
+          "cachedResultUrl": "/projects/0Cpv1rjP8dogQgcy/datatables/tqTaS6Yu8F1h7oGr"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "agent_id",
+              "keyValue": "={{ $('Prepare Data').item.json.agent_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        2432,
+        -528
+      ],
+      "id": "a4ec0284-6a53-4a7e-9287-e97e974b8b2f",
+      "name": "Delete row(s)"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1506ceb3-0616-4318-bc1f-11e1c37bb2e1",
+              "name": "status",
+              "value": "ok",
+              "type": "string"
+            },
+            {
+              "id": "05aefbbb-d39d-4839-861b-611bd7111bb2",
+              "name": "msg",
+              "value": "data_successfully_deleted",
+              "type": "string"
+            },
+            {
+              "id": "b3597323-d02e-42d3-816f-caf89733e41c",
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4384,
+        -912
+      ],
+      "id": "73230575-e6a4-457d-bd3e-4e7b1ff7349b",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1506ceb3-0616-4318-bc1f-11e1c37bb2e1",
+              "name": "status",
+              "value": "ok",
+              "type": "string"
+            },
+            {
+              "id": "05aefbbb-d39d-4839-861b-611bd7111bb2",
+              "name": "msg",
+              "value": "data_successfully_inserted",
+              "type": "string"
+            },
+            {
+              "id": "b3597323-d02e-42d3-816f-caf89733e41c",
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4384,
+        -1504
+      ],
+      "id": "6e2ebdbe-65db-4bc9-a9d0-6560dd8b7784",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1506ceb3-0616-4318-bc1f-11e1c37bb2e1",
+              "name": "status",
+              "value": "ok",
+              "type": "string"
+            },
+            {
+              "id": "05aefbbb-d39d-4839-861b-611bd7111bb2",
+              "name": "msg",
+              "value": "data_successfully_updated",
+              "type": "string"
+            },
+            {
+              "id": "b3597323-d02e-42d3-816f-caf89733e41c",
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4384,
+        -1184
+      ],
+      "id": "6f7e3163-1ea2-4f96-af54-d28c046d3fb1",
+      "name": "Edit Fields5"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $json.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "={{ $json.status }}"
+            },
+            {
+              "name": "msg",
+              "value": "={{ $json.msg }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        4608,
+        -1168
+      ],
+      "id": "0582c158-c047-4a10-8ac0-2e9b3f7cc6da",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "url": "={{ $vars.SAAS_API }}api/onboarding/{{ $('Prepare Data').item.json.license }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2464,
+        -1504
+      ],
+      "id": "528f612d-799b-4961-b7e2-f4870faf124e",
+      "name": "Get Onboarding Data"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "97e64401-0705-41a3-9a93-e21a028e4d8b",
+              "name": "text",
+              "value": "={{ $json.website_name }} knowledge base\n\nDomain: {{ $json.domain_name }}\nWebsite name: {{ $json.website_name }}\nNiche: {{ $json.website_niche }}\nTarget Audience: {{ $json.target_audience }}\nPurpose: {{ $json.purpose }}\nFearure/Service: {{ $json.features.toJsonString() }}\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2688,
+        -1504
+      ],
+      "id": "97c159f5-177b-45c2-b051-8913c9062daf",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "url": "={{ $vars.SAAS_API }}api/onboarding/{{ $('Prepare Data').item.json.license }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2240,
+        -1312
+      ],
+      "id": "6077a675-801d-475e-a285-a24109444837",
+      "name": "Get Onboarding Data1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "97e64401-0705-41a3-9a93-e21a028e4d8b",
+              "name": "text",
+              "value": "=Domain: {{ $json.domain_name }}\nWebsite name: {{ $json.website_name }}\nNiche: {{ $json.website_niche }}\nTarget Audience: {{ $json.target_audience }}\nPurpose: {{ $json.purpose }}\nFearure/Service: {{ $json.features.toJsonString() }}\n",
+              "type": "string"
+            },
+            {
+              "id": "c1614b72-0596-48c3-8ed5-fc00812103e2",
+              "name": "title",
+              "value": "={{ $json.website_name }} knowledge base",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2464,
+        -1312
+      ],
+      "id": "90faee3c-7dec-40f6-8cad-55cff19c0668",
+      "name": "Edit Fields6"
+    }
+  ],
+  "connections": {
+    "Check if license is valid": {
+      "main": [
+        [
+          {
+            "node": "Check license",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Error License",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get token": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get token",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch2": {
+      "main": [
+        [
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check license": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Error License",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if has knowledge files": {
+      "main": [
+        [
+          {
+            "node": "Get Onboarding Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Extract Text From File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Text From File": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Get Onboarding Data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Check if has knowledge files",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check Delete Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Get Knowledge Base",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Insert Data": {
+      "main": [
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Check Insert Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Knowledge Base": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Delete Data": {
+      "main": [
+        [
+          {
+            "node": "Switch3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch3": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Delete row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete row(s)": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert row": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields5": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields4": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Onboarding Data": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Onboarding Data1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields6": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "triggerCount": 1,
+  "versionId": "4b14e27c-199e-4177-ab3c-d67da3a59000",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "Q29WwRjNk49BZTwO",
+  "isArchived": false
+}

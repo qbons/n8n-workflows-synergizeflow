@@ -1,0 +1,1568 @@
+{
+  "id": "gkowxyDR8jCYe11J",
+  "name": "SF - Telegram",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $('get largest_file_id').item.json.selected_file_id }}",
+        "additionalFields": {
+          "mimeType": ""
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1072,
+        64
+      ],
+      "id": "ced7fcf3-6ec6-4af8-8357-78714be45b9a",
+      "name": "Get a file",
+      "webhookId": "4f8fc7e3-4680-4d10-9910-00b994386e4e",
+      "retryOnFail": true,
+      "waitBetweenTries": 2500,
+      "credentials": {
+        "telegramApi": {
+          "id": "YaCzKK7zR9ZCFSc0",
+          "name": "SynergizeFlow Dev Blog"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8f77ad26-3f99-4d24-85c8-0bc57256765f",
+              "name": "caption",
+              "value": "={{ $('Telegram Trigger').item.json.message.caption }}",
+              "type": "string"
+            },
+            {
+              "id": "d5f89f44-9ed2-45b2-b389-41832b059fae",
+              "name": "user_id",
+              "value": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+              "type": "string"
+            },
+            {
+              "id": "d3cdb6d2-feb9-4d3a-a231-a6976da1cd81",
+              "name": "user_name",
+              "value": "={{ $('Telegram Trigger').item.json.message.from.first_name }}",
+              "type": "string"
+            },
+            {
+              "id": "d18fd18f-9214-450d-9e02-8ba4cbe7249a",
+              "name": "date",
+              "value": "={{ $('Telegram Trigger').item.json.message.date }}",
+              "type": "string"
+            },
+            {
+              "id": "8a19e738-8529-4c19-b2c5-e3eff90b1bd5",
+              "name": "media_group_id",
+              "value": "={{ $('Telegram Trigger').item.json.message.media_group_id }}",
+              "type": "string"
+            },
+            {
+              "id": "55f4141f-4e34-47c9-bfb4-b52a8f759c93",
+              "name": "image_name",
+              "value": "={{ $('Get a file').item.json.result.file_path }}",
+              "type": "string"
+            },
+            {
+              "id": "4ee377ac-81e3-43f4-a7c5-7dba4b9e73d8",
+              "name": "file_unique_id",
+              "value": "={{ $('Get a file').item.json.result.file_unique_id }}",
+              "type": "string"
+            },
+            {
+              "id": "8956718d-5c1a-4a6e-9882-9893b09728b2",
+              "name": "image",
+              "value": "={{ $json.data }}",
+              "type": "string"
+            },
+            {
+              "id": "7af43f06-9b1c-4da5-b11c-df05c130128b",
+              "name": "",
+              "value": "={{ $('generate blog').item.json.content.parts[0].text }}",
+              "type": "string"
+            },
+            {
+              "id": "3a4667c3-0409-49cc-813a-1d6266690c19",
+              "name": "keyword",
+              "value": "={{ $('return text data1').item.json.keywords }}",
+              "type": "array"
+            },
+            {
+              "id": "a44e8a68-bae1-4169-a5a0-8ce50a8da2ca",
+              "name": "category",
+              "value": "=[{{ $('check user id req').item.json.category }}]",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -624,
+        64
+      ],
+      "id": "6184e4b1-a6cc-41fb-a479-a34902df854c",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -848,
+        64
+      ],
+      "id": "4d6e1118-c0cd-4b4f-9fa2-277c0b7c31d7",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "922db1ef-c670-4893-bd20-c9fd6e5a9c45",
+              "leftValue": "={{ $('get largest_file_id').item.json.selected_file_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -3648,
+        80
+      ],
+      "id": "c40f082e-e117-4a7b-9cf8-0617ef2a69d3",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_TEXT }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are an expert-level NLP (Natural Language Processing) and SEO Content Analysis System. Your goal is to analyze the user input provided in the variable `caption` and extract metadata into a structured format.\n\n**INPUT TEXT (`caption`):**\n\"\"\"\n{{ $('Telegram Trigger').item.json.message.caption }}\n\"\"\"\n\n**PROCESS:**\n\n1. **ANALYZE 'Language':**\n   - distinctively detect the primary language used in the input text.\n   - If the text is mixed (e.g., English mixed with Indonesian slang), identify the dominant language intended for the final audience.\n   - You must output a valid 2-letter ISO 639-1 code (e.g., 'en', 'id', 'es').\n\n2. **ANALYZE 'Keywords':**\n   - Extract the core topics, subjects, and intent from the text.\n   - If the text is short, infer the likely context or niche (e.g., if the text is about \"morning coffee,\" infer keywords like \"lifestyle,\" \"morning routine\").\n   - Generate 5 relevant, high-search-volume keywords suitable for tagging or SEO.\n\n3. **ANALYZE 'Writing Style':**\n   - Identify specific instructions given in the text regarding tone (e.g., \"write a blog,\" \"storytelling\").\n   - If no specific instruction is present, analyze the sentiment and vibe of the text itself (e.g., \"Casual,\" \"Professional,\" \"Urgent,\" \"Witty\").\n   - Combine these into a concise descriptor (e.g., \"Narrative Storytelling\" or \"Professional & Informative\").\n\n**EXECUTION COMMAND:**\nAnalyze the text and generate the JSON object. CRITICAL OUTPUT RULE: Output RAW JSON only. Do not use Markdown code blocks (no ```json or ```). Do not output any text, explanations, or whitespace before the opening { or after the closing }. Just the pure JSON string.\nThe structure must be exactly as follows:\n{\n  \"language\": \"(ISO 639-1 code)\",\n  \"keywords\": [\"Keyword 1\", \"Keyword 2\", \"Keyword 3\", \"Keyword 4\", \"Keyword 5\"],\n  \"writing_style\": \"(The extracted style string)\"\n}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -3200,
+        -16
+      ],
+      "id": "ed3f9be7-7700-4abf-a9e0-0c0fba1408a5",
+      "name": "Message a model",
+      "retryOnFail": true,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('check user id').item.json.url }}/wp-json/synergizeflow/v2/insert-blog",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license",
+              "value": "={{ $('check user id req').item.json.license_key }}"
+            },
+            {
+              "name": "title",
+              "value": "={{ $('return text data1').item.json.title }}"
+            },
+            {
+              "name": "content",
+              "value": "={{ $('return text data1').item.json.content }}"
+            },
+            {
+              "name": "excerpt",
+              "value": "={{ $('return text data1').item.json.excerpt }}"
+            },
+            {
+              "name": "status",
+              "value": "=publish"
+            },
+            {
+              "name": "category",
+              "value": "={{ $json.category }}"
+            },
+            {
+              "name": "keyword",
+              "value": "={{ $json.keyword }}"
+            },
+            {
+              "name": "image",
+              "value": "=data:image/{{ $json.extension == 'jpeg' ? 'jpeg' : ($json.extension == 'jpg' ? 'jpg' : 'png') }};base64,{{ $('Extract from File').item.json.data }}"
+            },
+            {
+              "name": "author",
+              "value": "={{ $('check user id req').item.json.wp_author_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -400,
+        64
+      ],
+      "id": "fc361944-401c-4df5-ab6a-5445826871ae",
+      "name": "Insert data to website",
+      "retryOnFail": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_TEXT }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=**INPUTS:**\n* Custom Prompt Override: {{ $('check user id').item.json.custom_prompt }}\n* User Input (Raw Thought): {{ $('Telegram Trigger').item.json.message.caption }}\n* Language: {{ $('return text data').item.json.language }}\n* Writing Style/Vibe: {{ $('return text data').item.json.writing_style }}\n* Existing Titles (Exclusion List): {{ $json.existingTitles }}\n---\n\n**⚠️ CRITICAL INSTRUCTION: EXECUTION PATH ⚠️**\n\n**STEP 1: CHECK `Custom Prompt Override`**\n\n**CONDITION A: If `Custom Prompt Override` IS NOT EMPTY:**\n1.  **ADOPT** the persona and tone requested in the `Custom Prompt Override`.\n2.  **APPLY** that persona to the `User Input`.\n3.  **FORMATTING CONSTRAINT (STRICT):** You must still output the result in the **exact JSON structure** defined below, even if the custom prompt doesn't ask for it.\n    * **title:** Generate a title fitting your custom persona.\n    * **content:** The main body of your custom response. Wrap in `<p>` tags.\n    * **keywords:** 5 relevant tags.\n    * **excerpt:** A short summary.\n    * **url_key:** A slug.\n    * **meta_analysis:** Fill this based on the input.\n\n**CONDITION B: If `Custom Prompt Override` IS EMPTY:**\n1.  **PROCEED** with the \"Default Standard Protocol\" (Expert Creative Ghostwriter) defined below.\n\n---\n\n**⬇️ DEFAULT STANDARD PROTOCOL (Active only if Custom Prompt is empty) ⬇️**\n\nYou are an expert Creative Ghostwriter and Narrative Storyteller. Your primary function is to take raw, casual user notes and transform them into a beautiful, evocative, and storytelling-driven micro-blog post.\n\n**PROCESS:**\n\n1.  **DECONSTRUCT (The 5 Ws & H):**\n    * Analyze the `User Input` to establish the narrative backbone.\n    * **WHO, WHEN, WHERE, WHAT, WHY, HOW.**\n\n2.  **GENERATE 'title':**\n    * Create a poetic, evocative title.\n    * Do NOT use clickbait.\n    * Must be in the specified `Language`.\n    * Must NOT match 'Existing Titles'.\n\n3.  **GENERATE 'content':**\n    * Write a short narrative blog post (1-3 paragraphs).\n    * **Formatting:** Use a single string of HTML. Use ONLY `<p>` tags.\n    * **Tone:** Adhere to `Writing Style/Vibe` OR the `Custom Prompt Override` vibe.\n\n4.  **GENERATE metadata:**\n    * Keywords, Excerpt, URL Slug.\n\n**EXECUTION COMMAND (APPLIES TO BOTH CONDITIONS):**\nGenerate a single JSON object. All string values must be in the specified `Language`. Your output must start with `{` and end with `}`.\n\n{\n  \"title\": \"Title [fitting the custom or default vibe]\",\n  \"content\": \"<p>Main content paragraph 1...</p><p>Paragraph 2...</p>\",\n  \"keywords\": [\"Theme1\", \"Theme2\", \"Theme3\", \"Theme4\", \"Theme5\"],\n  \"excerpt\": \"A short summary.\",\n  \"url_key\": \"aesthetic-url-slug\",\n  \"meta_analysis\": {\n      \"who\": \"...\",\n      \"when\": \"...\",\n      \"where\": \"...\",\n      \"what\": \"...\",\n      \"why\": \"...\",\n      \"how\": \"...\"\n  }\n}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1872,
+        160
+      ],
+      "id": "d2a379f9-e65d-411c-b264-5c7a70ac4e66",
+      "name": "generate blog",
+      "retryOnFail": true,
+      "waitBetweenTries": 2500,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "Blog created successfully",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -176,
+        0
+      ],
+      "id": "b3725ac7-17f1-4338-8b35-f709d6ecbf88",
+      "name": "Send a text message1",
+      "webhookId": "8c71386e-d556-4aaa-94ff-accc4f572f95",
+      "retryOnFail": true,
+      "waitBetweenTries": 2500,
+      "credentials": {
+        "telegramApi": {
+          "id": "YaCzKK7zR9ZCFSc0",
+          "name": "SynergizeFlow Dev Blog"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.message.chat.id }}",
+        "text": "Please share your contact number",
+        "replyMarkup": "replyKeyboard",
+        "replyKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Click this to share your contact",
+                    "additionalFields": {
+                      "request_contact": true
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "replyKeyboardOptions": {},
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -5248,
+        736
+      ],
+      "id": "adaac209-aded-4a8c-ab7f-433eb9770881",
+      "name": "share contact",
+      "webhookId": "3a690aca-5717-4b4c-b597-00d304ec0d08",
+      "retryOnFail": true,
+      "waitBetweenTries": 2500,
+      "credentials": {
+        "telegramApi": {
+          "id": "YaCzKK7zR9ZCFSc0",
+          "name": "SynergizeFlow Dev Blog"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "42b10b09-6bc2-4efa-aa99-9f7c34d3cb32",
+              "leftValue": "={{ $('Telegram Trigger').item.json.message.contact }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -5024,
+        544
+      ],
+      "id": "c3a78cb9-bad7-4f0a-993d-0021b4c6c109",
+      "name": "check if share contact"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bf3ac540-0d10-46e1-bd71-801da4cef946",
+              "leftValue": "={{ $json.message.from.is_bot }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -5696,
+        640
+      ],
+      "id": "9fa899f6-532f-41f2-b322-3c818084aecb",
+      "name": "check if bot"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "29a16a02-afbc-4d02-a9ae-49a9967c5193",
+              "leftValue": "={{ $('Telegram Trigger').item.json.message.text }}",
+              "rightValue": "/start",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -5472,
+        640
+      ],
+      "id": "1ffa6958-f4bc-4adc-8ea0-b68b220ce9a1",
+      "name": "check if start"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$vars.SAAS_API}}/api/telegram/attach-user",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Get token').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "userId",
+              "value": "={{ $('Telegram Trigger').item.json.message.from.id }}"
+            },
+            {
+              "name": "phoneNumber",
+              "value": "={{ $('Telegram Trigger').item.json.message.contact.phone_number }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -4688,
+        832
+      ],
+      "id": "ad5e3d77-9923-417f-a824-02f7b1b28f70",
+      "name": "get domain by phone number and save user id to saas",
+      "retryOnFail": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "Please send image with caption",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -3424,
+        176
+      ],
+      "id": "0eb1e00d-2be1-4b82-acc0-d0ea324dd261",
+      "name": "Send a text message no image sent",
+      "webhookId": "8c2079e4-51a9-49db-b5f0-7a82784905dd",
+      "retryOnFail": true,
+      "waitBetweenTries": 2500,
+      "credentials": {
+        "telegramApi": {
+          "id": "YaCzKK7zR9ZCFSc0",
+          "name": "SynergizeFlow Dev Blog"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Get the photos from the Telegram Trigger node first\nconst triggerPhotos = $('Telegram Trigger').first().json.message?.photo;\n\nfor (const item of $input.all()) {\n  \n  // 2. Check if we actually found photos\n  if (triggerPhotos && triggerPhotos.length > 0) {\n    \n    // 3. Filter: Try to find photos that fit within 1000x800\n    const validPhotos = triggerPhotos.filter(photo => photo.width <= 1000 && photo.height <= 800);\n\n    let selectedPhoto;\n\n    if (validPhotos.length > 0) {\n      // SCENARIO A: We found valid photos. \n      // Pick the last one (the largest quality that still fits the limit).\n      selectedPhoto = validPhotos.at(-1);\n    } else {\n      // SCENARIO B: All photos are too big.\n      // Fallback to the very first photo (index 0), which is the smallest available version.\n      selectedPhoto = triggerPhotos[0];\n    }\n\n    // 4. Assign to the current item\n    item.json.selected_photo = selectedPhoto;\n    item.json.selected_file_id = selectedPhoto.file_id;\n\n  } else {\n    // Logic if no photos were found in the trigger at all\n    item.json.selected_photo = null;\n    item.json.selected_file_id = null;\n  }\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3872,
+        80
+      ],
+      "id": "f4acba5f-348e-4b44-a92a-771d292db97b",
+      "name": "get largest_file_id"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "Creating the blog ...",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -3424,
+        -16
+      ],
+      "id": "fff4a24d-5ea3-44b5-bcdb-12f8fa65d58a",
+      "name": "sent text creating the blog",
+      "webhookId": "f2db1e14-dd3c-44e1-bec6-875f1487796c",
+      "retryOnFail": true,
+      "waitBetweenTries": 2500,
+      "credentials": {
+        "telegramApi": {
+          "id": "YaCzKK7zR9ZCFSc0",
+          "name": "SynergizeFlow Dev Blog"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return JSON.parse($input.first().json.text)"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2544,
+        160
+      ],
+      "id": "f7601fc8-e5e4-4b44-8407-1d12c38e7e3e",
+      "name": "return text data"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json.content.parts[0];\nconst input = item.text; // change \"text\" if your field name is different\n\nconst start = \"```json\\n\";\nconst end = \"\\n```\";\n\nlet output = input;\n\nif (input.includes(start)) {\n  output = input;\n\n  if (output.startsWith(start)) {\n    output = output.slice(start.length);\n  }\n\n  if (output.endsWith(end)) {\n    output = output.slice(0, -end.length);\n  }\n}\n\nreturn [\n  {\n    json: {\n      text: output\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2768,
+        160
+      ],
+      "id": "82a0a600-9f32-4d00-b8b3-32265df664ab",
+      "name": "remove markdown if exist"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.msg }}",
+        "replyMarkup": "replyKeyboardRemove",
+        "replyKeyboardRemove": {
+          "remove_keyboard": true
+        },
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -4016,
+        832
+      ],
+      "id": "31bb9b28-8d5c-45ce-a1aa-60c75bd57381",
+      "name": "send number saved or phone number not found in saas",
+      "webhookId": "efd86439-94c1-44cf-9084-2105eb033a0f",
+      "retryOnFail": true,
+      "waitBetweenTries": 2500,
+      "alwaysOutputData": true,
+      "credentials": {
+        "telegramApi": {
+          "id": "YaCzKK7zR9ZCFSc0",
+          "name": "SynergizeFlow Dev Blog"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d717bed8-70ba-4a6b-9ae9-d50672643a7d",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -4544,
+        176
+      ],
+      "id": "1fca1768-a77f-4918-8746-68883ca92688",
+      "name": "check user id"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "Your phone number is inactive.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -4320,
+        272
+      ],
+      "id": "457138ab-c11a-49a9-950f-734626aea796",
+      "name": "Send a text message",
+      "webhookId": "b3c32c95-0bd5-4244-9c4c-e43e25698293",
+      "retryOnFail": true,
+      "waitBetweenTries": 2500,
+      "credentials": {
+        "telegramApi": {
+          "id": "YaCzKK7zR9ZCFSc0",
+          "name": "SynergizeFlow Dev Blog"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "Post error, please contact admin",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -176,
+        160
+      ],
+      "id": "4ae25463-4772-4262-9487-13e5799bee18",
+      "name": "Send a text message2",
+      "webhookId": "65419f31-c474-4e89-95fa-8017b54c79ca",
+      "retryOnFail": true,
+      "waitBetweenTries": 2500,
+      "credentials": {
+        "telegramApi": {
+          "id": "YaCzKK7zR9ZCFSc0",
+          "name": "SynergizeFlow Dev Blog"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json.content.parts[0];\nconst input = item.text; // change \"text\" if your field name is different\n\nconst start = \"```json\\n\";\nconst end = \"\\n```\";\n\nlet output = input;\n\nif (input.includes(start)) {\n  output = input;\n\n  if (output.startsWith(start)) {\n    output = output.slice(start.length);\n  }\n\n  if (output.endsWith(end)) {\n    output = output.slice(0, -end.length);\n  }\n}\n\nreturn [\n  {\n    json: {\n      text: output\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1520,
+        64
+      ],
+      "id": "35c186ab-7e84-4d4f-9dea-0e2254892848",
+      "name": "remove markdown if exist1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return JSON.parse($input.first().json.text)"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1296,
+        64
+      ],
+      "id": "0edc106c-38cb-4b8e-b003-f435a7a70f21",
+      "name": "return text data1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "32054827-a764-4924-ab4c-fa9e83bc4749"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a684b107-6987-4d5a-95bf-4b0fc855dee3",
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -4096,
+        176
+      ],
+      "id": "24f5e096-19b2-4171-aca3-03d33ed452ea",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('check user id').item.json.url }}/wp-json/synergizeflow/v2/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license",
+              "value": "={{ $json.license_key }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -4320,
+        80
+      ],
+      "id": "31049e2d-0f5d-4343-8583-5767df53ab5d",
+      "name": "Check if license is valid"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "Your domain has invalid licence or expired, please contact admin",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -3872,
+        272
+      ],
+      "id": "ad86fdad-6903-4949-8bb3-ae434f8baa15",
+      "name": "invalid_license",
+      "webhookId": "b3c32c95-0bd5-4244-9c4c-e43e25698293",
+      "retryOnFail": true,
+      "waitBetweenTries": 2500,
+      "credentials": {
+        "telegramApi": {
+          "id": "YaCzKK7zR9ZCFSc0",
+          "name": "SynergizeFlow Dev Blog"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('check user id').item.json.url }}/wp-json/synergizeflow/v2/helper-data/",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "type",
+              "value": "get_title"
+            },
+            {
+              "name": "license",
+              "value": "={{ $('check user id').item.json.license_key }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -2320,
+        160
+      ],
+      "id": "bb1f5512-b3d7-4d1e-91a2-cb4ad6d3e339",
+      "name": "get titles"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "19a4c1f3-ff3a-45bd-bbdf-75e0bb1b4046",
+              "name": "msg",
+              "value": "={{ $json.message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -4240,
+        928
+      ],
+      "id": "91527bb4-d378-4cdf-96d6-e5d165c2f6b2",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ffec9ecb-5957-4604-a3fe-1f56de150ad8",
+              "name": "msg",
+              "value": "Telegram User ID is saved. Now you can send image with caption to generate a blog.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -4240,
+        736
+      ],
+      "id": "a68f9aca-518a-4abf-8ce4-e2f7af3ee658",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const titles = $input.first().json.data.map(item => item.title);\nreturn { existingTitles: titles };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2096,
+        160
+      ],
+      "id": "2e7e9da0-44ec-4027-9d04-8a74cecd60e2",
+      "name": "title list"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "website",
+              "value": "={{ $('check user id').item.json.url }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        -4096,
+        -16
+      ],
+      "id": "63e8bf27-f793-4938-a74a-d4a992d553b5",
+      "name": "Execution Data"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "Something happen when processing, please try again!",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -2768,
+        352
+      ],
+      "id": "93f4aebf-7f9f-4538-986b-1bc376ffd2c1",
+      "name": "Send a text message3",
+      "webhookId": "63b72c48-9d0b-4725-88d7-88e4687d55a7",
+      "credentials": {
+        "telegramApi": {
+          "id": "YaCzKK7zR9ZCFSc0",
+          "name": "SynergizeFlow Dev Blog"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "Something happen when processing, please try again!",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1520,
+        256
+      ],
+      "id": "4b263769-1455-42ee-854d-bfe38361a42a",
+      "name": "Send a text message4",
+      "webhookId": "630a1856-3d3b-49cd-af86-0d83cc1197b5",
+      "credentials": {
+        "telegramApi": {
+          "id": "YaCzKK7zR9ZCFSc0",
+          "name": "SynergizeFlow Dev Blog"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json.error.message;\n\n// Remove the leading '404 - ' and surrounding quotes\nconst jsonString = raw.replace(/^\\d+ - \"(.+)\"$/, '$1').replace(/\\\\\"/g, '\"');\n\n// Parse and get the message\nconst parsed = JSON.parse(jsonString);\n\nreturn [{ json: { message: parsed.message } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -4464,
+        928
+      ],
+      "id": "91c2463d-8179-4ce9-a11d-821d49a8c107",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "CfFTrHyw35Q6kVn5",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/CfFTrHyw35Q6kVn5",
+          "cachedResultName": "SynergizeFlow.v2 — Get App Token"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -5248,
+        544
+      ],
+      "id": "13517c65-160f-4d90-8377-111d5a8279a0",
+      "name": "Get token"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -5872,
+        640
+      ],
+      "id": "f04d2faa-f17b-4658-a87b-c3cf30792ba1",
+      "name": "Telegram Trigger",
+      "webhookId": "bdea2f3c-fb81-49a0-bfa7-b3d34f4b9d32",
+      "credentials": {
+        "telegramApi": {
+          "id": "YaCzKK7zR9ZCFSc0",
+          "name": "SynergizeFlow Dev Blog"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{$vars.SAAS_API}}/api/telegram/url/{{ $('Telegram Trigger').item.json.message.from.id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Get token').item.json.token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -4752,
+        352
+      ],
+      "id": "9aeac64b-79c6-465e-8240-b136389fe9c1",
+      "name": "check user id req",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$vars.SAAS_API}}/api/telegram/published-blog",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Get token').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "telegram_user_id",
+              "value": "={{ $('Telegram Trigger').item.json.message.from.id }}"
+            },
+            {
+              "name": "data",
+              "value": "={{ $('Insert data to website').item.json.data }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        48,
+        0
+      ],
+      "id": "ebf981e5-ec06-4d51-8e05-ed33bb0cd23c",
+      "name": "add posted blog1",
+      "retryOnFail": false,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "Your account is not found in our database.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -4544,
+        416
+      ],
+      "id": "4bca8f47-d20d-49dd-821e-7de3fefde784",
+      "name": "Send a text message5",
+      "webhookId": "b3c32c95-0bd5-4244-9c4c-e43e25698293",
+      "retryOnFail": true,
+      "waitBetweenTries": 2500,
+      "credentials": {
+        "telegramApi": {
+          "id": "YaCzKK7zR9ZCFSc0",
+          "name": "SynergizeFlow Dev Blog"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Insert data to website",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "sent text creating the blog",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message no image sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "remove markdown if exist",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert data to website": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "generate blog": {
+      "main": [
+        [
+          {
+            "node": "remove markdown if exist1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check if share contact": {
+      "main": [
+        [
+          {
+            "node": "check user id req",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "get domain by phone number and save user id to saas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check if bot": {
+      "main": [
+        [
+          {
+            "node": "check if start",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check if start": {
+      "main": [
+        [
+          {
+            "node": "Get token",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "share contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get domain by phone number and save user id to saas": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get largest_file_id": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "sent text creating the blog": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "return text data": {
+      "main": [
+        [
+          {
+            "node": "get titles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "remove markdown if exist": {
+      "main": [
+        [
+          {
+            "node": "return text data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check user id": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "remove markdown if exist1": {
+      "main": [
+        [
+          {
+            "node": "return text data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "return text data1": {
+      "main": [
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "get largest_file_id",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "invalid_license",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if license is valid": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get titles": {
+      "main": [
+        [
+          {
+            "node": "title list",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "send number saved or phone number not found in saas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "send number saved or phone number not found in saas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "title list": {
+      "main": [
+        [
+          {
+            "node": "generate blog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get token": {
+      "main": [
+        [
+          {
+            "node": "check if share contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "check if bot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check user id req": {
+      "main": [
+        [
+          {
+            "node": "check user id",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "add posted blog1": {
+      "main": [
+        []
+      ]
+    },
+    "Send a text message1": {
+      "main": [
+        [
+          {
+            "node": "add posted blog1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "triggerCount": 1,
+  "versionId": "34dfae99-ae0b-44b9-923d-b1ee83e0071c",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "icCJSa6WgYRUBtVb",
+  "isArchived": false
+}

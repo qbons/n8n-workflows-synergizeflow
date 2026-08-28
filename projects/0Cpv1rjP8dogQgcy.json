@@ -1,0 +1,143 @@
+{
+  "id": "0Cpv1rjP8dogQgcy",
+  "name": "SynergizeFlow.v2",
+  "icon": {
+    "type": "icon",
+    "value": "layers"
+  },
+  "description": "Revamp version SynergizeFlow",
+  "type": "team",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "variableStubs": [
+    {
+      "id": "HMyCJe0TNee6H2pd",
+      "key": "CF_ID",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "5jK2uLqA4yXqj1CW",
+      "key": "CF_SECRET",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "bqWYQvTJoTnHpbnY",
+      "key": "CLOUDFLARE_R2_BUCKET",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "JUORoSvmxdyjQebE",
+      "key": "FACEBOOK_API_VERSION",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "narnpiOyQbInxXJ3",
+      "key": "GEMINI_EMBEDDING",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "3uEH4O6Txfl5miKF",
+      "key": "GEMINI_FLASH_PREVIEW",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "m0IsaVIU8iC1kQnC",
+      "key": "GEMINI_FLASH_TEXT",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "qFLNngZb3dgvaq1u",
+      "key": "GEMINI_NANO_BANANA",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "qQEV0w0ERmLeZQhy",
+      "key": "GEMINI_NANO_BANANA_PRO",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "ofuljLrV0ToSqAtY",
+      "key": "GEMINI_PRO_IMAGE",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "RcO6D9rUu3hJ5gBB",
+      "key": "GEMINI_PRO_LATEST",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "oflxZcAYY2aaA0oV",
+      "key": "GEMINI_PRO_PREVIEW",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "q7On8I4f6ewFAxsw",
+      "key": "GEMINI_PRO_TEXT",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "5trnPYqEpFJic2dU",
+      "key": "GOOGLE_SERVICE_ACCOUNT_ID",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "Zf6UZQT3gh67qHgH",
+      "key": "IMAGEN_MODEL",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "rKvvnZAwdoXQ8etU",
+      "key": "INSTAGRAM_API_VERSION",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "YDTakoo4TNehnQGI",
+      "key": "LINKEDIN_API_VERSION",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "5ny5pAkfouQuEJFa",
+      "key": "N8N_URL",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "4776nUYqffsASwl9",
+      "key": "SAAS_API",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "pRk4iN8mJcyx0VS5",
+      "key": "SAAS_TELEGRAM_BEARER",
+      "type": "string",
+      "value": ""
+    },
+    {
+      "id": "denYUdxSJeDGi4ik",
+      "key": "STATIC_TOKEN",
+      "type": "string",
+      "value": ""
+    }
+  ]
+}

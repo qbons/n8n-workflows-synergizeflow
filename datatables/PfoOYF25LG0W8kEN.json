@@ -1,0 +1,31 @@
+{
+  "id": "PfoOYF25LG0W8kEN",
+  "name": "Generic",
+  "columns": [
+    {
+      "id": "CRWXnOuITNuJhcO6",
+      "name": "type",
+      "type": "string",
+      "index": 0
+    },
+    {
+      "id": "42RsoCUXm5SauzT3",
+      "name": "value",
+      "type": "string",
+      "index": 1
+    },
+    {
+      "id": "X62IsEtgL4Yg9JBp",
+      "name": "meta",
+      "type": "string",
+      "index": 2
+    }
+  ],
+  "ownedBy": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "createdAt": "2026-07-27T08:26:35.413Z",
+  "updatedAt": "2026-08-28T10:00:55.733Z"
+}

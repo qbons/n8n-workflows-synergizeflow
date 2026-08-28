@@ -1,0 +1,1415 @@
+{
+  "id": "eAJs9seeOBldyLJQ",
+  "name": "SF - Page Builder Agent - Job Listing",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c5325c77-f15d-4b9b-81c0-6b45fac35322",
+              "name": "title",
+              "value": "={{ $('Webhook').item.json.body.title }}",
+              "type": "string"
+            },
+            {
+              "id": "e1382527-938a-4cc0-bdfb-c51c94828fa4",
+              "name": "status",
+              "value": "={{ $('Webhook').item.json.body.status }}",
+              "type": "string"
+            },
+            {
+              "id": "fd3ae3e2-2340-4182-9d7f-d4d89faf7d36",
+              "name": "desc",
+              "value": "={{ $('Webhook').item.json.body.desc }}",
+              "type": "string"
+            },
+            {
+              "id": "50461d87-299f-4dce-8c24-18f86463b925",
+              "name": "domain",
+              "value": "={{ $('Webhook').item.json.body.domain }}",
+              "type": "string"
+            },
+            {
+              "id": "d914de83-6b25-44bb-8720-fddd1c6cebf1",
+              "name": "agent_id",
+              "value": "={{ $('Webhook').item.json.body.agent_id }}",
+              "type": "string"
+            },
+            {
+              "id": "9d5a9f33-08c0-4b57-b6cd-e27c891ad583",
+              "name": "license",
+              "value": "={{ $('Webhook').item.json.body.license }}",
+              "type": "string"
+            },
+            {
+              "id": "9f866fc0-b1af-4440-a20c-788274bcea85",
+              "name": "token",
+              "value": "={{ $json.token }}",
+              "type": "string"
+            },
+            {
+              "id": "7fa90efa-915a-42ed-889a-8a809462b9d0",
+              "name": "data",
+              "value": "={{ $('Webhook').item.json.body.data }}",
+              "type": "object"
+            },
+            {
+              "id": "9e3b220c-30f8-4f45-996c-814718f3b8bb",
+              "name": "template",
+              "value": "={{ $('Webhook').item.json.body.template }}",
+              "type": "string"
+            },
+            {
+              "id": "0ae3e33b-99cf-48b0-aed5-5eadf6dda54c",
+              "name": "styling",
+              "value": "={{ $('Webhook').item.json.body.styling }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -3136,
+        976
+      ],
+      "id": "66afc84c-d02d-4984-8add-1b13a3d0327a",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v2/page-builder-agent/job-listing",
+        "options": {
+          "responseData": "workflow_started"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -3600,
+        976
+      ],
+      "id": "79b6b390-5998-4062-9e29-cefed45bd665",
+      "name": "Webhook",
+      "webhookId": "c335034a-01df-4826-9d8a-925fe9a00755"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "CfFTrHyw35Q6kVn5",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/CfFTrHyw35Q6kVn5",
+          "cachedResultName": "SynergizeFlow.v2 — Get App Token"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -3344,
+        976
+      ],
+      "id": "2e0f53c8-901b-4dc9-9ab8-98df56d62a7b",
+      "name": "Get token"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "domain",
+              "value": "={{ $('Webhook').item.json.body.domain }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        -3344,
+        1184
+      ],
+      "id": "dd6d47a6-07d2-4222-9772-34e42975d524",
+      "name": "Execution Data"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.styling }}",
+                    "rightValue": "internal",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "cf2d0e05-f0d3-42f7-b797-d8db4e3aa355"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "internal"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "988b1635-7e7d-48f6-97f7-03330b0c0430",
+                    "leftValue": "={{ $json.styling }}",
+                    "rightValue": "internal",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "custom"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -2928,
+        976
+      ],
+      "id": "8aa3700e-59ae-4f6b-a1a7-f0cf026b8f71",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Prepare Data').item.json.domain }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -2608,
+        688
+      ],
+      "id": "147eb21d-c3ea-49ec-8536-e528c3a4972b",
+      "name": "HTTP Request4"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "style",
+              "cssSelector": "link[rel=\"stylesheet\"]",
+              "returnValue": "attribute",
+              "attribute": "href",
+              "returnArray": true
+            },
+            {
+              "key": "content",
+              "cssSelector": "body *:not(script):not(svg):not(img):not(iframe)",
+              "returnValue": "html",
+              "returnArray": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        -2384,
+        688
+      ],
+      "id": "e548f1be-0acb-4596-b9c5-bab98a65d041",
+      "name": "HTML1"
+    },
+    {
+      "parameters": {
+        "jsCode": "function extractAssets(urls) {\n  const result = {\n    elementor: [],\n    fonts: []\n  };\n\n  urls.forEach(url => {\n    if (url.includes('elementor')) {\n      result.elementor.push(url);\n    }\n\n    if (url.includes('fonts.googleapis.com')) {\n      result.fonts.push(url);\n    }\n  });\n\n  return result;\n}\n\n// Example usage:\nconst urls = $input.first().json.style\n\nconst extracted = extractAssets(urls);\nreturn {style: extracted}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2160,
+        688
+      ],
+      "id": "736856be-9ef9-4b2b-8ef0-999671945ae6",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "=style.elementor",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -1936,
+        688
+      ],
+      "id": "13722f5a-0b9e-4af0-b472-a931846de78f",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1712,
+        688
+      ],
+      "id": "deca77cc-3c54-40a2-832e-38993eb31797",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json['style.elementor'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1488,
+        720
+      ],
+      "id": "98dae932-f16d-483a-a2d7-be855639585b",
+      "name": "HTTP Request5"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e2ce3cce-64db-45f7-9dae-ebea15d19829",
+              "name": "css",
+              "value": "={{ $json.data }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1264,
+        736
+      ],
+      "id": "85606ccd-c2a9-4d14-806c-6bce57891983",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -1488,
+        528
+      ],
+      "id": "07c5f0c7-5b22-430e-8e0f-e93754192cf1",
+      "name": "Aggregate1"
+    },
+    {
+      "parameters": {
+        "jsCode": "let css = '';\nfor (const item of $input.first().json.data) {\n   css += item.css;\n}\n\nreturn {css:css}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1264,
+        528
+      ],
+      "id": "9e820f3e-3435-4970-beb7-17f937b7397a",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "db4d5971-3b3a-41d5-bf8a-ef7b1ab2d1bf",
+              "name": "css",
+              "value": "={{ $json.css }}",
+              "type": "string"
+            },
+            {
+              "id": "9a406e13-1297-4cb9-b6d4-3234e368937c",
+              "name": "html",
+              "value": "={{ $('HTML1').item.json.content }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1040,
+        528
+      ],
+      "id": "2268ae98-44d7-4726-bfea-e05702c76f11",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_FLASH_PREVIEW }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.toJsonString() }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "systemMessage": "=You are an expert front-end design token extractor. Your task is to analyze raw JSON data containing CSS strings and HTML snippets to extract the core design system of a website, specifically its color palette and typography settings.\n\n**Instructions:**\n1. **Analyze the Data:** Scan the provided \"css\" string for global CSS variables (e.g., `--e-global-color-...`, `--e-global-typography-...`) and frequently used styling rules to determine the site's primary styling.\n2. **Extract Colors:** - Identify the `primary`, `secondary`, and `text` colors (usually hex codes). \n   - Extract any `additional` colors used for accents, buttons, or backgrounds into an array.\n3. **Extract Typography:**\n   - Identify the `font-family`, `font-size`, and `font-weight` for the `primary` (e.g., main headings/H1), `secondary` (e.g., subheadings/H2-H6), and `text` (e.g., body paragraphs) styles.\n   - Extract any `additional` font styles (e.g., accent, button text, or specific UI elements) into an array of objects containing their respective size, family, and weight.\n4. **Format Output:** Map the extracted data exactly to the JSON schema provided below. If a specific value cannot be confidently determined, leave the string empty (`\"\"`).\n5. **Strict Constraint:** You must output **ONLY** a valid JSON object. Do not include greetings, explanations, or conversational text. Do NOT wrap the output in markdown code blocks (e.g., no \\`\\`\\`json). The first character of your response must be `{` and the last character must be `}`.\n\n**Required JSON Output Schema:**\n{\n    \"color\": {\n        \"primary\": \"\",\n        \"secondary\": \"\",\n        \"text\": \"\",\n        \"additional\": []\n    },\n    \"font\": {\n        \"primary\": {\n            \"size\": \"\",\n            \"family\": \"\",\n            \"weight\": \"\"\n        },\n        \"secondary\": {\n            \"size\": \"\",\n            \"family\": \"\",\n            \"weight\": \"\"\n        },\n        \"text\": {\n            \"size\": \"\",\n            \"family\": \"\",\n            \"weight\": \"\"\n        },\n        \"additional\": [\n            {\n                \"size\": \"\",\n                \"family\": \"\",\n                \"weight\": \"\"\n            }\n        ]\n    }\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -816,
+        528
+      ],
+      "id": "3245d76e-0d84-4c8e-a24b-df2c71b41ef5",
+      "name": "Message a model2",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "/* Your getValidJsonObject function is good. \n  It correctly handles bad strings by returning null.\n  No changes are needed here.\n*/\nfunction getValidJsonObject(rawText) {\n\n    if (typeof rawText !== 'string' || rawText.trim() === '') {\n        console.error(\"Invalid input or empty text field.\");\n        return null;\n    }\n\n    let jsonString = rawText.trim();\n\n    // 2. Check for and remove the markdown JSON block fences.\n    const markdownRegex = /^```json\\s*([\\s\\S]*?)\\s*```$/;\n    const match = jsonString.match(markdownRegex);\n\n    if (match) {\n        jsonString = match[1];\n    }\n\n    // 3. Parse the cleaned string into a JSON object.\n    try {\n        return JSON.parse(jsonString);\n    } catch (error) {\n        // This is expected for parts that aren't JSON, like \"```\"\n        // console.error(\"Failed to parse JSON string:\", error); \n        // console.error(\"Problematic string:\", jsonString);\n        return null; // Returning null is key\n    }\n}\n\n// === NEW LOGIC ===\n\n// 1. Get the array of all parts\nconst allParts = $input.first().json.content.parts;\n\n// 2. Map each part to a parse attempt.\n//    - If part.text is valid JSON, we get the object.\n//    - If part.text is \"```\" or other non-JSON, getValidJsonObject returns null.\nconst parsedData = allParts\n    .map(part => getValidJsonObject(part.text))\n    .filter(result => result !== null); // 3. Filter out all the nulls\n\n// `parsedData` is now an array of all successfully parsed JSON objects.\n// In your example, it will be: [ [ { id: \"h3f8e9a1\", ... } ] ]\n\nreturn { styling:parsedData[0] };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -464,
+        528
+      ],
+      "id": "4a03f9e8-acd7-4a8a-9707-86b39234bf92",
+      "name": "Code3",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "let data = [];\nlet scrape = $('Prepare Data').first().json.data.scrape;\n// Loop over input items and add a new field called 'myNewField' to the JSON of each one\n\nObject.entries($('Prepare Data').first().json.data.manual).forEach(([key, value]) => {\n  if(key != 'images' && key != 'app_url' && key != 'app_deadline'){\n    data.push({\n      label: key.replace(\"_\", \" \"),\n      value: value\n    })\n  }\n});\nreturn {\n  data: [...data, ...scrape],\n  builderConfig: {\n    title: $('Prepare Data').first().json.title,\n    status: $('Prepare Data').first().json.status,\n    template: $('Prepare Data').first().json.template,\n    styling: $('Prepare Data').first().json.styling == \"internal\" ? $input.first().json.styling : {},\n    info: $('Prepare Data').first().json.desc,\n    jobUrl: $('Prepare Data').first().json.data.manual.app_url,\n    jobDeadline: $('Prepare Data').first().json.data.manual.app_deadline\n  }\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -256,
+        976
+      ],
+      "id": "50ab04a1-740c-4a36-9c24-9358e3b68a45",
+      "name": "Job Agent Parsed"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a7bbc596-24e4-4c47-9e7c-9a96a760f7f7",
+              "name": "builder_prompt",
+              "value": "={{ $json.toJsonString() }}\n\n---\n\nYou are an elite AI Landing Page Planning Agent specialized in creating HIGH-CONVERTING recruitment and job-listing landing page blueprints.\n\nYour responsibility is NOT to generate:\n- HTML\n- CSS\n- React\n- Elementor JSON\n- frontend code\n- rendered UI\n\nYour responsibility IS to:\n1. Interpret messy and inconsistent job-related JSON data\n2. Normalize and understand the semantic meaning of the data\n3. Strategically plan a high-converting recruitment landing page\n4. Generate a structured JSON blueprint\n5. Produce widget-aware layout instructions for a downstream generation agent\n\nThe downstream generation agent ONLY understands a fixed set of widgets. Therefore, all layout instructions MUST strictly use ONLY the supported widgets and their documented usage patterns.\n\n━━━━━━━━━━━━━━━━━━\nPRIMARY OBJECTIVE\n━━━━━━━━━━━━━━━━━━\n\nYour primary objective is:\n\nMAXIMIZE QUALIFIED JOB APPLICATIONS.\n\nThe landing page must:\n- attract ideal candidates\n- create trust and credibility\n- clearly communicate the opportunity\n- reduce candidate hesitation\n- increase emotional engagement\n- communicate career growth\n- create urgency when appropriate\n- drive application clicks\n\nYou are NOT:\n- a generic formatter\n- a raw data organizer\n- a static content generator\n\nYou ARE:\n- a recruitment marketing strategist\n- a landing page architect\n- a conversion copy planner\n- a UX-aware recruitment content planner\n\n━━━━━━━━━━━━━━━━━━\nINPUT FORMAT\n━━━━━━━━━━━━━━━━━━\n\nYou will receive job-related JSON data.\n\nThe input structure is NOT guaranteed to be consistent.\n\nExamples:\n- \"job title\"\n- \"Position / Job Title\"\n- \"company name\"\n- \"Company Name\"\n\nmay all represent the same meaning.\n\nThe data may:\n- contain inconsistent capitalization\n- contain duplicate meanings\n- contain noisy labels\n- contain minimal or extensive details\n- contain multiline text\n- contain mixed formatting\n- contain overlapping information\n\nUse below info for the information:\n- Application URL: {{ $('Job Agent Parsed').item.json.builderConfig.jobUrl }}\n- Application Deadline: {{ $('Job Agent Parsed').item.json.builderConfig.jobDealine }}\n\n━━━━━━━━━━━━━━━━━━\nSTEP 1 — NORMALIZE INPUT DATA\n━━━━━━━━━━━━━━━━━━\n\nYou MUST first normalize the raw input into semantic meanings.\n\nYou MUST intelligently infer equivalent meanings.\n\nExamples:\n\n- \"job title\"\n- \"Position / Job Title\"\n→ normalize as:\njob_title\n\n- \"company name\"\n- \"Company Name\"\n→ normalize as:\ncompany_name\n\n- \"Benefits & Perks\"\n- \"benefits\"\n→ normalize as:\nbenefits\n\n- \"soft skills\"\n- \"Soft Skills Requirements\"\n→ normalize as:\nsoft_skills\n\n- \"Technical Skills Requirements\"\n- \"tech stack\"\n→ normalize as:\ntechnical_skills\n\nIf multiple versions exist:\n- prefer the more detailed version\n- prefer the more professional wording\n- prefer the richer contextual field\n\n━━━━━━━━━━━━━━━━━━\nOUTPUT CONTRACT (STRICT)\n━━━━━━━━━━━━━━━━━━\n\nYou MUST output ONLY valid JSON.\n\nDO NOT include:\n- markdown\n- explanations\n- notes\n- comments\n- reasoning\n- code fences\n- introductory text\n- analysis\n- metadata\n- confidence scores\n\nThe JSON MUST be immediately parsable.\n\nUse:\n- double quotes only\n- valid JSON syntax only\n- no trailing commas\n\n━━━━━━━━━━━━━━━━━━\nSTRICT OUTPUT SCHEMA\n━━━━━━━━━━━━━━━━━━\n\nThe output MUST EXACTLY follow this structure:\n\n{\n  \"title\": \"string\",\n  \"general_prompt\": \"string\",\n  \"styling_prompt\": \"string\",\n  \"sections\": [\n    {\n      \"title\": \"string\",\n      \"description\": \"string\",\n      \"layout\": \"string\"\n    }\n  ]\n}\n\n━━━━━━━━━━━━━━━━━━\nROOT FIELD RULES\n━━━━━━━━━━━━━━━━━━\n\nYou MUST include ALL required root fields:\n- title\n- general_prompt\n- styling_prompt\n- sections\n\nDO NOT add extra root keys.\n\nForbidden examples:\n- metadata\n- notes\n- analysis\n- reasoning\n- widgets\n- seo\n- tags\n- version\n\n━━━━━━━━━━━━━━━━━━\nSECTION OBJECT RULES\n━━━━━━━━━━━━━━━━━━\n\nEach section object MUST contain EXACTLY:\n\n{\n  \"title\": \"\",\n  \"description\": \"\",\n  \"layout\": \"\"\n}\n\nDO NOT add extra section keys.\n\nForbidden examples:\n- id\n- priority\n- widgets\n- order\n- CTA\n- style\n- settings\n\n━━━━━━━━━━━━━━━━━━\nTITLE FIELD RULES\n━━━━━━━━━━━━━━━━━━\n\n\"title\":\n- MUST represent the interpreted job title\n- MUST sound professional\n- MUST be concise\n- MUST be landing-page appropriate\n\nGood examples:\n- \"Senior WordPress Developer\"\n- \"AI-Driven Website Specialist\"\n- \"Remote Full Stack Engineer\"\n\n━━━━━━━━━━━━━━━━━━\nGENERAL_PROMPT RULES\n━━━━━━━━━━━━━━━━━━\n\n\"general_prompt\" MUST be ONE detailed paragraph.\n\nThis paragraph MUST synthesize:\n- primary conversion goal\n- job title\n- company name\n- opportunity positioning\n- ideal candidate profile\n- candidate pain points and motivations\n- main headline direction\n- unique selling proposition\n- company positioning\n- work environment\n- benefits\n- seniority expectations\n- urgency\n- CTA strategy\n- application URL\n- application deadline\n- professional copy tone\n\nThe paragraph MUST:\n- sound strategic\n- sound marketing-aware\n- sound conversion-focused\n- guide the downstream generation agent\n\nThe paragraph should feel like:\n- a creative brief\n- a landing page strategy summary\n- a recruitment marketing plan\n\nDO NOT simply concatenate raw fields.\n\nYou MUST synthesize and strategically interpret the data.\n\n━━━━━━━━━━━━━━━━━━\nSTYLING_PROMPT RULES\n━━━━━━━━━━━━━━━━━━\n\n\"styling_prompt\" MUST be ONE paragraph.\n\nIt MUST define:\n- design direction\n- visual tone\n- branding feel\n- UI personality\n- primary color direction\n- secondary color direction\n\nThe style MUST intelligently match:\n- company vibe\n- industry\n- seniority level\n- professionalism\n- target audience\n\nExamples:\n- modern\n- premium\n- corporate\n- startup\n- minimal\n- clean\n- high-tech\n- trustworthy\n- creative\n\nIf colors are not provided:\n- intelligently infer suitable professional colors\n\n━━━━━━━━━━━━━━━━━━\nSECTION PLANNING RULES\n━━━━━━━━━━━━━━━━━━\n\nThe \"sections\" array is the MOST IMPORTANT part.\n\nYou are designing a:\nHIGH-CONVERTING RECRUITMENT LANDING PAGE.\n\nEvery section MUST:\n- contribute to conversion\n- reduce hesitation\n- increase trust\n- improve clarity\n- improve emotional engagement\n- encourage applications\n\nAvoid filler sections.\n\nAvoid generic weak sections.\n\n━━━━━━━━━━━━━━━━━━\nSECTION COUNT RULES\n━━━━━━━━━━━━━━━━━━\n\nGenerate:\n- between 5 and 9 sections\n\nThe exact number depends on:\n- data richness\n- job complexity\n- available information\n\nPrefer:\n5–8 strong strategic sections\n\nNOT:\n12 weak fragmented sections.\n\n━━━━━━━━━━━━━━━━━━\nMANDATORY HERO SECTION\n━━━━━━━━━━━━━━━━━━\n\nThe FIRST section MUST ALWAYS be:\n\n\"Hero Section\"\n\nThis is mandatory.\n\nThe Hero section MUST:\n- immediately communicate the opportunity\n- include a strong headline direction\n- include emotional positioning\n- include urgency if relevant\n- include a CTA\n- include application deadline if useful\n\nThe Hero section SHOULD typically use:\n`Slides`\n\n━━━━━━━━━━━━━━━━━━\nCONVERSION-FOCUSED SECTION PRIORITY\n━━━━━━━━━━━━━━━━━━\n\nPrioritize sections in this approximate order:\n\n1. Hero\n2. Why Join / Benefits\n3. Responsibilities\n4. Requirements\n5. Company Credibility\n6. Work Culture\n7. Tech Stack\n8. Career Growth\n9. Compensation & Benefits\n10. Testimonials / Social Proof\n11. FAQ\n12. Final CTA\n\nYou MAY merge semantically similar sections.\n\nExample:\n- Benefits\n- Perks\n- Why Join\n→ can become:\n\"Why You'll Love Working Here\"\n\n━━━━━━━━━━━━━━━━━━\nLAYOUT FIELD RULES\n━━━━━━━━━━━━━━━━━━\n\nThe \"layout\" field is CRITICAL.\n\nThe layout MUST:\n- explicitly reference widget names\n- describe hierarchy\n- describe structure\n- describe widget placement\n- explain configuration intent\n- be executable by the downstream generation agent\n\nThe layout MUST ONLY use supported widgets.\n\nDO NOT invent widgets.\n\n━━━━━━━━━━━━━━━━━━\nSUPPORTED WIDGETS\n━━━━━━━━━━━━━━━━━━\n\nYou may ONLY use these widgets:\n\n1.  **`Container`**\n      * **Description:** The main layout block for creating sections and holding other elements.\n      * **Usage:** Used to create all sections (e.g., \"Hero Section,\" \"Features Section\"). You control its background, spacing, etc. All other elements are placed inside a `Container`.\n2.  **`Heading`**\n      * **Description:** A text widget for displaying titles and headlines.\n      * **Usage:** For the main headline (H1) or section titles (H2, H3). You control text, font, size, and color.\n3.  **`Image`**\n      * **Description:** Displays a single, standalone image.\n      * **Usage:** For product shots, logos, etc. You will provide a placeholder image URL (e.g., from Picsum) and can control its size.\n4.  **`Text Editor`**\n      * **Description:** Displays blocks of formatted text (paragraphs).\n      * **Usage:** For all main body copy, descriptions, and paragraphs.\n5.  **`Button`**\n      * **Description:** Creates a clickable button.\n      * **Usage:** The main call-to-action (CTA). You must set the `text` (e.g., \"Learn More\") and `link`. You also control its style (colors, border-radius).\n6.  **`Grid`**\n      * **Description:** A special `Container` for creating multi-column layouts.\n      * **Usage:** For 2, 3, or 4-column layouts. **Crucial Rule:** You first add the `Grid`, then you place a separate **`Container`** inside *each* column to act as the \"cell\" that holds the content.\n7.  **`Video`**\n      * **Description:** Embeds a video player (e.g., from YouTube).\n      * **Usage:** For product demos, etc. You will find a relevant sample YouTube URL based on the topic.\n8.  **`Icon`**\n      * **Description:** Displays a single vector icon from the Font Awesome library.\n      * **Usage:** For small visual cues. You will pick a relevant Font Awesome class (e.g., \"fa fa-check\").\n9.  **`Google Maps`**\n      * **Description:** Embeds an interactive Google Map.\n      * **Usage:** For \"Contact Us\" sections. You will set a relevant `address` and control zoom/height.\n10. **`Nested Tabs`**\n      * **Description:** Organizes content into clickable tab panels.\n      * **Usage:** For complex feature sets. Has **tab titles** (with optional icons) and **content containers**. Clicking a title shows the corresponding content.\n11. **`Nested Accordion`**\n      * **Description:** Organizes content into collapsible accordion panels.\n      * **Usage:** The perfect widget for **FAQ sections**. Has **titles** (questions) and **content containers** (answers).\n12. **`Image Carousel`**\n      * **Description:** A simple slideshow for **images only**.\n      * **Usage:** For a gallery of images. You provide a list of images it will cycle through.\n13. **`Icon List`**\n      * **Description:** Creates a list of text items, each preceded by an icon.\n      * **Usage:** Ideal for \"Features\" or \"Benefits\" lists instead of plain bullet points.\n14. **`Counter`**\n      * **Description:** Displays an animated number counting up.\n      * **Usage:** For social proof (e.g., \"2,500+ Happy Clients\"). You will set an `ending_number` and `title`.\n15. **`Progress`**\n      * **Description:** Displays an animated progress bar.\n      * **Usage:** For skill levels (e.g., \"JavaScript - 90%\") or satisfaction scores.\n16. **`Testimonial`**\n      * **Description:** Displays a *single*, complete user review (quote, avatar, name, job).\n      * **Usage:** To show a single piece of social proof. You will create realistic placeholder content.\n17. **`Social Icons`**\n      * **Description:** Displays a list of clickable icons for social media profiles.\n      * **Usage:** For footers or headers. Takes a list of icons (Facebook, Twitter) and their `links`.\n18. **`Rating`**\n      * **Description:** Displays a visual, star-based rating.\n      * **Usage:** To show a score (e.g., \"4.5 out of 5\"). Often used with testimonials.\n19. **`Form`**\n      * **Description:** A complete widget for building contact or lead-gen forms.\n      * **Usage:** Contains `form_fields` (e.g., \"Name,\" \"Email\") and a `submit_button`. Fields can have widths (e.g., 50%) to be side-by-side.\n20. **`Slides`**\n      * **Description:** A powerful slideshow, perfect for hero sections.\n      * **Usage:** This is the **default choice for a Hero Section**. Each slide has its own `background_image`, `heading`, `description`, and `button`.\n21. **`Price List`**\n      * **Description:** A menu-style list of items (title, description, price).\n      * **Usage:** Perfect for restaurant menus or service lists.\n22. **`Price Table`**\n      * **Description:** A single, complete pricing *column* or *tier*.\n      * **Usage:** The **default choice for Pricing Sections**. You will place 2 or 3 of these inside a `Grid` to create a comparison. Each table has a `heading` (plan name), `price`, `features_list`, and a `button`.\n23. **`Testimonial Carousel`**\n      * **Description:** Displays multiple testimonials in a single sliding block.\n      * **Usage:** The **default choice for a Testimonials Section**. Each slide is a full testimonial (quote, avatar, name, job).\n24. **`Image Box`**\n      * **Description:** A combined widget: Image + Title + Description.\n      * **Usage:** A great choice for feature sections. You provide an `image`, `title_text`, and `description_text`.\n25. **`Icon Box`**\n      * **Description:** A combined widget: Icon + Title + Description.\n      * **Usage:** The **default choice for \"Features\" or \"Benefits\" sections**, typically placed inside a `Grid`. You provide an `selected_icon`, `title_text`, and `description_text`.\n\n━━━━━━━━━━━━━━━━━━\nCRITICAL WIDGET HIERARCHY RULES\n━━━━━━━━━━━━━━━━━━\n\nYou MUST understand widget hierarchy.\n\nIMPORTANT:\n\n`Container`\nis the foundational wrapper.\n\n`Grid`\nREQUIRES separate `Container` elements inside each column.\n\nCorrect:\nGrid → Container → Widget\n\nIncorrect:\nGrid → Widget directly\n\n━━━━━━━━━━━━━━━━━━\nDEFAULT WIDGET MAPPINGS\n━━━━━━━━━━━━━━━━━━\n\nUse these preferred mappings whenever appropriate:\n\nHERO\n→ Slides\n\nBENEFITS\n→ Grid + Icon Box\n\nFEATURES\n→ Grid + Icon Box\n\nRESPONSIBILITIES\n→ Icon List or Text Editor\n\nTECH STACK\n→ Icon List\n\nFAQ\n→ Nested Accordion\n\nTESTIMONIALS\n→ Testimonial Carousel\n\nCOMPANY CULTURE\n→ Image Box\n\nSOCIAL PROOF\n→ Counter\n\nAPPLICATION FORM\n→ Form\n\nCONTACT\n→ Grid + Form + Google Maps\n\n━━━━━━━━━━━━━━━━━━\nWIDGET USAGE INTELLIGENCE\n━━━━━━━━━━━━━━━━━━\n\nChoose widgets strategically.\n\nExamples:\n\nUse:\n- Icon Box\nfor:\n- perks\n- benefits\n- advantages\n\nUse:\n- Nested Accordion\nfor:\n- FAQs\n\nUse:\n- Counter\nfor:\n- employee count\n- years in business\n- company growth\n- scale indicators\n\nUse:\n- Progress\nfor:\n- skill proficiency expectations\n\n━━━━━━━━━━━━━━━━━━\nJOB PAGE CONTEXT AWARENESS\n━━━━━━━━━━━━━━━━━━\n\nSome widgets are generally NOT appropriate for recruitment pages.\n\nExamples:\n- Price Table\n- Price List\n\nAvoid these unless genuinely relevant.\n\nDO NOT force widget usage unnaturally.\n\n━━━━━━━━━━━━━━━━━━\nCTA RULES\n━━━━━━━━━━━━━━━━━━\n\nThe application URL MUST be strategically used throughout the page.\n\nCTAs should appear:\n- in the Hero section\n- optionally mid-page\n- in the final CTA section\n\nCTA examples:\n- Apply Now\n- Join Our Team\n- Submit Your Application\n- Start Your Next Career Move\n- Apply Before Deadline\n\nAll CTA buttons MUST point to:\napp url\n\n━━━━━━━━━━━━━━━━━━\nURGENCY RULES\n━━━━━━━━━━━━━━━━━━\n\nThe application deadline MUST be strategically used.\n\nUse urgency naturally.\n\nExamples:\n- Limited hiring window\n- Applications close soon\n- Immediate hiring opportunity\n- Apply before the deadline\n\nDO NOT overuse urgency.\n\n━━━━━━━━━━━━━━━━━━\nCOPY TONE RULES\n━━━━━━━━━━━━━━━━━━\n\nThe tone MUST adapt to:\n- industry\n- company vibe\n- seniority\n- culture\n- compensation level\n\nExamples:\n\nSenior technical role:\n- elite\n- authoritative\n- technical\n- polished\n\nStartup role:\n- ambitious\n- energetic\n- modern\n\nCorporate role:\n- trustworthy\n- structured\n- professional\n\n━━━━━━━━━━━━━━━━━━\nANTI-HALLUCINATION RULES\n━━━━━━━━━━━━━━━━━━\n\nNEVER invent factual information.\n\nDO NOT fabricate:\n- salary\n- remote status\n- company size\n- benefits\n- office locations\n- certifications\n- tech stack\n- company history\n\nONLY use:\n- provided data\n- clearly inferable information\n\nYou MAY generate:\n- placeholder testimonials\n- placeholder FAQs\n- CTA copy\n- marketing framing\n- headline ideas\n\n━━━━━━━━━━━━━━━━━━\nPLACEHOLDER CONTENT RULES\n━━━━━━━━━━━━━━━━━━\n\nPlaceholder content MUST:\n- sound realistic\n- match the industry\n- match the seniority\n- remain generic enough to avoid false claims\n\n━━━━━━━━━━━━━━━━━━\nLAYOUT DESCRIPTION STYLE EXAMPLES\n━━━━━━━━━━━━━━━━━━\n\nGOOD EXAMPLE:\n\n\"Use a `Grid` (3 columns). Inside each column place a `Container`. Inside each `Container`, place one `Icon Box` widget. Configure each `Icon Box` with a relevant icon, a benefit-focused title, and a concise supporting description.\"\n\nGOOD EXAMPLE:\n\n\"Use the `Nested Accordion` widget. Each accordion item should contain a question title and a content container with a concise answer related to the application process, remote work expectations, and hiring timeline.\"\n\nBAD EXAMPLE:\n\n\"Create a nice benefits section with some icons.\"\n\nReason:\n- too vague\n- not executable\n- lacks widget hierarchy\n\n━━━━━━━━━━━━━━━━━━\nSAMPLE OUTPUT STRUCTURE\n━━━━━━━━━━━━━━━━━━\n\n{\n  \"title\": \"Senior WordPress Website Specialist\",\n  \"general_prompt\": \"This landing page is designed to attract highly experienced WordPress professionals for a senior-level website specialist role at Indovest. The primary goal is to maximize qualified applications from independent, execution-focused developers with strong frontend and backend expertise, performance optimization skills, and experience working with AI-assisted workflows. The page should position the opportunity as a premium career move for candidates seeking ownership, strategic impact, and exposure to international lifestyle brands. The messaging should emphasize autonomy, modern digital workflows, technical excellence, growth opportunities, and high-performance culture. The copy tone should feel professional, ambitious, modern, and results-driven while maintaining strong credibility and trust. The primary call-to-action should encourage immediate application before the hiring deadline using the provided application URL.\",\n  \"styling_prompt\": \"The design should feel modern, premium, structured, and technology-focused with a polished corporate aesthetic. Use a deep professional navy or dark blue as the primary color to communicate trust and authority, combined with energetic accent colors such as teal or vibrant green for CTA buttons and highlights. The layout should feel clean, high-end, conversion-focused, and optimized for experienced tech professionals.\",\n  \"sections\": [\n    {\n      \"title\": \"Hero Section\",\n      \"description\": \"A high-impact hero section that immediately communicates the seniority of the role, the career opportunity, and the urgency to apply before the deadline.\",\n      \"layout\": \"Use the `Slides` widget with one slide. Configure the slide with a professional technology-focused `background_image`, a compelling `heading` focused on the senior WordPress opportunity, a concise `description` summarizing the role and company positioning, and a prominent `button` using the application URL.\"\n    },\n    {\n      \"title\": \"Why You'll Love Working Here\",\n      \"description\": \"A section highlighting the key benefits, growth opportunities, AI-enhanced workflows, and exposure to international brands.\",\n      \"layout\": \"Use a `Grid` (3 columns). Inside each column place a `Container`. Inside each `Container`, place one `Icon Box` widget configured with a relevant icon, a concise benefit title, and a supporting description.\"\n    },\n    {\n      \"title\": \"Key Responsibilities\",\n      \"description\": \"A section outlining the primary responsibilities including WordPress ownership, optimization, integrations, analytics implementation, and performance improvements.\",\n      \"layout\": \"Use a `Container` with a `Heading` followed by an `Icon List` widget. Configure the `Icon List` with relevant icons and concise responsibility statements.\"\n    },\n    {\n      \"title\": \"Technical Expertise Required\",\n      \"description\": \"A section showcasing the required technical stack, performance skills, analytics tools, and AI-assisted development capabilities expected from candidates.\",\n      \"layout\": \"Use a `Grid` (2 columns). Inside each column place a `Container`. Inside each `Container`, place a `Heading` and an `Icon List` widget organized by technical categories such as development, analytics, and infrastructure.\"\n    },\n    {\n      \"title\": \"Work Culture & Growth\",\n      \"description\": \"A section communicating the company culture, independent work style, strategic ownership, and long-term growth opportunities.\",\n      \"layout\": \"Use a `Grid` (2 columns). In the first column place a `Container` with an `Image Box` widget featuring a professional workplace image, a culture-focused title, and a short description. In the second column place a `Container` with a `Text Editor` and a `Button` encouraging applications.\"\n    },\n    {\n      \"title\": \"Frequently Asked Questions\",\n      \"description\": \"A section answering common candidate questions about remote flexibility, technical expectations, hiring process, and application timeline.\",\n      \"layout\": \"Use the `Nested Accordion` widget. Configure multiple accordion items with concise questions and answers relevant to the role and application process.\"\n    },\n    {\n      \"title\": \"Apply Now\",\n      \"description\": \"A final conversion-focused CTA section encouraging immediate application before the deadline.\",\n      \"layout\": \"Use a `Container` with a strong `Heading`, a concise `Text Editor` urgency message, and a prominent `Button` widget linked to the application URL.\"\n    }\n  ]\n}\n\n━━━━━━━━━━━━━━━━━━\nFINAL OUTPUT REQUIREMENTS\n━━━━━━━━━━━━━━━━━━\n\nReturn ONLY valid JSON.\n\nDO NOT include:\n- markdown\n- explanations\n- notes\n- comments\n- analysis\n- code fences\n\nThe output MUST be production-ready and immediately usable by the downstream generation agent.",
+              "type": "string"
+            },
+            {
+              "id": "8c49c564-2cc3-4cdf-88a4-5b67444bd2f4",
+              "name": "images",
+              "value": "={{ $('Prepare Data').item.json.data.manual.images }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        976
+      ],
+      "id": "31628fa9-1ed5-4269-ac16-c12b516c7d3f",
+      "name": "Job Agent Flow"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Job Agent Flow').item.json.images }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "array",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    },
+                    "id": "54eba51c-c439-4134-855e-1ec43843a7a7"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "has_image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "eacbbc56-a383-4f4c-9c88-f77f87d22ebe",
+                    "leftValue": "={{ $('Job Agent Flow').item.json.images }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "array",
+                      "operation": "empty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "no_image"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        928,
+        976
+      ],
+      "id": "5453e437-1ded-4781-8322-eb05099b05e0",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_NANO_BANANA }}",
+          "mode": "id"
+        },
+        "text": "Analyze the input image with great detail and precision. Directly response without introduction text.\n",
+        "imageUrls": "={{ $json.url }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        1888,
+        768
+      ],
+      "id": "ccbd5270-7471-4bf5-888b-6532852ff9d1",
+      "name": "Analyze an image",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 3
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2336,
+        832
+      ],
+      "id": "4c129b5b-537e-410f-a948-7efcbe91d1e1",
+      "name": "Wait",
+      "webhookId": "d07b6762-ebfd-43fb-918e-981e292ddb70"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bf1c08b9-5bf5-4ad5-bd97-76cfaf517c94",
+              "name": "parsed",
+              "value": "={{ $json.images }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2128,
+        496
+      ],
+      "id": "a3103b0b-d14e-4485-bdff-88045efc5abf",
+      "name": "Prepare Image"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d4f81d94-89fd-4d68-b0b9-3442ae427152",
+              "name": "images",
+              "value": "[]",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2384,
+        1200
+      ],
+      "id": "875a92b6-ab19-4e48-95d5-5e5b33685d98",
+      "name": "No Image"
+    },
+    {
+      "parameters": {
+        "jsCode": "function getValidJsonObject(rawText) {\n\n    if (typeof rawText !== 'string' || rawText.trim() === '') {\n        console.error(\"Invalid input or empty text field.\");\n        return null;\n    }\n\n    let jsonString = rawText.trim();\n\n    // 2. Check for and remove the markdown JSON block fences.\n    // This regex is robust and handles variations in whitespace.\n    const markdownRegex = /^```json\\s*([\\s\\S]*?)\\s*```$/;\n    const match = jsonString.match(markdownRegex);\n\n    if (match) {\n        // If it's a match, the actual JSON string is in the first capture group.\n        jsonString = match[1];\n    }\n\n    // 3. Parse the cleaned string into a JSON object.\n    try {\n        return JSON.parse(jsonString);\n    } catch (error) {\n        console.error(\"Failed to parse JSON string:\", error);\n        console.error(\"Problematic string:\", jsonString);\n        return null;\n    }\n}\nlet result = getValidJsonObject($input.first().json.content.parts[0].text);\nresult.stylingRule = $('Prepare Data').first().json.styling === \"internal\" ? $('Code3').first().json.styling : {};\n\nreturn result;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        656,
+        976
+      ],
+      "id": "2fab83ee-6b2f-4341-a52a-ef3e7a995f80",
+      "name": "Landing Structure"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "514afa23-b926-4eab-911b-a7f38ee1fa8b",
+              "name": "internal_image",
+              "value": "=━━━━━━━━━━━━━━━━━━\nIMAGE ASSET MATCHING RULES\n━━━━━━━━━━━━━━━━━━\n\nImage assets below are HIGHLY IMPORTANT.\n\n{{ $json.images.toJsonString() }}\n\n\nYou MUST intelligently analyze each image description and determine:\n- the visual subject\n- the emotional tone\n- the business context\n- the professional setting\n- the most appropriate landing page usage\n\n━━━━━━━━━━━━━━━━━━\nIMAGE USAGE RULES\n━━━━━━━━━━━━━━━━━━\n\nWhen a relevant image exists:\n- incorporate the image URL naturally into the <img> tag\n\nDO NOT ignore provided images.\n\nDO NOT replace provided images with placeholders if relevant images exist.\n\nDO NOT hallucinate image URLs.\n\n━━━━━━━━━━━━━━━━━━\nIMAGE RELEVANCE RULES\n━━━━━━━━━━━━━━━━━━\n\nYou MUST prioritize:\n- relevance\n- professionalism\n- emotional alignment\n- contextual fit\n\nAvoid:\n- random image placement\n- repetitive usage\n- irrelevant section matching\n\n━━━━━━━━━━━━━━━━━━\nMULTIPLE IMAGE RULES\n━━━━━━━━━━━━━━━━━━\n\nIf multiple images are provided:\n- distribute them strategically across sections\n- avoid reusing the same image excessively\n- prioritize the strongest image for the Hero Section\n\n━━━━━━━━━━━━━━━━━━\nFALLBACK IMAGE RULES\n━━━━━━━━━━━━━━━━━━\n\nOnly use placeholder image suggestions when:\n- no provided image is suitable\n- no image assets are available\n\nIf no suitable image exists:\n- instruct the downstream generation agent to find an appropriate professional placeholder image.\n\n━━━━━━━━━━━━━━━━━━\nIMAGE URL PRESERVATION RULES\n━━━━━━━━━━━━━━━━━━\n\nYou MUST preserve the exact provided image URL.\n\nDO NOT:\n- modify URLs\n- shorten URLs\n- regenerate URLs\n- replace URLs unnecessarily\n\nUse the exact image URL provided in the input data.\n",
+              "type": "string"
+            },
+            {
+              "id": "04243120-9bfb-428a-a38f-3b2a839b9534",
+              "name": "has_image",
+              "value": "={{ $json.images.length > 0 ? 'yes' : 'no'}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2688,
+        832
+      ],
+      "id": "f54eb8ac-af38-42e7-a641-ad9598688e28",
+      "name": "Image checker"
+    },
+    {
+      "parameters": {
+        "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', ``, 'string') }}",
+        "model": "={{ $vars.GEMINI_FLASH_PREVIEW }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-gemini-search.geminiSearchToolTool",
+      "typeVersion": 1,
+      "position": [
+        3152,
+        1104
+      ],
+      "id": "5a700bf5-7b1b-4af2-9324-84b2d0f67320",
+      "name": "Gemini Search Tool1",
+      "credentials": {
+        "geminiSearchApi": {
+          "id": "HzOj98juqUxHGjsa",
+          "name": "SF - Gemini Search Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let raw = $input.first().json.content.parts[0].text;\n\n// Clean markdown wrapper\nraw = raw.replace(/```json\\s*/i, \"\").replace(/```$/, \"\").trim();\n\n// Parse\nlet parsed = JSON.parse(raw);\n\nreturn { data: parsed };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3312,
+        832
+      ],
+      "id": "d1909f00-0ebc-4b97-bc83-8eb3c0c816cd",
+      "name": "HTML Result"
+    },
+    {
+      "parameters": {
+        "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', ``, 'string') }}",
+        "model": "={{ $vars.GEMINI_FLASH_PREVIEW }}",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Items_per_Batch', ``, 'number') }}",
+              "batchInterval": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Batch_Interval__ms_', ``, 'number') }}"
+            }
+          },
+          "returnFullResponse": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_Full_Response', ``, 'boolean') }}"
+        }
+      },
+      "type": "n8n-nodes-gemini-search.geminiSearchToolTool",
+      "typeVersion": 1,
+      "position": [
+        448,
+        1152
+      ],
+      "id": "c78af421-3bfd-4f7b-b9ca-f44cf812e596",
+      "name": "Gemini Search Tool2",
+      "credentials": {
+        "geminiSearchApi": {
+          "id": "HzOj98juqUxHGjsa",
+          "name": "SF - Gemini Search Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return {images:$('Job Agent Flow').first().json.images}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1216,
+        768
+      ],
+      "id": "7ac848e8-eb5f-4748-94fb-c6e05a1a91cc",
+      "name": "Code in JavaScript4"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "images",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        768
+      ],
+      "id": "782e4b70-b623-42f8-aa88-624ab8668622",
+      "name": "Split Out2"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1664,
+        768
+      ],
+      "id": "7883159a-4da3-4e50-bcee-a3c4bd37e279",
+      "name": "Loop Over Items2"
+    },
+    {
+      "parameters": {
+        "jsCode": "return{\n  desc: $input.first().json.content.parts[0].text,\n  url: $('Loop Over Items2').first().json.url,\n  binary: $('Loop Over Items2').first().json.binary,\n  mime: $('Loop Over Items2').first().json.mime\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2112,
+        768
+      ],
+      "id": "bc5663e2-9e5f-49a3-95dd-418681ce6dc7",
+      "name": "Code in JavaScript5"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "images",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1904,
+        496
+      ],
+      "id": "d026d444-f1d1-43d2-9e1a-9de2f90bd8c6",
+      "name": "Aggregate2"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nlet imgs = [];\nfor (const item of $input.first().json.parsed) {\n  imgs.push({\n    description: item.desc,\n    url: item.url\n  })\n}\n\nreturn {images: imgs}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2352,
+        496
+      ],
+      "id": "2e45deab-0a7d-4e0c-8556-484e169e8255",
+      "name": "Code in JavaScript6"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_LATEST }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $('Landing Structure').item.json.toJsonString() }}"
+            },
+            {
+              "content": "=You are an AI agent responsible for generating a **high-converting landing page** from structured JSON input.\n\nYou have access to a **Gemini Search Tool**, which you MUST use to improve:\n\n* Copywriting quality\n* UX structure\n* Design inspiration\n* Industry relevance\n\n---\n\n## Mandatory Information\n\n* Application URL: {{ $('Job Agent Parsed').item.json.builderConfig.jobUrl }}  \n* Application Deadline: {{ $('Job Agent Parsed').item.json.builderConfig.jobDeadline }} \n\n\n## 🧠 CORE WORKFLOW (MANDATORY)\n\nYou MUST follow this process:\n\n### 1. 🔍 Research Phase (FIRST — REQUIRED)\n\nBefore generating anything, you MUST:\n\n* Use **Gemini Search Tool** to research:\n\n  * Similar products / courses / services\n  * High-converting landing pages\n  * Industry-standard sections\n  * Relevant marketing angles\n  * Common user concerns (for FAQ)\n\n---\n\n### Research Goals:\n\n* Improve **copywriting quality**\n* Discover **better section ideas**\n* Identify **conversion patterns**\n* Enhance **design direction**\n\n---\n\n### 2. 🧠 Interpretation Phase\n\nAnalyze:\n\n* `general_prompt`\n* `styling_prompt`\n{{ $('Landing Structure').item.json.stylingRule.isNotEmpty() ? '* `stylingRule`' : ''  }}\n\nDefine:\n\n* Target audience\n* Core value proposition\n* Emotional triggers\n* Best layout strategy\n\n---\n\n### 3. 🎨 Creative Generation Phase\n\nGenerate:\n\n* Page structure (dynamic)\n* UI layout\n* Copywriting\n* Interactions\n\n---\n\n## 🎯 OUTPUT FORMAT (STRICT — MUST FOLLOW)\n\nReturn ONLY:\n\n```json\n{\n  \"html\": \"\",\n  \"css\": \"\",\n  \"js\": \"\"\n}\n```\n\n---\n\n### Rules:\n\n* MUST be valid JSON\n* ❌ No comments\n* ❌ No trailing commas\n* Use **double quotes for JSON**\n* Use **single quotes in HTML attributes**\n\n---\n\n## 🧱 HTML RULES\n\n* Output will be injected inside `<body>`\n* ❌ DO NOT include `<html>`, `<head>`, `<body>`\n\n---\n\n### Root Wrapper (MANDATORY)\n\n```html id=\"1bc8vn\"\n<div id='lp-root'>\n  <!-- all content -->\n</div>\n```\n\n---\n\n### Structure Guidelines\n\n* Use semantic HTML\n* Clear hierarchy\n* No inline styles\n* No inline scripts\n\n---\n\n## 🖼️ IMAGE RULES (MANDATORY)\n\n{{  $json.has_image == 'yes' ? $json.internal_image : '' }}\n\nUse **Picsum** For Dummy\n\n### Format:\n\n```id=\"d9pm0v\"\nhttps://picsum.photos/seed/{keyword}/{width}/{height}\n```\n\n### Rules:\n\n* MUST use `seed`\n* ❌ No external images\n* ❌ No base64\n\n---\n\n## 🎯 ICON RULES\n\n* Inline SVG only\n* ❌ No `<img>` icons\n* ❌ No libraries\n\n---\n\n## 🎨 CSS RULES\n\n* All CSS inside `\"css\"`\n* ❌ No inline styles\n\n---\n\n### Scoped CSS (MANDATORY)\n\n```css id=\"0m0sci\"\n#lp-root { ... }\n```\n\n---\n\n## ⚙️ JAVASCRIPT RULES\n\n* Use **Vanilla Javascript ONLY**\n* Always use vanilla javascript without other third party library\n\n---\n\n### Interaction Expectations\n\nBased on research + layout:\n\n* Accordion (FAQ, curriculum)\n* Carousel (testimonials, hero if needed)\n* CTA interactions\n* Smooth scrolling\n\n---\n\n## 🧩 DYNAMIC LAYOUT ENGINE\n\nYou MUST NOT rely on fixed templates.\n\n---\n\n### Instead:\n\nUse:\n\n* Research insights\n* Input JSON\n\nTo dynamically decide:\n\n* Sections\n* Order\n* Layout types\n\n---\n\n### You MAY:\n\n* Add new sections (based on research)\n* Improve weak sections\n* Merge or split sections\n\n---\n\n### Goal:\n\n> Build the **best possible converting page**, not a literal interpretation\n\n---\n\n## ✍️ COPYWRITING RULES\n\nUse:\n\n* `general_prompt`\n* Research findings\n\n---\n\n### Must include:\n\n* Strong headline\n* Clear value proposition\n* Benefits (not just features)\n* Social proof\n* CTA repetition\n* Objection handling (FAQ)\n\n---\n\n### Tone:\n\n* Persuasive\n* Clear\n* Trustworthy\n* Energetic (when appropriate)\n\n---\n\n## 🎨 DESIGN INTELLIGENCE\n\nUse:\n\n* `styling_prompt`\n* Research inspiration\n\n---\n\n### You MUST:\n\n* Create visual hierarchy\n* Use contrast effectively\n* Guide user attention to CTA\n* Maintain consistency\n\n---\n\n## ⚠️ JSON SAFETY RULES\n\n* Escape all quotes properly\n* Ensure valid JSON\n* No malformed structure\n\n---\n\n## 🚫 FORBIDDEN\n\n* No external libraries\n* No Bootstrap / Tailwind\n* No external fonts\n* No inline JS\n* No inline CSS\n\n---\n\n## ✅ FINAL CHECKLIST\n\n* ✅ Research performed\n* ✅ Layout is dynamic\n* ✅ Valid JSON\n* ✅ HTML inside `<body>`\n* ✅ Root element is `<div id='lp-root'>`\n* ✅ Wrapped in `#lp-root`\n* ✅ Scoped CSS\n* ✅ Vanilla Javascript\n* ✅ Picsum images used\n* ✅ SVG icons used\n* ✅ Conversion-focused\n\n---\n\n## 🎯 FINAL GOAL\n\nCreate a landing page that is:\n\n* Research-backed\n* High-converting\n* Visually strong\n* Fully functional\n* Adaptable to ANY input JSON\n\n---\n\n## 🧠 PRIORITY RULE\n\nIf any conflict occurs:\n\n> ✅ Prioritize **research insights + conversion performance + UX quality** over strict interpretation of input JSON\n\n---\n\n---\n\n## TIMING\n\nIf there is any date time related information, use current date or time which is {{ $now.format('yyyy-MM-dd') }}\n\n---\n\n\n"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "maxToolsIterations": 15
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        2944,
+        832
+      ],
+      "id": "5f583665-8419-4535-81e3-3ee97fc0e58a",
+      "name": "Message a model3",
+      "retryOnFail": true,
+      "waitBetweenTries": 3000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_LATEST }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.builder_prompt }}"
+            }
+          ]
+        },
+        "options": {
+          "systemMessage": "Use `Gemini Search Tool` to find latest data. You can search multiple time if it's needed.",
+          "maxToolsIterations": 10
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        272,
+        976
+      ],
+      "id": "7f112d49-43c8-42de-8de0-73565bab1ff0",
+      "name": "Message a model4",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 3000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.N8N_URL }}/webhook/v2/page-builder-agent/elementor",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "CF-Access-Client-Id",
+              "value": "={{ $vars.CF_ID }}"
+            },
+            {
+              "name": "CF-Access-Client-Secret",
+              "value": "={{ $vars.CF_SECRET }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "payload",
+              "value": "={{ $json.data }}"
+            },
+            {
+              "name": "title",
+              "value": "={{ $('Prepare Data').item.json.title }}"
+            },
+            {
+              "name": "status",
+              "value": "={{ $('Prepare Data').item.json.status }}"
+            },
+            {
+              "name": "type",
+              "value": "page"
+            },
+            {
+              "name": "template",
+              "value": "={{ $('Prepare Data').item.json.template }}"
+            },
+            {
+              "name": "domain",
+              "value": "={{ $('Prepare Data').item.json.domain }}"
+            },
+            {
+              "name": "license",
+              "value": "={{ $('Prepare Data').item.json.license }}"
+            },
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        3584,
+        832
+      ],
+      "id": "f9365e5d-f09b-496c-b29f-de3c41ab25e0",
+      "name": "HTTP Request6",
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get token",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get token": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request4": {
+      "main": [
+        [
+          {
+            "node": "HTML1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request5": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Message a model2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model2": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Job Agent Parsed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "Job Agent Parsed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Job Agent Parsed": {
+      "main": [
+        [
+          {
+            "node": "Job Agent Flow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze an image": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Image": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No Image": {
+      "main": [
+        [
+          {
+            "node": "Image checker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Landing Structure": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Image checker": {
+      "main": [
+        [
+          {
+            "node": "Message a model3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Search Tool1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Message a model3",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript4": {
+      "main": [
+        [
+          {
+            "node": "Split Out2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items2": {
+      "main": [
+        [
+          {
+            "node": "Aggregate2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Analyze an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript5": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate2": {
+      "main": [
+        [
+          {
+            "node": "Prepare Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript6": {
+      "main": [
+        [
+          {
+            "node": "Image checker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model3": {
+      "main": [
+        [
+          {
+            "node": "HTML Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model4": {
+      "main": [
+        [
+          {
+            "node": "Landing Structure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Search Tool2": {
+      "ai_tool": [
+        [
+          {
+            "node": "Message a model4",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Job Agent Flow": {
+      "main": [
+        [
+          {
+            "node": "Message a model4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML Result": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "triggerCount": 1,
+  "versionId": "53a4bc39-af2c-4a9e-bf39-e24c3f4963de",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "V45SMClxlrIeuvx2",
+  "isArchived": false
+}

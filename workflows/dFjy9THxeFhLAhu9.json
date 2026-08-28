@@ -1,0 +1,40 @@
+{
+  "id": "dFjy9THxeFhLAhu9",
+  "name": "SF - Media Agent - DUMMY WEBHOOK RECEIVER",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v2/media-agent/dummy-webook",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f9e385ec-0b9e-4fff-945c-25b15a9ab680",
+      "name": "Webhook",
+      "webhookId": "97b0a4cf-74f8-4d22-b91a-df04ecf28aa7"
+    }
+  ],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "triggerCount": 1,
+  "versionId": "7c993b5b-3429-4cba-85b5-80f2cec3fa5d",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "uJERJZH2lBKMHex2",
+  "isArchived": false
+}

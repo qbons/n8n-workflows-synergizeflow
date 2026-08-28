@@ -1,0 +1,633 @@
+{
+  "id": "VmeMbBaxMoAtxApY",
+  "name": "SF - Job listing agent - Scrape Data URL",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v2/blog/job-listing-agent/scrape-data-url",
+        "options": {
+          "responseData": "workflow_started"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2208,
+        16
+      ],
+      "id": "200aa3e7-9d60-4d9d-bc15-e2b5590c0b21",
+      "name": "Webhook",
+      "webhookId": "39b03875-62de-4bef-a799-5cc8a2ad7d74"
+    },
+    {
+      "parameters": {
+        "jsCode": "function isValidUrl(url) {\n    if (typeof url !== 'string') return false;\n\n    const pattern = /^(https?:\\/\\/)[^\\s/$.?#].[^\\s]*$/i;\n    return pattern.test(url);\n}\n\nconst inputUrl = $input.first().json.url;\n\nreturn [\n    {\n        json: {\n            url: inputUrl,\n            isValid: isValidUrl(inputUrl) ? 'yes' : 'no'\n        }\n    }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1552,
+        16
+      ],
+      "id": "3de7949a-03ff-48bd-a3c5-c5e524c7ee5e",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.isValid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "8a48d598-334a-4c33-b60d-e8122369e444"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "valid"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "cf8fc633-57da-41ec-a391-87e16caf90aa",
+                    "leftValue": "={{ $json.isValid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "invalid"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -1328,
+        16
+      ],
+      "id": "b9c3d1af-0936-4dbf-aaf8-c83ae113d162",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1104,
+        -80
+      ],
+      "id": "669ff688-b55a-4c93-b42d-db767af9ecaa",
+      "name": "HTTP Request",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "content",
+              "cssSelector": "body"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        -880,
+        -96
+      ],
+      "id": "43f9cfc9-776d-4fac-9ce2-d461ee75e873",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_LATEST }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $('HTML').item.json.content }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "systemMessage": "# SYSTEM INSTRUCTION\n\n## Objective\n\nYour task is to process **any input data (structured or unstructured, in any format)** and:\n\n1. Determine whether the input represents a valid job vacancy.\n2. If valid, extract all job-related information with maximum completeness.\n3. Return **ONLY one valid JSON object** that strictly follows the required schema.\n\n---\n\n## Input Characteristics\n\nThe input may contain:\n\n* HTML\n* Plain text\n* JSON\n* XML\n* Markdown\n* Mixed formats\n* OCR text\n* Website source code\n* Copy-pasted content\n* Any language\n\nIt may also include:\n\n* Navigation menus\n* Headers and footers\n* Advertisements\n* Login forms\n* Tracking URLs\n* UI labels\n* Duplicate sections\n* Cookie notices\n* Scripts\n* Stylesheets\n* Other unrelated content\n\nDo not rely on any specific structure, layout, language, website, or formatting.\n\n---\n\n## Task 1 — Determine Job Validity\n\nClassify the content based on semantic meaning.\n\nReturn `\"isValidJob\": \"yes\"` only if the content clearly represents an actual job vacancy.\n\nStrong indicators include:\n\n* Position being offered\n* Hiring company\n* Responsibilities\n* Qualifications\n* Hiring or recruitment context\n* Application information\n* Employment details\n\nEvaluate the overall meaning of the content, not isolated keywords.\n\nReturn `\"isValidJob\": \"no\"` if:\n\n* The content is primarily navigation, UI, advertisements, blog articles, company profiles, career advice, or unrelated information.\n* There is insufficient evidence that the content is an actual job vacancy.\n\n---\n\n## Task 2 — Remove Noise\n\nIgnore all irrelevant information, including but not limited to:\n\n* Navigation menus\n* Buttons\n* Breadcrumbs\n* Headers\n* Footers\n* Cookie banners\n* Login/Register forms\n* Tracking URLs\n* Social links\n* Advertisements\n* Duplicate content\n* JavaScript\n* CSS\n* HTML layout\n* Non-job-related sections\n\nOnly retain information directly related to the job vacancy.\n\n---\n\n## Task 3 — Extract Maximum Job Information\n\nExtract every piece of relevant job information.\n\nDo not limit extraction to predefined fields.\n\nUse semantic understanding rather than pattern matching.\n\nDo not infer, estimate, assume, or fabricate information.\n\nOnly extract information explicitly stated or directly expressed.\n\nPreserve the original meaning whenever possible.\n\nNormalize labels where appropriate.\n\n---\n\n## Examples of Extractable Information\n\nThis list is not exhaustive.\n\n### Basic Information\n\n* Position\n* Job Title\n* Company\n* Employer\n* Department\n* Industry\n* Category\n* Location\n* Country\n* City\n* Employment Type\n* Workplace Type\n* Posted Date\n* Closing Date\n* Reference Number\n\n### Compensation\n\n* Salary\n* Salary Range\n* Bonus\n* Benefits\n* Allowances\n* Insurance\n* Incentives\n\n### Responsibilities\n\n* Job Description\n* Responsibilities\n* Duties\n* Daily Tasks\n\n### Requirements\n\n* Education\n* Experience\n* Certifications\n* Licenses\n* Technical Skills\n* Soft Skills\n* Languages\n* Eligibility\n\n### Working Information\n\n* Shift\n* Schedule\n* Working Hours\n* Remote\n* Hybrid\n* Onsite\n* Travel Requirement\n\n### Technologies\n\nExtract every technology, software, framework, platform, tool, programming language, or methodology mentioned.\n\n### Company Information\n\nInclude only company information directly relevant to understanding the job posting.\n\n### Application Information\n\n* Application Method\n* Apply URL\n* Contact\n* Email\n* Phone\n* Required Documents\n* Hiring Process\n* Employer Questions\n* Special Instructions\n\n### Additional Information\n\nExtract any other information directly related to the job vacancy.\n\n---\n\n## Extraction Rules\n\n* Extract as much relevant information as possible.\n* Never fabricate information.\n* Never guess missing values.\n* Never merge unrelated information.\n* Preserve the original wording whenever practical.\n* If a value appears multiple times, keep the most complete version.\n* If multiple values belong to the same field, combine them into a single string.\n\n---\n\n## Required Output Schema\n\nIf the content is not a job vacancy:\n\n```json\n{\n  \"isValidJob\": \"no\",\n  \"jobData\": []\n}\n```\n\nIf the content is a job vacancy:\n\n```json\n{\n  \"isValidJob\": \"yes\",\n  \"jobData\": [\n    {\n      \"label\": \"Position\",\n      \"value\": \"WordPress Developer\"\n    },\n    {\n      \"label\": \"Company\",\n      \"value\": \"ABC Company\"\n    }\n  ]\n}\n```\n\n---\n\n# JSON RESPONSE REQUIREMENTS (CRITICAL)\n\nThe response **MUST** satisfy every rule below.\n\n1. The response MUST consist of **exactly one JSON object**.\n2. The first character of the response MUST be `{`.\n3. The last character of the response MUST be `}`.\n4. The response MUST contain **no text before or after the JSON object**.\n5. Do NOT use Markdown.\n6. Do NOT use code fences.\n7. Do NOT include explanations.\n8. Do NOT include notes.\n9. Do NOT include comments.\n10. Do NOT include reasoning.\n11. Do NOT include thinking.\n12. Do NOT include XML.\n13. Do NOT include YAML.\n14. Do NOT include HTML.\n15. Do NOT include markdown formatting.\n16. Do NOT wrap the JSON in quotes.\n17. Use only valid JSON syntax as defined by RFC 8259.\n18. The JSON MUST be directly parseable using `JSON.parse()` without any modification.\n19. Use only double quotes (`\"`).\n20. Escape all special characters correctly.\n21. Do NOT output trailing commas.\n22. Do NOT output `undefined`.\n23. Do NOT output `null` unless explicitly required by the schema.\n24. Do NOT output `NaN`.\n25. Do NOT output `Infinity`.\n26. Do NOT output duplicate object keys.\n27. Properly close every object and array.\n28. Preserve Unicode correctly.\n29. Output UTF-8 compatible JSON.\n30. Never output more than one top-level JSON object.\n\n---\n\n## jobData Rules\n\n* `jobData` MUST always exist.\n* `jobData` MUST always be an array.\n* Every element MUST be an object.\n* Every object MUST contain exactly two properties:\n\n  * `label`\n  * `value`\n* `label` MUST be a string.\n* `value` MUST be a string.\n* Do NOT output additional properties.\n* Do NOT output nested objects.\n* Do NOT output nested arrays.\n* Do NOT output empty labels.\n* Omit fields whose values cannot be determined.\n* Do NOT output duplicate labels.\n\n---\n\n## Strict Prohibitions\n\nNever:\n\n* Hallucinate information.\n* Guess missing values.\n* Infer missing values.\n* Include irrelevant content.\n* Depend on website-specific layouts.\n* Depend on page structure.\n* Output Markdown.\n* Output explanations.\n* Output notes.\n* Output examples.\n* Output multiple JSON objects.\n* Output any text outside the required JSON object.\n\n---\n\n## Final Validation (Mandatory)\n\nBefore returning the response, internally verify that all of the following are true:\n\n* The output is exactly one JSON object.\n* `JSON.parse()` will succeed without modification.\n* The JSON contains exactly two top-level properties:\n\n  * `isValidJob`\n  * `jobData`\n* `isValidJob` is exactly `\"yes\"` or `\"no\"`.\n* `jobData` is an array.\n* Every element of `jobData` contains only:\n\n  * `label`\n  * `value`\n* Every `label` is a string.\n* Every `value` is a string.\n* No duplicate labels exist.\n* No fabricated information exists.\n* No extra text exists outside the JSON object.\n\nIf any validation would fail, regenerate the entire response until it is valid.\n\n**Return only the final validated JSON object. Nothing else.**\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -656,
+        -96
+      ],
+      "id": "7149947f-959c-4294-b4be-4db2be144534",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "/* Your getValidJsonObject function is good. \n  It correctly handles bad strings by returning null.\n  No changes are needed here.\n*/\nfunction getValidJsonObject(rawText) {\n\n    if (typeof rawText !== 'string' || rawText.trim() === '') {\n        console.error(\"Invalid input or empty text field.\");\n        return null;\n    }\n\n    let jsonString = rawText.trim();\n\n    // 2. Check for and remove the markdown JSON block fences.\n    const markdownRegex = /^```json\\s*([\\s\\S]*?)\\s*```$/;\n    const match = jsonString.match(markdownRegex);\n\n    if (match) {\n        jsonString = match[1];\n    }\n\n    // 3. Parse the cleaned string into a JSON object.\n    try {\n        return JSON.parse(jsonString);\n    } catch (error) {\n        // This is expected for parts that aren't JSON, like \"```\"\n        // console.error(\"Failed to parse JSON string:\", error); \n        // console.error(\"Problematic string:\", jsonString);\n        return null; // Returning null is key\n    }\n}\n\n// === NEW LOGIC ===\n\n// 1. Get the array of all parts\nconst allParts = $input.first().json.content.parts;\n\n// 2. Map each part to a parse attempt.\n//    - If part.text is valid JSON, we get the object.\n//    - If part.text is \"```\" or other non-JSON, getValidJsonObject returns null.\nconst parsedData = allParts\n    .map(part => getValidJsonObject(part.text))\n    .filter(result => result !== null); // 3. Filter out all the nulls\n\n// `parsedData` is now an array of all successfully parsed JSON objects.\n// In your example, it will be: [ [ { id: \"h3f8e9a1\", ... } ] ]\n\nreturn { data: parsedData[0] };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -288,
+        -96
+      ],
+      "id": "ca150344-0a81-426f-9d50-08339a6fbd0e",
+      "name": "Code2",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data.isValidJob }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "a4964c0d-eb38-45ac-ac18-22c40d9a90b2"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "valid"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "a03514f3-d866-4b2b-8ad3-face860dcd90",
+                    "leftValue": "={{ $json.data.isValidJob }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "invalid"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        -176
+      ],
+      "id": "6cdd9965-f4d5-4ff4-81c9-550015a23de0",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -64,
+        48
+      ],
+      "id": "78617eb7-76c4-4b11-af37-7dee9f14c5e4",
+      "name": "Wait",
+      "webhookId": "21632fe9-9b79-499c-92e4-5b457d712ca9"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "CfFTrHyw35Q6kVn5",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/CfFTrHyw35Q6kVn5",
+          "cachedResultName": "SynergizeFlow.v2 — Get App Token"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -2000,
+        16
+      ],
+      "id": "139e8a0c-2382-4df0-883e-7761a0e79801",
+      "name": "Get token"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "=fail"
+            },
+            {
+              "name": "msg",
+              "value": "=invalid_url"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -608,
+        288
+      ],
+      "id": "174623ce-bc41-4d75-96eb-ac7bbd32c5ce",
+      "name": "HTTP Request10"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "281d1f80-d55d-4c94-a3d8-a25004606618",
+              "name": "url",
+              "value": "={{ $('Webhook').item.json.body.url }}",
+              "type": "string"
+            },
+            {
+              "id": "e190069a-c518-43c3-8a83-c0d5a4c871b7",
+              "name": "agent_id",
+              "value": "={{ $('Webhook').item.json.body.agent_id }}",
+              "type": "number"
+            },
+            {
+              "id": "3e606352-155b-4d57-b877-6ddf20a589d8",
+              "name": "webhook",
+              "value": "={{ $('Webhook').item.json.body.webhook }}",
+              "type": "string"
+            },
+            {
+              "id": "a2a7bb68-af67-485d-b2b1-b62bd1a0901d",
+              "name": "token",
+              "value": "={{ $json.token }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1776,
+        16
+      ],
+      "id": "5ee2a6a4-9c0f-4386-a8b3-9f0eacf3d3d5",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "=fail"
+            },
+            {
+              "name": "msg",
+              "value": "=invalid_job"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        272,
+        16
+      ],
+      "id": "51f34676-e517-41c2-9e76-2badef60d04d",
+      "name": "HTTP Request11"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "=ok"
+            },
+            {
+              "name": "data",
+              "value": "={{ $json.data.jobData }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        272,
+        -288
+      ],
+      "id": "309276b3-1c62-4923-a76a-2bee531aa677",
+      "name": "HTTP Request12"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request12",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get token": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "triggerCount": 1,
+  "versionId": "651ed94d-5ef3-46a5-974a-5a06c8ead121",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "YgmRTvIuRARkpLyZ",
+  "isArchived": false
+}

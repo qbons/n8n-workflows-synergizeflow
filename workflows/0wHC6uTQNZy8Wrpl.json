@@ -1,0 +1,293 @@
+{
+  "id": "0wHC6uTQNZy8Wrpl",
+  "name": "SF - Explainer Agent - Generate Step",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{\nJSON.stringify({\n  description: $json.description,\n  visual_style: $json.visual_style,\n  voice_language: $json.voice_language,\n  speaker_name: $json.speaker_name,\n  orientation: $json.orientation,\n  reference_images: Array.isArray($json.reference_images) ? $json.reference_images : []\n}, null, 2)\n}}",
+        "options": {
+          "systemMessage": "=You are a professional storyboard director and narration scriptwriter. Your job is to transform a description or story into a structured step-by-step narration plan for an animated explainer video.\n\n## INPUT FORMAT\nYou will receive a message with these fields:\n- **description**: The story, narration, or concept to be broken down into steps.\n- **visual_style**: The desired visual/art style for all generated images (e.g., \"cinematic realistic\", \"anime\", \"watercolor illustration\", \"3D cartoon\", \"flat vector\", etc.).\n- **voice_language**: The language for the voice narration and subtitle text (e.g., \"id-ID\" for Indonesian, \"en-US\" for English, etc.).\n- **speaker_name**: The voice name to use for TTS (e.g., \"Kore\", \"Puck\", \"Charon\", \"Fenrir\", \"Aoede\", \"Leda\", \"Orus\", \"Zephyr\", etc.).\n- **orientation**: The video orientation — either \"vertical\" (9:16, for TikTok/Reels/Shorts) or \"horizontal\" (16:9, for YouTube/presentation).\n- **reference_images**: Optional array of user-uploaded reference images. If no reference images are provided, this will be an empty array `[]`.\nEach reference image has:\n- **id**: Unique reference image ID. Use this exact ID in step image.reference_images.\n- **type**: One of \"logo\", \"person\", \"product\", \"screenshot\", \"place\", \"mascot\", \"document\", \"other\".\n- **label**: Short name.\n- **description**: Visual description from image analyzer.\n- **usage_note**: Suggested usage.\n- **sensitive_note**: Preservation warning for logo/text/face/UI.\n\n## YOUR TASK\n1. Analyze the description and break it down into **minimum 3 and maximum 10 sequential steps** that tell the story visually and narratively.\n2. Each step represents one scene/slide in the video.\n3. Ensure the narrative flows naturally from step to step, building a coherent story arc.\n4. For each step, choose an appropriate motion effect and transition that matches the emotional tone of the scene.\n5. If `reference_images` are provided, decide which reference images are relevant for each scene.\n6. Do not force reference images into every scene.\n7. Use only reference image IDs that exist in the input.\n8. Use reference images naturally based on their type:\n   - logo: intro, outro, branded environments, signage, packaging, product UI\n   - person: founder, spokesperson, team, expert, testimonial scenes\n   - screenshot: platform workflow, dashboard, app, website, software UI scenes\n   - product: product hero, product demonstration, benefit scenes\n   - place: office, building, local context, location scenes\n   - mascot: guide, helper, AI assistant scenes\n   - document: report, contract, checklist, form scenes\n9. If no reference image is relevant for a scene, use an empty array for that scene.\n10. Do not mention reference images in subtitle or TTS narration.\n11. Write `reference_usage` as a visual generation instruction, not narration.\n\n## OUTPUT FORMAT\nYou MUST respond with a valid JSON object. Do NOT include any text before or after the JSON. The JSON must follow this exact structure:\n\n```json\n{\n  \"title\": \"A short title for this story/narration\",\n  \"orientation\": \"<orientation from input: 'vertical' or 'horizontal'>\",\n  \"total_steps\": <number>,\n  \"steps\": [\n    {\n      \"step\": 1,\n      \"scene_description\": \"Brief internal description of what this scene depicts, ALWAYS in English (for reference only, not spoken)\",\n      \"subtitle\": \"The exact narration text that will be displayed as subtitle AND spoken as voice. This must be natural, engaging narration in the specified voice_language. Keep each step's subtitle between 1-3 sentences (max ~40 words) so it fits well as a subtitle overlay and TTS audio clip.\",\n      \"image\": {\n        \"prompt\": \"A detailed, vivid image generation prompt in English describing the visual scene. Include the visual_style. Be specific about: subject, action, composition, lighting, color palette, mood, camera angle. The prompt should paint a clear picture for the AI image generator. Always include the visual_style keyword at the beginning of the prompt.\",\n        \"negative_prompt\": \"Elements to avoid in the image. Always include: blurry, low quality, distorted, deformed, ugly, bad anatomy, watermark, signature, text, logo, banner, extra limbs, disfigured. Add scene-specific negatives as needed.\",\n        \"image_size\": \"<'landscape_16_9' if orientation is horizontal, 'portrait_16_9' if orientation is vertical>\"\n      },\n      \"motion_effect\": \"<choose ONE from: 'zoom_in', 'zoom_out', 'pan_left', 'pan_right', 'pan_up', 'pan_down', 'ken_burns_in', 'ken_burns_out'>\",\n      \"transition\": \"<choose ONE from: 'crossfade', 'fade_black', 'wipe_left', 'wipe_right', 'none'>\",\n      \"tts\": {\n        \"input\": {\n          \"prompt\": \"ALWAYS IN ENGLISH. A style/delivery instruction for the TTS voice. Describe HOW to speak this line. Examples: 'Speak in a warm, storytelling tone with gentle pacing', 'Narrate with excitement and wonder', 'Deliver with a calm, reflective mood'. This field must ALWAYS be written in English regardless of voice_language, because the Gemini TTS engine processes style prompts best in English.\",\n          \"text\": \"MUST BE IDENTICAL to the 'subtitle' field above (the spoken words must match). This is the exact text that will be spoken. You MUST add Gemini TTS markup tags to make the delivery expressive and engaging. At minimum, add pacing tags at natural pause points. Available tags: [sigh], [laughing], [uhm] (non-speech sounds), [whispering], [shouting], [extremely fast] (style modifiers), [short pause], [medium pause], [long pause] (pacing). IMPORTANT: The spoken words (excluding markup tags) MUST match the subtitle exactly.\"\n        },\n        \"voice\": {\n          \"languageCode\": \"<voice_language from input, e.g., 'en-US', 'id-ID'>\",\n          \"name\": \"<speaker_name from input>\",\n          \"model_name\": \"{{$vars.GEMINI_FLASH_TEXT}}-tts\"\n        },\n        \"audioConfig\": {\n          \"audioEncoding\": \"MP3\"\n        }\n      }\n    }\n  ]\n}\n\n## REFERENCE OUTPUT CONSTRAINTS\n- Every `image` object MUST include `reference_images`, `reference_usage`, and `reference_strength`.\n- `reference_images` must be an array of IDs from input `reference_images` only.\n- If no reference is used, output:\n  - `\"reference_images\": []`\n  - `\"reference_usage\": \"\"`\n  - `\"reference_strength\": \"subtle\"`\n- Never output image URLs.\n- Never invent reference image IDs.\n- `reference_strength` must be `\"subtle\"`, `\"normal\"`, or `\"prominent\"`."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -1264,
+        144
+      ],
+      "id": "093e8a6b-0fae-4d89-8ce5-42b3a69ed668",
+      "name": "AI Agent",
+      "executeOnce": false,
+      "retryOnFail": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "modelName": "=models/{{ $vars.GEMINI_PRO_LATEST }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -1264,
+        336
+      ],
+      "id": "638f24c4-4365-4ebc-a16b-5fdc6d77b851",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// Parse AI JSON Output — robust decoder with graceful error handling\n// Input  : $input.first().json.output\n// Output : success=true  -> parsed JSON\n//          success=false -> structured error\n// ============================================================\n\nconst rawInput = $input.first().json.output;\n\ntry {\n  if (!rawInput || typeof rawInput !== 'string') {\n    throw new Error('Input \"output\" tidak ditemukan atau bukan string.');\n  }\n\n  const decodeAndParse = (str) => {\n    str = str.trim();\n\n    // Remove wrapping quotes\n    if (\n      (str.startsWith('\"') && str.endsWith('\"')) ||\n      (str.startsWith(\"'\") && str.endsWith(\"'\"))\n    ) {\n      str = str.slice(1, -1);\n    }\n\n    // Decode escaped chars\n    str = str\n      .replace(/\\\\\\\\n/g, '\\n')\n      .replace(/\\\\\\\\t/g, '\\t')\n      .replace(/\\\\\\\\r/g, '\\r')\n      .replace(/\\\\\\\\\\\"/g, '\"')\n      .replace(/\\\\\\\\\\\\\\\\/g, '\\\\');\n\n    // Remove markdown code blocks\n    str = str\n      .replace(/^```json[\\s]*/i, '')\n      .replace(/^```[\\s]*/i, '')\n      .replace(/```[\\s]*$/i, '');\n\n    str = str.trim();\n\n    try {\n      return JSON.parse(str);\n    } catch (e1) {\n      const match = str.match(/\\{[\\s\\S]*\\}/);\n\n      if (match) {\n        try {\n          return JSON.parse(match[0]);\n        } catch (e2) {\n          throw new Error(\n            `Gagal parse JSON fallback: ${e2.message}`\n          );\n        }\n      }\n\n      throw new Error(\n        `Tidak ditemukan blok JSON valid: ${e1.message}`\n      );\n    }\n  };\n\n  const parsed = decodeAndParse(rawInput);\n\n  const webhookBody = $('Prepare Data').first().json;\n  const inputReferenceImages = Array.isArray(webhookBody.reference_images)\n    ? webhookBody.reference_images\n    : [];\n  \n  const allowedReferenceIds = new Set(\n    inputReferenceImages.map((ref) => ref.id)\n  );\n  \n  const validStrengths = [\"subtle\", \"normal\", \"prominent\"];\n  \n  for (const step of parsed.steps || []) {\n    step.image = step.image || {};\n  \n    const refs = Array.isArray(step.image.reference_images)\n      ? step.image.reference_images\n      : [];\n  \n    step.image.reference_images = refs.filter((id) => allowedReferenceIds.has(id));\n  \n    if (!step.image.reference_images.length) {\n      step.image.reference_usage = \"\";\n      step.image.reference_strength = \"subtle\";\n    } else {\n      step.image.reference_usage = String(step.image.reference_usage || \"\");\n      step.image.reference_strength = validStrengths.includes(step.image.reference_strength)\n        ? step.image.reference_strength\n        : \"normal\";\n    }\n  }\n\n  return [{\n    json: {\n      status: \"ok\",\n      ...parsed\n    }\n  }];\n\n} catch (error) {\n  return [{\n    json: {\n      status: \"fail\",\n      stage: \"steps\",\n      error: error.message,\n      raw_preview: rawInput\n        ? rawInput.slice(0, 500)\n        : null\n    }\n  }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -896,
+        144
+      ],
+      "id": "f9ccca68-97e2-4586-b8f5-7d807a12c036",
+      "name": "Parse AI JSON Output"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "CfFTrHyw35Q6kVn5",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/CfFTrHyw35Q6kVn5",
+          "cachedResultName": "SynergizeFlow.v2 — Get App Token"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -1664,
+        144
+      ],
+      "id": "2309f3cb-4abe-40a1-9143-65ef3c586a0e",
+      "name": "Get token"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"description\": {{ JSON.stringify($('Webhook').item.json.body.description) }},\n  \"visual_style\": {{ JSON.stringify($('Webhook').item.json.body.visual_style) }},\n  \"voice_language\": {{ JSON.stringify($('Webhook').item.json.body.voice_language) }},\n  \"speaker_name\": {{ JSON.stringify($('Webhook').item.json.body.speaker_name) }},\n  \"orientation\": {{ JSON.stringify($('Webhook').item.json.body.orientation) }},\n  \"reference_images\": {{ Array.isArray($('Webhook').item.json.body.reference_images)\n  ? $('Webhook').item.json.body.reference_images\n  : [] }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1488,
+        144
+      ],
+      "id": "94d494c6-c64d-4ed6-a2dc-78c116917bc6",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').item.json.body.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Get token').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "={{ $json.status }}"
+            },
+            {
+              "name": "title",
+              "value": "={{ $json.title }}"
+            },
+            {
+              "name": "orientation",
+              "value": "={{ $json.orientation }}"
+            },
+            {
+              "name": "total_steps",
+              "value": "={{ $json.total_steps }}"
+            },
+            {
+              "name": "steps",
+              "value": "={{ $json.steps }}"
+            },
+            {
+              "name": "agent_id",
+              "value": "={{ $('Webhook').item.json.body.agent_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -656,
+        144
+      ],
+      "id": "56aa0c4e-1d0c-46cf-a885-40eb690ccffe",
+      "name": "HTTP Request",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v2/explainer-agent/generate-step",
+        "options": {
+          "responseData": "workflow_started"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1856,
+        144
+      ],
+      "id": "58fa5e38-3183-4e86-bd69-956426df18d9",
+      "name": "Webhook",
+      "webhookId": "0f16cebd-602c-45db-b81d-9d2c5888c6ab"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "domain",
+              "value": "={{ $('Webhook').item.json.body.domain }}"
+            },
+            {
+              "key": "type",
+              "value": "generate_step"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        -1664,
+        352
+      ],
+      "id": "1d036b9f-c609-4b28-9155-46dc0ab1b5fd",
+      "name": "Execution Data"
+    }
+  ],
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Parse AI JSON Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI JSON Output": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get token": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        []
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get token",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "triggerCount": 1,
+  "versionId": "7929fbf2-d3b2-450e-8e88-fcc57c228af3",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "EU3LkrzkjMEbKN3L",
+  "isArchived": false
+}

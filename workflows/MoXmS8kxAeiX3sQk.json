@@ -1,0 +1,203 @@
+{
+  "id": "MoXmS8kxAeiX3sQk",
+  "name": "SF - Chat Agent CTA Email",
+  "nodes": [
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"name\": {{ JSON.stringify($json.body.name) }},\n  \"contact\": {{ JSON.stringify($json.body.contact) }},\n  \"message\": {{ JSON.stringify($json.body.message) }},\n  \"ctaQuery\": {{ JSON.stringify($json.body.ctaQuery) }},\n  \"code\": {{ JSON.stringify($json.body.code) }},\n  \"website\": {{ JSON.stringify($json.body.website) }},\n  \"additional_field\": {{ JSON.stringify($json.body.additional_field) }}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -16,
+        16
+      ],
+      "id": "e646d2c5-7b56-48ff-b72a-f7a3976de4c4",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $vars.GEMINI_EMBEDDING }}:embedContent",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googlePalmApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"models/{{ $vars.GEMINI_EMBEDDING }}\",\n  \"content\": {\n    \"parts\": [\n      {\n        \"text\": {{ JSON.stringify($json.ctaQuery) }}\n      }\n    ]\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        16
+      ],
+      "id": "e5eade49-a327-4365-8bee-5041dc3cca03",
+      "name": "Embedding data",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://213.239.213.236:6333/collections/cta-{{ $('Edit Fields').item.json.code }}/points/search",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "qdrantRestApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  vector: $json.embedding.values,\n  limit: 1,\n  with_payload: true,\n  score_threshold: 0.5\n}) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        432,
+        16
+      ],
+      "id": "13b17ef2-1471-4984-bca4-d713d3f1783f",
+      "name": "HTTP Request1",
+      "credentials": {
+        "qdrantRestApi": {
+          "id": "x4lyWFNp7qjYd932",
+          "name": "SF - Qdrant account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.N8N_URL }}/webhook/v2/util/send-email",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "CF-Access-Client-Id",
+              "value": "={{ $vars.CF_ID }}"
+            },
+            {
+              "name": "CF-Access-Client-Secret",
+              "value": "={{ $vars.CF_SECRET }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        832,
+        16
+      ],
+      "id": "6812f73b-f5c8-4d24-ba87-2a16f3a132be",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "const editFields = $('Edit Fields').first().json;\nconst qdrantResult = $input.first().json.result[0].payload.metadata;\n\n// Build the base HTML Body\nlet htmlBody = `<strong>Goal:</strong> ${qdrantResult.goal_prompt}<br>\\n`;\nhtmlBody += `<strong>Name:</strong> ${editFields.name}<br>\\n`;\nhtmlBody += `<strong>Contact:</strong> ${editFields.contact}<br>\\n`;\n\n// Dynamically add any additional fields if they exist\nif (editFields.additional_field) {\n    try {\n        // Parse the JSON string sent by the LLM\n        const extraFields = JSON.parse(editFields.additional_field);\n        \n        // Loop through the parsed object and append to the email body\n        for (const [key, value] of Object.entries(extraFields)) {\n            // Capitalize the first letter of the key for a cleaner look\n            const formattedKey = key.charAt(0).toUpperCase() + key.slice(1);\n            htmlBody += `<strong>${formattedKey}:</strong> ${value}<br>\\n`;\n        }\n    } catch (error) {\n        // Failsafe in case the LLM returned a malformed JSON string\n    }\n}\n\nhtmlBody += `<strong>Message:</strong> ${editFields.ctaQuery}<br>\\n`;\n\nreturn [{\n  key: $vars.STATIC_TOKEN,\n  senderName: \"SynergizeFlow\",\n  fromEmail: \"noreply@synergizeflow.com\",\n  replyTo: \"noreply@synergizeflow.com\",\n  toEmail: qdrantResult.destination,\n  subject: editFields.website + \" User Inquiry\",\n  htmlBody: htmlBody\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        16
+      ],
+      "id": "8402e692-5428-42a7-8dbc-4fbd30c4761d",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v2/chat-agent/cta-email",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -208,
+        16
+      ],
+      "id": "886284eb-4a35-487c-988f-5a9dfb2553f5",
+      "name": "Webhook",
+      "webhookId": "df7ee3ce-14c9-49b7-9e2f-71024f89f608"
+    }
+  ],
+  "connections": {
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Embedding data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embedding data": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "triggerCount": 0,
+  "versionId": "bb63d11a-d19a-46ee-a9b5-c11fd822b0d1",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "PV0jWbESxCIaCPxC",
+  "isArchived": false
+}

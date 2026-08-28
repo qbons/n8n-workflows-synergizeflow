@@ -1,0 +1,948 @@
+{
+  "id": "IHyTeEtrTT4Sctiy",
+  "name": "SF - Media Agent - Combine Video",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "={{ $('Prepare Data').item.json.video_url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1472,
+        544
+      ],
+      "id": "44a9a69e-d770-43d4-9cff-af01ebb850ee",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "binaryToPropery",
+        "destinationKey": "video",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -1312,
+        544
+      ],
+      "id": "c956ea07-bc16-4e6c-9852-f6041eb15082",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "jsCode": "if($('Prepare Data').first().json.subtitle == 'none'){\n  return [\n    {\n      \"mime\": \"video/mp4\",\n      \"base\": $input.first().json.video,\n      \"name\": \"video.mp4\"\n    },\n    {\n      \"mime\": \"audio/mpeg\",\n      \"base\": $('Prepare Data').first().json.audio,\n      \"name\": \"audio.mp3\"\n    }\n  ]\n}else{\n  return [\n    {\n      \"mime\": \"video/mp4\",\n      \"base\": $input.first().json.video,\n      \"name\": \"video.mp4\"\n    },\n    {\n      \"mime\": \"text/plain\",\n      \"base\": $('Prepare Data').first().json.subtitle,\n      \"name\": \"subtitle.ass\"\n    },\n    {\n      \"mime\": \"audio/mpeg\",\n      \"base\": $('Prepare Data').first().json.audio,\n      \"name\": \"audio.mp3\"\n    }\n  ]  \n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1088,
+        544
+      ],
+      "id": "6c42c9d8-555e-485e-a4ac-f99314483ba5",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -864,
+        528
+      ],
+      "id": "8c122c5c-06e7-48eb-9b7d-fd04c641f9f6",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "490842e9-c107-4f93-8761-ee4c0f3ab650",
+              "name": "mime",
+              "value": "={{ $json.mime }}",
+              "type": "string"
+            },
+            {
+              "id": "98ac2ab2-bd54-4a95-ae9b-9bf9f94e3608",
+              "name": "base",
+              "value": "={{ $json.base }}",
+              "type": "string"
+            },
+            {
+              "id": "090e7532-8ccc-46a4-8868-22cca0239b64",
+              "name": "name",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -640,
+        544
+      ],
+      "id": "054e542e-1eb5-493a-a093-3e7d2b2cd94f",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "base",
+        "options": {
+          "fileName": "={{ $json.name }}",
+          "mimeType": "={{ $json.mime }}"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -416,
+        544
+      ],
+      "id": "806dd3e6-ca41-49c4-b6ad-21367a3d51e6",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "=/shared/{{ $('Prepare Data').item.json.folder }}/{{ $('Edit Fields1').item.json.name }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        624
+      ],
+      "id": "379c439d-60f0-4d4d-af54-a4a97d8aa88e",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "command": "=cd ../../shared/{{ $('Prepare Data').item.json.folder }}\nffmpeg -i video.mp4 -i audio.mp3 \\\n-filter_complex \"[0:v]split[v1][v2];[v2]reverse[v_rev];[v1][v_rev]concat=n=2:v=1:a=0[v_concat];[v_concat]loop=loop=-1:size=7500[v_out]\" \\\n-map \"[v_out]\" -map 1:a:0 \\\n-shortest -y result.mp4"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        160
+      ],
+      "id": "1464ce92-6f66-4ca6-a5a6-7f48286ce585",
+      "name": "Execute Command2"
+    },
+    {
+      "parameters": {
+        "command": "=cd ../../shared\nrm -rf {{ $json.folder }}\nmkdir -p {{ $json.folder }}"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        -1840,
+        544
+      ],
+      "id": "d6f2d981-f87a-4dca-bc3d-c6f2dbb56b3f",
+      "name": "Execute Command3"
+    },
+    {
+      "parameters": {
+        "fileSelector": "=/shared/{{ $('Prepare Data').item.json.folder }}/result.mp4",
+        "options": {
+          "fileName": "result.mp4"
+        }
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        256
+      ],
+      "id": "77f5263c-5f21-4b51-a393-1ae2ca93fc0f",
+      "name": "Read/Write Files from Disk1"
+    },
+    {
+      "parameters": {
+        "command": "=cd ../../shared\nrm -rf {{ $('Prepare Data').item.json.folder }}"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        672,
+        256
+      ],
+      "id": "c0bba541-91b6-4bcb-b99a-214c4b31feb2",
+      "name": "Execute Command",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "command": "=cd ../../shared/{{ $('Prepare Data').item.json.folder }}\n\nAUDIO_DURATION=$(ffprobe -v error -show_entries format=duration -of csv=p=0 audio.mp3)\n\nffmpeg \\\n-i video.mp4 \\\n-i audio.mp3 \\\n-filter_complex \"[0:v]split[v1][v2];[v2]reverse[v_rev];[v1][v_rev]concat=n=2:v=1:a=0,setpts=PTS-STARTPTS[v_cycle];[v_cycle]loop=loop=-1:size=32767:start=0,setpts=PTS-STARTPTS[v_loop];[v_loop]trim=duration=${AUDIO_DURATION},setpts=PTS-STARTPTS[v_trim];[v_trim]ass=filename=subtitle.ass[v_out]\" \\\n-map \"[v_out]\" \\\n-map 1:a:0 \\\n-shortest \\\n-y result.mp4"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        352
+      ],
+      "id": "7cc443e4-25b3-40b3-966a-352463d2f77a",
+      "name": "Execute Command4"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ecffe2ab-4983-4c9a-a81f-c99591f1e48a",
+                    "leftValue": "={{ $('Prepare Data').item.json.with_music }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "with_music"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Prepare Data').item.json.subtitle }}",
+                    "rightValue": "none",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "d7e0ace3-a7bc-4f17-8758-f4a610abec29"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "no_sub"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "9b406d0a-12ee-473a-83a4-38ed3859e5e5",
+                    "leftValue": "={{ $('Prepare Data').item.json.subtitle }}",
+                    "rightValue": "none",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "has_sub"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -640,
+        256
+      ],
+      "id": "bc5a9e76-c3c2-4959-8fe8-b7164ab09389",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "ok"
+            },
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "data",
+              "value": "={{ $json.result }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        432,
+        256
+      ],
+      "id": "3f1454f6-bd88-4083-b023-95240d13e720",
+      "name": "HTTP Request1",
+      "alwaysOutputData": false,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "command": "=cd ../../shared/{{ $('Prepare Data').item.json.folder }}\nffmpeg -i video.mp4 -i audio.mp3 -map 0:v:0 -map 1:a:0 -shortest -c:v copy -c:a aac -y result.mp4"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        -16
+      ],
+      "id": "0439d90f-1e45-42b7-af9d-7a4b70b59a42",
+      "name": "Execute Command1"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -2656,
+        608
+      ],
+      "id": "54dc2d17-4e7f-4859-9a6a-6a2a02b134b7",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "domain",
+              "value": "={{ $json.domain }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        -2384,
+        736
+      ],
+      "id": "040abaae-0959-46b6-bd59-66723b71d993",
+      "name": "Execution Data"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "CfFTrHyw35Q6kVn5",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/CfFTrHyw35Q6kVn5",
+          "cachedResultName": "SynergizeFlow.v2 — Get App Token"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -2384,
+        544
+      ],
+      "id": "7b34497f-ab65-4306-b9f8-6e61c56bcf98",
+      "name": "Get token"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "fE0eVO9sRgpzeLW1",
+          "mode": "list",
+          "cachedResultName": "Media Agent Data",
+          "cachedResultUrl": "/projects/0Cpv1rjP8dogQgcy/datatables/fE0eVO9sRgpzeLW1"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "agent_id",
+              "keyValue": "={{ $('When Executed by Another Workflow').item.json.agent_id }}"
+            }
+          ]
+        },
+        "limit": 1
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -2176,
+        544
+      ],
+      "id": "c9a576f7-d3d6-46b8-832b-13487cd17909",
+      "name": "Get row(s)"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "07751085-c756-4fc5-a6ab-93c8209921e9",
+              "name": "audio",
+              "value": "={{ $json.audio }}",
+              "type": "string"
+            },
+            {
+              "id": "70a3c05c-9e64-454b-baa2-d61ffc34f22f",
+              "name": "video_url",
+              "value": "={{ $json.media_url }}",
+              "type": "string"
+            },
+            {
+              "id": "573d9900-2457-431f-813e-7b3c4f227905",
+              "name": "folder",
+              "value": "=mediaAgentResult-{{ $json.agent_id }}",
+              "type": "string"
+            },
+            {
+              "id": "e54a3d84-d7fe-43e1-a65b-9b851f6c271d",
+              "name": "subtitle",
+              "value": "={{ $json.subtitle }}",
+              "type": "string"
+            },
+            {
+              "id": "83e7e3a8-0e50-4be1-8472-7a72a46b262b",
+              "name": "with_music",
+              "value": "={{ $json.music_url == \"none\" ? false : true }}",
+              "type": "boolean"
+            },
+            {
+              "id": "7810e9fc-e9c9-4452-9b91-95f19142ddd7",
+              "name": "music_url",
+              "value": "={{ $json.music_url }}",
+              "type": "string"
+            },
+            {
+              "id": "eac9a021-3922-4da1-bce1-0f8a25b9ce6f",
+              "name": "media_type",
+              "value": "={{ $json.media_type }}",
+              "type": "string"
+            },
+            {
+              "id": "5357530e-7cca-4d81-a197-91094b810b48",
+              "name": "caption_data",
+              "value": "={{ $json.caption_data }}",
+              "type": "array"
+            },
+            {
+              "id": "90017ffe-f70d-4581-9117-a1e3f5333423",
+              "name": "agent_id",
+              "value": "={{ $json.agent_id }}",
+              "type": "number"
+            },
+            {
+              "id": "f476db22-a88e-4ced-aec1-bb6284b5b687",
+              "name": "token",
+              "value": "={{ $('Get token').item.json.token }}",
+              "type": "string"
+            },
+            {
+              "id": "bdbc3b1a-d4e5-47d2-9fec-d13e7c8947fc",
+              "name": "webhook",
+              "value": "={{ $json.webhook }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2016,
+        544
+      ],
+      "id": "ddf2738f-bc01-4d0e-9238-02584d4c003c",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "={{ $vars.CLOUDFLARE_R2_BUCKET }}",
+        "fileName": "=mediaAgentResult/{{ $('Prepare Data').item.json.folder }}.mp4",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [
+        16,
+        256
+      ],
+      "id": "459fb1d4-8eb5-4f7b-860c-2bbfcdbf0116",
+      "name": "Upload a file1",
+      "credentials": {
+        "s3": {
+          "id": "AIXo2wxUCjaHKlfc",
+          "name": "SF - R2 Cloudflare Storage"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "bucketName": "={{ $vars.CLOUDFLARE_R2_BUCKET }}",
+        "fileKey": "={{ $('Prepare Data').item.json.folder }}/{{ $('Prepare Data').item.json.folder }}.mp4",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [
+        -1664,
+        544
+      ],
+      "id": "18bec7f0-d8c0-4094-bdf0-fe745f41a630",
+      "name": "Delete a file",
+      "credentials": {
+        "s3": {
+          "id": "AIXo2wxUCjaHKlfc",
+          "name": "SF - R2 Cloudflare Storage"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let social = $('Prepare Data').first().json.caption_data;\nlet result = [];\n// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of social) {\n  result.push({\n    type: item.social,\n    title: item.content.title,\n    caption: item.content.caption,\n    tags: item.content.tags,\n    media_url: [\"https://assets.synergizeflow.com/mediaAgentResult/mediaAgentResult-\"+$('Prepare Data').first().json.agent_id+\".mp4\"]\n  })\n}\n\nreturn {result: result}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        256
+      ],
+      "id": "6b550aa8-07ac-4085-ae0b-72dc04f2b068",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "operation": "deleteRows",
+        "dataTableId": {
+          "__rl": true,
+          "value": "fE0eVO9sRgpzeLW1",
+          "mode": "list",
+          "cachedResultName": "Media Agent Data",
+          "cachedResultUrl": "/projects/0Cpv1rjP8dogQgcy/datatables/fE0eVO9sRgpzeLW1"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "agent_id",
+              "keyValue": "={{ $('Prepare Data').item.json.agent_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        880,
+        256
+      ],
+      "id": "c4855d0b-a563-48a3-853a-e909998274f0",
+      "name": "Delete row(s)"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://dev-wizards.synergizeflow.com/webhook/v2/media-agent/dummy-webook",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "CF-Access-Client-Id",
+              "value": "={{ $vars.CF_ID }}"
+            },
+            {
+              "name": "CF-Access-Client-Secret",
+              "value": "={{ $vars.CF_SECRET }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "data",
+              "value": "={{ $('Code in JavaScript1').item.json.result }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1088,
+        256
+      ],
+      "id": "bd0eb916-526f-4f0e-9c36-93171cfaf38f",
+      "name": "HTTP Request2"
+    }
+  ],
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command2": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command3": {
+      "main": [
+        [
+          {
+            "node": "Delete a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk1": {
+      "main": [
+        [
+          {
+            "node": "Upload a file1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command4": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Execute Command1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Execute Command2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Execute Command4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command1": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get token",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get token": {
+      "main": [
+        [
+          {
+            "node": "Get row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s)": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Execute Command3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload a file1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete a file": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command": {
+      "main": [
+        [
+          {
+            "node": "Delete row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete row(s)": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "triggerCount": 0,
+  "versionId": "4f6ce989-4f7b-4d38-8ccd-d592c618b27d",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "uJERJZH2lBKMHex2",
+  "isArchived": false
+}

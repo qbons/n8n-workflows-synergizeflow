@@ -1,0 +1,48 @@
+{
+  "id": "3kIRWcbbt8kcLadD",
+  "name": "SF - Explainer Agent - Webhook Receiver [DEV ONLY]",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v2/explainer-agent/webhook-receiver",
+        "options": {
+          "responseData": "workflow_started"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "8dd4aab1-3c9c-4356-948f-bcc4d3dc62e1",
+      "name": "Webhook",
+      "webhookId": "53288c9a-b375-409c-90c0-11c019651848"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "triggerCount": 1,
+  "versionId": "8ecf6e43-6ba4-4feb-b849-2e5b065cbd7d",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "EU3LkrzkjMEbKN3L",
+  "isArchived": true
+}

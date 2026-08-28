@@ -1,0 +1,16 @@
+{
+  "id": "NampscDkGQRBqgsz",
+  "name": "SF - Gdrive",
+  "type": "googleDriveOAuth2Api",
+  "data": {
+    "clientId": "",
+    "clientSecret": ""
+  },
+  "ownedBy": {
+    "type": "personal",
+    "projectId": "hlqx30JRHLb2L6Zu",
+    "projectName": "Synergize Flow Development <info@mantab.one>",
+    "personalEmail": "info@mantab.one"
+  },
+  "isGlobal": false
+}

@@ -103,6 +103,110 @@
       "homeProjectId": "UNcEOCawQV9ZsxYR",
       "createdAt": "2026-06-15T12:07:10.975Z",
       "updatedAt": "2026-06-15T12:07:10.975Z"
+    },
+    {
+      "id": "RH3pD7tYrBWa3pTv",
+      "name": "Utility",
+      "parentFolderId": null,
+      "homeProjectId": "0Cpv1rjP8dogQgcy",
+      "createdAt": "2026-07-27T08:24:21.931Z",
+      "updatedAt": "2026-07-27T08:24:21.931Z"
+    },
+    {
+      "id": "1HETaocQSaH5ta4A",
+      "name": "Auth",
+      "parentFolderId": null,
+      "homeProjectId": "0Cpv1rjP8dogQgcy",
+      "createdAt": "2026-07-27T08:25:14.932Z",
+      "updatedAt": "2026-07-27T08:25:14.932Z"
+    },
+    {
+      "id": "ALSbETz1ex4rFhVj",
+      "name": "Assets",
+      "parentFolderId": null,
+      "homeProjectId": "0Cpv1rjP8dogQgcy",
+      "createdAt": "2026-07-31T07:11:56.349Z",
+      "updatedAt": "2026-07-31T07:11:56.349Z"
+    },
+    {
+      "id": "icCJSa6WgYRUBtVb",
+      "name": "Blog Agent",
+      "parentFolderId": null,
+      "homeProjectId": "0Cpv1rjP8dogQgcy",
+      "createdAt": "2026-07-31T08:03:26.295Z",
+      "updatedAt": "2026-07-31T08:03:26.295Z"
+    },
+    {
+      "id": "Q29WwRjNk49BZTwO",
+      "name": "Chat Agent",
+      "parentFolderId": null,
+      "homeProjectId": "0Cpv1rjP8dogQgcy",
+      "createdAt": "2026-08-04T13:34:57.237Z",
+      "updatedAt": "2026-08-04T13:34:57.237Z"
+    },
+    {
+      "id": "RXioxb8mqJ3lEYEV",
+      "name": "SEO Agent",
+      "parentFolderId": null,
+      "homeProjectId": "0Cpv1rjP8dogQgcy",
+      "createdAt": "2026-08-05T06:12:44.932Z",
+      "updatedAt": "2026-08-05T06:12:44.932Z"
+    },
+    {
+      "id": "fwFQCQ7AMxSsHe36",
+      "name": "Product marketing agent",
+      "parentFolderId": "icCJSa6WgYRUBtVb",
+      "homeProjectId": "0Cpv1rjP8dogQgcy",
+      "createdAt": "2026-08-05T10:30:34.822Z",
+      "updatedAt": "2026-08-05T10:30:34.822Z"
+    },
+    {
+      "id": "YgmRTvIuRARkpLyZ",
+      "name": "Job listing agent",
+      "parentFolderId": "icCJSa6WgYRUBtVb",
+      "homeProjectId": "0Cpv1rjP8dogQgcy",
+      "createdAt": "2026-08-07T04:59:36.069Z",
+      "updatedAt": "2026-08-07T04:59:36.069Z"
+    },
+    {
+      "id": "PV0jWbESxCIaCPxC",
+      "name": "Old",
+      "parentFolderId": "Q29WwRjNk49BZTwO",
+      "homeProjectId": "0Cpv1rjP8dogQgcy",
+      "createdAt": "2026-08-07T10:34:43.967Z",
+      "updatedAt": "2026-08-07T10:34:43.967Z"
+    },
+    {
+      "id": "V45SMClxlrIeuvx2",
+      "name": "Page Builder Agent",
+      "parentFolderId": null,
+      "homeProjectId": "0Cpv1rjP8dogQgcy",
+      "createdAt": "2026-08-10T11:55:59.874Z",
+      "updatedAt": "2026-08-10T11:55:59.874Z"
+    },
+    {
+      "id": "EU3LkrzkjMEbKN3L",
+      "name": "Explainer Agent",
+      "parentFolderId": null,
+      "homeProjectId": "0Cpv1rjP8dogQgcy",
+      "createdAt": "2026-08-12T07:24:42.504Z",
+      "updatedAt": "2026-08-12T07:24:42.504Z"
+    },
+    {
+      "id": "uJERJZH2lBKMHex2",
+      "name": "Media Agent",
+      "parentFolderId": null,
+      "homeProjectId": "0Cpv1rjP8dogQgcy",
+      "createdAt": "2026-08-13T07:58:37.852Z",
+      "updatedAt": "2026-08-13T07:58:37.852Z"
+    },
+    {
+      "id": "7lK8zFdVq3sDknkV",
+      "name": "TEMP SHOULD DELETE LATER",
+      "parentFolderId": null,
+      "homeProjectId": "0Cpv1rjP8dogQgcy",
+      "createdAt": "2026-08-24T11:56:17.612Z",
+      "updatedAt": "2026-08-24T11:56:17.612Z"
     }
   ]
 }

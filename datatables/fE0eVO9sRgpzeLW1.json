@@ -1,0 +1,91 @@
+{
+  "id": "fE0eVO9sRgpzeLW1",
+  "name": "Media Agent Data",
+  "columns": [
+    {
+      "id": "9eRQ3lnzsPYBI6kX",
+      "name": "agent_id",
+      "type": "number",
+      "index": 0
+    },
+    {
+      "id": "hjosRDwfJfFlFK8M",
+      "name": "kie_task_id",
+      "type": "string",
+      "index": 1
+    },
+    {
+      "id": "vRdkFw8m27lexrmO",
+      "name": "webhook",
+      "type": "string",
+      "index": 2
+    },
+    {
+      "id": "WT7ZbeUXEDl4TNMf",
+      "name": "domain",
+      "type": "string",
+      "index": 3
+    },
+    {
+      "id": "RzJKybMJLL10B9ux",
+      "name": "audio",
+      "type": "string",
+      "index": 4
+    },
+    {
+      "id": "OrgbW82UJamrVm4r",
+      "name": "subtitle",
+      "type": "string",
+      "index": 5
+    },
+    {
+      "id": "Fo5DJoPfI2sNM8E1",
+      "name": "output_meta",
+      "type": "string",
+      "index": 6
+    },
+    {
+      "id": "5HGPo4ff0CQCwoLX",
+      "name": "caption_data",
+      "type": "string",
+      "index": 7
+    },
+    {
+      "id": "42ZmtekxsDbDZ0Jh",
+      "name": "media_url",
+      "type": "string",
+      "index": 8
+    },
+    {
+      "id": "d6VlRFEWWEeqJ8ZJ",
+      "name": "status",
+      "type": "string",
+      "index": 9
+    },
+    {
+      "id": "DWkLl9gO7wFP66d7",
+      "name": "kie_music_task_id",
+      "type": "string",
+      "index": 10
+    },
+    {
+      "id": "lsuRMMEPVa84jbST",
+      "name": "music_url",
+      "type": "string",
+      "index": 11
+    },
+    {
+      "id": "pNIwRAMmEyHSDAn0",
+      "name": "media_type",
+      "type": "string",
+      "index": 12
+    }
+  ],
+  "ownedBy": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "createdAt": "2026-08-13T07:53:47.659Z",
+  "updatedAt": "2026-08-28T12:30:07.637Z"
+}

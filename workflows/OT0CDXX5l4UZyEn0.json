@@ -1,0 +1,473 @@
+{
+  "id": "OT0CDXX5l4UZyEn0",
+  "name": "SF - Writing Style",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v2/asset/writing-style",
+        "options": {
+          "responseData": "workflow_started"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -544,
+        0
+      ],
+      "id": "baa7e3c7-9619-4018-84ab-c9998ad71db3",
+      "name": "Webhook",
+      "webhookId": "db4a1b9c-cea3-47ff-a44b-04af0131fcb1"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_PREVIEW }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.content }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "systemMessage": "=You are an expert AI assistant with a specialization in linguistic and stylistic analysis. Your primary function is to deconstruct any given text to identify its unique writing style and then create a detailed set of instructions for replicating that style.\n\n**Instructions:**\n\n1.  You will be provided with an input `text`, which may contain HTML formatting. You must analyze the core content of this text.\n2.  Based on your analysis, you will synthesize a completely new description of the writing style.\n3.  Your goal is to accurately capture the nuances of the text's tone, perspective, vocabulary, structure, and intent.\n4.  Your output must be a single, valid JSON object containing two keys: `style` and `prompt`. Do not output any other text, explanations, or introductory phrases.\n\n**Guidelines for Generating the JSON Object:**\n\n*   **`style` (string):**\n    *   Create a concise, descriptive, and unique name for the writing style you have identified.\n    *   The name should be in Title Case and effectively summarize the text's primary characteristics.\n    *   *Examples of generated styles might be: \"Empathetic and Action-Oriented Self-Help,\" \"Data-Driven Technical Breakdown,\" or \"Whimsical and Imaginative Storytelling.\"*\n\n*   **`prompt` (string):**\n    *   Write a comprehensive and detailed prompt that would instruct another generative AI on how to perfectly replicate the identified writing style.\n    *   This prompt must be generated based on your analysis of the input text.\n    *   Specifically describe the following elements you observed in the text:\n        *   **Tone and Mood:** Is it formal, informal, uplifting, serious, humorous, objective, passionate?\n        *   **Perspective/Point of View:** Does it use first-person (\"I,\" \"we\"), second-person (\"you\"), or third-person (\"he,\" \"she,\" \"they\")?\n        *   **Vocabulary and Diction:** Describe the word choice. Is it simple, sophisticated, technical, colloquial, or emotive?\n        *   **Sentence Structure:** Are the sentences long and complex, short and direct, or varied for rhythmic effect?\n        *   **Rhetorical Devices:** Does it use techniques like storytelling, anecdotes, rhetorical questions, metaphors, data citation, or calls to action?\n        *   **Overall Goal:** What is the main purpose of the text? (e.g., to inspire, to instruct, to inform, to persuade, to entertain).\n\n**Example of Use:**\n\n**User Input (`text`):**\n```html\n<h3>Classic Chocolate Chip Cookies</h3>\n<p>Ready to bake the best cookies of your life? I thought so! First, you'll want to preheat your oven to 375°F (190°C). While it's heating up, grab a large bowl and cream together your butter and sugars until they're light and fluffy. Don't rush this step—it's the secret to a great texture!</p>\n<p>Next, beat in the eggs one at a time, followed by the vanilla. In a separate bowl, whisk together the flour, baking soda, and salt. Gradually add this to the wet ingredients. Finally, gently stir in the chocolate chips. You've got this! Drop rounded tablespoons of dough onto ungreased baking sheets and bake for about 10-12 minutes. Enjoy the amazing smell filling your kitchen!</p>\n```\n\n**Expected AI Output:**\n```json\n{\n  \"style\": \"Encouraging and Instructive Recipe Guide\",\n  \"prompt\": \"Write in a friendly, encouraging, and instructive style, as if guiding a friend through a recipe. The tone should be consistently positive and motivational. Use the second person ('you', 'your') to directly engage the reader and the first person ('I') to build a personal, confident connection. Employ clear, step-by-step instructions using simple, direct command verbs (e.g., 'preheat', 'grab', 'beat'). Sentences should be straightforward and easy to follow. Include personal tips and encouraging asides (e.g., 'Don't rush this step', 'You've got this!') to build the reader's confidence. The primary goal is to provide clear instructions while making the process feel fun, accessible, and foolproof.\"\n}\n```"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        736,
+        96
+      ],
+      "id": "ef2c7c1a-3a4b-485a-8eaa-3abc36c3ca95",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "url",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "1999ea25-b02e-4541-b425-3e06fd9faf75"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "url"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "85e1c753-a180-4da6-886d-4668460b47b4",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "url",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        64,
+        0
+      ],
+      "id": "f6420f07-da43-4a12-a1a3-1c21b8e1ca30",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.content }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        288,
+        -96
+      ],
+      "id": "71694a7e-e43c-436b-bc52-fb6c2ff0b9c7",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "content",
+              "cssSelector": "body",
+              "skipSelectors": "img,a,script,style"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        512,
+        -96
+      ],
+      "id": "6a51fea4-6b1c-414d-92b8-7fcb7dc356bd",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_PREVIEW }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.content }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "systemMessage": "=You are an expert AI assistant with a specialization in linguistic and stylistic analysis. Your primary function is to deconstruct any given text to identify its unique writing style and then create a detailed set of instructions for replicating that style.\n\n**Instructions:**\n\n1.  You will be provided with an input `text`, which may contain HTML formatting. You must analyze the core content of this text.\n2.  Based on your analysis, you will synthesize a completely new description of the writing style.\n3.  Your goal is to accurately capture the nuances of the text's tone, perspective, vocabulary, structure, and intent.\n4.  Your output must be a single, valid JSON object containing two keys: `style` and `prompt`. Do not output any other text, explanations, or introductory phrases.\n\n**Guidelines for Generating the JSON Object:**\n\n*   **`style` (string):**\n    *   Create a concise, descriptive, and unique name for the writing style you have identified.\n    *   The name should be in Title Case and effectively summarize the text's primary characteristics.\n    *   *Examples of generated styles might be: \"Empathetic and Action-Oriented Self-Help,\" \"Data-Driven Technical Breakdown,\" or \"Whimsical and Imaginative Storytelling.\"*\n\n*   **`prompt` (string):**\n    *   Write a comprehensive and detailed prompt that would instruct another generative AI on how to perfectly replicate the identified writing style.\n    *   This prompt must be generated based on your analysis of the input text.\n    *   Specifically describe the following elements you observed in the text:\n        *   **Tone and Mood:** Is it formal, informal, uplifting, serious, humorous, objective, passionate?\n        *   **Perspective/Point of View:** Does it use first-person (\"I,\" \"we\"), second-person (\"you\"), or third-person (\"he,\" \"she,\" \"they\")?\n        *   **Vocabulary and Diction:** Describe the word choice. Is it simple, sophisticated, technical, colloquial, or emotive?\n        *   **Sentence Structure:** Are the sentences long and complex, short and direct, or varied for rhythmic effect?\n        *   **Rhetorical Devices:** Does it use techniques like storytelling, anecdotes, rhetorical questions, metaphors, data citation, or calls to action?\n        *   **Overall Goal:** What is the main purpose of the text? (e.g., to inspire, to instruct, to inform, to persuade, to entertain).\n\n**Example of Use:**\n\n**User Input (`text`):**\n```html\n<h3>Classic Chocolate Chip Cookies</h3>\n<p>Ready to bake the best cookies of your life? I thought so! First, you'll want to preheat your oven to 375°F (190°C). While it's heating up, grab a large bowl and cream together your butter and sugars until they're light and fluffy. Don't rush this step—it's the secret to a great texture!</p>\n<p>Next, beat in the eggs one at a time, followed by the vanilla. In a separate bowl, whisk together the flour, baking soda, and salt. Gradually add this to the wet ingredients. Finally, gently stir in the chocolate chips. You've got this! Drop rounded tablespoons of dough onto ungreased baking sheets and bake for about 10-12 minutes. Enjoy the amazing smell filling your kitchen!</p>\n```\n\n**Expected AI Output:**\n```json\n{\n  \"style\": \"Encouraging and Instructive Recipe Guide\",\n  \"prompt\": \"Write in a friendly, encouraging, and instructive style, as if guiding a friend through a recipe. The tone should be consistently positive and motivational. Use the second person ('you', 'your') to directly engage the reader and the first person ('I') to build a personal, confident connection. Employ clear, step-by-step instructions using simple, direct command verbs (e.g., 'preheat', 'grab', 'beat'). Sentences should be straightforward and easy to follow. Include personal tips and encouraging asides (e.g., 'Don't rush this step', 'You've got this!') to build the reader's confidence. The primary goal is to provide clear instructions while making the process feel fun, accessible, and foolproof.\"\n}\n```"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        736,
+        -96
+      ],
+      "id": "e4dacde6-ba05-4189-a8a1-fe594e23dab3",
+      "name": "Message a model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return JSON.parse($input.first().json.content.parts[0].text);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1088,
+        0
+      ],
+      "id": "d70d2cb6-13f5-47d6-bf6a-3ad3b30bf097",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "CfFTrHyw35Q6kVn5",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/CfFTrHyw35Q6kVn5",
+          "cachedResultName": "SynergizeFlow.v2 — Get App Token"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -336,
+        0
+      ],
+      "id": "aac67bf1-eec9-4eb1-9f8f-87d865ae85a1",
+      "name": "Get token"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "ok"
+            },
+            {
+              "name": "writing_style_id",
+              "value": "={{ $('Prepare Data').item.json.writing_style_id }}"
+            },
+            {
+              "name": "data",
+              "value": "={{ $json }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1328,
+        0
+      ],
+      "id": "ce139cf5-5072-4812-a9d6-124750adc0b3",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4e164947-d012-4a86-ac54-37005f587b5f",
+              "name": "content",
+              "value": "={{ $('Webhook').item.json.body.content }}",
+              "type": "string"
+            },
+            {
+              "id": "4da26f9f-e1ee-4749-80f7-b6c8b83721dd",
+              "name": "type",
+              "value": "={{ $('Webhook').item.json.body.type }}",
+              "type": "string"
+            },
+            {
+              "id": "47b9dabe-35ae-4b80-8fdb-de13bbb313fb",
+              "name": "token",
+              "value": "={{ $json.token }}",
+              "type": "string"
+            },
+            {
+              "id": "025ad4f1-c8c1-409a-b2ad-18ee07d0b365",
+              "name": "webhook",
+              "value": "={{ $('Webhook').item.json.body.webhook }}",
+              "type": "string"
+            },
+            {
+              "id": "30cd3674-4e8e-4248-a625-e699bc89d163",
+              "name": "writing_style_id",
+              "value": "={{ $('Webhook').item.json.body.writing_style_id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -128,
+        0
+      ],
+      "id": "fc56a8e5-1509-43bd-acb9-ced7b9b0cd51",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "domain",
+              "value": "={{ $('Webhook').item.json.body.domain }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        -336,
+        192
+      ],
+      "id": "913a5357-e16c-4feb-b176-c4c9de87b014",
+      "name": "Execution Data"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get token",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get token": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "onQDQSO8gYYXVpPQ",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "triggerCount": 1,
+  "versionId": "4a853326-bb82-4b5f-ba29-3b261fe22579",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "ALSbETz1ex4rFhVj",
+  "isArchived": false
+}

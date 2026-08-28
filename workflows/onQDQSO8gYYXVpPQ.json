@@ -1,0 +1,341 @@
+{
+  "id": "onQDQSO8gYYXVpPQ",
+  "name": "SF - Error Monitoring v2",
+  "nodes": [
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0A81N03JKS",
+          "mode": "list",
+          "cachedResultName": "sf-error-monitoring"
+        },
+        "text": "=*Environtment:* n8n Development\n*Workflow:* {{ $json.workflow }}\n*Execution:* {{ $json.execution_url }}\n*Node:* {{ $json.node }}\n*Time:* {{ $json.timestamp }}\n*Message:* {{ $json.error_message }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false,
+          "mrkdwn": true
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        -1312,
+        256
+      ],
+      "id": "0ef62173-8ad7-4976-848b-5e345d778d8c",
+      "name": "Send a message",
+      "webhookId": "88b03bcb-f4b4-40e2-86dc-382fbe8c85d3",
+      "credentials": {
+        "slackApi": {
+          "id": "OLSn2aic7DIB7E1z",
+          "name": "SF - Slack Bot"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1312,
+        32
+      ],
+      "id": "d4effe27-c137-49bf-9344-5fb4c46c8c96",
+      "name": "Error Trigger",
+      "notesInFlow": false,
+      "alwaysOutputData": true,
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "616f4e60-54aa-4077-a339-8a776e6ba59c",
+              "name": "workflow",
+              "value": "={{ $('Error Trigger').item.json.workflow.name }}",
+              "type": "string"
+            },
+            {
+              "id": "07418314-6460-4bd2-af6a-4280e09b72b2",
+              "name": "execution_url",
+              "value": "={{ $('Error Trigger').item.json.execution.url }}",
+              "type": "string"
+            },
+            {
+              "id": "a7fcafa3-7537-49f2-9510-219f4bd01756",
+              "name": "error_message",
+              "value": "={{ $('Error Trigger').item.json.execution.error.message }}",
+              "type": "string"
+            },
+            {
+              "id": "07f4efe3-56ff-4f64-a474-2060616f6733",
+              "name": "node",
+              "value": "={{ $('Error Trigger').item.json.execution.lastNodeExecuted }}",
+              "type": "string"
+            },
+            {
+              "id": "2122584f-c32e-4bef-aa0a-25c0b225171e",
+              "name": "timestamp",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "61e585c6-0ba4-4c03-b561-ed5f58e63e09",
+              "name": "execution_id",
+              "value": "={{ $('Error Trigger').item.json.execution.id }}",
+              "type": "string"
+            },
+            {
+              "id": "aac1f635-1954-403a-b14d-24be4f2f48ba",
+              "name": "token",
+              "value": "={{ $json.token }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -864,
+        32
+      ],
+      "id": "cecab3c0-903c-4d68-b2ba-4f5501eb2b40",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SAAS_API }}api/webhook/failed",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Edit Fields').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $json.data?.resultData?.runData?.Webhook?.[0]?.data?.main?.[0]?.[0]?.json?.body?.agent_id ?? null }}"
+            },
+            {
+              "name": "image_vault_id",
+              "value": "={{ $json.data?.resultData?.runData?.Webhook?.[0]?.data?.main?.[0]?.[0]?.json?.body?.image_vault_id ?? null }}"
+            },
+            {
+              "name": "writing_style_id",
+              "value": "={{ $json.data?.resultData?.runData?.Webhook?.[0]?.data?.main?.[0]?.[0]?.json?.body?.writing_style_id ?? null }}"
+            },
+            {
+              "name": "branding_style_id",
+              "value": "={{ $json.data?.resultData?.runData?.Webhook?.[0]?.data?.main?.[0]?.[0]?.json?.body?.branding_style_id ?? null }}"
+            },
+            {
+              "name": "meta_type",
+              "value": "={{ $json.data.executionData.nodeExecutionStack[1]?.node?.parameters?.dataToSave?.values[2]?.value ?? null }}"
+            },
+            {
+              "name": "meta_media_id",
+              "value": "={{ $json.data.resultData.runData.Webhook[0].data.main[0][0].json?.body?.image?.id ?? null }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -192,
+        32
+      ],
+      "id": "d97f4c71-9679-4d4b-8eb7-b26c47f776b6",
+      "name": "webhook",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "={{ $vars.N8N_URL }}/api/v1/executions/{{ $json.execution_id }}?includeData=true&redactExecutionData=false",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "CF-Access-Client-Id",
+              "value": "df7b356ab8469e73180a34f316943468.access"
+            },
+            {
+              "name": "CF-Access-Client-Secret",
+              "value": "ce5fe761d797f0712211aee26d2ae52cc51d9d629bf8a3f13e9c7c47c166783c"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -416,
+        32
+      ],
+      "id": "c2b8e65b-ea9a-4dcc-8023-99b7502d72fd",
+      "name": "get_execution_data",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "2hCmYkPk4c38hqCz",
+          "name": "n8n API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "CfFTrHyw35Q6kVn5",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/CfFTrHyw35Q6kVn5",
+          "cachedResultName": "SynergizeFlow.v2 — Get App Token"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -1088,
+        32
+      ],
+      "id": "bc95da1f-9766-47bc-9cd1-b3d1b102a9a3",
+      "name": "Get token"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6f78a75f-f101-4d88-b66f-b1e2bf817383",
+              "leftValue": "={{ $json.execution_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -688,
+        32
+      ],
+      "id": "6c9d58da-b807-4c91-895f-af7fc20c62d8",
+      "name": "If"
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_execution_data": {
+      "main": [
+        [
+          {
+            "node": "webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get token": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "get_execution_data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true
+  },
+  "triggerCount": 0,
+  "versionId": "2ec0cdaf-5c0b-4318-92f1-9d6bafce2317",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "RH3pD7tYrBWa3pTv",
+  "isArchived": false
+}

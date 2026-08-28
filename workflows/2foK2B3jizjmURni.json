@@ -1,0 +1,835 @@
+{
+  "id": "2foK2B3jizjmURni",
+  "name": "SF - Blog FAQ",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3d1ab9b0-7d1e-44f3-82c6-3b9e3f88d229",
+              "name": "license",
+              "value": "={{ $('Webhook').item.json.body.license }}",
+              "type": "string"
+            },
+            {
+              "id": "e0787359-9291-4921-ab77-7d19dd04f4a6",
+              "name": "domain",
+              "value": "={{ $('Webhook').item.json.body.domain }}",
+              "type": "string"
+            },
+            {
+              "id": "cc44044c-7290-40e2-a779-969fd6c24ca1",
+              "name": "blog",
+              "value": "={{ $('Webhook').item.json.body.content }}",
+              "type": "array"
+            },
+            {
+              "id": "d934a4a0-cb9b-4e4d-a12d-a49952ae5cba",
+              "name": "webhook",
+              "value": "={{ $('Webhook').item.json.body.webhook }}",
+              "type": "string"
+            },
+            {
+              "id": "c29472ce-ccff-4077-8e8c-0dbc456bf8c9",
+              "name": "agent_id",
+              "value": "={{ $('Webhook').item.json.body.agent_id }}",
+              "type": "number"
+            },
+            {
+              "id": "5bcdb0d1-7d00-4dbf-aa8a-1a8848aa89d7",
+              "name": "faq_count",
+              "value": "={{ $('Webhook').item.json.body.faq_count }}",
+              "type": "number"
+            },
+            {
+              "id": "c8a40644-c59a-4923-93c9-34fe79bbe14c",
+              "name": "token",
+              "value": "={{ $json.token }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1120,
+        240
+      ],
+      "id": "1d9cca37-1b73-47e2-a515-d29f2d3da172",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v2/blog/faq-agent",
+        "options": {
+          "responseData": "workflow_started"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1632,
+        240
+      ],
+      "id": "fc53c665-576c-4e89-ac0e-ea1d882b6b15",
+      "name": "Webhook",
+      "webhookId": "e6cdc092-8bf7-4d04-8789-8162bddacbd0"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.domain }}wp-json/synergizeflow/v2/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license",
+              "value": "={{ $json.license }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -896,
+        240
+      ],
+      "id": "98772c41-b9a4-4be6-89ae-fe75548955dd",
+      "name": "Check if license is valid",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "60458c94-986c-49cd-8b69-4b5616163eb3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f910b52-842c-4b6a-a862-e6914c883764",
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -672,
+        240
+      ],
+      "id": "30bc0e7c-de5b-4050-87dd-60b3302c5565",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "fail"
+            },
+            {
+              "name": "msg",
+              "value": "invalid_license"
+            },
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -448,
+        448
+      ],
+      "id": "a0c26133-4daf-440c-933f-09108fa4c020",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $('Prepare Data').first().json.blog"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -448,
+        144
+      ],
+      "id": "710968bb-8087-45ef-8460-d0b619b8e1b4",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -224,
+        144
+      ],
+      "id": "8cb95458-d354-4ae3-aedb-defa1ae949ff",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.domain }}wp-json/synergizeflow/v2/get-single-post/",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license",
+              "value": "={{ $('Prepare Data').item.json.license }}"
+            },
+            {
+              "name": "id",
+              "value": "={{ $json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        224,
+        80
+      ],
+      "id": "7c8e7c4f-2d85-4920-8ed4-9d10cd6856dd",
+      "name": "Get blog content detail"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_LATEST}}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=1. faq_count: {{ $('Prepare Data').item.json.faq_count }}\n2. source_text: {{ $json.content }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "systemMessage": "=You are an expert Content Analyst and SEO Specialist.\n\nYour sole purpose is to analyze supplied content and generate a structured FAQ together with its corresponding JSON-LD schema.\n\nEverything you generate must be derived strictly from the provided source text.\n\nDo not invent, infer, or add information that is not supported by the source.\n\n---\n\n# INPUTS\n\nYou will receive:\n\n1. `source_text`\n   The content to analyze.\n\n2. `faq_count`\n   An integer specifying the exact number of FAQ items to generate.\n\n---\n\n# PROCESS\n\n## 1. ANALYZE\n\nRead the entire `source_text` carefully.\n\nIdentify:\n\n* Main topics\n* Important concepts\n* User intent\n* Frequently asked questions naturally answered by the content\n\nAll generated questions and answers MUST remain faithful to the source.\n\n---\n\n## 2. GENERATE QUESTIONS\n\nCreate clear, concise, and helpful questions that readers are likely to ask after reading the article.\n\nRequirements:\n\n* Questions must be unique.\n* Questions must be directly supported by the source.\n* Questions should cover different aspects of the content.\n* Questions should sound natural.\n* Do not create duplicate or nearly identical questions.\n\n---\n\n## 3. GENERATE ANSWERS\n\nGenerate concise answers.\n\nRequirements:\n\n* Answers must come strictly from the source text.\n* Do NOT invent information.\n* Do NOT use external knowledge.\n* Do NOT speculate.\n* Do NOT exaggerate.\n* Keep answers clear and helpful.\n* Preserve the meaning of the source.\n\n---\n\n## 4. FAQ COUNT\n\nGenerate exactly the number of FAQ items specified by:\n\n`faq_count`\n\nIf the source text genuinely cannot support that many unique questions, generate the maximum possible number of unique FAQs without repeating topics or fabricating information.\n\n---\n\n## 5. GENERATE JSON-LD SCHEMA\n\nGenerate a valid Schema.org FAQPage object.\n\nRequirements:\n\n* Use every generated FAQ.\n* The schema must be valid JSON-LD.\n* Every question and answer in the schema must exactly match those in the display FAQ.\n\n---\n\n# JSON STRUCTURE\n\nReturn exactly this structure:\n\n```json\n{\n  \"faq_display\": [\n    {\n      \"question\": \"\",\n      \"answer\": \"\"\n    }\n  ],\n  \"faq_schema\": {\n    \"@context\": \"https://schema.org\",\n    \"@type\": \"FAQPage\",\n    \"mainEntity\": [\n      {\n        \"@type\": \"Question\",\n        \"name\": \"\",\n        \"acceptedAnswer\": {\n          \"@type\": \"Answer\",\n          \"text\": \"\"\n        }\n      }\n    ]\n  }\n}\n```\n\nNotes:\n\n* `faq_display` and `faq_schema.mainEntity` must contain the same questions and answers.\n* `@context` MUST be `\"https://schema.org\"` exactly.\n* The output must be valid JSON.\n\n---\n\n# OUTPUT CONTRACT (CRITICAL)\n\nYour response MUST consist ONLY of the final JSON object.\n\nDO NOT output:\n\n* Any introduction\n* Any explanation\n* Any reasoning\n* Any confirmation\n* Any notes\n* Any apologies\n* Any Markdown\n* Any headings\n* Any bullet lists\n* Any code fences\n* Any text before the JSON\n* Any text after the JSON\n\nForbidden examples include:\n\n* \"Certainly!\"\n* \"Here is the FAQ.\"\n* \"Below is the JSON.\"\n* \"I've generated the FAQs.\"\n* \"Based on the provided content...\"\n\nThe FIRST character of your response MUST be:\n\n```\n{\n```\n\nThe LAST character of your response MUST be:\n\n```\n}\n```\n\nThe output MUST be valid JSON that can be parsed directly using `JSON.parse()` without any preprocessing.\n\nDo NOT include escaped newline characters (`\\n`) inside JSON string values unless they are genuinely required as part of the answer text.\n\nIf the requested number of FAQs cannot be generated because the source lacks sufficient information, still return a valid JSON object using the maximum number of unique, source-supported FAQ items. Never explain the limitation outside the JSON.\n\n---\n\n# EXECUTION COMMAND\n\nAnalyze the supplied content.\n\nGenerate the FAQ items.\n\nGenerate the matching FAQPage JSON-LD schema.\n\nReturn ONLY the following JSON object.\n\n```json\n{\n  \"faq_display\": [\n    {\n      \"question\": \"Question\",\n      \"answer\": \"Answer\"\n    }\n  ],\n  \"faq_schema\": {\n    \"@context\": \"https://schema.org\",\n    \"@type\": \"FAQPage\",\n    \"mainEntity\": [\n      {\n        \"@type\": \"Question\",\n        \"name\": \"Question\",\n        \"acceptedAnswer\": {\n          \"@type\": \"Answer\",\n          \"text\": \"Answer\"\n        }\n      }\n    ]\n  }\n}\n```\n\nThe response must begin with `{` and end with `}`."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        432,
+        80
+      ],
+      "id": "8e0f86a1-d60b-4da3-9c17-49ff4e40a472",
+      "name": "Message a model",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "function getValidJsonObject(rawText) {\n\n    if (typeof rawText !== 'string' || rawText.trim() === '') {\n        console.error(\"Invalid input or empty text field.\");\n        return {};\n    }\n\n    let jsonString = rawText.trim();\n\n    // 2. Check for and remove the markdown JSON block fences.\n    // This regex is robust and handles variations in whitespace.\n    const markdownRegex = /^```json\\s*([\\s\\S]*?)\\s*```$/;\n    const match = jsonString.match(markdownRegex);\n\n    if (match) {\n        // If it's a match, the actual JSON string is in the first capture group.\n        jsonString = match[1];\n    }\n\n    // 3. Parse the cleaned string into a JSON object.\n    try {\n        return JSON.parse(jsonString);\n    } catch (error) {\n        console.error(\"Failed to parse JSON string:\", error);\n        console.error(\"Problematic string:\", jsonString);\n        return {};\n    }\n}\n\n// Combine the 'text' from all parts into a single string.\nconst combinedText = $input.first().json.content.parts.map(part => part.text).join('');\n\nreturn {data: getValidJsonObject(combinedText)};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        784,
+        80
+      ],
+      "id": "3a6b357c-f95a-4212-8277-01db6271b770",
+      "name": "Code2",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.domain }}wp-json/synergizeflow/v2/submit-blog-faq/",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license",
+              "value": "={{ $('Prepare Data').item.json.license }}"
+            },
+            {
+              "name": "faq",
+              "value": "={{ $json.data.faq_display }}"
+            },
+            {
+              "name": "schema",
+              "value": "={{ $json.data.faq_schema }}"
+            },
+            {
+              "name": "blog_id",
+              "value": "={{ $('Edit Fields').item.json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1264,
+        -96
+      ],
+      "id": "ea9edb78-39f5-45b5-9a5d-050789c7dfe0",
+      "name": "Send content"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a61c4617-241a-4908-a8e9-355fe0a34cb8",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "number"
+            },
+            {
+              "id": "090307d0-1f8b-463d-b923-806b94f480b4",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        80
+      ],
+      "id": "e5e5f1cb-20ba-4319-a721-4ab8f6c4a27e",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  status: $input.first().json.status,\n  id: $('Edit Fields').first().json.id,\n  title: $('Edit Fields').first().json.title,\n  faq: $('Code2').first().json.data.faq_display\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        128
+      ],
+      "id": "878bde4b-797c-4ceb-a0bb-21b8a9e2f59d",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        16,
+        -160
+      ],
+      "id": "cf6e5d0b-2556-4b3c-b6e9-7c9e47856200",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "domain",
+              "value": "={{ $('Webhook').item.json.body.domain }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        -1344,
+        464
+      ],
+      "id": "94393237-4912-44d1-b6cd-6804b58b8114",
+      "name": "Execution Data"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    },
+                    "id": "81bb8987-50dd-4a1c-918f-d5b03f5862ff"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "ab55fd68-1707-4d1b-b9e0-c9cfd987fc21",
+                    "leftValue": "={{ $json.data }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "empty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "back"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        992,
+        -80
+      ],
+      "id": "971da67b-0dd7-4765-ab16-0c3d85bd0649",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1d616c0e-b93d-4119-b144-986fc366fa80",
+              "name": "id",
+              "value": "={{ $('Edit Fields').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "1deab333-9d34-413d-99c8-1a077b502860",
+              "name": "title",
+              "value": "={{ $('Edit Fields').item.json.title }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1312,
+        464
+      ],
+      "id": "025b4765-8b7f-46e8-bae2-458dec80bed0",
+      "name": "retry"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "blog_id",
+              "value": "={{ $('Edit Fields').item.json.id }}"
+            },
+            {
+              "name": "blog_title",
+              "value": "={{ $('Edit Fields').item.json.title }}"
+            },
+            {
+              "name": "faq_display",
+              "value": "={{ $('Code2').item.json.data.faq_display }}"
+            },
+            {
+              "name": "status",
+              "value": "ok"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1632,
+        -96
+      ],
+      "id": "98f5cd5d-e976-4fca-a1c4-11d6598fcede",
+      "name": "HTTP Request2",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "CfFTrHyw35Q6kVn5",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/CfFTrHyw35Q6kVn5",
+          "cachedResultName": "SynergizeFlow.v2 — Get App Token"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -1360,
+        240
+      ],
+      "id": "50ad8dc1-3bb6-4687-9717-439b7e3adb98",
+      "name": "Get token"
+    }
+  ],
+  "connections": {
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if license is valid": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get blog content detail": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "retry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send content": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Get blog content detail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        []
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Send content",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "retry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "retry": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get token": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "triggerCount": 1,
+  "versionId": "88ce118d-66b4-4b58-9501-4e7e09f21ae5",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "icCJSa6WgYRUBtVb",
+  "isArchived": false
+}

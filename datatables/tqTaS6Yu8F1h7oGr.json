@@ -1,0 +1,61 @@
+{
+  "id": "tqTaS6Yu8F1h7oGr",
+  "name": "Chat Agent Data",
+  "columns": [
+    {
+      "id": "Fq0ifoZXTzODXLok",
+      "name": "agent_id",
+      "type": "number",
+      "index": 0
+    },
+    {
+      "id": "gAu0XLB5ekEDF0Ia",
+      "name": "domain",
+      "type": "string",
+      "index": 1
+    },
+    {
+      "id": "HBTgHks3ZtonXHOM",
+      "name": "name",
+      "type": "string",
+      "index": 2
+    },
+    {
+      "id": "Ue5oF30h1ycFopSA",
+      "name": "language",
+      "type": "string",
+      "index": 3
+    },
+    {
+      "id": "wkcww6c6LbDoTTy7",
+      "name": "persona",
+      "type": "string",
+      "index": 4
+    },
+    {
+      "id": "Se548NQ5nRFcDOcQ",
+      "name": "instruction",
+      "type": "string",
+      "index": 5
+    },
+    {
+      "id": "ByZj4JlhZnc3qSXe",
+      "name": "knowledge_base",
+      "type": "string",
+      "index": 6
+    },
+    {
+      "id": "iQPBpy6Z4RnBmhkz",
+      "name": "cta",
+      "type": "string",
+      "index": 7
+    }
+  ],
+  "ownedBy": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "createdAt": "2026-08-07T10:35:22.333Z",
+  "updatedAt": "2026-08-21T12:17:09.614Z"
+}

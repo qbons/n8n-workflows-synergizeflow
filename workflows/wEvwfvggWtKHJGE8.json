@@ -1,0 +1,457 @@
+{
+  "id": "wEvwfvggWtKHJGE8",
+  "name": "Create App Token",
+  "nodes": [
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "PfoOYF25LG0W8kEN",
+          "mode": "list",
+          "cachedResultName": "Generic",
+          "cachedResultUrl": "/projects/0Cpv1rjP8dogQgcy/datatables/PfoOYF25LG0W8kEN"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "value": "={{ $json.token }}",
+            "type": "={{ $json.type }}",
+            "meta": "={{ $json.meta.toJsonString() }}"
+          },
+          "matchingColumns": [
+            "token"
+          ],
+          "schema": [
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "value",
+              "displayName": "value",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "meta",
+              "displayName": "meta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1552,
+        -48
+      ],
+      "id": "b56daf3c-e865-42f5-bba5-ce9fda791933",
+      "name": "Insert row"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "PfoOYF25LG0W8kEN",
+          "mode": "list",
+          "cachedResultName": "Generic",
+          "cachedResultUrl": "/projects/0Cpv1rjP8dogQgcy/datatables/PfoOYF25LG0W8kEN"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "type",
+              "keyValue": "app_token"
+            }
+          ]
+        },
+        "limit": 1
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        -48
+      ],
+      "id": "57061823-2708-44c1-8e62-ba52620c159d",
+      "name": "Get row(s)",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    },
+                    "id": "f40c0c03-5c41-4ec5-ad78-8138a48604fc"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "has_token"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "29caa8b9-00b5-451b-95a1-f4dcf75450be",
+                    "leftValue": "={{ $json }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "empty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "no_token"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        432,
+        -48
+      ],
+      "id": "89bf9d0f-9ef7-4538-bd4e-6c1d63d9813a",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "deleteRows",
+        "dataTableId": {
+          "__rl": true,
+          "value": "PfoOYF25LG0W8kEN",
+          "mode": "list",
+          "cachedResultName": "Generic",
+          "cachedResultUrl": "/projects/0Cpv1rjP8dogQgcy/datatables/PfoOYF25LG0W8kEN"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "type",
+              "keyValue": "app_token"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        656,
+        -128
+      ],
+      "id": "87ac9d56-92c8-4047-9558-9e6844177b01",
+      "name": "Delete row(s)"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "735e526e-8671-456c-beca-d852e255436c",
+              "name": "token",
+              "value": "={{ $json.value }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1776,
+        -48
+      ],
+      "id": "342d66d3-a9eb-44dd-a9e7-bba9e6f17db4",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -16,
+        -144
+      ],
+      "id": "8d91039f-6ffb-443b-969f-bbb5d632d35b",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 12
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -16,
+        48
+      ],
+      "id": "30485992-18d1-417e-9471-9f012a5b4ce4",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://staging.synergizeflow.com/oauth/token",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "grant_type",
+              "value": "client_credentials"
+            },
+            {
+              "name": "client_id",
+              "value": "019fb2f4-cf05-7221-a6d7-26a2b93f6aeb"
+            },
+            {
+              "name": "client_secret",
+              "value": "KFLz0wxopwtytaqoNy3Jnu1Ha3rYOSQIdJ4rWOAE"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        880,
+        -48
+      ],
+      "id": "3adee962-ba56-4389-9c13-7f6c31380a65",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a90ce765-6b3a-4c0c-a7be-8ad5497d96bb",
+              "name": "token",
+              "value": "={{ $json.token }}",
+              "type": "string"
+            },
+            {
+              "id": "13ce6e26-4e2d-49af-9ec2-e98a9f081eec",
+              "name": "type",
+              "value": "app_token",
+              "type": "string"
+            },
+            {
+              "id": "2c1fb6f4-314e-48de-8ad7-45ba2351284c",
+              "name": "meta",
+              "value": "={expired: \"{{ $json.expired }}\"}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1328,
+        -48
+      ],
+      "id": "e5b4b9aa-926d-4a1b-b8e9-54bf18700e09",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "const now = new Date();\nconst future = new Date(now.getTime() + parseInt($input.first().json.expires_in) * 1000);\n\nreturn [\n  {\n    json: {\n      token: $input.first().json.access_token,\n      expired: future.toISOString(),\n    },\n  },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1104,
+        -48
+      ],
+      "id": "80614498-52cd-4505-bcee-f039f2a19bfc",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "connections": {
+    "Get row(s)": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Delete row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete row(s)": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert row": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "triggerCount": 1,
+  "versionId": "7c2c30e4-a515-4008-8adc-e134d5ccf4f2",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "1HETaocQSaH5ta4A",
+  "isArchived": false
+}
