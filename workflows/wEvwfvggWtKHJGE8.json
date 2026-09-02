@@ -252,7 +252,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://staging.synergizeflow.com/oauth/token",
+        "url": "={{ $vars.SAAS_API }}oauth/token",
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
@@ -446,7 +446,7 @@
     "availableInMCP": false
   },
   "triggerCount": 1,
-  "versionId": "7c2c30e4-a515-4008-8adc-e134d5ccf4f2",
+  "versionId": "166f585a-90cd-4bf1-8da4-88b2a030276b",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",
