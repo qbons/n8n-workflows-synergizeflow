@@ -905,7 +905,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://dev-wizards.synergizeflow.com/webhook/v2/media-agent/kie-pooling",
+        "url": "={{$vars.N8N_URL}}/webhook/v2/media-agent/kie-pooling",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -1242,7 +1242,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://dev-wizards.synergizeflow.com/webhook/v2/media-agent/kie-pooling",
+        "url": "={{$vars.N8N_URL}}/webhook/v2/media-agent/kie-pooling",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -1542,51 +1542,6 @@
       "name": "HTTP Request5",
       "alwaysOutputData": false,
       "onError": "continueRegularOutput"
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "https://dev-wizards.synergizeflow.com/webhook/v2/media-agent/dummy-webook",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            },
-            {
-              "name": "CF-Access-Client-Id",
-              "value": "={{ $vars.CF_ID }}"
-            },
-            {
-              "name": "CF-Access-Client-Secret",
-              "value": "={{ $vars.CF_SECRET }}"
-            }
-          ]
-        },
-        "sendBody": true,
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "agent_id",
-              "value": "={{ $('Prepare Data').item.json.agent_id }}"
-            },
-            {
-              "name": "data",
-              "value": "={{ $('Code in JavaScript1').item.json.result }}"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.4,
-      "position": [
-        4096,
-        336
-      ],
-      "id": "26eda972-0058-434f-828d-e11bc47199b5",
-      "name": "HTTP Request6"
     },
     {
       "parameters": {
@@ -2252,13 +2207,7 @@
     },
     "HTTP Request5": {
       "main": [
-        [
-          {
-            "node": "HTTP Request6",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "Analyze audio": {
@@ -2284,7 +2233,7 @@
     "availableInMCP": false
   },
   "triggerCount": 1,
-  "versionId": "17c8175d-723f-46ec-bc88-4416f8d3bb5d",
+  "versionId": "a1658817-254f-4944-8657-f07a7ff55d7c",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",
