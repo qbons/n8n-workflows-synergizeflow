@@ -964,51 +964,6 @@
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "https://dev-wizards.synergizeflow.com/webhook/v2/media-agent/dummy-webook",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            },
-            {
-              "name": "CF-Access-Client-Id",
-              "value": "={{ $vars.CF_ID }}"
-            },
-            {
-              "name": "CF-Access-Client-Secret",
-              "value": "={{ $vars.CF_SECRET }}"
-            }
-          ]
-        },
-        "sendBody": true,
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "agent_id",
-              "value": "={{ $('Prepare Data').item.json.agent_id }}"
-            },
-            {
-              "name": "data",
-              "value": "={{ $('Code in JavaScript7').item.json.result }}"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.4,
-      "position": [
-        4992,
-        -160
-      ],
-      "id": "d21a6e24-6d8c-4ca9-a855-f8282f7e9d20",
-      "name": "HTTP Request6"
-    },
-    {
-      "parameters": {
         "assignments": {
           "assignments": [
             {
@@ -1578,13 +1533,7 @@
     },
     "HTTP Request5": {
       "main": [
-        [
-          {
-            "node": "HTTP Request6",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "Prepare Caption Data": {
@@ -1626,7 +1575,7 @@
     "binaryMode": "separate"
   },
   "triggerCount": 1,
-  "versionId": "06b912b5-4f6e-4aa2-8e65-23cd112fa315",
+  "versionId": "9fcdd017-bbe6-461d-bc68-7cfdd58eca11",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",
