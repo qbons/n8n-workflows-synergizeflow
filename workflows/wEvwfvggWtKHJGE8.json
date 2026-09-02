@@ -262,11 +262,11 @@
             },
             {
               "name": "client_id",
-              "value": "019fb2f4-cf05-7221-a6d7-26a2b93f6aeb"
+              "value": "={{ $vars.app_client_id }}"
             },
             {
               "name": "client_secret",
-              "value": "KFLz0wxopwtytaqoNy3Jnu1Ha3rYOSQIdJ4rWOAE"
+              "value": "={{ $vars.app_client_secret }}"
             }
           ]
         },
@@ -446,7 +446,7 @@
     "availableInMCP": false
   },
   "triggerCount": 1,
-  "versionId": "166f585a-90cd-4bf1-8da4-88b2a030276b",
+  "versionId": "9146a0c1-74cd-487c-a664-d8062a76d235",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",
