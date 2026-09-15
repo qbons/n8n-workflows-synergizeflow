@@ -56,6 +56,12 @@
       "value": ""
     },
     {
+      "id": "Lmyy0BEYeNSRQBiQ",
+      "key": "GEMINI_FLASH_LATEST",
+      "type": "string",
+      "value": ""
+    },
+    {
       "id": "3uEH4O6Txfl5miKF",
       "key": "GEMINI_FLASH_PREVIEW",
       "type": "string",

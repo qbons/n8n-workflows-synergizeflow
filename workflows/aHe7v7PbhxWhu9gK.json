@@ -1,6 +1,6 @@
 {
   "id": "aHe7v7PbhxWhu9gK",
-  "name": "SF - Blog Agent",
+  "name": "SF - Blog Agent OLD",
   "nodes": [
     {
       "parameters": {
@@ -210,7 +210,7 @@
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "v2/blog/blog-agent",
+        "path": "v2/blog/blog-agent-old",
         "options": {
           "responseData": "workflow_started"
         }
@@ -2643,7 +2643,7 @@
     "availableInMCP": false
   },
   "triggerCount": 1,
-  "versionId": "9774c149-7b29-42db-ad23-8379c6be1079",
+  "versionId": "5924481a-050d-4f64-a322-804705b89e2d",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",

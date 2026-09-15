@@ -207,6 +207,14 @@
       "homeProjectId": "0Cpv1rjP8dogQgcy",
       "createdAt": "2026-08-24T11:56:17.612Z",
       "updatedAt": "2026-08-24T11:56:17.612Z"
+    },
+    {
+      "id": "COlUXFB7ZeDqdhmU",
+      "name": "Event Agent",
+      "parentFolderId": null,
+      "homeProjectId": "0Cpv1rjP8dogQgcy",
+      "createdAt": "2026-09-04T07:31:12.644Z",
+      "updatedAt": "2026-09-04T07:31:12.644Z"
     }
   ]
 }

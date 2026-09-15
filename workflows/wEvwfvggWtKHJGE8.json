@@ -234,8 +234,7 @@
         "rule": {
           "interval": [
             {
-              "field": "hours",
-              "hoursInterval": 12
+              "field": "hours"
             }
           ]
         }
@@ -446,7 +445,7 @@
     "availableInMCP": false
   },
   "triggerCount": 1,
-  "versionId": "9146a0c1-74cd-487c-a664-d8062a76d235",
+  "versionId": "a8f96c49-d467-4bf2-9e82-ff899aeb9605",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",
