@@ -1,0 +1,118 @@
+{
+  "id": "FkRbM0HYENmGaK1B",
+  "name": "Image tester",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1648,
+        352
+      ],
+      "id": "f0e08cd8-25bd-43ae-b5e0-71bc45c7d84f",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.config.toJsonString() }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1072,
+        352
+      ],
+      "id": "dcd98706-81b9-4d36-8b08-1a86a9c5b20c",
+      "name": "Generate video1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "SFhjYsXsyVcRhxXr",
+          "name": "SF - KIE AI"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n    \"url\": \"https://api.kie.ai/api/v1/jobs/createTask\",\n    \"config\": {\n      \"model\": \"gpt-image/1.5-image-to-image\",\n   \"input\": {\n      \"input_urls\": [\n         \"https://tempfile.aiquickdraw.com/images/chatgpt/file_0000000096e482309f196a06035c9d8c.png\",\n         \"https://synergizeflow.com/wp-content/uploads/2025/09/new-logo.png\"\n      ],\n      \"prompt\": \"Change Redbull logo with synergizeflow logo, also change the coloring to similar with synergizeflow logo\",\n      \"aspect_ratio\": \"1:1\",\n      \"quality\": \"medium\"\n   }\n    } \n  }"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1440,
+        592
+      ],
+      "id": "12405733-6f93-4eae-b8e8-e85df2e751da",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n    \"url\": \"https://api.kie.ai/api/v1/jobs/createTask\",\n    \"config\": {\n      \"model\": \"gpt-image/1.5-text-to-image\",\n   \"input\": {\n      \"prompt\": \"create an image with Max Verstappen inside it. This will be an event with date 20 September 2026 located at Zandvoort to meet him for coaching clinic session. don't forget to add statistic/infographic style related to his racing career. use color of redbull. Use Henny Penny from googlefonts for the heading font. use realistic style.\",\n      \"aspect_ratio\": \"1:1\",\n      \"quality\": \"medium\"\n   }\n    } \n  }"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1440,
+        256
+      ],
+      "id": "da3a151c-dc7d-4927-a719-fab76147adf3",
+      "name": "Text to Image"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text to Image": {
+      "main": [
+        [
+          {
+            "node": "Generate video1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Generate video1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "triggerCount": 0,
+  "versionId": "070354e2-81bd-46d2-a456-bee83376c373",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "COlUXFB7ZeDqdhmU",
+  "isArchived": false
+}

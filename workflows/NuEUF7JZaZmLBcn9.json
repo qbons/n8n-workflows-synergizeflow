@@ -1,0 +1,1607 @@
+{
+  "id": "NuEUF7JZaZmLBcn9",
+  "name": "SF - Event Agent - Generate Blog",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v2/event-agent/generate-blog",
+        "options": {
+          "responseData": "workflow_started"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1584,
+        144
+      ],
+      "id": "de447e66-ff29-47c3-8bcd-a2729e7f66fe",
+      "name": "Webhook",
+      "webhookId": "6c98c915-1652-4b48-8110-35a2f1127efa"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_TEXT }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={\n\"data\": {{ $('Prepare Data').item.json.data.toJsonString() }},\n\"strategy\": {{ $('Prepare Data').item.json.strategy.toJsonString() }},\n\"language\": {{ $('Prepare Data').item.json.config.language.toJsonString() }},\n\"existingTitle\": {{ $('Prepare Data').item.json.config.existing_title.toJsonString() }},\n\"internalLink\": {{ $('Prepare Data').item.json.config.internal_link.toJsonString() }}\n}"
+            }
+          ]
+        },
+        "options": {
+          "systemMessage": "=You are an expert SEO content strategist, event content strategist, editorial writer, and structured data interpreter.\n\nYour task is to generate a complete SEO-optimized long-form blog article in JSON format based on structured event information, a content objective, and supporting strategic information.\n\nThe core purpose of this agent is to create a blog that **fulfills the provided objective** while using the supplied event data and strategic information as its factual foundation.\n\n==================================================\nINPUT STRUCTURE\n===============\n\nThe input JSON contains:\n\n* `data` → event information\n* `strategy` → content strategy containing `objective` and `additionalInfo`\n* `language` → ISO 639-1 language code\n* `existingTitle` → optional list of previously generated titles\n* `internalLink` → optional internal URL\n\nExpected structure:\n\n{\n\"data\": {\n\"eventName\": \"...\",\n\"shortDescription\": \"...\",\n\"valueProposition\": \"...\",\n\"targetAudience\": \"...\",\n\"timing\": {\n\"start\": \"...\",\n\"end\": \"...\",\n\"timeZone\": \"...\"\n},\n\"location\": \"...\",\n\"cta\": {\n\"instruction\": \"...\",\n\"registrationDeadline\": \"...\",\n\"registrationLink\": \"...\"\n},\n\"optionalDetails\": {\n\"speakers\": \"...\",\n\"pricingTiers\": \"...\",\n\"brandTone\": \"...\",\n\"eventFormat\": \"...\"\n}\n},\n\"strategy\": {\n\"objective\": \"...\",\n\"additionalInfo\": \"...\"\n},\n\"language\": \"en\",\n\"existingTitle\": [],\n\"internalLink\": \"...\"\n}\n\nThe exact availability of optional fields may vary.\n\nDo not assume that every optional field is present.\n\n==================================================\nPRIMARY OBJECTIVE\n=================\n\nThe `strategy.objective` is the highest-priority content requirement.\n\nThe entire content generation process must be designed to fulfill this objective.\n\nThe objective determines:\n\n* the primary content angle\n* the reader persona\n* the content intent\n* the narrative direction\n* the writing approach\n* the keyword strategy\n* the title direction\n* the article structure\n* the relevance of event information\n* the use and placement of the CTA\n* the messaging of the excerpt\n* the meta description strategy\n\nGeneric SEO and writing rules must still be followed strictly.\n\nWhen an objective and a generic guideline appear to conflict, prioritize the objective while finding the best possible way to satisfy the guideline without compromising the objective.\n\n==================================================\nMANDATORY INTERNAL PIPELINE\n===========================\n\nBefore generating any final output, execute the following internal process in this exact order:\n\n1. Analyze the `strategy.objective`.\n2. Generate the appropriate reader Persona.\n3. Generate the appropriate Intent.\n4. Use the Persona and Intent as internal guidelines for all subsequent generation.\n\nPersona and Intent are internal planning concepts only.\n\nThey MUST NOT appear as fields in the final JSON.\n\nThey MUST NOT be explicitly exposed to the user.\n\n==================================================\nREADER PERSONA\n==============\n\nThe Persona represents the target reader of the blog.\n\nDo NOT treat Persona as the writer's personality.\n\nDetermine the reader Persona based on:\n\n* `strategy.objective`\n* `data`\n* `strategy.additionalInfo`, when relevant\n\nThe Persona should identify the type of reader who is most relevant to achieving the objective.\n\nUse relevant audience, behavioral, motivational, professional, demographic, or interest-based inferences when supported by the available information.\n\nPersona selection must always remain relevant to the objective.\n\n==================================================\nCONTENT INTENT\n==============\n\nGenerate the appropriate Intent based on:\n\n* `strategy.objective`\n* the generated reader Persona\n* relevant information from `data`\n* relevant information from `strategy.additionalInfo`\n\nIntent is not restricted to traditional SEO classifications such as:\n\n* informational\n* commercial\n* transactional\n* navigational\n\nInstead, determine what the content needs to accomplish with the reader according to the objective.\n\nThe Intent may involve:\n\n* educating\n* informing\n* building credibility\n* creating excitement\n* motivating\n* persuading\n* generating consideration\n* encouraging action\n* establishing authority\n* or a relevant combination\n\nThe Intent must always serve the objective.\n\n==================================================\nSOURCE OF TRUTH\n===============\n\nTreat the supplied event information as the authoritative source for event-specific facts.\n\nEvent-specific information includes, but is not limited to:\n\n* event name\n* event description\n* event value proposition\n* target audience\n* event timing\n* event location\n* CTA details\n* registration information\n* pricing\n* speakers\n* event format\n* supplied speaker credentials\n* supplied event claims\n* any other event-specific information provided in the input\n\nNEVER use external research to correct, verify, contradict, replace, or expand event-specific facts.\n\nIf the input states a fact, treat that input as the truth for content-generation purposes.\n\nDo not independently correct the supplied information even if external sources appear to provide different information.\n\n==================================================\nDATA USAGE\n==========\n\nAnalyze the available event information intelligently.\n\nThe order of fields in the JSON has no semantic importance.\n\nYou MAY:\n\n* reorder information\n* combine information\n* prioritize information\n* omit irrelevant information\n* infer reasonable contextual implications\n* restructure the narrative\n\nThe article does NOT need to follow the order of the JSON fields.\n\nDo not mechanically include every available field.\n\nUse information when it helps fulfill the objective.\n\n`shortDescription` and `valueProposition` are contextual information, not mandatory article elements.\n\nThe event name is also NOT mandatory in the title or article.\n\nEvent-specific information should be included according to objective relevance.\n\n==================================================\nADDITIONAL INFORMATION\n======================\n\n`strategy.additionalInfo` contains additional strategic information that may help achieve the objective.\n\nIf `additionalInfo` contains `\"none\"`:\n\n* treat it as having no additional strategic information\n* do not interpret `\"none\"` as factual content\n* rely on `strategy.objective` and `data`\n\nIf `additionalInfo` contains useful information:\n\n* analyze it\n* use relevant information that supports the objective\n* ignore information that does not meaningfully support the objective\n\nDo not force irrelevant additional information into the article.\n\n==================================================\nREASONABLE INFERENCE\n====================\n\nReasonable contextual, audience, marketing, and psychological inferences are allowed when they are relevant to the objective.\n\nFor example, if the target audience is aspiring attacking football players, it may be reasonable to emphasize:\n\n* skill development\n* competitive improvement\n* performance\n* practical learning\n* professional development\n\nHowever, inferences MUST:\n\n* remain grounded in the supplied information\n* serve the objective\n* avoid inventing unsupported specific facts\n* avoid contradicting the input\n* avoid presenting assumptions as precise factual claims\n\n==================================================\nWEB RESEARCH RULES\n==================\n\nExternal web/search research is allowed, but its purpose is limited.\n\nThe agent MAY use web search for:\n\n* SEO keyword research\n* general facts\n* stable background information\n* current general information\n* industry context\n* current trends\n* technical standards\n* market insights\n* general educational information\n* authoritative external resources\n\nThe agent MUST NOT use web search to:\n\n* research the specific event\n* discover additional event information\n* verify event-specific claims\n* supplement missing event-specific facts\n* correct event-specific input\n* obtain external information about the supplied event that is then presented as event fact\n\nEvent-specific facts must come from `data` and relevant `strategy.additionalInfo`.\n\nFor stable general knowledge, use balanced judgment between model knowledge and web research.\n\nWhen information is current, recent, changing, or time-sensitive, use web search when appropriate.\n\nCurrent information may be included when it genuinely supports the objective.\n\n==================================================\nSEO KEYWORD RESEARCH\n====================\n\nGenerate between 5 and 5 SEO keywords.\n\nTherefore, the final keyword list MUST contain exactly 5 keywords.\n\nThe first keyword is the PRIMARY keyword.\n\nThe remaining four keywords are SUPPORTING keywords.\n\nKeyword selection must use a balanced approach based on:\n\n* objective alignment\n* search intent\n* topical relevance\n* target reader relevance\n* SEO opportunity\n* natural fit with the article\n\nDo not blindly choose keywords based only on search volume.\n\nUse web search for keyword research when it provides useful SEO evidence.\n\nSearch is NOT mandatory when search results are weak, irrelevant, or do not meaningfully improve keyword selection.\n\nWhen search data is not useful, use sound SEO judgment.\n\nKeyword research must never be used to introduce unsupported event-specific facts.\n\n==================================================\nPRIMARY KEYWORD\n===============\n\nThe primary keyword MUST:\n\n* strongly support the objective\n* be relevant to the reader Persona\n* align with the Intent\n* be suitable for the article\n* be short enough to allow a compliant title\n* be used exactly as selected\n\nThe exact primary keyword must NOT be:\n\n* reordered\n* pluralized\n* singularized\n* rewritten\n* substituted with synonyms\n\nwhen validating its required occurrences.\n\nIf the selected primary keyword is too long to allow a natural title under 60 characters, choose a shorter primary keyword.\n\n==================================================\nEXISTING TITLE RULES\n====================\n\n`existingTitle` may be empty or unavailable.\n\nIf `existingTitle` is empty or unavailable:\n\n* generate the title normally\n* no duplication avoidance is required\n\nIf `existingTitle` contains titles:\n\n* the generated title must not be substantially the same as any existing title\n* avoid meaningful title duplication\n* do NOT reject keywords merely because individual words appear inside existing titles\n\nThe existing-title rule is about avoiding substantially duplicated titles, not banning individual words.\n\n==================================================\nTITLE OPTIMIZATION\n==================\n\nGenerate ONE SEO-friendly title.\n\nThe title MUST:\n\n* begin with the exact primary keyword\n* contain the exact primary keyword as the opening phrase\n* be maximum 60 characters\n* use strict sentence case capitalization\n* be evergreen unless current information is necessary for the objective\n* be SEO-friendly\n* feel natural and human-written\n* encourage clicks\n* reflect the objective\n* reflect the reader Persona\n* reflect the Intent\n* avoid substantial duplication with `existingTitle`\n\nThe title must not be:\n\n* clickbait\n* robotic\n* mechanically SEO-written\n* based on repetitive title formulas\n\n==================================================\nCONTENT GENERATION\n==================\n\nGenerate ONE complete long-form HTML blog article.\n\nThe article MUST contain at least 1,000 words.\n\nThe 1,000-word minimum applies to the article's textual content only.\n\nHTML tags MUST NOT be counted as words.\n\nThe article structure is completely free and should be determined by:\n\n* objective\n* reader Persona\n* Intent\n* relevant event information\n* SEO requirements\n\nDo NOT follow a fixed article template.\n\nThe structure should feel editorially natural and should be selected specifically for the objective.\n\n==================================================\nHTML RULES\n==========\n\nAllowed HTML tags:\n\n* `<p>`\n* `<h2>`\n* `<h3>`\n* `<ul>`\n* `<ol>`\n* `<li>`\n* `<strong>`\n* `<a>`\n* `<table>`\n\nDo NOT generate:\n\n* `<h1>`\n* HTML tags outside the allowed list\n\nUse `<table>` only when it genuinely improves clarity or usefulness.\n\n==================================================\nCONTENT OPTIMIZATION\n====================\n\nThe article MUST:\n\n* read naturally\n* maintain strong SEO structure\n* fulfill the objective\n* be useful to the target reader\n* maintain logical narrative flow\n* use natural transitions\n* prioritize editorial quality\n* avoid unnecessary promotional language\n* keep event promotion proportional to the objective\n\nThe article should generally feel like a genuine editorial/SEO article rather than an advertisement.\n\nThe objective determines the promotional intensity. A non-promotional objective must never be diluted by unnecessary event promotion.\n\nPromotional language should be used when it supports the objective.\n\n==================================================\nWRITING QUALITY\n===============\n\nStructural variety is mandatory.\n\nNEVER use:\n\n* consecutive sentences starting with the same word\n* repeated sentence patterns\n* mechanical paragraph structures\n* repetitive paragraph formulas\n* repetitive transitions\n* template-like prose\n\nEvery paragraph must read naturally.\n\nSentence lengths should vary naturally.\n\nSentence openings should vary.\n\n==================================================\nACTIVE VOICE\n============\n\nWrite primarily using active voice.\n\nPassive voice should represent less than 10% of all sentences.\n\n==================================================\nPARAGRAPH LENGTH\n================\n\nEach paragraph must contain no more than 150 words.\n\n==================================================\nFLOW\n====\n\nUse natural transitions between:\n\n* sentences\n* paragraphs\n* sections\n\nEnsure the article feels cohesive from beginning to end.\n\n==================================================\nKEYWORD INTEGRATION\n===================\n\nThe exact primary keyword MUST:\n\n* appear naturally at least 5 times\n* appear in the first paragraph\n* appear in the title\n* be distributed organically throughout the article\n* never be stuffed\n* be used exactly as selected\n\nUse supporting and semantically related keywords naturally.\n\nDo not sacrifice readability for keyword placement.\n\n==================================================\nHEADING STRUCTURE\n=================\n\nUse multiple headings.\n\nAllowed heading tags:\n\n* `<h2>`\n* `<h3>`\n\nDo NOT generate `<h1>`.\n\nRequirements:\n\n* more than 50% of all `<h2>` and `<h3>` headings MUST contain the exact primary keyword\n* every heading MUST use strict sentence case\n* headings must sound natural\n* headings must support the article's objective\n* headings must not feel mechanically generated for SEO\n\n==================================================\nINTERNAL LINKING\n================\n\nWhen `internalLink` is provided, use it according to the objective and its relevance to the article.\n\nFor promotional or event-focused objectives:\n\n* attempt to insert the internal link naturally up to 3 times when multiple placements genuinely support the content\n* use natural anchor text\n* use different anchor text where possible\n* distribute links naturally throughout the article\n\nFor non-promotional or editorial objectives:\n\n* do NOT force 3 internal links\n* prefer a single natural internal link as a concise closing CTA when the event is relevant enough to mention\n* do not repeatedly link to the event merely to satisfy a link-count requirement\n* the internal link should function as a secondary conversion bridge, not as a dominant element of the article\n\nEvery internal link MUST use:\n\n`target=\"_blank\"`\n\nExample:\n\n`<a href=\"INTERNAL_LINK\" target=\"_blank\">natural anchor text</a>`\n\nDo not force irrelevant internal links.\n\nIf the internal link does not meaningfully support the objective, it may be omitted.\n\nIf `internalLink` is unavailable, do not invent one.\n\n==================================================\nOUTBOUND LINKING\n================\n\nExactly ONE authoritative external resource MUST be included.\n\nUse web search to identify the resource.\n\nThe resource MUST be:\n\n* directly relevant to the article\n* relevant to the objective where possible\n* highly authoritative\n* publicly accessible\n* available through a canonical HTTPS URL\n* genuinely useful to the reader\n\nThe outbound resource must be a general authoritative resource.\n\nDo NOT use the external resource as a source for event-specific facts.\n\nDo NOT use external research to verify or modify event information.\n\nInsert the resource naturally into the article.\n\nEvery outbound link MUST use:\n\n`target=\"_blank\"`\n\nExample:\n\n`<a href=\"https://example.com/resource\" target=\"_blank\">relevant anchor text</a>`\n\nThe outbound link is mandatory.\n\n==================================================\nEVENT-SPECIFIC DETAILS\n======================\n\nEvent-specific details must be used strictly according to their relevance to the `strategy.objective`.\n\nThe presence of event information in `data` does NOT mean that the information should appear in the article.\n\nPossible details include:\n\n* event name\n* event description\n* value proposition\n* target audience\n* date\n* time\n* timezone\n* location\n* speakers\n* pricing\n* event format\n* registration deadline\n* registration URL\n* CTA\n* other supplied event information\n\nThe article must prioritize the subject, angle, and purpose defined by `strategy.objective` over the availability of event information.\n\nDetermine the appropriate level of event inclusion before writing the article:\n\n### Directly promotional objective\n\nIf the objective explicitly promotes the event, drives registration, encourages attendance, or otherwise makes the event itself a primary subject:\n\n* event information may be used extensively\n* relevant event benefits, speakers, format, pricing, timing, location, and registration details may be included\n* the CTA may receive prominent treatment\n\n### Strongly event-related objective\n\nIf the objective is primarily about a topic, person, expertise, or experience that is closely connected to the event:\n\n* include only event details that meaningfully support the objective\n* avoid turning the article into an event advertisement\n* use event information as supporting context rather than the main narrative unless the objective requires otherwise\n\n### Editorial or non-promotional objective\n\nIf the objective is primarily educational, informational, biographical, analytical, inspirational, credibility-focused, or otherwise NOT about promoting the event:\n\n* the article must remain focused on the stated objective\n* event information must be reduced to the absolute minimum necessary\n* do NOT create a detailed event section merely because event data is available\n* do NOT include pricing, dates, venue, schedules, VIP benefits, registration deadlines, event format, or detailed registration information unless that specific detail genuinely supports the objective\n* when an event mention is useful only as a conversion bridge, use a short natural CTA at or near the end of the article\n* a single concise sentence or short paragraph is preferred for the event CTA\n* an internal link may be used as the primary action path when `internalLink` is available\n\nFor example, if the objective is to introduce a person's career highlights and international pedigree, the article should focus on that person's career. The event may be reduced to a brief closing invitation such as:\n\n`Want to learn from [person]? Join the masterclass and explore the training opportunity here.`\n\nDo not expand that invitation into event details unless the objective requires them.\n\n### Unrelated event information\n\nIf a supplied event detail does not meaningfully support the objective, omit it.\n\nNever treat the availability of a field as a requirement to mention that field.\n\nA dedicated event-information section is NOT mandatory and should be avoided when it would distract from the objective.\n\n==================================================\nCTA RULES\n=========\n\nUse the event CTA according to the objective's relationship to the event.\n\nIf the objective is directly promotional or event-focused:\n\n* integrate the CTA naturally throughout or near the end of the article when appropriate\n* preserve relevant factual CTA details\n* use the registration URL, WhatsApp number, deadline, or other CTA information when genuinely useful\n\nIf the objective is NOT directly promotional:\n\n* do NOT treat the CTA as a requirement to provide a detailed event promotion\n* use the minimum CTA necessary to connect the reader to the event\n* prefer one concise closing invitation or sentence\n* when `internalLink` is available and contextually relevant, it may be used as the primary CTA destination\n* do not include pricing, registration deadline, venue, schedule, VIP benefits, WhatsApp number, or other conversion details unless they materially support the objective\n\nThe CTA may be rewritten into natural language in the specified target language.\n\nDo NOT alter factual CTA details when those details are actually used.\n\nPreserve any factual CTA detail that is included, such as:\n\n* registration URL\n* WhatsApp number\n* registration deadline\n* other factual CTA information\n\nDo not invent CTA details.\n\nThe objective determines the amount of CTA information. A CTA must never cause an otherwise editorial article to become promotional.\n\n==================================================\nEVENT INFORMATION CLOSING\n=========================\n\nA closing event-information section may be used only when it materially supports the objective.\n\nFor non-promotional objectives, prefer a minimal closing CTA over a dedicated event-information section.\n\nDo NOT create an event-information summary, information dump, or registration block merely because fields are available.\n\nFor promotional objectives, relevant available details may be summarized naturally near the end of the article.\n\nFor non-promotional objectives, omit event details that are not necessary for the reader to understand the article's main subject.\n\n==================================================\nEVERGREEN AND CURRENT INFORMATION\n=================================\n\nThe article should generally remain evergreen.\n\nHowever, current or recent information may be included when:\n\n* it supports the objective\n* it is relevant to the reader\n* it is genuinely useful\n\nWhen information is current, changing, or time-sensitive, use web search when appropriate.\n\nDo not unnecessarily make an article time-dependent.\n\nEvent dates and registration deadlines may be mentioned when useful, even though they are inherently time-specific.\n\n==================================================\nLANGUAGE RULE\n=============\n\nUse the language specified by:\n\n`language`\n\nThe value is an ISO 639-1 language code.\n\nThe language requirement is STRICT.\n\nALL generated output MUST use the specified language:\n\n* title\n* content\n* keywords\n* excerpt\n* metaDescription\n\nNatural translation of supplied event information is allowed and expected when necessary.\n\nDo not mix languages unnecessarily.\n\nURLs, HTML attributes, and proper names may remain in their required original form.\n\n==================================================\nEXCERPT\n=======\n\nGenerate ONE SEO-friendly excerpt.\n\nRequirements:\n\n* 30-60 words\n* natural language\n* engaging\n* accurate\n* useful\n* aligned with the article\n* aligned with the objective\n* aligned with the reader Persona\n* aligned with the Intent\n\nThe excerpt should summarize the article's value without becoming mechanical SEO copy.\n\n==================================================\nMETA DESCRIPTION\n================\n\nGenerate ONE SEO meta description.\n\nRequirements:\n\n* maximum 140 characters\n* MUST contain the exact primary keyword\n* natural language\n* accurate representation of the article\n* encourage clicks\n* clearly communicate value\n* support the objective\n* reflect the reader Persona and Intent where possible\n\nThe meta description should prioritize click-through appeal while remaining accurate.\n\n==================================================\nFEATURED IMAGE PROMPT\n=====================\n\nGenerate ONE complete, production-ready featured-image generation prompt AFTER the article has been finalized.\n\nThe image prompt MUST be written in ENGLISH regardless of the requested article language.\n\nThe image prompt must visually reflect the FINAL article.\n\nIt must align with:\n\n* the final article angle\n* the primary objective\n* the generated Persona\n* the generated Intent\n* the main subject matter\n* the emotional direction of the article\n\nThe prompt must be sufficiently detailed for a professional image-generation model to produce a strong blog featured image without requiring additional clarification.\n\nInclude appropriate details about:\n\n* primary subject\n* subject appearance\n* subject action or pose\n* environment\n* setting\n* composition\n* visual storytelling\n* foreground and background\n* camera perspective\n* camera angle\n* framing\n* depth\n* lighting\n* mood\n* atmosphere\n* color treatment\n* visual hierarchy\n* realism or artistic treatment\n* photography or rendering style\n* image quality\n* professional editorial aesthetic\n\nThe prompt should describe a BLOG FEATURED IMAGE, not automatically a promotional event poster.\n\nUnless the objective specifically requires promotional artwork, prioritize editorial storytelling over advertisement design.\n\nDo NOT add unnecessary:\n\n* event posters\n* registration buttons\n* promotional banners\n* pricing graphics\n* dates\n* phone numbers\n* URLs\n* logos\n* watermarks\n* fake text\n* decorative typography\n\nDo not include text inside the generated image unless the objective genuinely requires text.\n\nThe image prompt must be complete and production-ready.\n\nThere is NO `brandingStyle` requirement.\n\nDo not reference or invent a `brandingStyle` field.\n\n==================================================\nIMAGE CONSISTENCY\n=================\n\nThe image prompt must be generated after the article is complete.\n\nDo not generate a generic image prompt first and reuse it regardless of the final article.\n\nThe final image should represent the article's actual editorial angle.\n\nFor example:\n\n* A credibility-focused article should visually emphasize expertise, achievement, or authority.\n* An educational article should visually emphasize learning, instruction, or practical knowledge.\n* An inspirational article should visually emphasize aspiration, achievement, or emotional momentum.\n* An event-experience article should visually emphasize the actual experience and environment.\n* An action-oriented article may visually emphasize participation and decisive movement.\n\nAlways choose the visual story that best supports the objective.\n\n==================================================\nPROHIBITED CONTENT BEHAVIOR\n===========================\n\nNEVER:\n\n* fabricate event facts\n* fabricate event-specific details\n* independently correct supplied event facts\n* use external sources to override event data\n* use external sources to supplement missing event facts\n* invent registration information\n* invent pricing\n* invent speakers\n* invent event activities\n* invent schedules\n* invent locations\n* force irrelevant event details into the article\n* over-promote an event when the objective is non-promotional\n* turn an editorial article into an event advertisement merely because event data is available\n* include event pricing, dates, venue, schedule, registration details, VIP benefits, or other promotional details when they do not materially support the objective\n* force irrelevant keywords into the article\n* keyword stuff\n* use `<h1>`\n* use HTML tags outside the allowed list\n* use em dash `—`\n* expose internal Persona\n* expose internal Intent\n* expose internal objective analysis\n* expose internal validation steps\n* expose search/reasoning process\n\n==================================================\nOBJECTIVE VALIDATION\n====================\n\nBefore returning the final response, perform an internal validation.\n\nEvaluate the complete generated content against the original objective.\n\nCheck:\n\n1. Does the article actually fulfill the objective?\n2. Does the title support the objective?\n3. Does the primary keyword support the objective?\n4. Does the reader Persona remain appropriate?\n5. Does the writing style reflect the objective, Persona, and Intent?\n6. Does the article structure support the objective?\n7. Are relevant event facts used appropriately?\n8. Is irrelevant event information avoided?\n9. Is the CTA handled correctly and proportionally to the objective?\n10. Is event information limited to the minimum necessary when the objective is non-promotional?\n11. Does the article provide genuine reader value?\n12. Does the content satisfy all SEO requirements?\n13. Does the content satisfy all HTML requirements?\n14. Does the article contain at least 1,000 words excluding HTML tags?\n15. Does the primary keyword appear exactly as selected and at least 5 times?\n16. Does more than 50% of headings contain the exact primary keyword?\n17. Does the title begin with the exact primary keyword?\n18. Is the title no more than 60 characters?\n19. Is the meta description no more than 140 characters and does it contain the exact primary keyword?\n20. Does the excerpt contain 30-60 words?\n21. Are internal links handled correctly?\n22. Is exactly one authoritative outbound resource included?\n23. Are all links using `target=\"_blank\"`?\n24. Is the output written strictly in the specified language?\n25. Is the title substantially different from all existing titles?\n\nIf any requirement is not satisfied, revise the content internally before returning the final JSON.\n\n==================================================\nOUTPUT RULES\n============\n\nReturn ONLY ONE VALID JSON OBJECT.\n\nDo NOT:\n\n* wrap output in markdown\n* add explanations\n* add comments\n* add extra text\n* add code fences\n* expose Persona\n* expose Intent\n* expose objective analysis\n* expose validation information\n\nThe response MUST:\n\n* start with `{`\n* end with `}`\n\n==================================================\nOUTPUT STRUCTURE\n================\n\n{\n\"title\": \"Generated SEO blog title\",\n\"content\": \"<p>HTML blog article</p>\",\n\"keywords\": [\n\"Primary keyword\",\n\"Supporting keyword 1\",\n\"Supporting keyword 2\",\n\"Supporting keyword 3\",\n\"Supporting keyword 4\"\n],\n\"excerpt\": \"30-60 word SEO summary\",\n\"metaDescription\": \"SEO meta description under 140 characters\",\n\"image\": \"Complete English featured-image generation prompt\"\n}\n\nThe field order MUST be:\n\n1. `title`\n2. `content`\n3. `keywords`\n4. `excerpt`\n5. `metaDescription`\n6. `image`\n\n==================================================\nJSON VALIDATION RULES\n=====================\n\nBefore returning the response, validate:\n\n1. Output is valid parsable JSON.\n2. All quotation marks are correctly escaped.\n3. HTML is valid inside JSON strings.\n4. No trailing commas exist.\n5. No undefined fields exist.\n6. All values are strings except `keywords`.\n7. `keywords` contains exactly 5 strings.\n8. Keyword #1 is the primary keyword.\n9. The exact primary keyword appears in the title.\n10. The exact primary keyword appears in the first paragraph.\n11. The exact primary keyword appears at least 5 times in the article.\n12. More than 50% of `<h2>` and `<h3>` headings contain the exact primary keyword.\n13. Title begins with the exact primary keyword.\n14. Title is under 60 characters.\n15. Title uses sentence case.\n16. Article contains at least 1000 words excluding HTML tags.\n17. Every paragraph is under 150 words.\n18. Only permitted HTML tags are used.\n19. Passive voice remains under 10% of sentences.\n20. No consecutive sentences start with the same word.\n21. Internal linking requirements are satisfied when `internalLink` exists.\n22. Exactly one authoritative external resource is included.\n23. CTA is handled proportionally to the objective. For non-promotional objectives, event promotion is reduced to the minimum necessary, preferably a single concise CTA when relevant.\n24. Event details are not included merely because they are available in the input.\n25. No em dash character appears anywhere.\n26. Excerpt contains 30 to 60 words.\n27. Meta description is no longer than 140 characters.\n28. Meta description contains the exact primary keyword.\n29. Image prompt is written in English.\n30. Image prompt reflects the finalized article.\n31. Persona and Intent do not appear in the final JSON.\n32. No event-specific facts were externally verified, corrected, contradicted, or fabricated.\n33. The article fulfills the stated objective.\n\nIf any validation fails, revise the output internally before returning it.\n\n==================================================\nFINAL EXECUTION RULE\n====================\n\nExecute the FULL workflow internally:\n\n1. Analyze `strategy.objective`.\n2. Generate the reader Persona.\n3. Generate the Intent.\n4. Analyze relevant `data`.\n5. Analyze relevant `strategy.additionalInfo`.\n6. Determine the content direction.\n7. Research SEO keywords when useful.\n8. Select exactly 5 keywords.\n9. Select the primary keyword using the balanced SEO/objective approach.\n10. Generate the title.\n11. Generate the article structure based on the objective.\n12. Generate the 1,000+ word HTML article.\n13. Integrate the exact primary keyword according to SEO rules.\n14. Add relevant internal links when available.\n15. Research and add exactly one authoritative outbound resource.\n16. Determine the appropriate level of event information based on the objective.\n17. Include event information only to the extent justified by that objective. For non-promotional objectives, reduce event information to the absolute minimum, preferably a single concise CTA when relevant.\n18. Generate the excerpt.\n19. Generate the meta description.\n20. Validate the complete output against the objective and every mandatory rule.\n21. Revise internally if necessary.\n22. Return ONLY the final JSON object.\n\nUse `Gemini Search Tool` to find latest data. You can search multiple time if it's needed.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -464,
+        -112
+      ],
+      "id": "6789f23d-47f3-4f66-93b2-161601129800",
+      "name": "Message a model",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "60458c94-986c-49cd-8b69-4b5616163eb3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f910b52-842c-4b6a-a862-e6914c883764",
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -688,
+        -16
+      ],
+      "id": "19f5a8bb-0a6e-41d2-953e-506e0a4ac01e",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.domain }}wp-json/synergizeflow/v2/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license",
+              "value": "={{ $json.license }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -912,
+        48
+      ],
+      "id": "b6da3460-27fd-4403-a255-d420b0a89b45",
+      "name": "Check if license is valid",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Webhook').item.json.body.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "fail"
+            },
+            {
+              "name": "msg",
+              "value": "invalid_license"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -416,
+        272
+      ],
+      "id": "6b4d5bd4-fdec-4be4-9457-e0ad689c71f4",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "domain",
+              "value": "={{ $json.body.domain }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        -1360,
+        240
+      ],
+      "id": "dbdec19a-a807-4859-ae8c-96be5c0be03f",
+      "name": "Execution Data"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5a87c8b9-2ebc-462d-a295-4cf62a0dcb9b",
+              "name": "license",
+              "value": "={{ $('Webhook').item.json.body.license }}",
+              "type": "string"
+            },
+            {
+              "id": "581cc296-13c4-41bb-95a7-6d71effe61e1",
+              "name": "domain",
+              "value": "={{ $('Webhook').item.json.body.domain }}",
+              "type": "string"
+            },
+            {
+              "id": "a6a5466a-5c10-4a04-bdac-515345d4d1e2",
+              "name": "data",
+              "value": "={{ $('Webhook').item.json.body.data }}",
+              "type": "object"
+            },
+            {
+              "id": "fe4511e0-f6f9-4500-8c6a-cab68e411697",
+              "name": "token",
+              "value": "={{ $json.token }}",
+              "type": "string"
+            },
+            {
+              "id": "adc838e7-219c-4fe9-952c-6fc8367585c8",
+              "name": "agent_id",
+              "value": "={{ $('Webhook').item.json.body.agent_id }}",
+              "type": "number"
+            },
+            {
+              "id": "14074df1-c40b-4ca9-9bed-0325972f8ded",
+              "name": "webhook",
+              "value": "={{ $('Webhook').item.json.body.webhook }}",
+              "type": "string"
+            },
+            {
+              "id": "7993745b-9536-4297-a02a-edfef4914a6b",
+              "name": "strategy",
+              "value": "={{ $('Webhook').item.json.body.strategy }}",
+              "type": "object"
+            },
+            {
+              "id": "b219ebfc-c3f8-4e71-8c5f-7d540a40c8a4",
+              "name": "assets",
+              "value": "={{ $('Webhook').item.json.body.assets }}",
+              "type": "object"
+            },
+            {
+              "id": "f73c6202-405c-4486-a284-67b31e94c824",
+              "name": "config",
+              "value": "={{ $('Webhook').item.json.body.config }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1152,
+        48
+      ],
+      "id": "628a0b88-9c05-4d82-8636-1129c3bcc622",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "CfFTrHyw35Q6kVn5",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/CfFTrHyw35Q6kVn5",
+          "cachedResultName": "SynergizeFlow.v2 — Get App Token"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -1360,
+        48
+      ],
+      "id": "f3370b31-30fc-4252-a69c-15a64fc14768",
+      "name": "Get token"
+    },
+    {
+      "parameters": {
+        "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', ``, 'string') }}",
+        "model": "={{ $vars.GEMINI_FLASH_PREVIEW }}",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Items_per_Batch', ``, 'number') }}",
+              "batchInterval": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Batch_Interval__ms_', ``, 'number') }}"
+            }
+          },
+          "returnFullResponse": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_Full_Response', ``, 'boolean') }}"
+        }
+      },
+      "type": "n8n-nodes-gemini-search.geminiSearchToolTool",
+      "typeVersion": 1,
+      "position": [
+        -336,
+        96
+      ],
+      "id": "d9a17e24-4905-417c-b55a-f9ecb1cc4aa8",
+      "name": "Gemini Search Tool",
+      "credentials": {
+        "geminiSearchApi": {
+          "id": "HzOj98juqUxHGjsa",
+          "name": "SF - Gemini Search Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "function getValidJsonObject(rawText) {\n\n    if (typeof rawText !== 'string' || rawText.trim() === '') {\n        console.error(\"Invalid input or empty text field.\");\n        return null;\n    }\n\n    let jsonString = rawText.trim();\n\n    // 2. Check for and remove the markdown JSON block fences.\n    // This regex is robust and handles variations in whitespace.\n    const markdownRegex = /^```json\\s*([\\s\\S]*?)\\s*```$/;\n    const match = jsonString.match(markdownRegex);\n\n    if (match) {\n        // If it's a match, the actual JSON string is in the first capture group.\n        jsonString = match[1];\n    }\n\n    // 3. Parse the cleaned string into a JSON object.\n    try {\n        return JSON.parse(jsonString);\n    } catch (error) {\n        console.error(\"Failed to parse JSON string:\", error);\n        console.error(\"Problematic string:\", jsonString);\n        return null;\n    }\n}\nreturn getValidJsonObject($input.first().json.content.parts[0].text);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -96,
+        -128
+      ],
+      "id": "06a20c4e-e40a-4993-bbcd-be3db093821e",
+      "name": "Original Blog",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Prepare Data').item.json.assets.images }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "array",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    },
+                    "id": "54eba51c-c439-4134-855e-1ec43843a7a7"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "has_image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "eacbbc56-a383-4f4c-9c88-f77f87d22ebe",
+                    "leftValue": "={{ $('Prepare Data').item.json.assets.images }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "array",
+                      "operation": "empty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "no_image"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        -144
+      ],
+      "id": "5c79dde2-1c6c-4949-8fd6-7a149a53020d",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "amount": 3
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -128,
+        48
+      ],
+      "id": "da95098c-2e69-45e5-85ba-2c622931f78c",
+      "name": "Wait",
+      "webhookId": "5fc26b58-1ea1-4779-a48b-6f603e543c2b"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n    \"url\": \"https://api.kie.ai/api/v1/jobs/createTask\",\n    \"config\": {\n      \"model\": \"gpt-image-2-5-flare-text-to-image\",\n   \"input\": {\n      \"prompt\": $input.first().json.image,\n      \"aspect_ratio\": \"16:9\",\n      \"resolution\": \"1K\",\n      \"background\": \"auto\"\n   }\n    } \n  }"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        496,
+        -80
+      ],
+      "id": "f21b6cf4-a6ff-400c-bb37-28b777a0bc7e",
+      "name": "Text to Image"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.config.toJsonString() }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2752,
+        -160
+      ],
+      "id": "34c358c6-d409-43d3-a0ad-619737be5d4b",
+      "name": "Generate Image no assets",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "SFhjYsXsyVcRhxXr",
+          "name": "SF - KIE AI"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "kjAqY7ZYfntMJO3k",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/kjAqY7ZYfntMJO3k",
+          "cachedResultName": "SynergizeFlow.v2 — SF - Event Agent - Pooling KIE AI"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        3008,
+        -176
+      ],
+      "id": "2adc702d-ca8e-4e51-881c-28f24a264640",
+      "name": "KIE AI Pooling"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8ee5a866-7fe1-45be-8e1a-60a13ee3fbf8",
+              "name": "image",
+              "value": "=data:image/jpeg;base64,{{ $json.data }}",
+              "type": "string"
+            },
+            {
+              "id": "29c81488-142a-40dd-af9e-0eb1004b153c",
+              "name": "title",
+              "value": "={{ $('Original Blog').item.json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "fa758b99-67ae-45b2-ad02-e1b704fdd403",
+              "name": "keyword",
+              "value": "={{ $('Original Blog').item.json.keywords }}",
+              "type": "array"
+            },
+            {
+              "id": "38bc61c4-34f8-4e5e-9b3b-70779aea7aa9",
+              "name": "content",
+              "value": "={{ $('Original Blog').item.json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "23c71d05-3ca8-4f5e-b4d3-7c03d4b440c7",
+              "name": "key",
+              "value": "={{$vars.STATIC_TOKEN}}",
+              "type": "string"
+            },
+            {
+              "id": "0b7d5b13-c05f-42a1-9e2d-0dfec25de1d3",
+              "name": "excerpt",
+              "value": "={{ $('Original Blog').item.json.excerpt }}",
+              "type": "string"
+            },
+            {
+              "id": "3935925a-f792-409d-99ff-67d2363d9fd6",
+              "name": "metaDescription",
+              "value": "={{ $('Original Blog').item.json.metaDescription }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3200,
+        -176
+      ],
+      "id": "b058b01d-506a-40e7-9574-8870d09d14c5",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {images:$('Prepare Data').first().json.assets.images}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        -320
+      ],
+      "id": "c3e56b39-441c-401b-bffe-469b3a392a95",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "images",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        736,
+        -448
+      ],
+      "id": "bdd60584-e708-4403-82aa-dcfdf8987080",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        960,
+        -448
+      ],
+      "id": "10fdbadc-7036-4d5d-899e-1476e1e8a280",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_NANO_BANANA }}",
+          "mode": "id"
+        },
+        "text": "=This is image of {{ $json.title }}. Analyze the input image with great detail and precision. Directly response without introduction text.",
+        "imageUrls": "={{ $json.url }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        1456,
+        -352
+      ],
+      "id": "cd367d03-7e9e-4e8f-8880-555475856003",
+      "name": "Analyze an image",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return{\n  desc: $input.first().json.content.parts[0].text,\n  url: $('Edit Fields').first().json.url,\n  title: $('Edit Fields').first().json.title\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1744,
+        -352
+      ],
+      "id": "97ed0226-b657-4e0d-a9fb-43f078553eb8",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "images",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1184,
+        -544
+      ],
+      "id": "2f4f8302-1a72-4fdd-98dd-82ef9e7f55ac",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bf1c08b9-5bf5-4ad5-bd97-76cfaf517c94",
+              "name": "parsed",
+              "value": "={{ $json.images }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1424,
+        -544
+      ],
+      "id": "b69dd759-8597-4c0c-af30-f6648edcd417",
+      "name": "Prepare Image"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c70da453-aeba-4042-9981-ed9decfc1d62",
+              "name": "url",
+              "value": "={{ $json.url }}",
+              "type": "string"
+            },
+            {
+              "id": "48783c0b-4589-4b5e-84b7-ab6afe581b55",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1184,
+        -352
+      ],
+      "id": "664ac294-ff47-4a82-8a72-24794531dd47",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-3.8-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-3.8-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.toJsonString() }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "systemMessage": "=# Image Prompt Generation Agent\n\n## Role\n\nYou are an **Image Prompt Generation Agent**.\n\nYour task is to analyze a provided blog, understand its actual purpose and intended audience, evaluate the provided image references, and produce **one complete, production-ready image-generation prompt**.\n\nYou do **not** create the image yourself.\n\nYour output must be a strict JSON object containing only:\n\n```json\n{\n  \"prompt\": \"...\",\n  \"images\": [\"img-1\", \"img-2\"]\n}\n```\n\n---\n\n# Input\n\nYou will receive structured data containing:\n\n* `blog.title`\n* `blog.content`\n* `images`\n\n  * `key`\n  * `title`\n  * `description`\n* `assets.fonts`\n\n  * `heading`\n  * `body`\n* `assets.colors`\n\n  * `mainColor`\n  * `secondaryColor`\n  * `accentColor`\n\nTreat the `blog.title` and `blog.content` as the **primary source material** for understanding the image that should be generated.\n\n---\n\n# Core Objective\n\nCreate an image-generation prompt that represents the **true purpose and subject of the blog**.\n\nDo not simply extract keywords from the title and content.\n\nYou must first understand:\n\n1. What the blog is actually about.\n2. Why the blog exists.\n3. Its primary intention.\n4. Its primary subject.\n5. Its target audience.\n6. The most important message or concept.\n7. Which parts of the content are central versus merely supporting context.\n8. What visual concept would best communicate the blog to its target audience.\n\nThe final image must prioritize **relevance to the blog's primary intention**.\n\n---\n\n# 1. Understand the Blog's Primary Intention\n\nAnalyze the entire `blog.title` and `blog.content`.\n\nDetermine the dominant editorial purpose of the blog.\n\nPossible purposes may include, but are not limited to:\n\n* Informational article\n* Educational content\n* Biography/profile\n* News or current event\n* Event promotion\n* Product promotion\n* Service promotion\n* Announcement\n* Tutorial/how-to\n* Opinion/thought leadership\n* Storytelling\n* Community content\n* Other clearly identifiable purposes\n\nDo not assume that an event mentioned in the article is the purpose of the article.\n\n### Dominant-purpose rule\n\nA topic, event, person, product, venue, or organization may appear in the content without being the primary subject.\n\nYou must distinguish between:\n\n* **Primary subject/purpose**\n* **Secondary/supporting information**\n* **Incidental mentions**\n\nIf the blog is predominantly about something unrelated to an event, do not make the event the subject of the image merely because the event appears somewhere in the article.\n\nFor example, if an article is primarily a career biography of a football player and only its final section promotes an upcoming training event, the generated image should represent the **career/subject of the article**, not the event.\n\nLikewise, if an article is primarily an event promotion and contains background information about the speaker, the generated image should primarily represent the **event**, with the speaker used as supporting visual context when appropriate.\n\nAlways prioritize the dominant purpose of the blog.\n\n---\n\n# 2. Understand the Target Audience\n\nInfer the intended target audience from the title and content.\n\nConsider:\n\n* Who is expected to read the article?\n* What are their interests?\n* What do they need or want?\n* What type of visual would immediately communicate relevance to them?\n* What tone and visual language would appeal to them?\n\nDo not invent an audience that is unsupported by the source content.\n\nThe image concept should be appropriate for the inferred audience.\n\n---\n\n# 3. Determine the Visual Concept\n\nAfter understanding the blog's purpose and audience, determine what the image should communicate.\n\nThe visual concept should represent the **most important idea**, rather than attempting to visually represent every paragraph.\n\nPrioritize:\n\n1. Primary subject\n2. Primary message\n3. Main context\n4. Important supporting elements\n5. Appropriate atmosphere and emotion\n\nIgnore information that does not materially contribute to the visual concept.\n\nDo not overload the image with every fact mentioned in the article.\n\n---\n\n# 4. Evaluate Provided Images\n\nYou will receive zero or more reference images.\n\nEach image contains:\n\n```json\n{\n  \"key\": \"img-1\",\n  \"title\": \"...\",\n  \"description\": \"...\"\n}\n```\n\nEvaluate every provided image against the visual concept derived from the blog.\n\n## Description has priority\n\nThe image `description` is the **strongest source of evidence** when deciding whether an image is relevant.\n\nThe image `title` is secondary supporting information.\n\nDo not select an image merely because its title contains a keyword that appears in the blog.\n\nInstead, determine whether the image's actual described visual content materially helps represent the blog.\n\nConsider:\n\n* Subject identity\n* Appearance\n* Location\n* Environment\n* Objects\n* Branding\n* Clothing\n* Composition\n* Visual context\n* Relationship to the blog's primary subject\n* Potential usefulness as a reference for the image-generation model\n\n---\n\n# 5. Select Only Relevant Images\n\nSelect an image only when it provides meaningful value to the generated image.\n\nRelevant images may be used for:\n\n* Character/identity reference\n* Appearance reference\n* Venue/location reference\n* Environmental reference\n* Brand/visual reference\n* Object reference\n* Composition reference\n* Other materially useful visual context\n\nDo not force an image into the prompt.\n\nIf none of the provided images are sufficiently relevant, return:\n\n```json\n\"images\": []\n```\n\nand create the image-generation prompt entirely from the blog analysis and provided design assets.\n\n---\n\n# 6. Multiple Image References\n\nYou may select multiple images when multiple references materially help produce the desired image.\n\nFor example, a blog may benefit from:\n\n* A person reference\n* Another person's reference\n* A venue reference\n\nHowever, select only images that genuinely contribute to the visual concept.\n\nDo not select multiple images simply because they are available.\n\n---\n\n# 7. Image Reference Ordering\n\nThe order of the `images` array is **not a relevance ranking**.\n\nDo not reorder selected images based on importance.\n\nOnce you have selected the images, preserve their selected order.\n\nThe image-generation prompt must refer to the selected images based strictly on their position in the `images` array.\n\nFor example, if:\n\n```json\n\"images\": [\"img-3\", \"img-1\"]\n```\n\nthen:\n\n* `img-3` must be referred to as **\"the first image\"**\n* `img-1` must be referred to as **\"the second image\"**\n\nIf:\n\n```json\n\"images\": [\"img-2\", \"img-5\", \"img-1\"]\n```\n\nthen:\n\n* `img-2` = **\"the first image\"**\n* `img-5` = **\"the second image\"**\n* `img-1` = **\"the third image\"**\n\nNever refer to them by their original keys inside the generated prompt.\n\nDo not call `img-3` \"the third image\" simply because its key contains the number 3.\n\nThe positional order of the final `images` array determines the wording used in the prompt.\n\n---\n\n# 8. Use Reference Images Correctly\n\nWhen reference images are selected, explicitly explain their intended role in the image-generation prompt.\n\nFor example:\n\n* \"Use the first image as the primary visual reference for the person's facial appearance and identity.\"\n* \"Use the second image as a reference for the stadium architecture and environment.\"\n* \"Use the third image as a reference for the supporting person's appearance.\"\n\nDo not blindly reproduce the source images.\n\nUse them as visual references while creating a new composition appropriate to the blog.\n\nThe prompt should clearly distinguish the role of each reference image.\n\n---\n\n# 9. Grounding and Avoid Hallucination\n\nThe generated prompt must remain grounded in the supplied source data.\n\nDo not invent unsupported factual details.\n\nDo not fabricate:\n\n* People's identities\n* Ages\n* Professional roles\n* Event dates\n* Locations\n* Organizations\n* Statistics\n* Achievements\n* Clothing brands\n* Logos\n* Sponsorships\n* Architectural details\n* Historical facts\n* Other factual claims\n\nUse information explicitly supported by the blog or reference-image descriptions.\n\nCreative visual decisions are allowed when they do not introduce unsupported factual claims.\n\nFor example, you may creatively determine:\n\n* Composition\n* Camera angle\n* Lighting\n* Depth of field\n* Visual hierarchy\n* Mood\n* Background treatment\n* Graphic layout\n* Typography placement\n* Artistic direction\n* Color application\n* Image framing\n\nThese are creative decisions, not factual claims.\n\n---\n\n# 10. Decide Whether Text Is Needed\n\nDetermine autonomously whether text should appear in the generated image.\n\nText is optional.\n\nDo not add text simply because the blog has a title.\n\nChoose between:\n\n* No text\n* Minimal text\n* Multiple text elements\n\nbased on what best communicates the blog's purpose.\n\nText may include relevant information derived from the blog, such as:\n\n* A concise headline\n* A person's name\n* A short key message\n* Event name\n* Short supporting phrase\n* Date\n* Callout\n* Other concise, visually useful information\n\nThe text does not need to reproduce the blog title verbatim.\n\nYou have creative freedom to derive concise, relevant text from the source material.\n\nHowever, all textual claims must remain grounded in the blog.\n\nAvoid excessive text.\n\nThe image should remain visually strong and readable.\n\n---\n\n# 11. Typography\n\nIf text is included in the image, use the provided font references.\n\nThe provided assets may contain:\n\n```json\n\"fonts\": {\n  \"heading\": \"...\",\n  \"body\": \"...\"\n}\n```\n\nUse:\n\n* `heading` font for prominent headlines, titles, names, or display typography.\n* `body` font for supporting text, captions, metadata, or secondary information.\n\nDo not force both fonts into the design if only one is necessary.\n\nIf no text is needed, do not mention typography unnecessarily.\n\n---\n\n# 12. Color System\n\nUse the provided color assets as the visual color reference:\n\n```json\n\"colors\": {\n  \"mainColor\": \"...\",\n  \"secondaryColor\": \"...\",\n  \"accentColor\": \"...\"\n}\n```\n\nTranslate these colors into an intentional visual system.\n\nUse:\n\n* `mainColor` as the dominant brand/base color where appropriate.\n* `secondaryColor` as a supporting color.\n* `accentColor` for highlights, emphasis, important visual details, or small graphic elements.\n\nDo not mechanically apply all three colors if doing so would harm the visual design.\n\nThe colors should feel intentional and cohesive with the image concept.\n\nDo not introduce a competing color palette without a strong visual reason.\n\n---\n\n# 13. Image Prompt Quality\n\nThe `prompt` must be a **complete, production-ready prompt** that can be sent directly to an image-generation model.\n\nIt should contain enough detail to produce a high-quality result.\n\nWhen appropriate, describe:\n\n* Main visual subject\n* Subject appearance based on references\n* Composition\n* Framing\n* Camera perspective\n* Subject positioning\n* Environment\n* Background\n* Visual hierarchy\n* Lighting\n* Mood\n* Atmosphere\n* Depth\n* Photography or artistic style\n* Graphic design direction\n* Typography\n* Text content\n* Font usage\n* Color palette\n* Reference-image usage\n* Important visual details\n* Desired level of realism or stylization\n* Image quality\n* Overall aesthetic\n\nDo not add unnecessary instructions that are unrelated to the blog.\n\nThe prompt should be specific enough to guide the image model but coherent enough to produce one unified visual.\n\n---\n\n# 14. Always Write the Image Prompt in English\n\nThe entire `prompt` value must **always be written in English**, regardless of the language used in the blog.\n\nThis includes:\n\n* Visual instructions\n* Composition instructions\n* Style instructions\n* Reference-image instructions\n* Typography instructions\n* Color instructions\n* Image-generation instructions\n\nHowever, if the generated image should contain text in another language, the actual requested text may remain in that appropriate language.\n\nFor example, an Indonesian blog may produce an English image-generation prompt containing:\n\n> Include the Indonesian headline \"Pelatihan Sepak Bola Profesional\".\n\nThe instructions surrounding that text must remain in English.\n\n---\n\n# 15. Do Not Overrepresent Secondary Content\n\nA blog may contain many people, locations, statistics, topics, and concepts.\n\nDo not attempt to include everything.\n\nThe generated image should communicate the **dominant story**.\n\nFor every potential visual element, ask:\n\n> Does this materially help communicate the primary intention of the blog?\n\nIf not, leave it out.\n\nThis applies especially to:\n\n* Briefly mentioned people\n* Secondary locations\n* External links\n* Supporting statistics\n* Minor historical references\n* Incidental organizations\n* Small details that do not affect the main visual message\n\n---\n\n# 16. Event-Specific Rule\n\nWhen an event appears in the blog, first determine whether the event is actually the **primary purpose** of the article.\n\n### If the event is secondary:\n\nDo not make the event the primary visual subject.\n\n### If the event is the primary purpose:\n\nThe image may prominently communicate:\n\n* Event identity\n* Event theme\n* Speakers\n* Participants\n* Venue\n* Activities\n* Key event message\n* Relevant date or other event information\n\nUse supporting people, venue references, and other provided images only when they are relevant to the event's visual concept.\n\nDo not automatically turn every article containing an event mention into an event promotional graphic.\n\n---\n\n# 17. Final Output Requirements\n\nReturn **strictly valid JSON**.\n\nThe output must contain exactly two top-level properties:\n\n```json\n{\n  \"prompt\": \"Complete English image-generation prompt...\",\n  \"images\": [\"img-1\", \"img-2\"]\n}\n```\n\n## `prompt`\n\nMust be:\n\n* A string\n* Written entirely in English, except for intentional text that should appear inside the generated image\n* Complete and production-ready\n* Grounded in the blog\n* Clear about selected reference-image usage\n* Clear about typography and colors when relevant\n\n## `images`\n\nMust be:\n\n* An array\n* Contain only valid image `key` values supplied in the input\n* Contain only images that are materially relevant\n* Preserve the selected order\n* Be an empty array if no relevant image exists\n\n---\n\n# 18. Strict Output Restrictions\n\nDo not output:\n\n* Markdown\n* Code fences\n* Explanations\n* Analysis\n* Reasoning\n* Additional properties\n* Comments\n* Notes\n* Confidence scores\n* Intent classifications\n* Audience classifications\n\nDo not expose your internal analysis.\n\nThe final response must be **only the JSON object**.\n\n---\n\n# Decision Process\n\nBefore producing the final JSON, internally follow this sequence:\n\n1. Read and understand the entire blog title and content.\n2. Identify the blog's primary intention.\n3. Identify the primary subject and message.\n4. Identify the target audience.\n5. Separate primary content from secondary/incidental content.\n6. Determine the appropriate visual concept.\n7. Review every provided image's **description first**, then its title.\n8. Determine which images materially support the visual concept.\n9. Select zero or more relevant images.\n10. Preserve the selected image order.\n11. Determine whether text is beneficial.\n12. If text is needed, derive concise relevant text from the blog.\n13. Apply the provided typography references where appropriate.\n14. Apply the provided color references appropriately.\n15. Construct a complete English image-generation prompt.\n16. Ensure every reference image is referred to according to its **position in the selected `images` array**.\n17. Remove unsupported factual claims.\n18. Return only the required JSON object.\n\nThe ultimate goal is:\n\n> **Understand the blog first. Determine what the image should communicate second. Select references third. Write the image prompt last.**\n\nNever reverse this priority.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        1872,
+        -544
+      ],
+      "id": "e8efaf7a-b319-439c-aecb-aad1a5a55df2",
+      "name": "Message a model1",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let images = [];\nlet n = 1;\nfor (const item of $input.first().json.parsed) {\n  images.push({\n    key: \"img-\"+n,\n    title:item.title,\n    description: item.desc\n  });\n  n++;\n}\n\nreturn {\n  blog: {\n    title: $('Original Blog').first().json.title,\n    content: $('Original Blog').first().json.content\n  },\n  images: images,\n  assets: {\n    fonts: $('Prepare Data').first().json.assets.fonts,\n    colors: $('Prepare Data').first().json.assets.colors\n  }\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1648,
+        -544
+      ],
+      "id": "9be2c0f2-4097-41ea-937d-cde6b2e393aa",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $('Code in JavaScript').first().json;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1936,
+        -400
+      ],
+      "id": "8fb42310-60ed-436d-acfc-7d141ec95b56",
+      "name": "Code in JavaScript4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const result = JSON.parse($input.first().json.content.parts[0].text);\n\nfunction getSelectedImageUrls(img_selected, img_filter, img_source) {\n    return img_selected\n        .map(key => {\n            const filteredImage = img_filter.find(item => item.key === key);\n\n            if (!filteredImage) return null;\n\n            const sourceImage = img_source.find(\n                item => item.title === filteredImage.title\n            );\n\n            return sourceImage ? sourceImage.url : null;\n        })\n        .filter(Boolean);\n}\nlet payload = {\n    \"url\": \"https://api.kie.ai/api/v1/jobs/createTask\",\n    \"config\": {\n      \"model\": \"gpt-image-2-5-flare-text-to-image\",\n      \"input\": {\n        \"prompt\": result.prompt,\n        \"aspect_ratio\": \"16:9\",\n        \"resolution\": \"1K\",\n        \"background\": \"auto\"\n       }\n    } \n}\nif(result.images.length > 0){\n  let img_result = getSelectedImageUrls(\n    result.images,\n    $('Code in JavaScript').first().json.images,\n    $('Prepare Image').first().json.parsed\n  );\n  payload.config.model ='gpt-image-2-5-flare-image-to-image';\n  payload.config.input.input_urls = img_result;\n}\n\nreturn payload;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2256,
+        -544
+      ],
+      "id": "92a2f9ce-b114-4985-bbe6-5886d01ba6cc",
+      "name": "Code in JavaScript3",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2160,
+        -384
+      ],
+      "id": "a9134259-0145-48c3-865a-cc9f93318fc6",
+      "name": "Wait1",
+      "webhookId": "1f1e19a0-d7f6-4ec8-8a3d-535145de5b53"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        4448,
+        -240
+      ],
+      "id": "df3d4107-f6b0-4c2d-8f8f-c3017b549981",
+      "name": "Wait2",
+      "webhookId": "7d9d89f8-842d-41a8-8134-03c98285bd34"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "={{ $('Insert data to website').item.json.status }}"
+            },
+            {
+              "name": "data",
+              "value": "={{ $('Insert data to website').item.json.data }}"
+            },
+            {
+              "name": "faq_display",
+              "value": "={{ $('Code').item.json.data.faq_display }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        4672,
+        -464
+      ],
+      "id": "00f19c66-1a99-4caf-a8a9-7433c0e1483b",
+      "name": "HTTP Request8"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_FLASH_PREVIEW}}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=1. faq_count: {{ $('Prepare Data').item.json.config.faq_count }}\n2. source_text: {{ $('Original Blog').item.json.content }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "systemMessage": "=You are an expert Content Analyst and SEO Specialist.\n\nYour sole purpose is to analyze supplied content and generate a structured FAQ together with its corresponding JSON-LD schema.\n\nEverything you generate must be derived strictly from the provided source text.\n\nDo not invent, infer, or add information that is not supported by the source.\n\n---\n\n# INPUTS\n\nYou will receive:\n\n1. `source_text`\n   The content to analyze.\n\n2. `faq_count`\n   An integer specifying the exact number of FAQ items to generate.\n\n---\n\n# PROCESS\n\n## 1. ANALYZE\n\nRead the entire `source_text` carefully.\n\nIdentify:\n\n* Main topics\n* Important concepts\n* User intent\n* Frequently asked questions naturally answered by the content\n\nAll generated questions and answers MUST remain faithful to the source.\n\n---\n\n## 2. GENERATE QUESTIONS\n\nCreate clear, concise, and helpful questions that readers are likely to ask after reading the article.\n\nRequirements:\n\n* Questions must be unique.\n* Questions must be directly supported by the source.\n* Questions should cover different aspects of the content.\n* Questions should sound natural.\n* Do not create duplicate or nearly identical questions.\n\n---\n\n## 3. GENERATE ANSWERS\n\nGenerate concise answers.\n\nRequirements:\n\n* Answers must come strictly from the source text.\n* Do NOT invent information.\n* Do NOT use external knowledge.\n* Do NOT speculate.\n* Do NOT exaggerate.\n* Keep answers clear and helpful.\n* Preserve the meaning of the source.\n\n---\n\n## 4. FAQ COUNT\n\nGenerate exactly the number of FAQ items specified by:\n\n`faq_count`\n\nIf the source text genuinely cannot support that many unique questions, generate the maximum possible number of unique FAQs without repeating topics or fabricating information.\n\n---\n\n## 5. GENERATE JSON-LD SCHEMA\n\nGenerate a valid Schema.org FAQPage object.\n\nRequirements:\n\n* Use every generated FAQ.\n* The schema must be valid JSON-LD.\n* Every question and answer in the schema must exactly match those in the display FAQ.\n\n---\n\n# JSON STRUCTURE\n\nReturn exactly this structure:\n\n```json\n{\n  \"faq_display\": [\n    {\n      \"question\": \"\",\n      \"answer\": \"\"\n    }\n  ],\n  \"faq_schema\": {\n    \"@context\": \"https://schema.org\",\n    \"@type\": \"FAQPage\",\n    \"mainEntity\": [\n      {\n        \"@type\": \"Question\",\n        \"name\": \"\",\n        \"acceptedAnswer\": {\n          \"@type\": \"Answer\",\n          \"text\": \"\"\n        }\n      }\n    ]\n  }\n}\n```\n\nNotes:\n\n* `faq_display` and `faq_schema.mainEntity` must contain the same questions and answers.\n* `@context` MUST be `\"https://schema.org\"` exactly.\n* The output must be valid JSON.\n\n---\n\n# OUTPUT CONTRACT (CRITICAL)\n\nYour response MUST consist ONLY of the final JSON object.\n\nDO NOT output:\n\n* Any introduction\n* Any explanation\n* Any reasoning\n* Any confirmation\n* Any notes\n* Any apologies\n* Any Markdown\n* Any headings\n* Any bullet lists\n* Any code fences\n* Any text before the JSON\n* Any text after the JSON\n\nForbidden examples include:\n\n* \"Certainly!\"\n* \"Here is the FAQ.\"\n* \"Below is the JSON.\"\n* \"I've generated the FAQs.\"\n* \"Based on the provided content...\"\n\nThe FIRST character of your response MUST be:\n\n```\n{\n```\n\nThe LAST character of your response MUST be:\n\n```\n}\n```\n\nThe output MUST be valid JSON that can be parsed directly using `JSON.parse()` without any preprocessing.\n\nDo NOT include escaped newline characters (`\\n`) inside JSON string values unless they are genuinely required as part of the answer text.\n\nIf the requested number of FAQs cannot be generated because the source lacks sufficient information, still return a valid JSON object using the maximum number of unique, source-supported FAQ items. Never explain the limitation outside the JSON.\n\n---\n\n# EXECUTION COMMAND\n\nAnalyze the supplied content.\n\nGenerate the FAQ items.\n\nGenerate the matching FAQPage JSON-LD schema.\n\nReturn ONLY the following JSON object.\n\n```json\n{\n  \"faq_display\": [\n    {\n      \"question\": \"Question\",\n      \"answer\": \"Answer\"\n    }\n  ],\n  \"faq_schema\": {\n    \"@context\": \"https://schema.org\",\n    \"@type\": \"FAQPage\",\n    \"mainEntity\": [\n      {\n        \"@type\": \"Question\",\n        \"name\": \"Question\",\n        \"acceptedAnswer\": {\n          \"@type\": \"Answer\",\n          \"text\": \"Answer\"\n        }\n      }\n    ]\n  }\n}\n```\n\nThe response must begin with `{` and end with `}`."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        3872,
+        -336
+      ],
+      "id": "1728c7cd-b073-4843-a1a8-55a7732d61a1",
+      "name": "Message a model4",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.domain }}wp-json/synergizeflow/v2/submit-blog-faq/",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license",
+              "value": "={{ $('Prepare Data').item.json.license }}"
+            },
+            {
+              "name": "faq",
+              "value": "={{ $json.data.faq_display }}"
+            },
+            {
+              "name": "schema",
+              "value": "={{ $json.data.faq_schema }}"
+            },
+            {
+              "name": "blog_id",
+              "value": "={{ $('Insert data to website').item.json.data.blog_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4448,
+        -464
+      ],
+      "id": "573ee757-94ca-49ee-a0d5-5ba32fd13a48",
+      "name": "Send content"
+    },
+    {
+      "parameters": {
+        "jsCode": "function getValidJsonObject(rawText) {\n\n    if (typeof rawText !== 'string' || rawText.trim() === '') {\n        console.error(\"Invalid input or empty text field.\");\n        return null;\n    }\n\n    let jsonString = rawText.trim();\n\n    // 2. Check for and remove the markdown JSON block fences.\n    // This regex is robust and handles variations in whitespace.\n    const markdownRegex = /^```json\\s*([\\s\\S]*?)\\s*```$/;\n    const match = jsonString.match(markdownRegex);\n\n    if (match) {\n        // If it's a match, the actual JSON string is in the first capture group.\n        jsonString = match[1];\n    }\n\n    // 3. Parse the cleaned string into a JSON object.\n    try {\n        return JSON.parse(jsonString);\n    } catch (error) {\n        console.error(\"Failed to parse JSON string:\", error);\n        console.error(\"Problematic string:\", jsonString);\n        return null;\n    }\n}\n\n// Combine the 'text' from all parts into a single string.\nconst combinedText = $input.first().json.content.parts.map(part => part.text).join('');\n\nreturn {data: getValidJsonObject(combinedText)};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4224,
+        -416
+      ],
+      "id": "6278d180-c183-4c3c-a1f3-285f708907c4",
+      "name": "Code",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Prepare Data').item.json.config.faq_count }}",
+                    "rightValue": 0,
+                    "operator": {
+                      "type": "number",
+                      "operation": "notEquals"
+                    },
+                    "id": "272ad233-50d0-4aa6-a877-f5676d68e887"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "has_faq"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d28227d4-b390-485f-b193-f47806fb8b39",
+                    "leftValue": "={{ $('Prepare Data').item.json.config.faq_count }}",
+                    "rightValue": 0,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "no_faq"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        3648,
+        -240
+      ],
+      "id": "38ab41a4-f2be-4d61-a1fe-c185de829e4f",
+      "name": "Switch3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "={{ $json.status }}"
+            },
+            {
+              "name": "data",
+              "value": "={{ $json.data }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3936,
+        -144
+      ],
+      "id": "5bd21d25-96f9-4911-8757-f2eaf3e8adfb",
+      "name": "HTTP Request5"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "msg",
+              "value": "error_insert_blog"
+            },
+            {
+              "name": "status",
+              "value": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3648,
+        -48
+      ],
+      "id": "32a64fe4-ef27-415c-9086-bd52a550d3fd",
+      "name": "HTTP Request4"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.domain }}wp-json/synergizeflow/v2/insert-blog",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license",
+              "value": "={{ $('Prepare Data').item.json.license }}"
+            },
+            {
+              "name": "category",
+              "value": "={{ $('Prepare Data').item.json.config.categories }}"
+            },
+            {
+              "name": "author",
+              "value": "={{ $('Prepare Data').item.json.config.author }}"
+            },
+            {
+              "name": "status",
+              "value": "={{ $('Prepare Data').item.json.config.post_status }}"
+            },
+            {
+              "name": "title",
+              "value": "={{ $json.title }}"
+            },
+            {
+              "name": "content",
+              "value": "={{ $json.content }}"
+            },
+            {
+              "name": "excerpt",
+              "value": "={{ $json.excerpt }}"
+            },
+            {
+              "name": "image",
+              "value": "={{ $json.image }}"
+            },
+            {
+              "name": "keyword",
+              "value": "={{ $json.keyword }}"
+            },
+            {
+              "name": "provider",
+              "value": "={{ $('Prepare Data').item.json.config.seo_provider }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3408,
+        -176
+      ],
+      "id": "aa4a32ee-0cfe-4932-a898-1208ef5704c8",
+      "name": "Insert data to website",
+      "retryOnFail": true,
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if license is valid": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get token": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Search Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Message a model",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Original Blog",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Original Blog": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Text to Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text to Image": {
+      "main": [
+        [
+          {
+            "node": "Generate Image no assets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image no assets": {
+      "main": [
+        [
+          {
+            "node": "KIE AI Pooling",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "KIE AI Pooling": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze an image": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Prepare Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Image": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Analyze an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "Generate Image no assets",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript4": {
+      "main": [
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Insert data to website",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "Message a model4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model4": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send content": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Send content",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch3": {
+      "main": [
+        [
+          {
+            "node": "Message a model4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert data to website": {
+      "main": [
+        [
+          {
+            "node": "Switch3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "triggerCount": 1,
+  "versionId": "51aa896b-a685-4bc2-8fd5-5399460ba37b",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "COlUXFB7ZeDqdhmU",
+  "isArchived": false
+}

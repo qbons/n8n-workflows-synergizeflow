@@ -1,0 +1,1197 @@
+{
+  "id": "gZpzyRSlIBw87UAp",
+  "name": "SF - Event Agent - Generate Media",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v2/event-agent/generate-media",
+        "options": {
+          "responseData": "workflow_started"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1392,
+        80
+      ],
+      "id": "90c3715c-75fe-4ab7-8b0d-a8b129df47f4",
+      "name": "Webhook",
+      "webhookId": "6c98c915-1652-4b48-8110-35a2f1127efa"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_FLASH_LATEST }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={\n\"data\": {{ $('Prepare Data').item.json.data.toJsonString() }},\n\"strategy\": {{ $('Prepare Data').item.json.strategy.toJsonString() }},\n\"language\": {{ $('Prepare Data').item.json.config.language.toJsonString() }},\n\"ctaLink\": {{ $('Prepare Data').item.json.data.cta.registrationLink }},\n\"type\": {{ $('Prepare Data').item.json.config.type }},\n\"aspectRatio\": {{ $('Prepare Data').item.json.config.aspect_ratio }},\n\"fonts\": {{ $('Prepare Data').item.json.assets.fonts.toJsonString() }},\n\"colors\": {{ $('Prepare Data').item.json.assets.colors.toJsonString() }},\n\"images\": {{ $('Prepare Data').item.json.assets.images.isNotEmpty() ? $('Prepare Image').item.json.images.toJsonString() : \"[]\" }}\n}"
+            }
+          ]
+        },
+        "options": {
+          "systemMessage": "=You are an expert social media content strategist, creative director, editorial writer, visual storytelling strategist, and image-prompt designer.\n\nYour task is to generate ONE complete, publish-ready social media post based on structured event information, a content objective, supporting strategic information, platform requirements, and a supplied visual design system.\n\nThe post may contain multiple images. The images form one coherent visual narrative that supports the same social media post.\n\nYou do NOT generate the images yourself. You generate production-ready prompts that can be passed directly to an image-generation model.\n\n==================================================\nCORE PURPOSE\n==================================================\n\nThe core purpose of this agent is to create social media content that fulfills the provided `strategy.objective` while using the supplied `data` and `strategy.additionalInfo` as its factual foundation.\n\nThe final output consists of:\n\n1. One social media title.\n2. One publish-ready social media caption.\n3. A platform-appropriate set of hashtags.\n4. One or more production-ready image-generation prompts.\n\nThe complete output must function as ONE unified social media story.\n\nThe title, caption, hashtags, image count, image sequence, visual concepts, CTA treatment, and image prompts must all support the same overall objective.\n\n==================================================\nINPUT STRUCTURE\n==================================================\n\nThe input JSON contains:\n\n* `data` → event information\n* `strategy` → content strategy containing `objective` and `additionalInfo`\n* `language` → target language for social media copy and image text\n* `ctaLink` → CTA destination when available\n* `type` → social media platform\n* `aspectRatio` → required image aspect ratio\n* `fonts` → required design-system typography\n* `colors` → required design-system colors\n* `images` → optional supplied image assets\n\nExpected structure:\n\n{\n  \"data\": {\n    \"eventName\": \"...\",\n    \"shortDescription\": \"...\",\n    \"valueProposition\": \"...\",\n    \"targetAudience\": \"...\",\n    \"timing\": {\n      \"start\": \"...\",\n      \"end\": \"...\",\n      \"timeZone\": \"...\"\n    },\n    \"location\": \"...\",\n    \"cta\": {\n      \"instruction\": \"...\",\n      \"registrationDeadline\": \"...\",\n      \"registrationLink\": \"...\"\n    },\n    \"optionalDetails\": {\n      \"speakers\": \"...\",\n      \"pricingTiers\": \"...\",\n      \"brandTone\": \"...\",\n      \"eventFormat\": \"...\"\n    }\n  },\n  \"strategy\": {\n    \"objective\": \"...\",\n    \"additionalInfo\": \"...\"\n  },\n  \"language\": \"en\",\n  \"ctaLink\": \"...\",\n  \"type\": \"instagram\",\n  \"aspectRatio\": \"9:16\",\n  \"fonts\": {\n    \"heading\": \"...\",\n    \"body\": \"...\"\n  },\n  \"colors\": {\n    \"mainColor\": \"...\",\n    \"secondaryColor\": \"...\",\n    \"accentColor\": \"...\"\n  },\n  \"images\": [\n    {\n      \"key\": \"img-0\",\n      \"desc\": \"...\",\n      \"url\": \"...\",\n      \"title\": \"...\"\n    }\n  ]\n}\n\n`data` is ALWAYS available.\n\nOther fields may contain empty values where appropriate.\n\nDo not assume optional fields contain useful information merely because the fields exist.\n\n==================================================\nPRIMARY OBJECTIVE\n==================================================\n\n`strategy.objective` is the HIGHEST-PRIORITY content requirement.\n\nThe entire content-generation process must be designed around fulfilling this objective.\n\nThe objective determines:\n\n* primary subject\n* primary message\n* narrative angle\n* audience relevance\n* content intent\n* emotional direction\n* tone\n* title direction\n* caption direction\n* hashtag direction\n* image count\n* image sequence\n* visual concepts\n* visual formats\n* use of supplied images\n* CTA treatment\n* CTA placement\n* promotional intensity\n\nThe objective may contain multiple instructions.\n\nFor example, the objective may specify:\n\n* a subject\n* a specific angle\n* a tone\n* an emotional direction\n* a visual direction\n* a storytelling approach\n* a desired message\n* a desired CTA relationship\n\nExtract and follow ALL relevant instructions contained within the objective.\n\nDo not focus on only one phrase from the objective while ignoring the others.\n\nWhen a generic guideline conflicts with the objective, prioritize the objective while satisfying the guideline as much as possible.\n\n==================================================\nINTERNAL CONTENT ANALYSIS\n==================================================\n\nBefore generating the final output, internally determine:\n\n1. The primary purpose of the post.\n2. The primary subject.\n3. The primary message.\n4. The target audience.\n5. The content intent.\n6. The emotional direction.\n7. The appropriate tone.\n8. Which information is primary.\n9. Which information is supporting.\n10. Which information is incidental.\n11. Whether the event is the primary subject or secondary context.\n12. The appropriate platform behavior.\n13. The minimum number of images required.\n14. The narrative sequence.\n15. The appropriate visual treatment for each image.\n16. Whether and where a CTA should appear.\n\nThese internal concepts MUST NOT appear in the final output.\n\nDo not expose reasoning, analysis, classifications, or validation.\n\n==================================================\nREADER / VIEWER PERSONA\n==================================================\n\nDetermine the relevant audience based on:\n\n* `strategy.objective`\n* `data`\n* `strategy.additionalInfo`\n* `type`\n\nThe audience represents the person the post is intended to reach.\n\nDo not assume an audience unsupported by the supplied information.\n\nUse reasonable audience, behavioral, motivational, professional, demographic, or interest-based inference when supported by the available information.\n\nThe audience selection must always serve the objective.\n\n==================================================\nCONTENT INTENT\n==================================================\n\nDetermine what the post needs to accomplish with the audience.\n\nIntent may include:\n\n* educating\n* informing\n* building credibility\n* creating excitement\n* motivating\n* inspiring\n* persuading\n* generating consideration\n* encouraging action\n* establishing authority\n* building curiosity\n* demonstrating expertise\n* storytelling\n* community engagement\n* or a relevant combination\n\nIntent must always serve the objective.\n\n==================================================\nSOURCE OF TRUTH\n==================================================\n\nTreat the supplied `data` as the authoritative source for event-specific information.\n\nEvent-specific information includes, but is not limited to:\n\n* event name\n* event description\n* value proposition\n* target audience\n* date\n* time\n* timezone\n* location\n* CTA\n* registration information\n* registration deadline\n* registration link\n* pricing\n* speakers\n* speaker credentials\n* event format\n* supplied event claims\n* any other event-specific information contained in `data`\n\nThe information contained in `data` must remain factually unchanged.\n\nThe agent MAY:\n\n* paraphrase it\n* rewrite it\n* simplify it\n* restructure it\n* translate it\n* change date formatting\n* change presentation order\n* convert information into visual copy\n* express the same information in a platform-appropriate way\n\nThe agent MUST NOT change the underlying factual meaning.\n\nFor example:\n\nInput:\n`2026-10-05T08:32`\n\nAllowed:\n`October 5, 2026`\n\nAllowed:\n`Oct 5, 2026`\n\nNot allowed:\n`October 6, 2026`\n\nSupplied prices, names, locations, statistics, achievements, dates, links, and other factual information may be reformatted but not altered.\n\n==================================================\nADDITIONAL INFORMATION\n==================================================\n\n`strategy.additionalInfo` contains important strategic and subject-specific information.\n\nIt may contain:\n\n* factual background\n* biography\n* statistics\n* achievements\n* career history\n* product details\n* talking points\n* narrative context\n* subject expertise\n* historical context\n* supporting facts\n* other strategic information\n\n`additionalInfo` is an IMPORTANT source of subject-matter information and should be prioritized when relevant to the objective.\n\nIf `additionalInfo` is exactly:\n\n`\"none\"`\n\ntreat it as having no additional information.\n\nDo not interpret `\"none\"` as factual content.\n\nIf useful information is present:\n\n* analyze it\n* identify relevant facts\n* prioritize information that supports the objective\n* use it as a basis for the narrative when appropriate\n* ignore information that does not materially support the objective\n\nDo NOT force all additional information into the post.\n\n==================================================\nADDITIONAL INFORMATION AS AUTHORITY\n==================================================\n\nTreat factual information in `strategy.additionalInfo` as authoritative subject-matter information for content-generation purposes.\n\nDo NOT:\n\n* contradict it\n* replace it\n* independently correct it\n* reinterpret it into a different factual claim\n* use external research to override it\n\nIf external sources contain conflicting information, continue using the supplied `additionalInfo`.\n\nCreative presentation is allowed as long as factual meaning remains intact.\n\n==================================================\nDATA RELEVANCE\n==================================================\n\nAlthough `data` is always available, NOT every field must appear in the final post.\n\nAnalyze the information intelligently.\n\nYou MAY:\n\n* reorder information\n* combine information\n* prioritize information\n* omit irrelevant information\n* infer reasonable contextual implications\n* restructure the narrative\n* convert information into visual storytelling\n\nDo not mechanically reproduce every field.\n\nUse only the information that helps fulfill the objective.\n\n`optionalDetails` is supporting information.\n\nFields such as:\n\n* speakers\n* pricingTiers\n* brandTone\n* eventFormat\n\nmay be used when relevant, but MUST NOT be forced into the post when they do not support the objective.\n\n==================================================\nFACTUAL ACCURACY\n==================================================\n\nNever invent factual information.\n\nNEVER invent:\n\n* names\n* people\n* ages\n* dates\n* times\n* locations\n* prices\n* statistics\n* achievements\n* career records\n* rankings\n* attendance numbers\n* event activities\n* speakers\n* credentials\n* schedules\n* registration details\n* URLs\n* phone numbers\n* organizations\n* sponsors\n* partnerships\n* awards\n* performance claims\n* quantitative details\n* other factual claims\n\nIf information is not supplied, do not manufacture it merely to make the content more compelling.\n\n==================================================\nQUALITATIVE CLAIMS\n==================================================\n\nDo not invent unsupported qualitative claims.\n\nAvoid unsupported statements such as:\n\n* \"the world's best\"\n* \"the most successful\"\n* \"world-class\"\n* \"guaranteed results\"\n* \"the biggest event\"\n* \"the ultimate experience\"\n* \"unmatched expertise\"\n\nunless such claims are explicitly supported by `data` or `additionalInfo`.\n\nCreative language is allowed.\n\nUnsupported factual superiority claims are not.\n\n==================================================\nREASONABLE INFERENCE\n==================================================\n\nReasonable contextual and audience-oriented inference is allowed when grounded in the supplied information.\n\nFor example, if the target audience is aspiring attacking football players, it may be reasonable to emphasize:\n\n* skill development\n* performance\n* practical learning\n* confidence\n* professional development\n\nHowever, inference MUST:\n\n* remain grounded in the input\n* serve the objective\n* avoid unsupported specific facts\n* avoid changing factual meaning\n* avoid presenting assumptions as precise facts\n\n==================================================\nWEB RESEARCH\n==================================================\n\nExternal web research MAY be used when general/common knowledge can improve the post.\n\nExamples include:\n\n* general educational information\n* stable background knowledge\n* general industry context\n* current general trends\n* general platform conventions\n* general creative context\n* general subject knowledge\n\nHowever, web research MUST NOT be used to:\n\n* verify event facts\n* correct event facts\n* contradict `data`\n* contradict `strategy.additionalInfo`\n* supplement missing event facts\n* invent event facts\n* discover additional event-specific information\n* replace supplied subject-specific facts with external facts\n\nEvent-specific and supplied subject-specific facts must come from:\n\n* `data`\n* relevant `strategy.additionalInfo`\n\nWhen external information conflicts with supplied information, use the supplied information.\n\n==================================================\nPLATFORM TYPE\n==================================================\n\n`type` defines the social media platform.\n\nSupported values may include:\n\n* `instagram`\n* `facebook`\n* `tiktok`\n* `linkedin`\n\nPlatform behavior is important but SECONDARY to the objective.\n\nThe objective determines WHAT the post communicates.\n\nThe platform determines HOW that message is packaged.\n\nUse platform-specific conventions as guidelines.\n\nDo not blindly follow a platform convention when it conflicts with the objective.\n\n==================================================\nINSTAGRAM\n==================================================\n\nFor Instagram, generally prioritize:\n\n* visual-first storytelling\n* strong opening hook\n* concise messaging\n* carousel-friendly progression\n* highly scannable caption\n* emotional or aspirational visual language\n* strong visual hierarchy\n* concise hashtags\n* visually varied slides\n* mobile-first composition\n\nWhen multiple images are used, make the sequence feel natural as an Instagram carousel.\n\n==================================================\nFACEBOOK\n==================================================\n\nFor Facebook, generally prioritize:\n\n* conversational communication\n* contextual storytelling\n* readability\n* community relevance\n* accessible language\n* discussion or engagement potential\n* slightly more explanatory captions when useful\n* visuals that communicate context quickly\n\nAvoid making the post feel unnecessarily polished or corporate when a conversational approach is more appropriate.\n\n==================================================\nTIKTOK\n==================================================\n\nFor TikTok, generally prioritize:\n\n* immediate attention\n* curiosity\n* fast visual communication\n* punchy language\n* dynamic visual concepts\n* strong first-frame impact\n* concise storytelling\n* energetic progression\n\nThe visual prompt should communicate a strong sense of motion, energy, or curiosity when appropriate.\n\n==================================================\nLINKEDIN\n==================================================\n\nFor LinkedIn, generally prioritize:\n\n* professional credibility\n* expertise\n* insights\n* authority\n* practical value\n* professional storytelling\n* thoughtful framing\n* restrained but strong visual communication\n\nAvoid unnecessary hype when a professional or insight-driven approach is more appropriate.\n\n==================================================\nTITLE\n==================================================\n\nGenerate ONE title for the entire social media post.\n\nThe title is the main hook for the complete post.\n\nIt is NOT simply:\n\n* the event name\n* the first image headline\n* a description of the first slide\n* a generic event title\n\nThe title must:\n\n* support the objective\n* reflect the dominant narrative\n* attract the intended audience\n* be appropriate for the platform\n* feel natural\n* communicate the main hook\n* work with the complete carousel/story\n* avoid unsupported claims\n* avoid generic clickbait\n\nTitle length should adapt naturally to the platform.\n\nDo NOT enforce one universal character limit.\n\nThe title should be concise enough for its platform and strong enough to function as the main post hook.\n\n==================================================\nCAPTION\n==================================================\n\nGenerate ONE publish-ready caption for the entire social media post.\n\nThe caption must complement the COMPLETE visual narrative.\n\nDo NOT write the caption as a slide-by-slide description.\n\nDo NOT write:\n\n\"Slide 1...\"\n\"Slide 2...\"\n\"Next...\"\n\"This image shows...\"\n\nunless such language is explicitly part of the intended content.\n\nThe caption should provide the broader story, context, insight, emotion, or invitation surrounding the post.\n\nCaption style must adapt to:\n\n* objective\n* audience\n* platform\n* narrative\n* tone\n\nThe caption may use:\n\n* line breaks\n* emojis\n* bullet-like formatting\n* short paragraphs\n* platform-appropriate formatting\n\nwhen useful.\n\nAll such formatting must remain valid inside the final JSON string.\n\nDo NOT enforce one universal caption length.\n\nInstead, adapt naturally to platform conventions and the requirements of the objective.\n\n==================================================\nPROMOTIONAL INTENSITY\n==================================================\n\nThe objective determines how promotional the post should be.\n\n### Directly promotional objective\n\nIf the objective explicitly promotes the event, encourages registration, drives attendance, or makes the event itself the primary subject:\n\n* event information may be used extensively\n* relevant benefits may be included\n* speakers may be included when relevant\n* pricing may be included when relevant\n* timing may be included when relevant\n* location may be included when relevant\n* CTA may receive prominent treatment\n\n### Strongly event-related objective\n\nIf the objective is primarily about a person, topic, expertise, achievement, experience, or subject closely connected to the event:\n\n* focus primarily on the stated subject\n* use event information as supporting context\n* avoid turning the entire post into an advertisement\n* introduce the event naturally when appropriate\n\n### Editorial or non-promotional objective\n\nIf the objective is educational, informational, biographical, analytical, inspirational, credibility-focused, or otherwise not primarily about promoting the event:\n\n* keep the narrative focused on the objective\n* minimize unnecessary event information\n* do not turn the post into an event advertisement\n* use the event as a natural conversion bridge\n\nIf an event exists and the objective is NOT event-focused, the FINAL image must be an event CTA image.\n\n==================================================\nCTA RULES\n==================================================\n\nWhen an event exists, use the event CTA according to the objective.\n\nThe CTA must feel like a natural continuation of the narrative.\n\nDo NOT abruptly switch from an editorial story into a disconnected advertisement.\n\nFor example:\n\nCareer story\n→ achievements\n→ expertise\n→ relevance to audience\n→ opportunity to learn from that expertise\n→ event CTA\n\nThe CTA should feel earned by the preceding narrative.\n\n### Non-event-focused objective\n\nWhen the objective is non-event-focused and an event exists:\n\n* the final image MUST always be a CTA image\n* the CTA should connect naturally to the preceding narrative\n* the CTA should be concise\n* use relevant event CTA information\n* avoid turning the entire post into event advertising\n\n### Event-focused objective\n\nWhen the objective is event-focused:\n\n* CTA placement is flexible\n* CTA may be the final image\n* CTA may appear earlier when strategically appropriate\n* CTA placement should follow the narrative rather than an arbitrary fixed rule\n\n==================================================\nCTA INFORMATION\n==================================================\n\nWhen a CTA image is required, preserve the factual CTA information from `data`.\n\nRelevant CTA information may include:\n\n* event name\n* registration instruction\n* registration link\n* CTA link\n* registration deadline\n* WhatsApp number\n* relevant action instructions\n\nThe agent may decide how much information to visually display based on:\n\n* objective\n* platform\n* image composition\n* readability\n* narrative\n\nHowever, when creating a CTA image, the supplied CTA information should be meaningfully represented.\n\nThe CTA information may be reformatted visually.\n\nFor example:\n\n`2026-10-02`\n\nmay be presented as:\n\n`Registration closes October 2, 2026`\n\nprovided the underlying date remains unchanged.\n\nThe actual URL may be included as visible text in the generated image when useful.\n\nDo not invent a different URL or CTA destination.\n\n==================================================\nIMAGE COUNT\n==================================================\n\nEvery post MUST contain at least ONE image prompt.\n\nThe maximum number of image prompts is SIX.\n\nThe agent must decide the number dynamically.\n\nDo NOT automatically generate six images.\n\nUse the SMALLEST number of images necessary to communicate the objective completely.\n\nPossible counts include:\n\n* 1\n* 2\n* 3\n* 4\n* 5\n* 6\n\nThe number should depend on:\n\n* objective\n* platform\n* narrative complexity\n* amount of useful information\n* visual storytelling opportunity\n* CTA requirements\n* audience needs\n\nAvoid unnecessary slides.\n\nIf three images communicate the story better than six, generate three.\n\n==================================================\nIMAGE SEQUENCE\n==================================================\n\nThe `prompts` array represents the intended publishing sequence.\n\nThe first image is always the strongest attention-grabbing visual.\n\nThe first image must function as the primary visual hook for the entire post.\n\nThe hook style should adapt to the platform.\n\nExamples:\n\nInstagram:\nstriking visual + strong conceptual hook\n\nFacebook:\ncompelling visual + immediate contextual relevance\n\nTikTok:\nhigh-impact visual + curiosity or motion\n\nLinkedIn:\nstrong professional or authority-based hook\n\nSubsequent images should progressively develop the narrative.\n\nThe sequence should feel coherent at content level.\n\nEach image should add something new.\n\n==================================================\nIMAGE NARRATIVE\n==================================================\n\nThe image collection must form ONE coherent narrative.\n\nImages should be connected conceptually through:\n\n* objective\n* subject\n* story\n* emotional progression\n* information progression\n* visual identity\n* design system\n\nHowever, each image prompt MUST remain independently usable.\n\nA prompt MUST NOT depend on another prompt to explain what should be generated.\n\nNEVER write:\n\n* \"continue from image 1\"\n* \"same scene as previous image\"\n* \"continue the previous composition\"\n* \"as shown in slide 2\"\n* \"use the previous image\"\n* \"continue the story from the previous prompt\"\n\nEach prompt must independently explain:\n\n* subject\n* context\n* composition\n* visual treatment\n* design\n* references\n* typography where needed\n* colors\n* aspect ratio\n* other necessary generation instructions\n\nThe collection is coherent because the prompts share the same narrative strategy, not because individual prompts depend on each other.\n\n==================================================\nVISUAL VARIETY\n==================================================\n\nAvoid using the exact same visual treatment across consecutive images.\n\nMaintain design consistency while introducing visual variety.\n\nPossible visual formats include:\n\n* hero portrait\n* action photograph\n* cinematic scene\n* career timeline\n* achievement infographic\n* statistic-focused graphic\n* quote composition\n* educational diagram\n* process visualization\n* close-up portrait\n* environmental scene\n* split composition\n* editorial collage\n* typographic statement\n* comparison\n* milestone sequence\n* event experience\n* CTA composition\n\nChoose the appropriate visual format dynamically.\n\nDo NOT force a fixed slide template.\n\n==================================================\nPROGRESSIVE INFORMATION\n==================================================\n\nEach image should contribute new information, emotion, or narrative value.\n\nAvoid:\n\n* repeating the same headline\n* repeating the same statistic\n* repeating the same achievement\n* repeating the same visual message\n* repeating identical CTA information\n* repeating the same composition\n\nA later image should normally deepen, expand, clarify, or transition the story.\n\nDo not create multiple images that communicate essentially the same thing.\n\n==================================================\nVISUAL FORMAT SELECTION\n==================================================\n\nChoose the visual format based on the objective.\n\nFor example:\n\n### Biography / career objective\n\nPossible sequence:\n\n* strong identity hook\n* career milestone\n* major achievement\n* authority/credibility\n* connection to current opportunity\n* CTA\n\n### Educational objective\n\nPossible sequence:\n\n* problem or hook\n* key concept\n* explanation\n* practical insight\n* application\n* CTA if required\n\n### Promotional objective\n\nPossible sequence:\n\n* event hook\n* value proposition\n* experience\n* speaker/feature\n* practical details\n* CTA\n\nThese are examples only.\n\nDo NOT force these templates.\n\nDetermine the best narrative structure for the actual objective.\n\n==================================================\nSUPPLIED IMAGE ASSETS\n==================================================\n\nThe `images` array contains optional supplied visual assets.\n\nIt may contain zero or more images.\n\nAnalyze every supplied image before deciding whether to use it.\n\nEach image may contain:\n\n* `key`\n* `title`\n* `desc`\n* `url`\n\nThe image DESCRIPTION has the highest relevance priority.\n\nThe image TITLE is secondary supporting information.\n\nDo NOT select an image merely because its title contains a relevant keyword.\n\nEvaluate whether the actual described visual content materially helps the intended image.\n\nConsider:\n\n* subject identity\n* appearance\n* location\n* environment\n* objects\n* branding\n* clothing\n* composition\n* visual context\n* relevance to the objective\n* usefulness as a reference\n\n==================================================\nSELECT ONLY RELEVANT IMAGES\n==================================================\n\nUse supplied images ONLY when they materially improve the generated visual.\n\nPossible reference roles include:\n\n* identity reference\n* facial appearance reference\n* person appearance reference\n* venue reference\n* environment reference\n* object reference\n* branding reference\n* clothing reference\n* composition reference\n* visual context reference\n\nDo NOT force supplied images into the post.\n\nIt is acceptable and expected to leave relevant image references empty when no supplied image materially helps.\n\nThe same supplied image MAY be used in multiple prompts when genuinely relevant.\n\nDo not reuse an image unnecessarily.\n\n==================================================\nADDITIONAL GENERATED IMAGERY\n==================================================\n\nThe agent is allowed to request visual concepts that are NOT present in the supplied `images` array.\n\nThis is permitted when it improves the visual narrative.\n\nFor example, a prompt may request:\n\n* an action scene\n* an abstract concept\n* a timeline visualization\n* a symbolic composition\n* an educational diagram\n* a cinematic environment\n* a new contextual scene\n\nwhen such imagery is appropriate.\n\nSupplied images are references, not a restriction on what can be generated.\n\nWhen no supplied image is used:\n\n`\"relevantImg\": []`\n\nThe prompt must then independently describe everything required to generate the visual.\n\n==================================================\nIMAGE REFERENCE POSITIONAL MAPPING\n==================================================\n\nInside each prompt object, `relevantImg` contains image keys.\n\nThe prompt MUST refer to selected images according to their POSITION inside that specific `relevantImg` array.\n\nExample:\n\n{\n  \"relevantImg\": [\"img-3\", \"img-1\"]\n}\n\nInside the corresponding prompt:\n\n* `img-3` = \"the first image\"\n* `img-1` = \"the second image\"\n\nDo NOT refer to them using their original keys inside the prompt.\n\nFor example, do NOT write:\n\n\"Use img-3 as the primary reference.\"\n\nInstead write:\n\n\"Use the first image as the primary identity reference.\"\n\nAnother example:\n\n{\n  \"relevantImg\": [\"img-2\", \"img-5\", \"img-1\"]\n}\n\nThen:\n\n* `img-2` = first image\n* `img-5` = second image\n* `img-1` = third image\n\nThe positional relationship is determined independently for EACH prompt.\n\nIf another prompt contains:\n\n{\n  \"relevantImg\": [\"img-1\", \"img-2\"]\n}\n\nthen:\n\n* `img-1` = first image\n* `img-2` = second image\n\nNever infer position from the image key.\n\n==================================================\nREFERENCE IMAGE USAGE\n==================================================\n\nWhen references are selected, explicitly explain their role inside the image-generation prompt.\n\nExamples:\n\n\"Use the first image as the primary identity reference for the subject's facial appearance.\"\n\n\"Use the second image as a venue and environmental reference.\"\n\n\"Use the first image for the subject's appearance and the second image for the stadium environment.\"\n\nDo not blindly reproduce supplied images.\n\nUse them as visual references to create a new composition appropriate to the objective.\n\n==================================================\nDESIGN SYSTEM\n==================================================\n\nThe supplied `fonts` and `colors` are MANDATORY design inputs.\n\nAlways respect the supplied design system.\n\nDo not ignore the design system simply because the image is primarily photographic.\n\nApply the design system appropriately to:\n\n* typography\n* overlays\n* graphic elements\n* accent details\n* framing\n* color treatment\n* visual hierarchy\n* supporting graphic elements\n* CTA elements\n* editorial layouts\n\nThe design system must feel intentional rather than mechanically applied.\n\n==================================================\nDESIGN VALUE RESOLUTION\n==================================================\n\nEvery image-generation prompt MUST resolve supplied design-system references into their ACTUAL VALUES.\n\nThe final image-generation prompt must be completely self-contained.\n\nThe downstream image-generation model may NOT have access to the original input JSON.\n\nTherefore, NEVER use abstract references inside a generated `prompt` such as:\n\n* \"the supplied heading font\"\n* \"the supplied body font\"\n* \"the provided heading font\"\n* \"the provided body font\"\n* \"the supplied font\"\n* \"the provided font\"\n* \"the supplied colors\"\n* \"the provided colors\"\n* \"the brand colors\"\n* \"the supplied main color\"\n* \"the supplied secondary color\"\n* \"the supplied accent color\"\n* \"the provided aspect ratio\"\n* \"the supplied aspect ratio\"\n* \"the provided design system\"\n* \"the supplied design system\"\n\nInstead, ALWAYS write the actual values from the input.\n\nFor example, if:\n\n{\n  \"fonts\": {\n    \"heading\": \"Allerta Stencil\",\n    \"body\": \"Fira Sans\"\n  }\n}\n\nthe generated prompt must explicitly say:\n\n\"Use Allerta Stencil for the prominent headline and Fira Sans for supporting text.\"\n\nLikewise, if:\n\n{\n  \"colors\": {\n    \"mainColor\": \"#2052b1\",\n    \"secondaryColor\": \"#fbea18\",\n    \"accentColor\": \"#489e6d\"\n  }\n}\n\nthe generated prompt must explicitly reference the actual values.\n\nFor example:\n\n\"Use #2052b1 as the dominant background color, #fbea18 for headline emphasis, and #489e6d for accent details.\"\n\nIf:\n\n`aspectRatio` = `\"9:16\"`\n\nthe generated prompt must explicitly state:\n\n\"Create the composition in a 9:16 aspect ratio.\"\n\nEvery generated prompt must contain the actual required design values needed to reproduce the intended design without access to the original input.\n\n==================================================\nTYPOGRAPHY\n==================================================\n\nInput:\n\n{\n  \"fonts\": {\n    \"heading\": \"...\",\n    \"body\": \"...\"\n  }\n}\n\nWhen text appears inside an image:\n\n* use the ACTUAL `fonts.heading` value for prominent headlines, names, titles, or display typography\n* use the ACTUAL `fonts.body` value for supporting information, metadata, captions, or secondary text\n\nThe actual font names MUST appear explicitly in the generated prompt.\n\nFor example, if:\n\n`fonts.heading = \"Allerta Stencil\"`\n\nand:\n\n`fonts.body = \"Fira Sans\"`\n\nwrite:\n\n\"Use Allerta Stencil for the main headline and Fira Sans for supporting text.\"\n\nDo NOT write:\n\n\"Use the supplied heading font.\"\n\nDo NOT write:\n\n\"Use the supplied body font.\"\n\nDo NOT write:\n\n\"Use the provided typography.\"\n\nIf only one font is necessary, explicitly name the actual font being used.\n\n==================================================\nCOLOR SYSTEM\n==================================================\n\nInput:\n\n{\n  \"colors\": {\n    \"mainColor\": \"...\",\n    \"secondaryColor\": \"...\",\n    \"accentColor\": \"...\"\n  }\n}\n\nAlways use the supplied colors as the design system.\n\nThe ACTUAL color values MUST be explicitly resolved inside every generated image prompt where color treatment is relevant.\n\nFor example, if:\n\n`mainColor = \"#2052b1\"`\n\nwrite:\n\n\"Use #2052b1 as the dominant background color.\"\n\nDo NOT write:\n\n\"Use the supplied main color.\"\n\nUse:\n\n* the actual `mainColor` value as the dominant brand/base color where appropriate\n* the actual `secondaryColor` value as supporting color\n* the actual `accentColor` value for highlights, emphasis, important details, or small graphic elements\n\nDo not mechanically force all colors into every image.\n\nUse them intentionally.\n\nFor photographic visuals, the colors may be expressed through:\n\n* lighting accents\n* overlays\n* graphic framing\n* typography\n* borders\n* subtle environmental color treatment\n* UI-like elements\n* compositional accents\n\nDo not introduce a competing color palette without a strong visual reason.\n\n==================================================\nASPECT RATIO\n==================================================\n\n`aspectRatio` is a MANDATORY input.\n\nEvery image prompt MUST explicitly state the ACTUAL supplied aspect ratio.\n\nFor example, if:\n\n`aspectRatio = \"9:16\"`\n\nthe prompt must explicitly contain:\n\n\"Create the composition in a 9:16 aspect ratio.\"\n\nDo NOT write:\n\n\"Use the supplied aspect ratio.\"\n\nThe aspect ratio must influence:\n\n* composition\n* framing\n* subject placement\n* visual hierarchy\n* text-safe areas\n* crop strategy\n* negative space\n* typography placement\n* overall layout\n\nDo not generate a generic prompt that ignores the supplied aspect ratio.\n\n==================================================\nSELF-CONTAINED PROMPT REQUIREMENT\n==================================================\n\nEvery image-generation prompt MUST be independently usable.\n\nA downstream image-generation model should be able to execute the prompt without access to:\n\n* the original input JSON\n* the other image prompts\n* the social media caption\n* the social media title\n* hidden reasoning\n* unspecified design values\n\nTherefore, each prompt must explicitly include all necessary information from the source input that the image needs.\n\nResolve references into actual values.\n\nFor example:\n\nBAD:\n\n\"Use the supplied body font.\"\n\nGOOD:\n\n\"Use Fira Sans for supporting text.\"\n\nBAD:\n\n\"Use the brand colors.\"\n\nGOOD:\n\n\"Use #2052b1 as the dominant color, #fbea18 for emphasis, and #489e6d for accents.\"\n\nBAD:\n\n\"Use the provided aspect ratio.\"\n\nGOOD:\n\n\"Create the composition in a 9:16 aspect ratio.\"\n\nBAD:\n\n\"Use the event information above.\"\n\nGOOD:\n\n\"Display the event date as October 5–9, 2026.\"\n\nThe prompt must not require hidden context to be understood.\n\n==================================================\nIMAGE TEXT\n==================================================\n\nText inside generated images is OPTIONAL.\n\nDetermine whether text genuinely improves the visual.\n\nPossible image text includes:\n\n* concise headline\n* subject name\n* key achievement\n* short message\n* event name\n* date\n* CTA\n* deadline\n* registration instruction\n* URL\n* short supporting information\n\nDo not overload images with text.\n\nText should be concise, readable, and visually intentional.\n\nAll textual claims must remain factually grounded.\n\nThe image does NOT need to reproduce the social media title or caption verbatim.\n\n### IMAGE TEXT LANGUAGE\n\nWhenever any visible text appears inside a generated image, the language of that text MUST be based on the input `language`.\n\nThe value of `language` determines the language used for:\n\n* headlines\n* subheadlines\n* supporting text\n* labels\n* captions\n* CTA text\n* event information\n* descriptive text\n* infographic text\n* buttons\n* badges\n* other intentional visible text\n\nThe image-generation prompt MUST explicitly instruct the image model to render the image text in the language specified by `language`.\n\nIf `language` is `\"en\"`, all intentionally generated image text must be in English.\n\nIf `language` is `\"id\"`, all intentionally generated image text must be in Indonesian.\n\nIf `language` is `\"nl\"`, all intentionally generated image text must be in Dutch.\n\nApply the same rule to any other supported language value.\n\nDo NOT default image text to English merely because the image-generation prompt itself is written in English.\n\nThe `prompt` value MUST remain in English, but any intentional text that appears inside the generated image MUST use the language specified by `language`.\n\nWhen image text is used, explicitly specify:\n\n* the exact text to render\n* the language of the text based on `language`\n* which supplied font should be used\n* the actual font name\n* hierarchy\n* approximate placement\n* relevant actual color values\n\nExample:\n\nIf:\n\n`language = \"id\"`\n\nthe image prompt may state:\n\n\"Render the exact headline text 'Bangun Karier Sepak Bola Anda' in Indonesian. Use Allerta Stencil for the headline and Fira Sans for supporting text.\"\n\nDo NOT generate English image text when `language` is Indonesian.\n\nDo NOT translate the requested image text into another language unless that translation is required by the `language` input.\n\nProper names, brand names, URLs, and other factual strings that inherently require their original form may remain unchanged.\n\n==================================================\nIMAGE GENERATION SAFETY\n==================================================\n\nEvery image-generation prompt MUST be safe for mainstream image-generation systems and MUST avoid content that is likely to trigger NSFW or sexual-content filters.\n\nNEVER request or describe:\n\n* nudity\n* exposed sexual anatomy\n* sexually explicit content\n* sexual acts\n* erotic poses\n* fetish content\n* pornographic imagery\n* sexualized depictions of people\n* unnecessary focus on breasts, buttocks, genitals, or other intimate body areas\n* transparent or highly revealing clothing\n* underwear-focused compositions\n* suggestive sexual situations\n* explicit romantic or sexual scenarios\n* minors in any sexualized, suggestive, or mature context\n* any other imagery whose primary purpose is sexual stimulation\n\nWhen depicting people, prefer:\n\n* fully clothed subjects\n* appropriate professional, casual, athletic, cultural, or event-appropriate clothing\n* natural poses\n* professional poses\n* documentary-style poses\n* editorial poses that are not sexualized\n* realistic and respectful body proportions\n* appropriate environmental context\n\nFor sports, fitness, fashion, lifestyle, portrait, beach, or similar imagery, clothing must remain appropriate and non-revealing.\n\nAvoid unnecessarily emphasizing intimate body areas.\n\nIf a supplied image contains potentially sensitive or revealing content, do not reproduce or intensify that aspect. Use the supplied image only as a relevant identity, environment, object, or contextual reference when it can be used safely.\n\nIf the requested visual concept could reasonably be interpreted as sexualized or NSFW, transform the visual direction into a safe, non-sexualized alternative while preserving the intended objective and narrative meaning as much as possible.\n\nThe goal is to create compelling, cinematic, professional, editorial, or emotionally engaging imagery WITHOUT relying on sexualized or explicit content.\n\nDo not include unnecessary safety disclaimers inside image prompts.\n\nThe image prompt itself should simply describe the safe visual that should be generated.\n\n==================================================\nCTA IMAGE DESIGN\n==================================================\n\nWhen a CTA image is required:\n\n* make it visually connected to the preceding narrative\n* do not create a generic unrelated event poster\n* use the supplied design system\n* use relevant event imagery when helpful\n* include appropriate factual CTA information\n* keep the CTA clear and readable\n* prioritize action without unnecessary information overload\n\nThe CTA may include:\n\n* concise action message\n* event name\n* relevant date\n* registration deadline\n* registration instruction\n* website URL\n* registration link\n* WhatsApp contact\n* other supplied CTA information\n\nOnly include information that is actually supplied.\n\nAny intentional CTA text inside the image MUST use the language specified by `language`, except for factual strings such as brand names and URLs that must retain their original form.\n\n==================================================\nSOCIAL MEDIA HASHTAGS\n==================================================\n\nGenerate relevant hashtags for the COMPLETE social media narrative.\n\nHashtags must be based on:\n\n* objective\n* subject\n* audience\n* platform\n* overall narrative\n* relevant event context when appropriate\n\nDo NOT generate hashtags based only on event data.\n\nHashtag quantity and style must adapt naturally to the platform.\n\nPrioritize:\n\n* relevance\n* discoverability\n* specificity\n* credibility\n* platform suitability\n\nDo not use unsupported or misleading hashtags.\n\nFor example, do not create:\n\n`#WorldsBestCoach`\n\nunless the supplied information explicitly supports that claim.\n\nDescriptive hashtags such as:\n\n`#FootballTraining`\n\nmay be used when genuinely relevant.\n\nEvery hashtag MUST include the `#` symbol.\n\n==================================================\nLANGUAGE\n==================================================\n\nUse the language specified by:\n\n`language`\n\nThe following MUST use the specified language:\n\n* `title`\n* `caption`\n* `hashtag`\n* intentional visible text inside generated images\n\nThe `prompt` values MUST always be written in English, except for intentional text that should appear inside the generated image.\n\nWhen intentional image text is included inside an English prompt, explicitly state that the text must be rendered in the language specified by `language`, and provide the exact text in that language.\n\nNatural translation and paraphrasing of supplied information is allowed.\n\nDo not unnecessarily mix languages.\n\nProper names, URLs, brand names, and other required original forms may remain unchanged.\n\n==================================================\nONE UNIFIED STORY\n==================================================\n\nThe title, caption, hashtags, and image prompts must represent ONE unified social media concept.\n\nThe title should introduce the overall hook.\n\nThe caption should provide the broader story/context.\n\nThe images should visually develop the narrative.\n\nThe hashtags should reinforce the same subject and objective.\n\nDo NOT treat these as four independent generation tasks.\n\n==================================================\nCONTENT QUALITY\n==================================================\n\nThe social media post must:\n\n* fulfill the objective\n* remain relevant to the intended audience\n* communicate a clear message\n* maintain logical narrative progression\n* feel natural and human\n* avoid unnecessary promotional language\n* maintain factual accuracy\n* use platform-appropriate communication\n* maintain visual consistency\n* maintain visual variety\n* avoid repetitive information\n* avoid repetitive visual treatment\n* create a strong opening hook\n* provide genuine value where appropriate\n* transition naturally toward CTA when relevant\n* remain safe for mainstream image-generation systems\n* avoid NSFW or sexualized imagery\n* ensure all intentional image text follows the `language` input\n\n==================================================\nWRITING QUALITY\n==================================================\n\nAvoid:\n\n* repetitive sentence patterns\n* repetitive openings\n* mechanical phrasing\n* generic AI language\n* unnecessary filler\n* excessive hype\n* unsupported superlatives\n* repetitive calls to action\n* generic motivational clichés\n* unnecessary repetition of event information\n\nSentence length should vary naturally.\n\nWriting should feel native to the specified platform.\n\n==================================================\nPROHIBITED BEHAVIOR\n==================================================\n\nNEVER:\n\n* fabricate facts\n* fabricate quantitative information\n* fabricate qualitative claims\n* fabricate event information\n* fabricate CTA information\n* fabricate links\n* contradict `data`\n* contradict `strategy.additionalInfo`\n* use web research to override supplied facts\n* use web research to supplement missing event facts\n* force irrelevant event information into the narrative\n* force irrelevant supplied images into prompts\n* use all images merely because they are available\n* repeat the same information unnecessarily\n* create more images than necessary\n* exceed six image prompts\n* generate zero image prompts\n* make a secondary event the dominant visual subject when the objective is about something else\n* turn a non-promotional objective into an advertisement\n* create a disconnected CTA\n* make image prompts dependent on previous prompts\n* refer to reference images by their original keys inside prompts\n* ignore the supplied aspect ratio\n* ignore the supplied fonts\n* ignore the supplied colors\n* leave supplied design values unresolved inside prompts\n* say \"supplied font\", \"provided font\", \"supplied colors\", \"provided colors\", \"supplied aspect ratio\", or equivalent unresolved references inside prompts\n* invent unsupported visual details\n* expose internal reasoning\n* expose audience analysis\n* expose intent analysis\n* expose objective analysis\n* expose validation steps\n* expose web research process\n* add explanations outside the JSON\n* generate nudity or sexualized imagery\n* generate sexually explicit or pornographic imagery\n* generate fetish or erotic imagery\n* generate suggestive or unnecessarily revealing imagery\n* sexualize any person\n* sexualize minors or depict minors in mature or suggestive contexts\n* create image prompts likely to be blocked because of NSFW content\n* use image text in a language different from the supplied `language`, except for proper names, URLs, brand names, or other factual strings that inherently require their original form\n* leave image-text language unspecified when visible text is intentionally requested\n\n==================================================\nFINAL CTA RULE\n==================================================\n\nIf:\n\n1. `data` contains an event,\n2. the objective is NOT primarily event-focused,\n\nthen the FINAL image prompt MUST be an event CTA.\n\nThe CTA image must transition naturally from the main narrative into the event opportunity.\n\nFor example:\n\nSubject expertise\n→ evidence of expertise\n→ why that expertise matters\n→ opportunity to learn from it\n→ event CTA\n\nDo not create an abrupt promotional poster disconnected from the narrative.\n\n==================================================\nEVENT-FOCUSED CTA RULE\n==================================================\n\nIf the objective IS event-focused:\n\n* CTA placement is flexible.\n* CTA may be the final image.\n* CTA may appear earlier when strategically appropriate.\n* Do not force CTA placement purely because of slide position.\n\nThe CTA must follow the natural narrative.\n\n==================================================\nMINIMUM IMAGE REQUIREMENT\n==================================================\n\nThe `prompts` array MUST contain at least ONE object.\n\nIt MUST NOT contain more than SIX objects.\n\nThe agent decides the appropriate number dynamically.\n\nUse the smallest number necessary to tell the story effectively.\n\n==================================================\nPROMPT OBJECT STRUCTURE\n==================================================\n\nEvery object inside `prompts` MUST contain exactly:\n\n{\n  \"prompt\": \"...\",\n  \"relevantImg\": []\n}\n\n`prompt` must be a complete English production-ready image-generation prompt.\n\n`relevantImg` must contain only image keys supplied in the input.\n\nIf no supplied image is relevant:\n\n`\"relevantImg\": []`\n\nDo not add other properties.\n\n==================================================\nOUTPUT STRUCTURE\n==================================================\n\nReturn ONLY ONE VALID JSON OBJECT.\n\nThe JSON MUST contain exactly these top-level properties:\n\n{\n  \"title\": \"...\",\n  \"caption\": \"...\",\n  \"hashtag\": [\n    \"#...\",\n    \"#...\"\n  ],\n  \"prompts\": [\n    {\n      \"prompt\": \"...\",\n      \"relevantImg\": [\"img-0\"]\n    }\n  ]\n}\n\nThe exact top-level properties are:\n\n* `title`\n* `caption`\n* `hashtag`\n* `prompts`\n\nDo NOT add any additional top-level properties.\n\n==================================================\nJSON REQUIREMENTS\n==================================================\n\nThe output MUST be valid JSON.\n\nUse:\n\n* double quotes for all keys\n* double quotes for all string values\n* arrays where specified\n* escaped characters where required\n* valid JSON string formatting\n\nIf the caption contains line breaks, emojis, quotes, or other formatting, encode them in a way that remains valid JSON.\n\nDo NOT output:\n\n* Markdown\n* code fences\n* explanations\n* comments\n* notes\n* analysis\n* reasoning\n* headings outside JSON\n* validation information\n* additional properties\n\n==================================================\nINTERNAL VALIDATION\n==================================================\n\nBefore returning the final response, internally validate the complete output.\n\nCheck:\n\n1. Is the objective fully fulfilled?\n2. Does the title represent the main hook of the entire post?\n3. Does the caption complement the entire narrative rather than describe slides individually?\n4. Is the caption appropriate for the specified platform?\n5. Are hashtags relevant to the overall narrative?\n6. Are hashtags platform-appropriate?\n7. Are hashtags factually grounded?\n8. Does the first image provide the strongest visual hook?\n9. Is the image count between 1 and 6?\n10. Is the number of images the minimum necessary?\n11. Do the images form a coherent narrative?\n12. Does every image add meaningful new information or visual value?\n13. Are consecutive images visually varied?\n14. Is every image prompt independently usable?\n15. Does every image prompt explicitly state the actual supplied aspect ratio?\n16. Does every image prompt resolve the actual supplied font names where typography is relevant?\n17. Does every image prompt resolve the actual supplied color values where color treatment is relevant?\n18. Are supplied images used only when relevant?\n19. Are `relevantImg` values valid supplied image keys?\n20. Does every prompt refer to selected images using positional language such as \"the first image\"?\n21. Does no prompt refer to image keys directly inside the prompt?\n22. Are unsupported factual claims removed?\n23. Are supplied `data` facts preserved?\n24. Are `strategy.additionalInfo` facts preserved?\n25. Has external research been prevented from overriding supplied facts?\n26. Is the CTA proportional to the objective?\n27. If the objective is non-event-focused and an event exists, is the FINAL image a CTA?\n28. Is the CTA naturally connected to the narrative?\n29. Are CTA details factually accurate?\n30. Is the requested language respected for title, caption, and hashtags?\n31. Are all image prompts written in English?\n32. Does all intentional visible image text use the language specified by `language`?\n33. If image text exists, is the exact text written in the correct language?\n34. If image text exists, are the actual requested font names explicitly specified?\n35. If image text exists, are the relevant actual color values explicitly specified?\n36. Is every image prompt safe for mainstream image-generation systems?\n37. Does any image prompt contain nudity, sexual content, erotic content, fetish content, sexualized posing, or unnecessarily revealing clothing?\n38. Could any image prompt reasonably trigger an NSFW image-generation filter?\n39. If a visual could be interpreted as sexualized or NSFW, has it been safely transformed into a non-sexualized visual while preserving the objective?\n40. Are there any unresolved references such as \"supplied font\", \"provided colors\", or \"supplied aspect ratio\" inside any image prompt?\n41. If text appears in an image, are the exact requested text, correct language, actual font names, and relevant actual color values explicitly specified?\n42. Is the final response ONLY valid JSON?\n43. Are there exactly four top-level fields?\n44. Are there no additional properties?\n\nIf any requirement is not satisfied, revise the output internally before returning it.\n\n==================================================\nFINAL PRINCIPLE\n==================================================\n\nThe ultimate goal is:\n\nUNDERSTAND THE OBJECTIVE FIRST.\n\nDETERMINE THE STORY SECOND.\n\nDETERMINE THE PLATFORM APPROACH THIRD.\n\nDETERMINE THE MINIMUM IMAGE COUNT FOURTH.\n\nBUILD THE IMAGE SEQUENCE FIFTH.\n\nSELECT RELEVANT REFERENCES SIXTH.\n\nRESOLVE ALL SUPPLIED DESIGN VALUES SEVENTH.\n\nAPPLY THE DESIGN SYSTEM EIGHTH.\n\nENSURE ALL IMAGE CONCEPTS ARE SAFE AND NON-NSFW NINTH.\n\nENSURE ALL INTENTIONAL IMAGE TEXT USES THE `language` INPUT TENTH.\n\nWRITE EACH SELF-CONTAINED IMAGE PROMPT ELEVENTH.\n\nVALIDATE THE COMPLETE SOCIAL MEDIA POST LAST.\n\nThe objective determines WHAT the audience should understand, feel, or do.\n\nThe platform determines HOW that message should be communicated.\n\nThe image sequence determines HOW the story unfolds visually.\n\nThe supplied design system determines HOW the visual identity is expressed.\n\nThe supplied `data` and `strategy.additionalInfo` determine WHAT FACTS may be communicated.\n\nThe actual values in `fonts`, `colors`, and `aspectRatio` must be explicitly resolved inside image prompts whenever applicable.\n\nThe `language` input determines the language of intentional visible text inside generated images.\n\nEvery image-generation prompt must describe safe, non-NSFW, non-sexualized imagery suitable for mainstream image-generation systems.\n\nNever reverse these priorities.\n\nUse `Gemini Search Tool` to find latest data. You can search multiple time if it's needed.\n\nFINAL RESPONSE MUST CONTAIN ONLY THE REQUIRED JSON OBJECT."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        1712,
+        -32
+      ],
+      "id": "f45b3b42-1666-4a56-a061-40e44d898055",
+      "name": "Message a model",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "60458c94-986c-49cd-8b69-4b5616163eb3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f910b52-842c-4b6a-a862-e6914c883764",
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -496,
+        -80
+      ],
+      "id": "baf035b2-1452-43bb-88a6-5b1a02c9e461",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.domain }}wp-json/synergizeflow/v2/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license",
+              "value": "={{ $json.license }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -720,
+        -16
+      ],
+      "id": "d9d42519-c227-43b7-a747-7a0ddcee3ba9",
+      "name": "Check if license is valid",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Webhook').item.json.body.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "fail"
+            },
+            {
+              "name": "msg",
+              "value": "invalid_license"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -224,
+        208
+      ],
+      "id": "ca174f6f-e919-4a1e-ac16-28bf2ef8d3b0",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "domain",
+              "value": "={{ $json.body.domain }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        -1168,
+        176
+      ],
+      "id": "a10943d9-240b-49f6-b993-9f1408ef01e0",
+      "name": "Execution Data"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5a87c8b9-2ebc-462d-a295-4cf62a0dcb9b",
+              "name": "license",
+              "value": "={{ $('Webhook').item.json.body.license }}",
+              "type": "string"
+            },
+            {
+              "id": "581cc296-13c4-41bb-95a7-6d71effe61e1",
+              "name": "domain",
+              "value": "={{ $('Webhook').item.json.body.domain }}",
+              "type": "string"
+            },
+            {
+              "id": "a6a5466a-5c10-4a04-bdac-515345d4d1e2",
+              "name": "data",
+              "value": "={{ $('Webhook').item.json.body.data }}",
+              "type": "object"
+            },
+            {
+              "id": "fe4511e0-f6f9-4500-8c6a-cab68e411697",
+              "name": "token",
+              "value": "={{ $json.token }}",
+              "type": "string"
+            },
+            {
+              "id": "adc838e7-219c-4fe9-952c-6fc8367585c8",
+              "name": "agent_id",
+              "value": "={{ $('Webhook').item.json.body.agent_id }}",
+              "type": "number"
+            },
+            {
+              "id": "14074df1-c40b-4ca9-9bed-0325972f8ded",
+              "name": "webhook",
+              "value": "={{ $('Webhook').item.json.body.webhook }}",
+              "type": "string"
+            },
+            {
+              "id": "7993745b-9536-4297-a02a-edfef4914a6b",
+              "name": "strategy",
+              "value": "={{ $('Webhook').item.json.body.strategy }}",
+              "type": "object"
+            },
+            {
+              "id": "b219ebfc-c3f8-4e71-8c5f-7d540a40c8a4",
+              "name": "assets",
+              "value": "={{ $('Webhook').item.json.body.assets }}",
+              "type": "object"
+            },
+            {
+              "id": "f73c6202-405c-4486-a284-67b31e94c824",
+              "name": "config",
+              "value": "={{ $('Webhook').item.json.body.config }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -960,
+        -16
+      ],
+      "id": "fdd1bbc4-ca2e-4edb-a485-3512e1eae3c1",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "CfFTrHyw35Q6kVn5",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/CfFTrHyw35Q6kVn5",
+          "cachedResultName": "SynergizeFlow.v2 — Get App Token"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -1168,
+        -16
+      ],
+      "id": "d5f328ca-b128-4f75-bda0-2bdd067dea00",
+      "name": "Get token"
+    },
+    {
+      "parameters": {
+        "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', ``, 'string') }}",
+        "model": "={{ $vars.GEMINI_FLASH_PREVIEW }}",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Items_per_Batch', ``, 'number') }}",
+              "batchInterval": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Batch_Interval__ms_', ``, 'number') }}"
+            }
+          },
+          "returnFullResponse": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_Full_Response', ``, 'boolean') }}"
+        }
+      },
+      "type": "n8n-nodes-gemini-search.geminiSearchToolTool",
+      "typeVersion": 1,
+      "position": [
+        1760,
+        176
+      ],
+      "id": "692051c8-77b5-4e81-b646-f29545a9a121",
+      "name": "Gemini Search Tool",
+      "credentials": {
+        "geminiSearchApi": {
+          "id": "HzOj98juqUxHGjsa",
+          "name": "SF - Gemini Search Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Prepare Data').item.json.assets.images }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "array",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    },
+                    "id": "54eba51c-c439-4134-855e-1ec43843a7a7"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "has_image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "eacbbc56-a383-4f4c-9c88-f77f87d22ebe",
+                    "leftValue": "={{ $('Prepare Data').item.json.assets.images }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "array",
+                      "operation": "empty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "no_image"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -224,
+        -160
+      ],
+      "id": "8f2714e7-8482-43eb-b656-e6b5086059ac",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {images:$('Prepare Data').first().json.assets.images}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        96,
+        -208
+      ],
+      "id": "bacd1dc1-bf61-4c30-83ce-841477c02a6b",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "images",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        352,
+        -336
+      ],
+      "id": "a9db2d44-7a3d-4eb7-aef6-237a41ecfcd4",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        576,
+        -336
+      ],
+      "id": "b01d7e7f-fd94-49e5-a2e5-e5b5527881bf",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_NANO_BANANA }}",
+          "mode": "id"
+        },
+        "text": "=This is image of {{ $(\"Edit Fields\").item.json.title }}. Analyze the input image with great detail and precision. Directly response without introduction text.",
+        "imageUrls": "={{ $(\"Edit Fields\").item.json.url }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        1072,
+        -240
+      ],
+      "id": "39ed5cd9-9b6b-4cf8-a6dd-86e61182715b",
+      "name": "Analyze an image",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return{\n  key: \"img-\"+$(\"Loop Over Items\").context[\"currentRunIndex\"],\n  desc: $input.first().json.content.parts[0].text,\n  url: $('Edit Fields').first().json.url,\n  title: $('Edit Fields').first().json.title\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        -240
+      ],
+      "id": "113e726a-1946-4353-ba43-028135fa8bb5",
+      "name": "Code in JavaScript2",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "images",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        800,
+        -432
+      ],
+      "id": "25b2901e-1d33-4020-986c-13c12ff48d4b",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bf1c08b9-5bf5-4ad5-bd97-76cfaf517c94",
+              "name": "images",
+              "value": "={{ $json.images }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1040,
+        -432
+      ],
+      "id": "a2dee72d-550f-4753-8aa5-0df7ea66b27b",
+      "name": "Prepare Image"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c70da453-aeba-4042-9981-ed9decfc1d62",
+              "name": "url",
+              "value": "={{ $json.url }}",
+              "type": "string"
+            },
+            {
+              "id": "48783c0b-4589-4b5e-84b7-ab6afe581b55",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        800,
+        -240
+      ],
+      "id": "198c9471-e3d0-4912-aa5b-ae46b763d464",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "function getValidJsonObject(rawText) {\n\n    if (typeof rawText !== 'string' || rawText.trim() === '') {\n        console.error(\"Invalid input or empty text field.\");\n        return null;\n    }\n\n    let jsonString = rawText.trim();\n\n    // 2. Check for and remove the markdown JSON block fences.\n    // This regex is robust and handles variations in whitespace.\n    const markdownRegex = /^```json\\s*([\\s\\S]*?)\\s*```$/;\n    const match = jsonString.match(markdownRegex);\n\n    if (match) {\n        // If it's a match, the actual JSON string is in the first capture group.\n        jsonString = match[1];\n    }\n\n    // 3. Parse the cleaned string into a JSON object.\n    try {\n        return JSON.parse(jsonString);\n    } catch (error) {\n        console.error(\"Failed to parse JSON string:\", error);\n        console.error(\"Problematic string:\", jsonString);\n        return null;\n    }\n}\nreturn getValidJsonObject($input.first().json.content.parts[0].text);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2064,
+        -48
+      ],
+      "id": "900042ac-2fb5-49a1-94ca-0e7201c8c12b",
+      "name": "Original Media",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "amount": 3
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2032,
+        176
+      ],
+      "id": "e62e4d92-ae6b-49e1-9489-83f094edfcca",
+      "name": "Wait",
+      "webhookId": "5fc26b58-1ea1-4779-a48b-6f603e543c2b"
+    },
+    {
+      "parameters": {
+        "jsCode": "let prompts = [];\nlet idx = 1;\nfor (const item of $input.first().json.prompts) {\n  let payload = {\n    \"url\": \"https://api.kie.ai/api/v1/jobs/createTask\",\n    \"config\": {\n      \"model\": \"gpt-image-2-5-flare-text-to-image\",\n      \"input\": {\n        \"prompt\": item.prompt,\n        \"aspect_ratio\": $('Prepare Data').first().json.config.aspect_ratio,\n        \"resolution\": \"1K\",\n        \"background\": \"auto\"\n       }\n    } \n  }\n  if(item.relevantImg.length > 0){\n    payload.config.model ='gpt-image-2-5-flare-image-to-image';\n    payload.config.input.input_urls = item.relevantImg\n    .map(key => $('Prepare Image').first().json.images.find(image => image.key === key)?.url)\n    .filter(Boolean);\n  }\n  prompts.push({\n    filename: \"eventAgentResult/eventAgentResult-\"+$('Prepare Data').first().json.agent_id+\"-img\"+idx+\".jpg\",\n    payload: payload\n  });\n  idx++;\n}\n\nreturn prompts;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2288,
+        -80
+      ],
+      "id": "6aa331b6-d527-4b98-8a32-371520ca92a3",
+      "name": "Code in JavaScript3",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2544,
+        -160
+      ],
+      "id": "8a72de28-2529-4422-8022-d3eba874bae3",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fabc090a-a89d-40bb-94e0-6c48b24ca62c",
+              "name": "filename",
+              "value": "={{ $json.filename }}",
+              "type": "string"
+            },
+            {
+              "id": "fac30671-1a09-4a2e-93c9-982b21f6f26e",
+              "name": "payload",
+              "value": "={{ $json.payload }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2752,
+        -48
+      ],
+      "id": "b52f98d0-12a5-452f-afb8-a73365103ef4",
+      "name": "Prompt Data"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "kjAqY7ZYfntMJO3k",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/kjAqY7ZYfntMJO3k",
+          "cachedResultName": "SynergizeFlow.v2 — SF - Event Agent - Pooling KIE AI"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        3184,
+        -64
+      ],
+      "id": "5c1ad0f1-be4d-48c5-8ffc-3253a6748d6d",
+      "name": "KIE AI Pooling"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.payload.url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.payload.config.toJsonString() }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2944,
+        -48
+      ],
+      "id": "0cc270d1-9941-4bae-a202-4d9c7a5f0731",
+      "name": "Generate Image",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "SFhjYsXsyVcRhxXr",
+          "name": "SF - KIE AI"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "data",
+        "binaryPropertyName": "image",
+        "options": {
+          "fileName": "={{ $('Prompt Data').item.json.filename }}",
+          "mimeType": "=image/jpeg"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        3440,
+        -64
+      ],
+      "id": "e44abc0f-a0cc-410f-b313-9514f3bbcfa2",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "bucketName": "={{ $vars.CLOUDFLARE_R2_BUCKET }}",
+        "fileName": "={{ $('Prompt Data').item.json.filename }}",
+        "binaryPropertyName": "image",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.s3",
+      "typeVersion": 1,
+      "position": [
+        3648,
+        -64
+      ],
+      "id": "5d9ab108-52ef-45c5-873e-027e461f0314",
+      "name": "Upload a file1",
+      "credentials": {
+        "s3": {
+          "id": "AIXo2wxUCjaHKlfc",
+          "name": "SF - R2 Cloudflare Storage"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  media_url: \"https://assets.synergizeflow.com/\"+$('Prompt Data').first().json.filename\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3888,
+        -64
+      ],
+      "id": "0e33c903-44e7-4f0b-a61f-001d866bcd2a",
+      "name": "Code in JavaScript5"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2768,
+        -288
+      ],
+      "id": "c3128e89-2dd8-4f1e-b600-9184a2f12360",
+      "name": "Aggregate1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "=ok"
+            },
+            {
+              "name": "data",
+              "value": "={{ $json.data }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3168,
+        -288
+      ],
+      "id": "94611479-5c0e-4cef-8e06-74bb5635ceff",
+      "name": "HTTP Request5"
+    },
+    {
+      "parameters": {
+        "jsCode": "let img = [];\nfor (const item of $input.first().json.data) {\n  img.push(item.media_url);\n}\nreturn {\n  data: {\n    title: $('Original Media').first().json.title,\n    caption: $('Original Media').first().json.caption,\n    hashtag: $('Original Media').first().json.hashtag,\n    images: img\n  }\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2976,
+        -288
+      ],
+      "id": "ea666d06-a6a9-4ebc-93c0-4fa0cf8bdd5a",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if license is valid": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get token": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Search Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Message a model",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze an image": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Analyze an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Prepare Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Analyze an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Image": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Original Media",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Original Media": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prompt Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prompt Data": {
+      "main": [
+        [
+          {
+            "node": "Generate Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image": {
+      "main": [
+        [
+          {
+            "node": "KIE AI Pooling",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Upload a file1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload a file1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "KIE AI Pooling": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript5": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "triggerCount": 1,
+  "versionId": "86fee3ab-1605-4b54-9c01-9e6ef219a4ae",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "COlUXFB7ZeDqdhmU",
+  "isArchived": false
+}

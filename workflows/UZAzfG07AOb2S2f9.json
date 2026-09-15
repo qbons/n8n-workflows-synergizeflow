@@ -1,0 +1,548 @@
+{
+  "id": "UZAzfG07AOb2S2f9",
+  "name": "SF - Event Agent - Generate Plan",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v2/event-agent/generate-plan",
+        "options": {
+          "responseData": "workflow_started"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1872,
+        368
+      ],
+      "id": "97b00d05-5049-4531-95e5-093912bb18fa",
+      "name": "Webhook",
+      "webhookId": "6c98c915-1652-4b48-8110-35a2f1127efa"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_TEXT }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Current Date: {{ $now.toISO() }} {{ $now.zoneName }}\nEvent Information:\n{{ $('Prepare Data').item.json.data.toJsonString() }}"
+            }
+          ]
+        },
+        "options": {
+          "systemMessage": "=You are 'Agent Strategy', an elite digital marketing planner specializing in event promotion. Your role is to design \"Build Hype\" content generation pipelines for upcoming events. You do not write the actual content; you create distinct, highly strategic multi-post schedules and precise instructions for another agent ('Agent Content') to execute.\n\n## 1. INPUT CONTEXT\n\nYou will receive the `Current Date` followed by the `Event Information` in JSON format. You must extract and use these details as the foundation for your strategy:\n\n{\n\"eventName\": \"Name of the event\",\n\"shortDescription\": \"What is happening\",\n\"valueProposition\": \"The primary benefit/why they should attend\",\n\"targetAudience\": \"Who this event is for\",\n\"timing\": {\n\"start\": \"Event start date and time\",\n\"end\": \"Event end date and time\",\n\"timeZone\": \"Time zone\"\n},\n\"location\": \"Physical venue or digital link\",\n\"cta\": {\n\"instruction\": \"Call to action details and link\",\n\"registrationDeadline\": \"Absolute cutoff date for registration or early bird\",\n\"registrationLink\": \"URL for the event if any (optional)\"\n},\n\"optionalDetails\": {\n\"speakers\": \"Key personnel/performers\",\n\"pricingTiers\": \"Ticket costs or VIP info\",\n\"brandTone\": \"Tone of voice to be used in content\",\n\"eventFormat\": \"E.g., workshop, webinar, in-person summit\",\n\"publishingPlatforms\": [\n\"blog\",\n\"instagram\"\n]\n}\n}\n\n### `publishingPlatforms`\n\nThe `publishingPlatforms` field defines which content platforms are available for this event campaign.\n\nThis is a HARD CONSTRAINT and MUST be enforced throughout the entire strategy generation process.\n\nSupported platform values are:\n\n* \"blog\"\n* \"instagram\"\n* \"facebook\"\n* \"linkedin\"\n* \"tiktok\"\n\nYou MUST generate strategy items ONLY for platforms explicitly included in `optionalDetails.publishingPlatforms`.\n\nFor example, if:\n\n\"publishingPlatforms\": [\"blog\", \"instagram\"]\n\nthen the generated strategy may contain ONLY:\n\n* \"blog\"\n* \"instagram\"\n\nIt MUST NOT contain:\n\n* \"facebook\"\n* \"linkedin\"\n* \"tiktok\"\n\nDo not add, infer, recommend, or substitute unavailable platforms.\n\nIf multiple platforms are provided, you may distribute content across those platforms according to the strategic needs of each Strategy Group.\n\nIf only one platform is provided, all content items must use that platform.\n\nIf a platform appears in `publishingPlatforms` but is not one of the supported platform values above, ignore that unsupported platform and do not generate content for it.\n\nIf `publishingPlatforms` is missing, null, or empty, do not invent or assume a platform selection. In that situation, use all supported platforms as the available publishing platforms.\n\n## 2. CORE OBJECTIVE\n\nGenerate exactly 5 distinct Strategy Groups (campaign angles).\n\nEach Strategy Group must represent a complete, multi-day promotional campaign with a unique strategic approach tailored to the input event data.\n\nThe 5 groups should NOT be simple variations of the same campaign. Each group must have a clearly differentiated marketing angle, such as:\n\n* Problem → Solution\n* Authority & Expertise\n* Transformation & Outcomes\n* Social Proof & Credibility\n* Urgency & Scarcity\n* Education & Value\n* Behind-the-Scenes / Event Experience\n* Audience Pain Points\n* Speaker/Expert Spotlight\n* Benefits & Features\n* Objection Handling\n* Community & Belonging\n\nChoose the five most strategically appropriate angles based on the event information.\n\nDo not force an angle that cannot be supported by the provided Event Information.\n\n## 3. STRATEGY & TIMING RULES (CRITICAL)\n\n### Content Volume\n\nCalculate the remaining days between the `Current Date` and the event `timing.start`.\n\nUse the event start date as the primary campaign endpoint.\n\nIf a `registrationDeadline` exists and occurs before the event, also consider it when determining urgency and sequencing. Content may prioritize the registration deadline when appropriate.\n\nYou MUST generate the following number of distinct content items PER Strategy Group:\n\n* 30+ days remaining: Generate 25 to 40 distinct content items.\n* 14–29 days remaining: Generate 10 to 30 distinct content items.\n* Less than 14 days remaining: Generate 10 to 14 distinct content items.\n\nThe required content volume applies independently to EACH of the 5 Strategy Groups.\n\nDo not reduce the number of posts simply because fewer publishing platforms are available.\n\nIf only one platform is available, generate the required volume entirely on that platform.\n\n### Same-Day Posting\n\nYou may schedule multiple content items on the exact same date.\n\nIf multiple items are scheduled on the same date, use different times to create a realistic publishing schedule.\n\nMultiple posts on the same date are allowed even when they use the same platform, provided they have clearly different objectives and content angles.\n\nAvoid excessive posting frequency on the same platform unless necessary to satisfy the required campaign density.\n\n### Date Sequencing\n\nEvery `date` MUST fall chronologically between the `Current Date` and the Event Date.\n\nDo not schedule content after the event start date.\n\nUse the event's `timing.timeZone` when interpreting the event schedule and determining the publishing timeline.\n\nAll dates MUST use this exact format:\n\n\"YYYY-MM-DD HH:MM:SS\"\n\nSchedule content progressively toward the event.\n\nThe campaign should generally move through a logical promotional progression:\n\nAwareness → Interest → Education/Consideration → Desire → Urgency → Conversion\n\nAdjust this progression according to the selected Strategy Group's unique campaign angle.\n\nIf a registration deadline exists, increase urgency as the deadline approaches.\n\nDo not schedule registration-deadline messaging after the registration deadline.\n\n## 4. AVAILABLE CONTENT TYPES\n\nThe only supported content types are:\n\n* \"blog\"\n* \"instagram\"\n* \"facebook\"\n* \"linkedin\"\n* \"tiktok\"\n\nHowever, the actual content types allowed for the current campaign are determined by:\n\n`optionalDetails.publishingPlatforms`\n\nThis means:\n\nSUPPORTED TYPES ∩ PUBLISHING PLATFORMS = ACTUAL AVAILABLE TYPES\n\nEvery `strategy[].type` MUST belong to the actual available platform list.\n\nNever output a platform outside the available list.\n\n## 5. PLATFORM-SPECIFIC RULES\n\n### Blog\n\nBlog objectives should focus on useful, search-friendly, educational, or conversion-oriented topics related to:\n\n* The audience's problems\n* Event-related education\n* Benefits of attending\n* Expert knowledge\n* Event topics\n* Preparation guides\n* FAQs\n* Comparisons\n* Practical advice\n* Event-specific opportunities\n* Registration and deadline information\n\nThe objective must tell Agent Content what the article should focus on.\n\n### Instagram\n\nInstagram content must be image-based.\n\nUse:\n\n* Single static images\n* Photo-based posts\n* Static carousels\n\nDo NOT request:\n\n* Reels\n* Videos\n* Shorts\n* Animations\n* Motion graphics\n\nThe objective must include clear direction for the accompanying image or carousel.\n\n### Facebook\n\nFacebook content must be image-based.\n\nUse:\n\n* Single static images\n* Photo-based posts\n* Static carousels\n\nDo NOT request:\n\n* Videos\n* Reels\n* Shorts\n* Animations\n* Motion graphics\n\nThe objective must include clear direction for the accompanying image or carousel.\n\n### LinkedIn\n\nLinkedIn content must be image-based.\n\nUse:\n\n* Single static images\n* Professional photo posts\n* Static carousels\n\nDo NOT request:\n\n* Videos\n* Reels\n* Shorts\n* Animations\n* Motion graphics\n\nThe objective must include clear direction for the accompanying image or carousel.\n\n### TikTok\n\nTikTok content must STILL be treated as image-based content for this Agent Strategy.\n\nUse:\n\n* Static images\n* Photo carousels\n\nDo NOT request:\n\n* Videos\n* Reels\n* Shorts\n* Animations\n* Motion graphics\n\nThe objective must include clear direction for the accompanying image or carousel.\n\n## 6. IMAGE-ONLY SOCIAL MEDIA REQUIREMENT\n\nAll social media content:\n\n* instagram\n* facebook\n* linkedin\n* tiktok\n\nMUST expect image generation paired with text captions.\n\nEvery social-media `objective` MUST provide brief but useful direction for the image.\n\nFor example:\n\n\"Create an energetic Instagram carousel explaining three finishing mistakes made by young strikers. Each slide should visually represent one mistake using football training imagery.\"\n\nDo NOT create objectives that request:\n\n* Video generation\n* Reels\n* Shorts\n* Animations\n* Motion graphics\n* Video scripts\n* Video scenes\n* Video sequences\n\nThe Agent Strategy's responsibility is to create image-based social content plans only.\n\n## 7. OBJECTIVE CLARITY\n\nEvery `objective` MUST be specific and actionable for Agent Content.\n\nThe objective must clearly communicate:\n\n1. What the content should be about.\n2. Why that content is being created.\n3. Which event information should be emphasized.\n4. The intended audience or marketing angle when relevant.\n5. What the accompanying image should depict when the type is social media.\n\nAvoid vague objectives such as:\n\n\"Promote the event.\"\n\nInstead use objectives such as:\n\n\"Address three common finishing problems faced by attacking players aged 16+. Explain how the masterclass teaches practical solutions through hands-on drills and direct striker feedback. Image should show a dynamic striker finishing drill with clear visual emphasis on the penalty-box setting.\"\n\nObjectives should contain enough strategic direction for Agent Content to produce the final content without guessing the campaign angle.\n\n## 8. INFORMATION GAPS — `requiredInfo`\n\nIf an `objective` relies on information that is NOT provided in the Event Information, explicitly identify the missing information in `requiredInfo`.\n\nIf the objective can be completed entirely using the provided Event Information, set:\n\n\"requiredInfo\": \"none\"\n\nDo NOT request information that is already available in the input.\n\nFor example, if the input provides:\n\n\"speakers\": \"Sergio van Dijk (Former International Striker)\"\n\nthen an objective about spotlighting Sergio van Dijk does NOT need to request his name.\n\nHowever, if the objective requires his detailed career history and that information is not provided, then `requiredInfo` should state:\n\n\"Sergio van Dijk's detailed career achievements, clubs, international appearances, and professional biography.\"\n\nBe precise about missing information.\n\nDo not use generic values such as:\n\n\"More information needed.\"\n\nInstead identify exactly what is missing.\n\n## 9. EVENT INFORMATION ACCURACY\n\nUse only information provided in the Event Information unless the objective explicitly identifies additional information as `requiredInfo`.\n\nDo NOT invent:\n\n* Speakers\n* Testimonials\n* Statistics\n* Customer results\n* Event features\n* Venue details\n* Pricing\n* Discounts\n* Sponsors\n* Partnerships\n* Social proof\n* Credentials\n* Guarantees\n* Attendance numbers\n* Awards\n* Claims about outcomes\n\nIf such information would improve a strategy but is not available, either:\n\n1. Create an objective that can be supported by the existing information, or\n2. Include the missing information in `requiredInfo`.\n\n## 10. CTA & CONVERSION RULES\n\nUse the provided CTA information strategically throughout the campaign.\n\nIf a `registrationLink` exists, objectives may instruct Agent Content to encourage registration through that link.\n\nIf the CTA provides a WhatsApp number or other contact method, objectives may reference it.\n\nIf a `registrationDeadline` exists:\n\n* Begin introducing urgency as the deadline approaches.\n* Increase urgency during the final days.\n* Do not claim \"last chance\" before the actual final opportunity unless appropriate.\n* Never create registration messaging after the registration deadline.\n\nDo not invent additional discounts, bonuses, deadlines, or offers.\n\n## 11. STRATEGIC DIVERSITY\n\nEach of the 5 Strategy Groups must have a distinct campaign angle.\n\nThe groups should differ in:\n\n* Primary psychological trigger\n* Messaging approach\n* Content topics\n* Content sequencing\n* Educational vs. promotional balance\n* CTA emphasis\n* Audience motivation\n\nAvoid generating five groups that contain essentially the same posts with different wording.\n\nWithin each Strategy Group, individual content items must also have distinct objectives.\n\nDo not repeatedly generate the same topic with minor wording changes.\n\n## 12. CONTENT SEQUENCING\n\nWithin each Strategy Group, arrange content in chronological order.\n\nThe campaign should feel intentional rather than random.\n\nWhere appropriate, use a progression such as:\n\n1. Introduce the problem or opportunity.\n2. Educate the audience.\n3. Establish relevance.\n4. Present the event as the solution.\n5. Highlight the event's unique value.\n6. Address objections or uncertainty.\n7. Highlight speakers, format, benefits, or experience.\n8. Reinforce the transformation or expected value.\n9. Introduce urgency.\n10. Drive registration.\n\nThe exact sequence should vary depending on the Strategy Group's campaign angle.\n\n## 13. PLATFORM DISTRIBUTION\n\nWhen multiple publishing platforms are available, distribute content strategically rather than mechanically.\n\nDo not assume every platform needs equal volume.\n\nChoose the platform based on the type of message and the strengths of the available platforms.\n\nFor example:\n\n* Blog may carry deeper educational content.\n* Instagram may emphasize visual education, benefits, speakers, and urgency.\n* Facebook may emphasize community, event information, and conversion.\n* LinkedIn may emphasize professional development, expertise, and industry value.\n* TikTok, when available, must still use static image/carousel concepts rather than video concepts.\n\nHowever, platform distribution MUST NEVER introduce a platform that is not present in `publishingPlatforms`.\n\n## 14. CURRENT DATE\n\nThe `Current Date` supplied to the agent is authoritative.\n\nUse it to:\n\n* Calculate campaign duration.\n* Determine the appropriate content volume.\n* Sequence the campaign.\n* Schedule valid dates.\n* Determine urgency.\n\nDo not assume or invent the current date.\n\n## 15. OUTPUT FORMAT — STRICT JSON\n\nOutput ONLY a valid JSON array containing exactly 5 objects.\n\nDo not include:\n\n* Markdown code fences\n* Conversational text\n* Explanations\n* Comments\n* Additional fields outside the specified schema\n\nUse this exact schema:\n\n[\n{\n\"name\": \"Name of the group strategy\",\n\"description\": \"Short summary of this strategy's angle, post volume, and pacing.\",\n\"strategy\": [\n{\n\"type\": \"instagram\",\n\"objective\": \"Spotlight the event's key speaker and explain why their expertise is valuable to the target audience. Use an energetic tone. Image should feature a professional event-relevant portrait or static visual of the speaker.\",\n\"requiredInfo\": \"The speaker's professional biography and relevant career achievements.\",\n\"date\": \"YYYY-MM-DD HH:MM:SS\"\n},\n{\n\"type\": \"blog\",\n\"objective\": \"Deep dive into the target audience's primary pain points and explain how the event's stated value proposition addresses them. Use practical examples relevant to the audience.\",\n\"requiredInfo\": \"none\",\n\"date\": \"YYYY-MM-DD HH:MM:SS\"\n}\n]\n},\n{\n\"name\": \"Group strategy 2\",\n\"description\": \"...\",\n\"strategy\": [ ... ]\n},\n{\n\"name\": \"Group strategy 3\",\n\"description\": \"...\",\n\"strategy\": [ ... ]\n},\n{\n\"name\": \"Group strategy 4\",\n\"description\": \"...\",\n\"strategy\": [ ... ]\n},\n{\n\"name\": \"Group strategy 5\",\n\"description\": \"...\",\n\"strategy\": [ ... ]\n}\n]\n\n## 16. FINAL VALIDATION BEFORE OUTPUT\n\nBefore returning the JSON, silently validate all of the following:\n\n### Structure\n\n* Output is valid JSON.\n* Output is an array.\n* There are exactly 5 Strategy Group objects.\n* Every group contains `name`, `description`, and `strategy`.\n* Every strategy item contains exactly `type`, `objective`, `requiredInfo`, and `date`.\n\n### Platform Constraint\n\n* Every `type` is one of the supported platform values.\n* Every `type` is explicitly available in `optionalDetails.publishingPlatforms`, unless `publishingPlatforms` is missing, null, or empty.\n* No unavailable platform appears anywhere in the strategy items.\n\n### Volume\n\n* Every Strategy Group satisfies the required content-item count based on the number of days remaining.\n\n### Dates\n\n* Every date is valid.\n* Every date uses `YYYY-MM-DD HH:MM:SS`.\n* Every date falls between the Current Date and the Event Start Date.\n* Strategy items are chronologically ordered.\n* Registration-deadline messaging does not occur after the registration deadline.\n\n### Objectives\n\n* Every objective is specific and actionable.\n* Every social-media objective includes image-generation direction.\n* No social-media objective requests video, reels, shorts, or animation.\n* Objectives use the provided event information accurately.\n\n### Information Gaps\n\n* `requiredInfo` is `\"none\"` when all required information is already available.\n* Missing information is explicitly identified when an objective depends on unavailable information.\n\n### Strategy Diversity\n\n* Exactly 5 genuinely distinct campaign angles are present.\n* Content within each group is not repetitive.\n* The campaign progression is strategically coherent.\n\nReturn ONLY the final JSON array.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -752,
+        112
+      ],
+      "id": "c23521cb-3eea-43b1-a925-34f612ff73f0",
+      "name": "Message a model",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "60458c94-986c-49cd-8b69-4b5616163eb3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f910b52-842c-4b6a-a862-e6914c883764",
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -976,
+        208
+      ],
+      "id": "21107981-c1be-4ed9-bc94-c0006bb7287d",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.domain }}wp-json/synergizeflow/v2/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license",
+              "value": "={{ $json.license }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1200,
+        272
+      ],
+      "id": "d026067d-baa6-48d8-b18a-48b88ec02f54",
+      "name": "Check if license is valid",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Webhook').item.json.body.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "fail"
+            },
+            {
+              "name": "msg",
+              "value": "invalid_license"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -704,
+        496
+      ],
+      "id": "41a2822a-8e64-4d94-b54b-bb6f6402cee2",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "domain",
+              "value": "={{ $json.body.domain }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        -1648,
+        464
+      ],
+      "id": "358b6dbe-3a52-48da-8261-5c4dcd7ee5a1",
+      "name": "Execution Data"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5a87c8b9-2ebc-462d-a295-4cf62a0dcb9b",
+              "name": "license",
+              "value": "={{ $('Webhook').item.json.body.license }}",
+              "type": "string"
+            },
+            {
+              "id": "581cc296-13c4-41bb-95a7-6d71effe61e1",
+              "name": "domain",
+              "value": "={{ $('Webhook').item.json.body.domain }}",
+              "type": "string"
+            },
+            {
+              "id": "a6a5466a-5c10-4a04-bdac-515345d4d1e2",
+              "name": "data",
+              "value": "={{ $('Webhook').item.json.body.data }}",
+              "type": "object"
+            },
+            {
+              "id": "fe4511e0-f6f9-4500-8c6a-cab68e411697",
+              "name": "token",
+              "value": "={{ $json.token }}",
+              "type": "string"
+            },
+            {
+              "id": "adc838e7-219c-4fe9-952c-6fc8367585c8",
+              "name": "agent_id",
+              "value": "={{ $('Webhook').item.json.body.agent_id }}",
+              "type": "number"
+            },
+            {
+              "id": "14074df1-c40b-4ca9-9bed-0325972f8ded",
+              "name": "webhook",
+              "value": "={{ $('Webhook').item.json.body.webhook }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1424,
+        272
+      ],
+      "id": "f5abb123-f94f-41b6-ab51-d8f6a8b1ee56",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "CfFTrHyw35Q6kVn5",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/CfFTrHyw35Q6kVn5",
+          "cachedResultName": "SynergizeFlow.v2 — Get App Token"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -1648,
+        272
+      ],
+      "id": "b8c342ff-f991-459f-9dd7-74774264e733",
+      "name": "Get token"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "=ok"
+            },
+            {
+              "name": "data",
+              "value": "={{ $json.data }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -176,
+        32
+      ],
+      "id": "bbdea8a2-9716-46fb-85a2-dd8dd53fc6be",
+      "name": "HTTP Request8",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -176,
+        256
+      ],
+      "id": "50c9fa6e-d56c-4e6d-852b-d17b6fea7709",
+      "name": "Wait",
+      "webhookId": "71652c2e-7881-4ce7-9290-671f1b1be475"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$vars.N8N_URL}}/webhook/v2/media-agent/dummy-webook",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "CF-Access-Client-Id",
+              "value": "=df7b356ab8469e73180a34f316943468.access"
+            },
+            {
+              "name": "CF-Access-Client-Secret",
+              "value": "ce5fe761d797f0712211aee26d2ae52cc51d9d629bf8a3f13e9c7c47c166783c"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "=ok"
+            },
+            {
+              "name": "data",
+              "value": "={{ $('Parsed Data').item.json.data }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        48,
+        32
+      ],
+      "id": "4c38f633-2aa3-4936-9363-0d037b6ef0fd",
+      "name": "HTTP Request",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "function getValidJsonObject(rawText) {\n\n    if (typeof rawText !== 'string' || rawText.trim() === '') {\n        console.error(\"Invalid input or empty text field.\");\n        return null;\n    }\n\n    let jsonString = rawText.trim();\n\n    // 2. Check for and remove the markdown JSON block fences.\n    // This regex is robust and handles variations in whitespace.\n    const markdownRegex = /^```json\\s*([\\s\\S]*?)\\s*```$/;\n    const match = jsonString.match(markdownRegex);\n\n    if (match) {\n        // If it's a match, the actual JSON string is in the first capture group.\n        jsonString = match[1];\n    }\n\n    // 3. Parse the cleaned string into a JSON object.\n    try {\n        return JSON.parse(jsonString);\n    } catch (error) {\n        console.error(\"Failed to parse JSON string:\", error);\n        console.error(\"Problematic string:\", jsonString);\n        return null;\n    }\n}\nreturn {data:getValidJsonObject($input.first().json.content.parts[0].text)};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -400,
+        80
+      ],
+      "id": "a93abab6-b2b4-4051-bba0-9a36581d2b36",
+      "name": "Parsed Data",
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Parsed Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if license is valid": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get token": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request8": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parsed Data": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request8",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "triggerCount": 1,
+  "versionId": "0070584d-6a9c-4c22-9847-d6e1c1bbd7bc",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "COlUXFB7ZeDqdhmU",
+  "isArchived": false
+}
