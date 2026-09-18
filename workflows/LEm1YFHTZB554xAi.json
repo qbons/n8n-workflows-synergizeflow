@@ -1364,94 +1364,21 @@
     },
     {
       "parameters": {
-        "jsCode": "const url = $('Source Data').first().json.content_data.img_url;\nconst mimeType = url.includes(\"jpg\") ? \"image/jpeg\" : \"image/png\";\n\nreturn {\n  status: \"ok\",\n  website_name: \"dummy\",\n  parsed: [\n    {\n      title: \"dummy_title\",\n      description: $('Source Data').first().json.prompt_data.blog_image_description,\n      mime: mimeType,\n      url: $('Source Data').first().json.content_data.img_url,\n      category: \"dummy\"\n    }\n  ]\n\n}"
+        "jsCode": "let prompt = $('Message a model3').first().json.content.parts[0].text + `\n\nIMPORTANT ORIENTATION AND ASPECT RATIO INSTRUCTION:\n\nUse the attached image as the visual reference/source for the generated image.\n\nPreserve the reference image's subject, visual characteristics, style, details, and overall visual identity as appropriate.\n\nHowever, the requested output aspect ratio must be treated as a native composition requirement.\n\nDo NOT rotate the reference image or rotate the entire scene to match the requested aspect ratio.\n\nDo NOT turn the reference sideways or upside down.\n\nWhen the reference image orientation differs from the requested output orientation, naturally recompose the scene for the requested orientation while keeping all people, objects, furniture, interfaces, and environmental elements correctly oriented relative to gravity.\n\nFor a 9:16 portrait output, create a genuinely upright portrait composition. The person must remain upright, with their head above their body, and objects must maintain their normal physical orientation. Reposition, resize, crop, or rearrange elements naturally as necessary to fit the portrait canvas.\n\nThe output should look like the original scene was naturally composed for 9:16, not like the reference image was rotated or mechanically converted from landscape to portrait.\n\nDo not sacrifice natural orientation or physical coherence in order to preserve the reference image's original framing.`;\n\nreturn {\n    \"url\": \"https://api.kie.ai/api/v1/jobs/createTask\",\n    \"config\": {\n      \"model\": \"gpt-image-2-5-flare-image-to-image\",\n   \"input\": {\n      \"prompt\": prompt,\n      \"aspect_ratio\": $('Source Data').first().json.prompt_data.aspect_ratio,\n      \"resolution\": \"1K\",\n      \"background\": \"auto\",\n       \"input_urls\": [\n         $('Source Data').first().json.content_data.img_url\n       ]\n   }\n    } \n}\n\n\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2336,
-        352
-      ],
-      "id": "9fc85f51-9e6e-4d4d-a5b6-f65f64293e15",
-      "name": "Text image",
-      "onError": "continueErrorOutput"
-    },
-    {
-      "parameters": {
-        "workflowId": {
-          "__rl": true,
-          "value": "lLVBwo7b4O3KXhwN",
-          "mode": "list",
-          "cachedResultUrl": "/workflow/lLVBwo7b4O3KXhwN",
-          "cachedResultName": "SynergizeFlow.v2 — SF - Image Vaults Converter"
-        },
-        "workflowInputs": {
-          "mappingMode": "defineBelow",
-          "value": {},
-          "matchingColumns": [],
-          "schema": [],
-          "attemptToConvertTypes": false,
-          "convertFieldsToString": true
-        },
-        "options": {
-          "waitForSubWorkflow": true
-        }
-      },
-      "type": "n8n-nodes-base.executeWorkflow",
-      "typeVersion": 1.3,
-      "position": [
-        2560,
-        336
-      ],
-      "id": "11201987-d90c-4cfd-b231-ac6d5046dd61",
-      "name": "Convert to Base64"
-    },
-    {
-      "parameters": {
-        "jsCode": "let prompt = $('Message a model3').first().json.content.parts[0].text + `\n\nIMPORTANT ORIENTATION AND ASPECT RATIO INSTRUCTION:\n\nUse the attached image as the visual reference/source for the generated image.\n\nPreserve the reference image's subject, visual characteristics, style, details, and overall visual identity as appropriate.\n\nHowever, the requested output aspect ratio must be treated as a native composition requirement.\n\nDo NOT rotate the reference image or rotate the entire scene to match the requested aspect ratio.\n\nDo NOT turn the reference sideways or upside down.\n\nWhen the reference image orientation differs from the requested output orientation, naturally recompose the scene for the requested orientation while keeping all people, objects, furniture, interfaces, and environmental elements correctly oriented relative to gravity.\n\nFor a 9:16 portrait output, create a genuinely upright portrait composition. The person must remain upright, with their head above their body, and objects must maintain their normal physical orientation. Reposition, resize, crop, or rearrange elements naturally as necessary to fit the portrait canvas.\n\nThe output should look like the original scene was naturally composed for 9:16, not like the reference image was rotated or mechanically converted from landscape to portrait.\n\nDo not sacrifice natural orientation or physical coherence in order to preserve the reference image's original framing.`;\n\nconst parts = [\n  { text: prompt },\n  {\n    inlineData: {\n        mimeType: $('Convert to Base64').first().json.parsed[0].mime,\n        data: $('Convert to Base64').first().json.parsed[0].data // n8n already provides this as base64\n    }\n  }\n];\n\n// Return the structure ready for the API\nreturn {\n  json: {\n    payload: {\n      contents: [\n        {\n          parts: parts\n        }\n      ],\n      generationConfig: {\n          responseModalities: [\"image\"],\n          imageConfig:{\n               aspectRatio: $('Source Data').first().json.prompt_data.aspect_ratio\n          }\n      }\n    }\n  }\n};\n\n"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        2800,
-        336
+        2368,
+        320
       ],
       "id": "b4a1a964-7572-4358-8b0d-abe95d11c6cd",
       "name": "Image Payload"
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $vars.GEMINI_PRO_IMAGE }}:generateContent",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ $json.payload }}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.3,
-      "position": [
-        3024,
-        336
-      ],
-      "id": "fddcbcfc-2ff5-48e0-bcc4-7b1f20742164",
-      "name": "HTTP Request4",
-      "retryOnFail": true,
-      "maxTries": 5,
-      "waitBetweenTries": 5000,
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "tURjQrWDQUUGEoyg",
-          "name": "SF - Gemini Header Auth"
-        }
-      }
-    },
-    {
-      "parameters": {
         "operation": "toBinary",
-        "sourceProperty": "candidates[0].content.parts[0].inlineData.data",
+        "sourceProperty": "data",
         "binaryPropertyName": "image",
         "options": {}
       },
@@ -1572,6 +1499,64 @@
         }
       },
       "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.config.toJsonString() }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2640,
+        320
+      ],
+      "id": "264fbd00-59d9-45d9-98d8-afe0f49c33a2",
+      "name": "Generate Image no assets",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "SFhjYsXsyVcRhxXr",
+          "name": "SF - KIE AI"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "kjAqY7ZYfntMJO3k",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/kjAqY7ZYfntMJO3k",
+          "cachedResultName": "SynergizeFlow.v2 — SF - Event Agent - Pooling KIE AI"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        2928,
+        336
+      ],
+      "id": "ba8b7b6e-6433-401c-a6a5-fe65020c7ce9",
+      "name": "KIE AI Pooling"
     }
   ],
   "connections": {
@@ -2096,7 +2081,7 @@
       "main": [
         [
           {
-            "node": "Text image",
+            "node": "Image Payload",
             "type": "main",
             "index": 0
           }
@@ -2121,51 +2106,11 @@
         ]
       ]
     },
-    "Text image": {
-      "main": [
-        [
-          {
-            "node": "Convert to Base64",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Wait4",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Convert to Base64": {
-      "main": [
-        [
-          {
-            "node": "Image Payload",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Image Payload": {
       "main": [
         [
           {
-            "node": "HTTP Request4",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "HTTP Request4": {
-      "main": [
-        [
-          {
-            "node": "Convert to File1",
+            "node": "Generate Image no assets",
             "type": "main",
             "index": 0
           }
@@ -2220,6 +2165,28 @@
           }
         ]
       ]
+    },
+    "Generate Image no assets": {
+      "main": [
+        [
+          {
+            "node": "KIE AI Pooling",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "KIE AI Pooling": {
+      "main": [
+        [
+          {
+            "node": "Convert to File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -2233,7 +2200,7 @@
     "availableInMCP": false
   },
   "triggerCount": 1,
-  "versionId": "a1658817-254f-4944-8657-f07a7ff55d7c",
+  "versionId": "f55ff35c-264e-4b58-ad35-d0b712879231",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",
