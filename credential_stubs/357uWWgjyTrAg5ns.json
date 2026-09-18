@@ -1,0 +1,14 @@
+{
+  "id": "357uWWgjyTrAg5ns",
+  "name": "telegram-update-15-09-2026",
+  "type": "telegramApi",
+  "data": {
+    "accessToken": ""
+  },
+  "ownedBy": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "isGlobal": false
+}

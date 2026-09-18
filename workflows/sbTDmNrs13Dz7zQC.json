@@ -1047,7 +1047,7 @@
         "messages": {
           "values": [
             {
-              "content": "=1. faq_count: {{ $('Prepare Data').item.json.config.faq_count }}\n2. source_text: {{ $('Original Blog').item.json.content }}"
+              "content": "=1. faq_count: {{ $('Prepare Data').item.json.faq_count }}\n2. source_text: {{ $('Original Blog').item.json.content }}"
             }
           ]
         },
@@ -1138,7 +1138,7 @@
                 },
                 "conditions": [
                   {
-                    "leftValue": "={{ $('Prepare Data').item.json.config.faq_count }}",
+                    "leftValue": "={{ $('Prepare Data').item.json.faq_count }}",
                     "rightValue": 0,
                     "operator": {
                       "type": "number",
@@ -1163,7 +1163,7 @@
                 "conditions": [
                   {
                     "id": "d28227d4-b390-485f-b193-f47806fb8b39",
-                    "leftValue": "={{ $('Prepare Data').item.json.config.faq_count }}",
+                    "leftValue": "={{ $('Prepare Data').item.json.faq_count }}",
                     "rightValue": 0,
                     "operator": {
                       "type": "number",
@@ -1788,7 +1788,7 @@
     "availableInMCP": false
   },
   "triggerCount": 1,
-  "versionId": "0826e68b-8073-438c-b0f5-833b148c6b76",
+  "versionId": "999cae24-fb16-42ff-bafb-b634b78e2091",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",
