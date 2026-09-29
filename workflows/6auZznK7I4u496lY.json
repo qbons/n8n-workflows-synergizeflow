@@ -42,7 +42,8 @@
             "status": "waiting_kie_ai",
             "kie_music_task_id": "none",
             "music_url": "none",
-            "media_type": "={{ $('Webhook').item.json.body.output_type }}"
+            "media_type": "={{ $('Webhook').item.json.body.output_type }}",
+            "identifier": "={{ $('Webhook').item.json.body.identifier }}"
           },
           "matchingColumns": [],
           "schema": [
@@ -169,6 +170,16 @@
             {
               "id": "media_type",
               "displayName": "media_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "identifier",
+              "displayName": "identifier",
               "required": false,
               "defaultMatch": false,
               "display": true,
@@ -629,6 +640,10 @@
             {
               "keyName": "agent_id",
               "keyValue": "={{ $json.body.agent_id }}"
+            },
+            {
+              "keyName": "identifier",
+              "keyValue": "={{ $json.body.identifier }}"
             }
           ]
         },
@@ -727,6 +742,10 @@
             {
               "keyName": "agent_id",
               "keyValue": "={{ $('Webhook').item.json.body.agent_id }}"
+            },
+            {
+              "keyName": "identifier",
+              "keyValue": "={{ $('Webhook').item.json.body.identifier }}"
             }
           ]
         },
@@ -755,6 +774,12 @@
               "id": "291b666d-8eae-4af7-bb4f-272ffba0aae3",
               "name": "domain",
               "value": "={{ $('Webhook').item.json.body.domain }}",
+              "type": "string"
+            },
+            {
+              "id": "279386fd-e707-4613-b9d8-9df713cc4934",
+              "name": "identifier",
+              "value": "={{ $('Webhook').item.json.body.identifier }}",
               "type": "string"
             }
           ]
@@ -1774,7 +1799,7 @@
     "saveDataSuccessExecution": "all"
   },
   "triggerCount": 1,
-  "versionId": "6064aed0-2c34-4bf5-91b6-d26428598b67",
+  "versionId": "7c18af53-c876-4760-a18c-00cda08c06ec",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",

@@ -1,6 +1,6 @@
 {
   "id": "sbTDmNrs13Dz7zQC",
-  "name": "SF - Blog Agent NEW",
+  "name": "SF - Blog Agent",
   "nodes": [
     {
       "parameters": {
@@ -723,6 +723,12 @@
               "name": "topic",
               "value": "={{ $('Webhook').item.json.body.topic }}",
               "type": "string"
+            },
+            {
+              "id": "6b6df477-3442-41f9-a657-eeb1625e8da8",
+              "name": "additional_language",
+              "value": "={{ $('Webhook').item.json.body.additional_language && Array.isArray($('Webhook').item.json.body.additional_language) ? $('Webhook').item.json.body.additional_language : [] }}",
+              "type": "array"
             }
           ]
         },
@@ -1041,7 +1047,7 @@
       "parameters": {
         "modelId": {
           "__rl": true,
-          "value": "=models/{{ $vars.GEMINI_FLASH_PREVIEW}}",
+          "value": "=models/{{ $vars.GEMINI_FLASH_LATEST}}",
           "mode": "id"
         },
         "messages": {
@@ -1338,12 +1344,87 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        -1872,
-        528
+        -2144,
+        144
       ],
       "id": "c2d62c15-235d-422e-8808-e04a4fff25b4",
       "name": "Wait3",
       "webhookId": "7d9d89f8-842d-41a8-8134-03c98285bd34"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "645f5103-619f-461a-9c25-81b97117b355",
+              "leftValue": "={{ $('Prepare Data').item.json.additional_language }}",
+              "rightValue": "",
+              "operator": {
+                "type": "array",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1440,
+        448
+      ],
+      "id": "3af2ceb6-a68d-4bf8-9ccb-204785787ce1",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "Rl0ZOC1WsAfVMH7H",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/Rl0ZOC1WsAfVMH7H",
+          "cachedResultName": "SynergizeFlow.v2 — SF - Blog Agent Multi Language"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -992,
+        432
+      ],
+      "id": "a1678003-1787-4ce4-a6c2-551e1e59483e",
+      "name": "Call Multilanguage"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  domain: $('Prepare Data').first().json.domain,\n  license: $('Prepare Data').first().json.license,\n  language: $('Prepare Data').first().json.additional_language,\n  agent_id: $('Prepare Data').first().json.agent_id,\n  parent_id: $('Insert data to website').first().json.data.blog_id,\n  image: $('Edit Fields3').first().json.image,\n  faq: $('Prepare Data').first().json.faq_count,\n    post_status: $('Prepare Data').first().json.post_status,\n    categories: $('Prepare Data').first().json.categories,\n    author: $('Prepare Data').first().json.author,\n    seo_provider: $('Prepare Data').first().json.seo_provider,\n  webhook: $('Prepare Data').first().json.webhook,\n  data: {\n    title: $('Original Blog').first().json.title,\n    content: $('Original Blog').first().json.content,\n    keywords: $('Original Blog').first().json.keywords,\n    excerpt: $('Original Blog').first().json.excerpt\n  }\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1184,
+        432
+      ],
+      "id": "64a1d6f1-3d05-48b1-8e9d-a21858b4bbd5",
+      "name": "Code in JavaScript3"
     }
   ],
   "connections": {
@@ -1777,6 +1858,50 @@
           }
         ]
       ]
+    },
+    "HTTP Request5": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request8": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "Call Multilanguage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -1788,7 +1913,7 @@
     "availableInMCP": false
   },
   "triggerCount": 1,
-  "versionId": "6d49e156-983a-465d-b2a5-53e924284f35",
+  "versionId": "f52d5998-17b2-44ad-95c7-ab97d6d10a72",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",

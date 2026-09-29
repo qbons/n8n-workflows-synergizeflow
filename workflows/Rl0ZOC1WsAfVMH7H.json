@@ -1,0 +1,861 @@
+{
+  "id": "Rl0ZOC1WsAfVMH7H",
+  "name": "SF - Blog Agent Multi Language",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -32,
+        32
+      ],
+      "id": "8a604ffe-56cd-42d7-b0ed-e116f7c34fe0",
+      "name": "Blog Agent"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "CfFTrHyw35Q6kVn5",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/CfFTrHyw35Q6kVn5",
+          "cachedResultName": "SynergizeFlow.v2 — Get App Token"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        192,
+        32
+      ],
+      "id": "e1bdee23-93b3-4e60-b740-e148c15b4f3d",
+      "name": "Get token"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5a87c8b9-2ebc-462d-a295-4cf62a0dcb9b",
+              "name": "license",
+              "value": "={{ $('Blog Agent').item.json.license }}",
+              "type": "string"
+            },
+            {
+              "id": "581cc296-13c4-41bb-95a7-6d71effe61e1",
+              "name": "domain",
+              "value": "={{ $('Blog Agent').item.json.domain }}",
+              "type": "string"
+            },
+            {
+              "id": "a6a5466a-5c10-4a04-bdac-515345d4d1e2",
+              "name": "agent_id",
+              "value": "={{ $('Blog Agent').item.json.agent_id }}",
+              "type": "number"
+            },
+            {
+              "id": "a588bfae-1014-44e1-a9ba-74273ae3a576",
+              "name": "parent_id",
+              "value": "={{ $('Blog Agent').item.json.parent_id }}",
+              "type": "number"
+            },
+            {
+              "id": "afbca853-fa37-4fc2-bced-85dfdb9b374d",
+              "name": "language",
+              "value": "={{ $('Blog Agent').item.json.language }}",
+              "type": "array"
+            },
+            {
+              "id": "290f5675-dee3-4772-b15e-b3e38a45bf59",
+              "name": "data",
+              "value": "={{ $('Blog Agent').item.json.data }}",
+              "type": "object"
+            },
+            {
+              "id": "c4a09bbb-e67b-4448-a2c6-79dcc91128a8",
+              "name": "token",
+              "value": "={{ $json.token }}",
+              "type": "string"
+            },
+            {
+              "id": "4c1a8219-8778-45db-8471-92f125f2e614",
+              "name": "image",
+              "value": "={{ $('Blog Agent').item.json.image }}",
+              "type": "string"
+            },
+            {
+              "id": "c4d92e84-c0e7-4dc2-b9c4-7874f6214fd0",
+              "name": "faq_count",
+              "value": "={{ $('Blog Agent').item.json.faq }}",
+              "type": "number"
+            },
+            {
+              "id": "3d34d03f-0af7-489f-b8c6-d2a2a337b8c7",
+              "name": "post_status",
+              "value": "={{ $('Blog Agent').item.json.post_status }}",
+              "type": "string"
+            },
+            {
+              "id": "b000ee45-087e-4dd5-a791-a52d0aedf5e7",
+              "name": "categories",
+              "value": "={{ $('Blog Agent').item.json.categories }}",
+              "type": "array"
+            },
+            {
+              "id": "e45b748f-d986-4105-b0e6-eae30f815f60",
+              "name": "author",
+              "value": "={{ $('Blog Agent').item.json.author }}",
+              "type": "number"
+            },
+            {
+              "id": "b1f4de00-503c-42a0-a721-86446b569b3a",
+              "name": "seo_provider",
+              "value": "={{ $('Blog Agent').item.json.seo_provider }}",
+              "type": "string"
+            },
+            {
+              "id": "99abedb0-116d-45b5-96b6-9f1041fa66e1",
+              "name": "webhook",
+              "value": "={{ $('Blog Agent').item.json.webhook }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        400,
+        32
+      ],
+      "id": "0b6216ec-4c2e-44fa-b95f-e253d6d871a9",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "language",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        624,
+        32
+      ],
+      "id": "46d3524c-0786-455c-a0c2-08f63390a8e3",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        832,
+        32
+      ],
+      "id": "114a9246-654f-4022-85ed-de8a9597d565",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "jsCode": "let data = $('Prepare Data').first().json.data;\ndata.language = $input.first().json.language;\nreturn data;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1072,
+        320
+      ],
+      "id": "2a16c42a-fbbd-4812-94f3-a0ede5af69c2",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_TEXT }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{  $json.toJsonString() }}"
+            }
+          ]
+        },
+        "options": {
+          "systemMessage": "=# Translation Agent — System Instruction\n\nYou are a professional translation agent.\n\nYour task is to translate the received JSON data into the language specified by the `language` field.\n\n## Core Objective\n\nTranslate the content of the input JSON from its current language into the target language defined by:\n\n```json\n\"language\": \"TARGET_LANGUAGE\"\n```\n\nThe output MUST preserve the exact same JSON structure as the input.\n\nYou must NOT add, remove, rename, or reorder fields.\n\n---\n\n## Translation Rules\n\n### 1. Preserve the JSON structure\n\nThe output must have exactly the same:\n\n* JSON object structure\n* Property names\n* Array structure\n* Number of array items\n* Nested objects\n* HTML structure\n* URLs\n* HTML attributes\n* Formatting markers\n\nOnly translate the textual content.\n\nFor example, if the input contains:\n\n```json\n{\n  \"title\": \"...\",\n  \"content\": \"...\",\n  \"keywords\": [\"...\", \"...\"],\n  \"excerpt\": \"...\",\n  \"language\": \"nl\"\n}\n```\n\nthe output must contain exactly these same fields:\n\n```json\n{\n  \"title\": \"...\",\n  \"content\": \"...\",\n  \"keywords\": [\"...\", \"...\"],\n  \"excerpt\": \"...\",\n  \"language\": \"nl\"\n}\n```\n\n---\n\n### 2. Translate all user-facing textual content\n\nTranslate the values of fields containing human-readable content, including:\n\n* `title`\n* `content`\n* `keywords`\n* `excerpt`\n* Any other textual fields that may appear in the input\n\nDo not assume that only these fields will exist. If another field contains natural-language content, translate it as well.\n\n---\n\n### 3. Preserve HTML\n\nThe `content` field may contain HTML.\n\nTranslate the visible text inside the HTML while preserving the HTML structure exactly.\n\nFor example:\n\nInput:\n\n```html\n<h2>Why family-friendly jobs matter</h2>\n<p>Flexible work helps employees.</p>\n```\n\nOutput:\n\n```html\n<h2>[translated heading]</h2>\n<p>[translated paragraph]</p>\n```\n\nDo NOT:\n\n* Remove HTML tags\n* Add HTML tags\n* Change tag names\n* Change attributes\n* Change HTML nesting\n* Change links\n* Change URLs\n* Change `target`, `class`, `id`, or other attributes\n\n---\n\n### 4. Preserve URLs\n\nNever translate, modify, replace, or remove URLs.\n\nFor example:\n\n```html\n<a href=\"https://example.com/some-page\">Some text</a>\n```\n\nOnly translate:\n\n```html\nSome text\n```\n\nKeep this exactly unchanged:\n\n```html\nhttps://example.com/some-page\n```\n\n---\n\n### 5. Preserve keywords as individual items\n\nIf `keywords` is an array, translate each keyword individually while preserving:\n\n* The array\n* The number of items\n* The order of items\n\nExample:\n\n```json\n\"keywords\": [\n  \"keyword one\",\n  \"keyword two\",\n  \"keyword three\"\n]\n```\n\nmust remain:\n\n```json\n\"keywords\": [\n  \"translated keyword one\",\n  \"translated keyword two\",\n  \"translated keyword three\"\n]\n```\n\nDo not combine, remove, reorder, or add keywords.\n\n---\n\n### 6. Preserve meaning and intent\n\nTranslate naturally for the target language.\n\nDo not perform a literal word-for-word translation when it would sound unnatural.\n\nPreserve:\n\n* Meaning\n* Context\n* Tone\n* Intent\n* Claims\n* Calls to action\n* Industry terminology\n* Brand messaging\n\nDo not rewrite, summarize, expand, shorten, improve, fact-check, or otherwise modify the original content.\n\nThe task is translation, not content optimization.\n\n---\n\n### 7. Preserve brand names and proper nouns\n\nDo not translate brand names, company names, product names, domain names, URLs, or other proper nouns unless the input explicitly indicates that they should be translated.\n\nFor example:\n\n```text\nGlansPro\nSynergizeFlow\nWordPress\nGoogle\n```\n\nshould remain unchanged.\n\n---\n\n### 8. Preserve technical terminology when appropriate\n\nTechnical, marketing, SEO, HTML, programming, and industry-specific terminology should be translated appropriately for the target language while maintaining the original meaning.\n\nDo not unnecessarily translate established technical terms when they are normally used in their original form in the target language.\n\n---\n\n### 9. Preserve placeholders and variables\n\nNever translate or modify placeholders, variables, template expressions, or dynamic values.\n\nExamples:\n\n```text\n{{name}}\n{{ $now }}\n{{ $json.title }}\n%USERNAME%\n{keyword}\n[VARIABLE]\n```\n\nThese must remain exactly unchanged.\n\n---\n\n### 10. Preserve special characters and formatting\n\nPreserve meaningful formatting such as:\n\n* Line breaks\n* HTML entities\n* Markdown syntax\n* Escape characters\n* Special symbols\n* Numeric values\n* Dates\n* Percentages\n* Currency values\n\nDo not change factual values merely because they appear inside translatable content.\n\n---\n\n## Language Field\n\nThe `language` field specifies the target language.\n\nThe value of the `language` field MUST remain unchanged in the output.\n\nFor example, if:\n\n```json\n\"language\": \"nl\"\n```\n\nthen translate the content into Dutch, but keep:\n\n```json\n\"language\": \"nl\"\n```\n\nDo not translate `\"nl\"` into `\"Dutch\"` or any other value.\n\n---\n\n## JSON-Only Output\n\nYour response MUST contain valid JSON only.\n\nDo NOT output:\n\n* Markdown\n* Code fences\n* Explanations\n* Comments\n* Notes\n* Introduction text\n* Translation summaries\n* Additional fields\n\nIncorrect:\n\n```text\nHere is the translated content:\n\n{\n  ...\n}\n```\n\nCorrect:\n\n```json\n{\n  ...\n}\n```\n\n---\n\n## Strict Output Requirements\n\nBefore returning the response, verify that:\n\n1. The output is valid JSON.\n2. The JSON structure exactly matches the input.\n3. No fields were added.\n4. No fields were removed.\n5. No field names were changed.\n6. Array lengths are unchanged.\n7. Array ordering is unchanged.\n8. HTML structure is preserved.\n9. URLs are unchanged.\n10. HTML attributes are unchanged.\n11. Placeholders and variables are unchanged.\n12. Brand names and protected proper nouns are preserved.\n13. All translatable textual content is translated.\n14. The `language` field remains unchanged.\n15. No text exists outside the JSON object.\n\nReturn ONLY the translated JSON object.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        1296,
+        320
+      ],
+      "id": "e0363fd5-5dd7-4370-bead-a95f68baa951",
+      "name": "Message a model",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "function getValidJsonObject(rawText) {\n\n    if (typeof rawText !== 'string' || rawText.trim() === '') {\n        console.error(\"Invalid input or empty text field.\");\n        return null;\n    }\n\n    let jsonString = rawText.trim();\n\n    // 2. Check for and remove the markdown JSON block fences.\n    // This regex is robust and handles variations in whitespace.\n    const markdownRegex = /^```json\\s*([\\s\\S]*?)\\s*```$/;\n    const match = jsonString.match(markdownRegex);\n\n    if (match) {\n        // If it's a match, the actual JSON string is in the first capture group.\n        jsonString = match[1];\n    }\n\n    // 3. Parse the cleaned string into a JSON object.\n    try {\n        return JSON.parse(jsonString);\n    } catch (error) {\n        console.error(\"Failed to parse JSON string:\", error);\n        console.error(\"Problematic string:\", jsonString);\n        return null;\n    }\n}\nreturn getValidJsonObject($input.first().json.content.parts[0].text);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1680,
+        320
+      ],
+      "id": "8cbcbe0e-97e4-4547-9728-5c6a9cc97f54",
+      "name": "Original Blog",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8ee5a866-7fe1-45be-8e1a-60a13ee3fbf8",
+              "name": "image",
+              "value": "={{ $('Prepare Data').item.json.image }}",
+              "type": "string"
+            },
+            {
+              "id": "29c81488-142a-40dd-af9e-0eb1004b153c",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "fa758b99-67ae-45b2-ad02-e1b704fdd403",
+              "name": "keyword",
+              "value": "={{ $json.keywords }}",
+              "type": "array"
+            },
+            {
+              "id": "38bc61c4-34f8-4e5e-9b3b-70779aea7aa9",
+              "name": "content",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "23c71d05-3ca8-4f5e-b4d3-7c03d4b440c7",
+              "name": "key",
+              "value": "={{$vars.STATIC_TOKEN}}",
+              "type": "string"
+            },
+            {
+              "id": "0b7d5b13-c05f-42a1-9e2d-0dfec25de1d3",
+              "name": "excerpt",
+              "value": "={{ $json.excerpt }}",
+              "type": "string"
+            },
+            {
+              "id": "c929aa0a-8005-473e-9ba8-181fbf8aeded",
+              "name": "language",
+              "value": "={{ $json.language }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1936,
+        304
+      ],
+      "id": "5682b503-9491-474a-8d57-3998119904ce",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.domain }}wp-json/synergizeflow/v2/insert-blog",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license",
+              "value": "={{ $('Prepare Data').item.json.license }}"
+            },
+            {
+              "name": "category",
+              "value": "={{ $('Prepare Data').item.json.categories }}"
+            },
+            {
+              "name": "author",
+              "value": "={{ $('Prepare Data').item.json.author }}"
+            },
+            {
+              "name": "status",
+              "value": "={{ $('Prepare Data').item.json.post_status }}"
+            },
+            {
+              "name": "title",
+              "value": "={{ $json.title }}"
+            },
+            {
+              "name": "content",
+              "value": "={{ $json.content }}"
+            },
+            {
+              "name": "excerpt",
+              "value": "={{ $json.excerpt }}"
+            },
+            {
+              "name": "image",
+              "value": "={{ $json.image }}"
+            },
+            {
+              "name": "keyword",
+              "value": "={{ $json.keyword }}"
+            },
+            {
+              "name": "provider",
+              "value": "={{ $('Prepare Data').item.json.seo_provider }}"
+            },
+            {
+              "name": "language",
+              "value": "={{ $json.language }}"
+            },
+            {
+              "name": "parent",
+              "value": "={{ $('Prepare Data').item.json.parent_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2128,
+        304
+      ],
+      "id": "e314c660-549b-4228-ac23-6bdff1f0d513",
+      "name": "Insert data to website",
+      "retryOnFail": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Prepare Data').item.json.faq_count }}",
+                    "rightValue": 0,
+                    "operator": {
+                      "type": "number",
+                      "operation": "notEquals"
+                    },
+                    "id": "272ad233-50d0-4aa6-a877-f5676d68e887"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "has_faq"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d28227d4-b390-485f-b193-f47806fb8b39",
+                    "leftValue": "={{ $('Prepare Data').item.json.faq_count }}",
+                    "rightValue": 0,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "no_faq"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        2512,
+        288
+      ],
+      "id": "43c76250-3d9e-40df-b6ab-e1affabe7baa",
+      "name": "Switch3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "={{ $json.status }}"
+            },
+            {
+              "name": "data",
+              "value": "={{ $json.data }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2848,
+        464
+      ],
+      "id": "512d17c9-6f00-4f03-a316-2671b7b0197a",
+      "name": "HTTP Request5"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "={{ $('Insert data to website').item.json.status }}"
+            },
+            {
+              "name": "data",
+              "value": "={{ $('Payload Response').item.json.data }}"
+            },
+            {
+              "name": "faq_display",
+              "value": "={{ $('Code').item.json.data.faq_display }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3920,
+        16
+      ],
+      "id": "1b0c8ad1-c040-4376-98d5-f3bb6993f661",
+      "name": "HTTP Request8"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_FLASH_LATEST}}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=1. faq_count: {{ $('Prepare Data').item.json.faq_count }}\n2. source_text: {{ $('Original Blog').item.json.content }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "systemMessage": "=You are an expert Content Analyst and SEO Specialist.\n\nYour sole purpose is to analyze supplied content and generate a structured FAQ together with its corresponding JSON-LD schema.\n\nEverything you generate must be derived strictly from the provided source text.\n\nDo not invent, infer, or add information that is not supported by the source.\n\n---\n\n# INPUTS\n\nYou will receive:\n\n1. `source_text`\n   The content to analyze.\n\n2. `faq_count`\n   An integer specifying the exact number of FAQ items to generate.\n\n---\n\n# PROCESS\n\n## 1. ANALYZE\n\nRead the entire `source_text` carefully.\n\nIdentify:\n\n* Main topics\n* Important concepts\n* User intent\n* Frequently asked questions naturally answered by the content\n\nAll generated questions and answers MUST remain faithful to the source.\n\n---\n\n## 2. GENERATE QUESTIONS\n\nCreate clear, concise, and helpful questions that readers are likely to ask after reading the article.\n\nRequirements:\n\n* Questions must be unique.\n* Questions must be directly supported by the source.\n* Questions should cover different aspects of the content.\n* Questions should sound natural.\n* Do not create duplicate or nearly identical questions.\n\n---\n\n## 3. GENERATE ANSWERS\n\nGenerate concise answers.\n\nRequirements:\n\n* Answers must come strictly from the source text.\n* Do NOT invent information.\n* Do NOT use external knowledge.\n* Do NOT speculate.\n* Do NOT exaggerate.\n* Keep answers clear and helpful.\n* Preserve the meaning of the source.\n\n---\n\n## 4. FAQ COUNT\n\nGenerate exactly the number of FAQ items specified by:\n\n`faq_count`\n\nIf the source text genuinely cannot support that many unique questions, generate the maximum possible number of unique FAQs without repeating topics or fabricating information.\n\n---\n\n## 5. GENERATE JSON-LD SCHEMA\n\nGenerate a valid Schema.org FAQPage object.\n\nRequirements:\n\n* Use every generated FAQ.\n* The schema must be valid JSON-LD.\n* Every question and answer in the schema must exactly match those in the display FAQ.\n\n---\n\n# JSON STRUCTURE\n\nReturn exactly this structure:\n\n```json\n{\n  \"faq_display\": [\n    {\n      \"question\": \"\",\n      \"answer\": \"\"\n    }\n  ],\n  \"faq_schema\": {\n    \"@context\": \"https://schema.org\",\n    \"@type\": \"FAQPage\",\n    \"mainEntity\": [\n      {\n        \"@type\": \"Question\",\n        \"name\": \"\",\n        \"acceptedAnswer\": {\n          \"@type\": \"Answer\",\n          \"text\": \"\"\n        }\n      }\n    ]\n  }\n}\n```\n\nNotes:\n\n* `faq_display` and `faq_schema.mainEntity` must contain the same questions and answers.\n* `@context` MUST be `\"https://schema.org\"` exactly.\n* The output must be valid JSON.\n\n---\n\n# OUTPUT CONTRACT (CRITICAL)\n\nYour response MUST consist ONLY of the final JSON object.\n\nDO NOT output:\n\n* Any introduction\n* Any explanation\n* Any reasoning\n* Any confirmation\n* Any notes\n* Any apologies\n* Any Markdown\n* Any headings\n* Any bullet lists\n* Any code fences\n* Any text before the JSON\n* Any text after the JSON\n\nForbidden examples include:\n\n* \"Certainly!\"\n* \"Here is the FAQ.\"\n* \"Below is the JSON.\"\n* \"I've generated the FAQs.\"\n* \"Based on the provided content...\"\n\nThe FIRST character of your response MUST be:\n\n```\n{\n```\n\nThe LAST character of your response MUST be:\n\n```\n}\n```\n\nThe output MUST be valid JSON that can be parsed directly using `JSON.parse()` without any preprocessing.\n\nDo NOT include escaped newline characters (`\\n`) inside JSON string values unless they are genuinely required as part of the answer text.\n\nIf the requested number of FAQs cannot be generated because the source lacks sufficient information, still return a valid JSON object using the maximum number of unique, source-supported FAQ items. Never explain the limitation outside the JSON.\n\n---\n\n# EXECUTION COMMAND\n\nAnalyze the supplied content.\n\nGenerate the FAQ items.\n\nGenerate the matching FAQPage JSON-LD schema.\n\nReturn ONLY the following JSON object.\n\n```json\n{\n  \"faq_display\": [\n    {\n      \"question\": \"Question\",\n      \"answer\": \"Answer\"\n    }\n  ],\n  \"faq_schema\": {\n    \"@context\": \"https://schema.org\",\n    \"@type\": \"FAQPage\",\n    \"mainEntity\": [\n      {\n        \"@type\": \"Question\",\n        \"name\": \"Question\",\n        \"acceptedAnswer\": {\n          \"@type\": \"Answer\",\n          \"text\": \"Answer\"\n        }\n      }\n    ]\n  }\n}\n```\n\nThe response must begin with `{` and end with `}`."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        3152,
+        48
+      ],
+      "id": "25943c8f-85f3-41f0-a771-30f4584fac90",
+      "name": "Message a model4",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.domain }}wp-json/synergizeflow/v2/submit-blog-faq/",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license",
+              "value": "={{ $('Prepare Data').item.json.license }}"
+            },
+            {
+              "name": "faq",
+              "value": "={{ $json.data.faq_display }}"
+            },
+            {
+              "name": "schema",
+              "value": "={{ $json.data.faq_schema }}"
+            },
+            {
+              "name": "blog_id",
+              "value": "={{ $('Insert data to website').item.json.data.blog_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3712,
+        16
+      ],
+      "id": "8ef21808-bedd-4a20-a437-a6d5a351742b",
+      "name": "Send content"
+    },
+    {
+      "parameters": {
+        "jsCode": "function getValidJsonObject(rawText) {\n\n    if (typeof rawText !== 'string' || rawText.trim() === '') {\n        console.error(\"Invalid input or empty text field.\");\n        return null;\n    }\n\n    let jsonString = rawText.trim();\n\n    // 2. Check for and remove the markdown JSON block fences.\n    // This regex is robust and handles variations in whitespace.\n    const markdownRegex = /^```json\\s*([\\s\\S]*?)\\s*```$/;\n    const match = jsonString.match(markdownRegex);\n\n    if (match) {\n        // If it's a match, the actual JSON string is in the first capture group.\n        jsonString = match[1];\n    }\n\n    // 3. Parse the cleaned string into a JSON object.\n    try {\n        return JSON.parse(jsonString);\n    } catch (error) {\n        console.error(\"Failed to parse JSON string:\", error);\n        console.error(\"Problematic string:\", jsonString);\n        return null;\n    }\n}\n\n// Combine the 'text' from all parts into a single string.\nconst combinedText = $input.first().json.content.parts.map(part => part.text).join('');\n\nreturn {data: getValidJsonObject(combinedText)};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3472,
+        32
+      ],
+      "id": "a6063a9a-9459-496b-b321-bdb46b11c089",
+      "name": "Code",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3536,
+        256
+      ],
+      "id": "1a9a2be5-7ce7-4c13-9577-f8e71e657e83",
+      "name": "Wait3",
+      "webhookId": "7d9d89f8-842d-41a8-8134-03c98285bd34"
+    },
+    {
+      "parameters": {
+        "jsCode": "let data = $input.first().json.data\ndata.blog_parent_id = $('Prepare Data').first().json.parent_id;\ndata.language = $('Loop Over Items').first().json.language;\nreturn {data:data};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2336,
+        288
+      ],
+      "id": "de1269f1-7391-4237-a9a5-bf7b354403d9",
+      "name": "Payload Response"
+    }
+  ],
+  "connections": {
+    "Blog Agent": {
+      "main": [
+        [
+          {
+            "node": "Get token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get token": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Original Blog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Original Blog": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Insert data to website",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert data to website": {
+      "main": [
+        [
+          {
+            "node": "Payload Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch3": {
+      "main": [
+        [
+          {
+            "node": "Message a model4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model4": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send content": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Send content",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait3": {
+      "main": [
+        [
+          {
+            "node": "Message a model4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request5": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request8": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Payload Response": {
+      "main": [
+        [
+          {
+            "node": "Switch3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "triggerCount": 0,
+  "versionId": "1c848126-b3d7-4bba-b056-7e02015cc70b",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "icCJSa6WgYRUBtVb",
+  "isArchived": false
+}

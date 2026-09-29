@@ -534,10 +534,11 @@
     "binaryMode": "separate",
     "timeSavedMode": "fixed",
     "callerPolicy": "workflowsFromSameOwner",
-    "availableInMCP": false
+    "availableInMCP": false,
+    "saveDataSuccessExecution": "all"
   },
   "triggerCount": 1,
-  "versionId": "0070584d-6a9c-4c22-9847-d6e1c1bbd7bc",
+  "versionId": "87459143-a39f-4e1b-96c0-538644cb394f",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",

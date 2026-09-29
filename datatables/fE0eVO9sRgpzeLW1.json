@@ -79,6 +79,12 @@
       "name": "media_type",
       "type": "string",
       "index": 12
+    },
+    {
+      "id": "eV0AUtrb2lcVapv1",
+      "name": "identifier",
+      "type": "string",
+      "index": 13
     }
   ],
   "ownedBy": {
@@ -87,5 +93,5 @@
     "teamName": "SynergizeFlow.v2"
   },
   "createdAt": "2026-08-13T07:53:47.659Z",
-  "updatedAt": "2026-08-28T12:30:07.637Z"
+  "updatedAt": "2026-09-29T12:06:53.114Z"
 }

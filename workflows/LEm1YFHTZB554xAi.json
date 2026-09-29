@@ -262,6 +262,12 @@
               "name": "social_media",
               "value": "={{ $('Webhook').item.json.body.config.social_media }}",
               "type": "array"
+            },
+            {
+              "id": "4109b8bf-f704-4f9c-8363-1ea9194f8e0e",
+              "name": "identifier",
+              "value": "={{ $('Webhook').item.json.body.identifier }}",
+              "type": "string"
             }
           ]
         },
@@ -965,6 +971,10 @@
             {
               "name": "kie_music_task_id",
               "value": "none"
+            },
+            {
+              "name": "identifier",
+              "value": "={{ $('Prepare Data').item.json.identifier }}"
             }
           ]
         },
@@ -1302,6 +1312,10 @@
             {
               "name": "kie_music_task_id",
               "value": "={{ $('Generate Music').item.json.data.taskId }}"
+            },
+            {
+              "name": "identifier",
+              "value": "={{ $('Prepare Data').item.json.identifier }}"
             }
           ]
         },
@@ -1395,7 +1409,7 @@
       "parameters": {
         "operation": "upload",
         "bucketName": "={{ $vars.CLOUDFLARE_R2_BUCKET }}",
-        "fileName": "=mediaAgentResult/mediaAgentResult-{{ $('Prepare Data').item.json.agent_id }}.jpg",
+        "fileName": "=mediaAgentResult/mediaAgentResult-{{ $('Prepare Data').item.json.agent_id }}-{{ $('Prepare Data').item.json.identifier }}.jpg",
         "binaryPropertyName": "image",
         "additionalFields": {}
       },
@@ -1416,7 +1430,7 @@
     },
     {
       "parameters": {
-        "jsCode": "let social = $('Source Data').first().json.caption_data;\nlet result = [];\n// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of social) {\n  result.push({\n    type: item.social,\n    title: item.content.title,\n    caption: item.content.caption,\n    tags: item.content.tags,\n    media_url: [\"https://assets.synergizeflow.com/mediaAgentResult/mediaAgentResult-\"+$('Prepare Data').first().json.agent_id+\".jpg\"]\n  })\n}\n\nreturn {result: result}"
+        "jsCode": "let social = $('Source Data').first().json.caption_data;\nlet result = [];\n// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of social) {\n  result.push({\n    type: item.social,\n    title: item.content.title,\n    caption: item.content.caption,\n    tags: item.content.tags,\n    media_url: [\"https://assets.synergizeflow.com/mediaAgentResult/mediaAgentResult-\"+$('Prepare Data').first().json.agent_id+\"-\"+$('Prepare Data').first().json.identifier+\".jpg\"]\n  })\n}\n\nreturn {result: result}"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -2200,7 +2214,7 @@
     "availableInMCP": false
   },
   "triggerCount": 1,
-  "versionId": "f55ff35c-264e-4b58-ad35-d0b712879231",
+  "versionId": "ed223463-94d5-43fe-8975-734a0e7cdc3a",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",

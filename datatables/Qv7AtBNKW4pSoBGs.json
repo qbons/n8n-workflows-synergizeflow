@@ -1,0 +1,31 @@
+{
+  "id": "Qv7AtBNKW4pSoBGs",
+  "name": "Chat Agent Statistic",
+  "columns": [
+    {
+      "id": "OcM3lWiKM6gMfHJ7",
+      "name": "agent_id",
+      "type": "number",
+      "index": 0
+    },
+    {
+      "id": "aWq9HBqRzSMyXuqH",
+      "name": "chat",
+      "type": "number",
+      "index": 1
+    },
+    {
+      "id": "spsiqpKiSyLx7zjE",
+      "name": "cta",
+      "type": "string",
+      "index": 2
+    }
+  ],
+  "ownedBy": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "createdAt": "2026-09-28T05:32:07.262Z",
+  "updatedAt": "2026-09-29T10:49:04.102Z"
+}

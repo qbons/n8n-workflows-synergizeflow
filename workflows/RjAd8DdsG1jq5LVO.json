@@ -1,0 +1,715 @@
+{
+  "id": "RjAd8DdsG1jq5LVO",
+  "name": "PF - Analyze Website",
+  "nodes": [
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "60458c94-986c-49cd-8b69-4b5616163eb3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f910b52-842c-4b6a-a862-e6914c883764",
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -320,
+        96
+      ],
+      "id": "fa2a7bde-c9dc-4f34-a6c5-4d542f57e242",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.domain }}wp-json/synergizeflow/v2/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license",
+              "value": "={{ $json.license }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -544,
+        224
+      ],
+      "id": "1b362831-b970-4516-a51f-0123501eea29",
+      "name": "Check if license is valid",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v2/promptflow/analyze-website",
+        "options": {
+          "responseData": "workflow_started"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1216,
+        320
+      ],
+      "id": "9efc399d-2fce-4837-b7a5-24b08758b97d",
+      "name": "Webhook",
+      "webhookId": "7ed478b2-6067-446c-b510-06d65a1a9b74"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Webhook').item.json.body.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "fail"
+            },
+            {
+              "name": "msg",
+              "value": "invalid_license"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -96,
+        240
+      ],
+      "id": "446e43d0-5b86-404e-9276-1f4a3d78892a",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "domain",
+              "value": "={{ $json.body.domain }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        -992,
+        416
+      ],
+      "id": "fe08eb2a-8b21-4c25-adb7-ea48c51c15fe",
+      "name": "Execution Data"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "CfFTrHyw35Q6kVn5",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/CfFTrHyw35Q6kVn5",
+          "cachedResultName": "SynergizeFlow.v2 — Get App Token"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -992,
+        224
+      ],
+      "id": "eb45fb17-78db-4fe2-b1a7-5e22eeadf940",
+      "name": "Get token"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5a87c8b9-2ebc-462d-a295-4cf62a0dcb9b",
+              "name": "license",
+              "value": "={{ $('Webhook').item.json.body.license }}",
+              "type": "string"
+            },
+            {
+              "id": "581cc296-13c4-41bb-95a7-6d71effe61e1",
+              "name": "domain",
+              "value": "={{ $('Webhook').item.json.body.domain }}",
+              "type": "string"
+            },
+            {
+              "id": "8c3b4c23-65cf-47ef-800c-dce8d88b4d38",
+              "name": "language",
+              "value": "={{ $('Webhook').item.json.body.language }}",
+              "type": "string"
+            },
+            {
+              "id": "bbf79e8d-7664-4fa3-adf9-fcb9219f0d78",
+              "name": "webhook",
+              "value": "={{ $('Webhook').item.json.body.webhook }}",
+              "type": "string"
+            },
+            {
+              "id": "c4a09bbb-e67b-4448-a2c6-79dcc91128a8",
+              "name": "token",
+              "value": "={{ $json.token }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -768,
+        224
+      ],
+      "id": "3623ac85-61eb-43c9-a99d-245f4c18f6fd",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Prepare Data').item.json.domain }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -96,
+        0
+      ],
+      "id": "7ecad88c-fc93-4e61-8730-7b6a11ae1204",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "function getInternalLinks(html, baseDomain, limit = 5) {\n    const links = new Set();\n\n    // Normalize base domain\n    baseDomain = baseDomain.replace(/\\/+$/, \"\");\n\n    // Always include homepage\n    links.add(baseDomain + \"/\");\n\n    const regex = /<a\\b[^>]*href\\s*=\\s*(['\"])(.*?)\\1/gi;\n    let match;\n\n    while ((match = regex.exec(html)) !== null) {\n        if (links.size >= limit) break;\n\n        let href = match[2].trim();\n\n        if (!href) continue;\n\n        // Ignore unwanted links\n        if (/^(#|mailto:|tel:|javascript:|sms:)/i.test(href)) continue;\n        if (/\\.(jpg|jpeg|png|gif|svg|webp|ico|pdf|zip|css|js|mp4|mp3)(\\?|$)/i.test(href)) continue;\n\n        let absolute;\n\n        if (/^https?:\\/\\//i.test(href)) {\n            absolute = href;\n        } else if (href.startsWith(\"//\")) {\n            absolute = \"https:\" + href;\n        } else if (href.startsWith(\"/\")) {\n            absolute = baseDomain + href;\n        } else {\n            absolute = baseDomain + \"/\" + href;\n        }\n\n        // Remove query/hash\n        absolute = absolute.split(\"#\")[0].split(\"?\")[0];\n\n        // Remove trailing slash except homepage\n        if (\n            absolute.endsWith(\"/\") &&\n            absolute !== baseDomain + \"/\"\n        ) {\n            absolute = absolute.slice(0, -1);\n        }\n\n        // Keep only internal links\n        if (\n            absolute === baseDomain ||\n            absolute.startsWith(baseDomain + \"/\")\n        ) {\n            links.add(absolute);\n        }\n    }\n\n    return Array.from(links).slice(0, limit);\n}\n\n// n8n\nconst html = $input.first().json.data;\nconst baseDomain = $('Prepare Data').first().json.domain;\n\nreturn [{\n    json: {\n        links: getInternalLinks(html, baseDomain)\n    }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        128,
+        0
+      ],
+      "id": "daac493a-5f9d-4f48-ad54-3d01d6081d67",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "links",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        336,
+        0
+      ],
+      "id": "c9be24a3-69ad-4cea-8340-fce0b5fb34a6",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        608,
+        0
+      ],
+      "id": "bb834d4e-a646-40da-af51-3fdb46079c9c",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.links }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        832,
+        144
+      ],
+      "id": "2e5ddad0-7c7b-4b7a-8110-87fa55d9d937",
+      "name": "HTTP Request2",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "title",
+              "cssSelector": "title"
+            },
+            {
+              "key": "description",
+              "cssSelector": "meta[name=\"description\"]",
+              "returnValue": "attribute",
+              "attribute": "content"
+            },
+            {
+              "key": "content",
+              "cssSelector": "body",
+              "skipSelectors": "img,a,iframe,script,style"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        1040,
+        144
+      ],
+      "id": "310d6a5e-62a1-4349-8835-39dad0c47375",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        912,
+        -112
+      ],
+      "id": "0fda1f9b-3133-4222-9a43-8bdf3d695a4f",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "jsCode": "function getValidJsonObject(rawText) {\n\n    if (typeof rawText !== 'string' || rawText.trim() === '') {\n        console.error(\"Invalid input or empty text field.\");\n        return null;\n    }\n\n    let jsonString = rawText.trim();\n\n    // 2. Check for and remove the markdown JSON block fences.\n    // This regex is robust and handles variations in whitespace.\n    const markdownRegex = /^```json\\s*([\\s\\S]*?)\\s*```$/;\n    const match = jsonString.match(markdownRegex);\n\n    if (match) {\n        // If it's a match, the actual JSON string is in the first capture group.\n        jsonString = match[1];\n    }\n\n    // 3. Parse the cleaned string into a JSON object.\n    try {\n        return JSON.parse(jsonString);\n    } catch (error) {\n        console.error(\"Failed to parse JSON string:\", error);\n        console.error(\"Problematic string:\", jsonString);\n        return null;\n    }\n}\nreturn {\n  key: $('Prepare Data').first().json.key,\n  data: getValidJsonObject($input.first().json.content.parts[0].text)\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1488,
+        -112
+      ],
+      "id": "44b72802-8d67-449a-92da-2bbd0ccc6200",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_TEXT }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.data.toJsonString() }}"
+            }
+          ]
+        },
+        "options": {
+          "systemMessage": "=# ROLE\n\nYou are an AI Research Agent responsible for analyzing businesses, brands, products, organizations, or websites and producing structured onboarding data.\n\nYour output will be consumed directly by software and parsed automatically. Therefore, your response MUST always be a single valid JSON object and nothing else.\n\n---\n\n# RESPONSE LANGUAGE\n\nAll human-readable text in the JSON response MUST be written in **{{ $('Prepare Data').item.json.language }}**.\n\nThis requirement applies to all generated text values, including but not limited to:\n\n- brandAlias\n- shortDescription\n- industry\n- detailDescription\n- keyFeature\n- persona.name\n- persona.description\n- prompts.text\n\nThe JSON schema MUST remain exactly as defined in this instruction.\n\nNever translate or modify:\n\n- JSON property names\n- Object structure\n- Array structure\n- Enumerated values\n\nThe following enumerated values MUST always remain exactly as written:\n\nTone of Voice:\n- Professional & Authoritative\n- Warm & Friendly\n- Bold & Innovative\n- Playful & Witty\n- Academic & Analytical\n\nIntent:\n- Organic\n- Brand Specific\n- Competitor Comparison\n\nCategory:\n- Branded\n- Commercial\n- Informational\n- Navigational\n- Transactional\n\nCompetitor URLs must never be translated or modified.\n\nRegardless of the selected response language, the JSON structure, property names, and fixed enumeration values must remain unchanged.\n\n---\n\n# PRIMARY OBJECTIVE\n\nAnalyze all information provided in the input together with real-time research to build a comprehensive business profile.\n\nThe input format is intentionally undefined and may vary completely between requests. Never rely on a fixed schema or expected fields. Instead, intelligently identify the relevant information regardless of how it is presented.\n\n---\n\n# RESEARCH (MANDATORY)\n\nYou have access to the **Gemini Search Tool**.\n\nUsing Gemini Search Tool is **MANDATORY** for every request.\n\nThe provided input should be treated as initial context, not the only source of truth.\n\nYou must verify and enrich the information through research whenever possible.\n\nResearch should include, when applicable:\n\n* brand or company information\n* products and services\n* business positioning\n* target audience\n* competitors\n* industry\n* terminology\n* publicly available information that helps improve the accuracy of the final profile\n\nNever fabricate facts.\n\nNever fabricate competitors.\n\nNever fabricate products or services.\n\nIf certain information cannot be verified through research, infer it only from strong evidence contained within the provided input.\n\n---\n\n# ANALYSIS REQUIREMENTS\n\n## Brand Alias\n\nReturn the commonly recognized brand or business name.\n\n---\n\n## Short Description\n\nWrite a concise business summary.\n\nRequirements:\n\n* maximum 250 characters\n* easy to understand\n* describe what the business does\n\n---\n\n## Industry\n\nReturn the most accurate industry classification.\n\nExamples include (but are not limited to):\n\n* AI SaaS\n* Healthcare\n* Education\n* Finance\n* Cybersecurity\n* Marketing\n* E-commerce\n* Travel\n* Manufacturing\n* Real Estate\n\nReturn only the best matching industry.\n\n---\n\n## Tone of Voice\n\nAnalyze the communication style of the brand.\n\nChoose exactly one of the following values:\n\n* Professional & Authoritative\n* Warm & Friendly\n* Bold & Innovative\n* Playful & Witty\n* Academic & Analytical\n\n---\n\n## Detail Description\n\nProduce a comprehensive description of the business.\n\nInclude as much relevant detail as possible, such as:\n\n* business model\n* products\n* services\n* customer problems being solved\n* value proposition\n* positioning\n* differentiators\n* workflows\n* technology (when relevant)\n* notable capabilities\n\nThe description should allow another AI system to understand the business without requiring the original source material.\n\n---\n\n## Key Features\n\nIdentify the primary customer-facing features, services, or capabilities.\n\nRequirements:\n\n* minimum 3 items\n* maximum 10 items\n* avoid duplicates\n* prioritize unique selling points\n\n---\n\n## Persona\n\nIdentify the most likely primary target audience.\n\nReturn:\n\n* persona name\n* description\n* estimated age range\n* estimated education level\n\nThe persona should represent the primary buyer, customer, or decision maker.\n\n---\n\n## Competitors\n\nResearch direct competitors.\n\nRequirements:\n\n* minimum 3\n* maximum 10\n* direct competitors only\n* official homepage URLs\n* no duplicates\n* no review websites\n* no directories\n* no marketplaces unless they are true competitors\n\nCompetitors must be supported by research.\n\n---\n\n## AI Visibility Prompts\n\nGenerate prompts that a real user would naturally ask an AI assistant.\n\nThese prompts should be suitable for evaluating how visible the analyzed brand or business is within AI-generated responses.\n\nGenerate between **5 and 10** unique prompts.\n\nDistribute the prompts across the following intent types:\n\n* Organic\n* Brand Specific\n* Competitor Comparison\n\nEach prompt must also contain one category selected from:\n\n* Branded\n* Commercial\n* Informational\n* Navigational\n* Transactional\n\nRequirements:\n\n* use natural language\n* avoid duplicates\n* cover different customer journeys\n* include both broad discovery queries and brand-focused queries\n* include comparison prompts where appropriate\n* ensure every prompt is realistic and likely to be asked by a human\n\n---\n\n# OUTPUT FORMAT\n\nReturn exactly one JSON object.\n\nDo not output:\n\n* Markdown\n* Code fences\n* Explanations\n* Notes\n* Comments\n* XML\n* YAML\n* HTML\n* Any text before or after the JSON\n\n---\n\n# OUTPUT SCHEMA\n\n```json\n{\n  \"brandAlias\": \"\",\n  \"shortDescription\": \"\",\n  \"industry\": \"\",\n  \"toneVoice\": \"\",\n  \"detailDescription\": \"\",\n  \"keyFeature\": [\n    \"\"\n  ],\n  \"persona\": {\n    \"name\": \"\",\n    \"description\": \"\",\n    \"ageRange\": \"\",\n    \"educationLevel\": \"\"\n  },\n  \"competitors\": [\n    \"\"\n  ],\n  \"prompts\": [\n    {\n      \"text\": \"\",\n      \"intent\": \"\",\n      \"category\": \"\"\n    }\n  ]\n}\n```\n\n---\n\n# JSON REQUIREMENTS (CRITICAL)\n\nYour response will be parsed using JavaScript `JSON.parse()`.\n\nYou MUST follow all of these rules:\n\n* Return only a single JSON object.\n* Never wrap the JSON in Markdown.\n* Never include code fences.\n* Never include comments.\n* Never include trailing commas.\n* Every property name must use double quotes.\n* Every string value must use double quotes.\n* Escape all special characters correctly.\n* Do not output JavaScript syntax.\n* Do not output `undefined`, `NaN`, or non-JSON values.\n* Ensure the JSON is syntactically valid according to RFC 8259.\n* The output must be directly consumable by `JSON.parse()` without any modification.\n\nFailure to produce valid JSON is considered a critical error.\n\nUse `Gemini Search Tool` to find latest data. You can search multiple time if it's needed.",
+          "maxToolsIterations": 10
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        1152,
+        -112
+      ],
+      "id": "90b78ca4-4617-4f85-8a76-da3f184322f9",
+      "name": "Message a model",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', ``, 'string') }}",
+        "model": "={{ $vars.GEMINI_FLASH_PREVIEW }}",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Items_per_Batch', ``, 'number') }}",
+              "batchInterval": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Batch_Interval__ms_', ``, 'number') }}"
+            }
+          },
+          "returnFullResponse": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_Full_Response', ``, 'boolean') }}"
+        }
+      },
+      "type": "n8n-nodes-gemini-search.geminiSearchToolTool",
+      "typeVersion": 1,
+      "position": [
+        1328,
+        112
+      ],
+      "id": "5111891e-0713-42e2-877a-e40532338dc8",
+      "name": "Gemini Search Tool",
+      "credentials": {
+        "geminiSearchApi": {
+          "id": "HzOj98juqUxHGjsa",
+          "name": "SF - Gemini Search Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "=ok"
+            },
+            {
+              "name": "data",
+              "value": "={{ $json.data }}"
+            },
+            {
+              "name": "license",
+              "value": "={{ $('Prepare Data').item.json.license }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1712,
+        -112
+      ],
+      "id": "6e13dffd-57f3-48bc-af4b-e6c8d640e6a9",
+      "name": "HTTP Request5"
+    }
+  ],
+  "connections": {
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if license is valid": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get token": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Search Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Message a model",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "saveDataSuccessExecution": "all",
+    "saveExecutionProgress": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "triggerCount": 1,
+  "versionId": "5838685d-8dc2-4ad1-a1a9-c362e94150c0",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "t9dCdoPcc9q1JrUJ",
+  "isArchived": false
+}

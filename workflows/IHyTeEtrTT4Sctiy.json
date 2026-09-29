@@ -311,6 +311,10 @@
             {
               "name": "data",
               "value": "={{ $json.result }}"
+            },
+            {
+              "name": "identifier",
+              "value": "={{ $('Prepare Data').item.json.identifier }}"
             }
           ]
         },
@@ -339,19 +343,6 @@
       ],
       "id": "0439d90f-1e45-42b7-af9d-7a4b70b59a42",
       "name": "Execute Command1"
-    },
-    {
-      "parameters": {
-        "inputSource": "passthrough"
-      },
-      "type": "n8n-nodes-base.executeWorkflowTrigger",
-      "typeVersion": 1.1,
-      "position": [
-        -2656,
-        608
-      ],
-      "id": "54dc2d17-4e7f-4859-9a6a-6a2a02b134b7",
-      "name": "When Executed by Another Workflow"
     },
     {
       "parameters": {
@@ -416,7 +407,11 @@
           "conditions": [
             {
               "keyName": "agent_id",
-              "keyValue": "={{ $('When Executed by Another Workflow').item.json.agent_id }}"
+              "keyValue": "={{ $('SF - Media Agent - Pooling Kie AI').item.json.agent_id }}"
+            },
+            {
+              "keyName": "identifier",
+              "keyValue": "={{ $('SF - Media Agent - Pooling Kie AI').item.json.identifier }}"
             }
           ]
         },
@@ -450,7 +445,7 @@
             {
               "id": "573d9900-2457-431f-813e-7b3c4f227905",
               "name": "folder",
-              "value": "=mediaAgentResult-{{ $json.agent_id }}",
+              "value": "=mediaAgentResult-{{ $json.agent_id }}-{{ $json.identifier }}",
               "type": "string"
             },
             {
@@ -499,6 +494,12 @@
               "id": "bdbc3b1a-d4e5-47d2-9fec-d13e7c8947fc",
               "name": "webhook",
               "value": "={{ $json.webhook }}",
+              "type": "string"
+            },
+            {
+              "id": "d933ab6d-39c1-4ecc-b963-5ff8e693567e",
+              "name": "identifier",
+              "value": "={{ $json.identifier }}",
               "type": "string"
             }
           ]
@@ -560,7 +561,7 @@
     },
     {
       "parameters": {
-        "jsCode": "let social = $('Prepare Data').first().json.caption_data;\nlet result = [];\n// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of social) {\n  result.push({\n    type: item.social,\n    title: item.content.title,\n    caption: item.content.caption,\n    tags: item.content.tags,\n    media_url: [\"https://assets.synergizeflow.com/mediaAgentResult/mediaAgentResult-\"+$('Prepare Data').first().json.agent_id+\".mp4\"]\n  })\n}\n\nreturn {result: result}"
+        "jsCode": "let social = $('Prepare Data').first().json.caption_data;\nlet result = [];\n// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of social) {\n  result.push({\n    type: item.social,\n    title: item.content.title,\n    caption: item.content.caption,\n    tags: item.content.tags,\n    media_url: [\"https://assets.synergizeflow.com/mediaAgentResult/mediaAgentResult-\"+$('Prepare Data').first().json.agent_id+\"-\"+$('Prepare Data').first().json.identifier+\".mp4\"]\n  })\n}\n\nreturn {result: result}"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -587,6 +588,10 @@
             {
               "keyName": "agent_id",
               "keyValue": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "keyName": "identifier",
+              "keyValue": "={{ $('Prepare Data').item.json.identifier }}"
             }
           ]
         },
@@ -600,6 +605,19 @@
       ],
       "id": "c4855d0b-a563-48a3-853a-e909998274f0",
       "name": "Delete row(s)"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -2656,
+        608
+      ],
+      "id": "54dc2d17-4e7f-4859-9a6a-6a2a02b134b7",
+      "name": "SF - Media Agent - Pooling Kie AI"
     }
   ],
   "connections": {
@@ -778,22 +796,6 @@
         ]
       ]
     },
-    "When Executed by Another Workflow": {
-      "main": [
-        [
-          {
-            "node": "Get token",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Execution Data",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Get token": {
       "main": [
         [
@@ -875,6 +877,22 @@
       "main": [
         []
       ]
+    },
+    "SF - Media Agent - Pooling Kie AI": {
+      "main": [
+        [
+          {
+            "node": "Get token",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -886,7 +904,7 @@
     "availableInMCP": false
   },
   "triggerCount": 0,
-  "versionId": "e343571a-3642-4c5c-8421-6c3ad4fee2ab",
+  "versionId": "3f9d6ce2-e267-4158-8d87-5f791178c1ba",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",

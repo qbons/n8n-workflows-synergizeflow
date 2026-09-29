@@ -606,7 +606,7 @@
         "operation": "analyze",
         "modelId": {
           "__rl": true,
-          "value": "=models/{{ $vars.GEMINI_NANO_BANANA }}",
+          "value": "=models/{{ $vars.GEMINI_FLASH_PREVIEW }}",
           "mode": "id"
         },
         "text": "=This is image of {{ $json.title }}. Analyze the input image with great detail and precision. Directly response without introduction text.",
@@ -1593,10 +1593,14 @@
   },
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
   },
   "triggerCount": 1,
-  "versionId": "51aa896b-a685-4bc2-8fd5-5399460ba37b",
+  "versionId": "bb4592cc-c507-4d4b-bb91-043e97a52f0d",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",

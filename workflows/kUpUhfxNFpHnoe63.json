@@ -1,0 +1,227 @@
+{
+  "id": "kUpUhfxNFpHnoe63",
+  "name": "PF - Group Looping",
+  "nodes": [
+    {
+      "parameters": {
+        "fieldToSplitOut": "group",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "eb226811-2bfc-4656-b69b-42a19ec709d2",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "4b27abdf-c3d6-42d5-8b7a-efcf720f25ee",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "40efbcc9-7075-44d9-b522-ac2c163a678b",
+              "name": "company",
+              "value": "={{ $('Execute Monitoring').item.json.companyName }}",
+              "type": "string"
+            },
+            {
+              "id": "9d161da1-d933-4184-a373-0fb0062fb9fa",
+              "name": "brand",
+              "value": "={{ $('Execute Monitoring').item.json.brandAliases }}",
+              "type": "array"
+            },
+            {
+              "id": "489a7c35-9801-4d69-8230-46cb9c1ddeed",
+              "name": "competitors",
+              "value": "={{ $('Execute Monitoring').item.json.competitors }}",
+              "type": "array"
+            },
+            {
+              "id": "140dd79c-00d4-49a0-9e4e-a1cac10e6b30",
+              "name": "group_data",
+              "value": "={{ $json }}",
+              "type": "object"
+            },
+            {
+              "id": "098bcb8a-d0e0-4f36-910b-f6d9fc1985c2",
+              "name": "insdustry",
+              "value": "={{ $('Execute Monitoring').item.json.industry }}",
+              "type": "string"
+            },
+            {
+              "id": "835400d1-9c9e-48c5-a072-adcf35aa1ee8",
+              "name": "tone_of_voice",
+              "value": "={{ $('Execute Monitoring').item.json.toneOfVoice }}",
+              "type": "string"
+            },
+            {
+              "id": "181c9654-b701-4203-8325-3f9a959ede0f",
+              "name": "description",
+              "value": "={{ $('Execute Monitoring').item.json.description }}",
+              "type": "string"
+            },
+            {
+              "id": "7c2ac8de-fb14-4663-8139-160d314c6c07",
+              "name": "key_features",
+              "value": "={{ $('Execute Monitoring').item.json.keyFeatures }}",
+              "type": "array"
+            },
+            {
+              "id": "6d72efd2-758c-471b-adf4-f2c37d64c422",
+              "name": "persona",
+              "value": "={{ $('Execute Monitoring').item.json.persona }}",
+              "type": "object"
+            },
+            {
+              "id": "2ec068ae-8677-4bd7-a0ce-0691a734b1aa",
+              "name": "project_id",
+              "value": "={{ $('Execute Monitoring').item.json.project_id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        656,
+        112
+      ],
+      "id": "7d56d247-aeb1-4580-909a-a48b200c6946",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "821b1042-8e86-46c2-8c09-dd609618c33f",
+      "name": "Execute Monitoring"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "oVKqZbLBdwrIMV0a",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/oVKqZbLBdwrIMV0a",
+          "cachedResultName": "SynergizeFlow.v2 — PF - Model Looping"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        896,
+        112
+      ],
+      "id": "9cdcb079-0397-4d29-b3a4-366012f28c9a",
+      "name": "Model Looping"
+    }
+  ],
+  "connections": {
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Monitoring": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Model Looping",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Model Looping": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "triggerCount": 0,
+  "versionId": "623f0551-86cd-4746-beed-8140ba498f45",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "t9dCdoPcc9q1JrUJ",
+  "isArchived": false
+}

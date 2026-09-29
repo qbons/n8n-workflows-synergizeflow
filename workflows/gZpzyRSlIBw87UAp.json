@@ -448,17 +448,17 @@
         "operation": "analyze",
         "modelId": {
           "__rl": true,
-          "value": "=models/{{ $vars.GEMINI_NANO_BANANA }}",
+          "value": "=models/{{ $vars.GEMINI_FLASH_PREVIEW }}",
           "mode": "id"
         },
         "text": "=This is image of {{ $(\"Edit Fields\").item.json.title }}. Analyze the input image with great detail and precision. Directly response without introduction text.",
-        "imageUrls": "={{ $(\"Edit Fields\").item.json.url }}",
+        "imageUrls": "={{ $json.url }}",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1.2,
       "position": [
-        1072,
+        1008,
         -240
       ],
       "id": "39ed5cd9-9b6b-4cf8-a6dd-86e61182715b",
@@ -477,7 +477,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1360,
+        1200,
         -240
       ],
       "id": "113e726a-1946-4353-ba43-028135fa8bb5",
@@ -545,7 +545,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        800,
+        816,
         -240
       ],
       "id": "198c9471-e3d0-4912-aa5b-ae46b763d464",
@@ -581,7 +581,7 @@
     },
     {
       "parameters": {
-        "jsCode": "let prompts = [];\nlet idx = 1;\nfor (const item of $input.first().json.prompts) {\n  let payload = {\n    \"url\": \"https://api.kie.ai/api/v1/jobs/createTask\",\n    \"config\": {\n      \"model\": \"gpt-image-2-5-flare-text-to-image\",\n      \"input\": {\n        \"prompt\": item.prompt,\n        \"aspect_ratio\": $('Prepare Data').first().json.config.aspect_ratio,\n        \"resolution\": \"1K\",\n        \"background\": \"auto\"\n       }\n    } \n  }\n  if(item.relevantImg.length > 0){\n    payload.config.model ='gpt-image-2-5-flare-image-to-image';\n    payload.config.input.input_urls = item.relevantImg\n    .map(key => $('Prepare Image').first().json.images.find(image => image.key === key)?.url)\n    .filter(Boolean);\n  }\n  prompts.push({\n    filename: \"eventAgentResult/eventAgentResult-\"+$('Prepare Data').first().json.agent_id+\"-img\"+idx+\".jpg\",\n    payload: payload\n  });\n  idx++;\n}\n\nreturn prompts;"
+        "jsCode": "let prompts = [];\nlet idx = 1;\nlet negative = `Do not invent, assume, infer, or add any information, objects, subjects, details, labels, metadata, or visual elements that are not explicitly requested or clearly implied by the main prompt. Do not fabricate dates, times, locations, names, people, organizations, brands, logos, prices, statistics, measurements, addresses, contact information, URLs, social media handles, captions, descriptions, event details, product specifications, or other factual information.\n\nDo not add text, typography, numbers, symbols, signage, labels, badges, watermarks, UI elements, or decorative copy unless they are explicitly requested in the main prompt. If text is requested, use only the exact text provided and do not create additional text or alter, expand, translate, paraphrase, abbreviate, or reinterpret it. Do not add dates or metadata merely because the image appears to be an event poster, advertisement, product image, social media graphic, infographic, presentation, or editorial design.\n\nDo not infer missing information from context, common conventions, cultural expectations, visual style, or the type of image being created. Do not complete missing details with plausible or realistic-looking information. Unspecified information must remain unspecified.\n\nDo not introduce unrelated people, objects, characters, products, brands, logos, architecture, scenery, props, patterns, icons, effects, or graphical elements unless requested. Do not add extra subjects or narrative details simply to make the composition appear more complete.\n\nPreserve the exact meaning, entities, quantities, relationships, attributes, colors, wording, and other explicit requirements of the main prompt. Do not modify, substitute, exaggerate, embellish, or reinterpret explicitly provided information.\n\nWhen the prompt does not specify a detail, leave it neutral, generic, ambiguous, or visually absent rather than inventing a specific detail. Prioritize fidelity to the main prompt over realism, convention, completeness, or creative improvisation.`;\nfor (const item of $input.first().json.prompts) {\n  let payload = {\n    \"url\": \"https://api.kie.ai/api/v1/jobs/createTask\",\n    \"config\": {\n      \"model\": \"gpt-image-2-5-flare-text-to-image\",\n      \"input\": {\n        \"prompt\": item.prompt+'\\n\\r'+negative,\n        \"aspect_ratio\": $('Prepare Data').first().json.config.aspect_ratio,\n        \"resolution\": \"1K\",\n        \"background\": \"auto\"\n       }\n    } \n  }\n  if(item.relevantImg.length > 0){\n    payload.config.model ='gpt-image-2-5-flare-image-to-image';\n    payload.config.input.input_urls = item.relevantImg\n    .map(key => $('Prepare Image').first().json.images.find(image => image.key === key)?.url)\n    .filter(Boolean);\n  }\n  prompts.push({\n    filename: \"eventAgentResult/eventAgentResult-\"+$('Prepare Data').first().json.agent_id+\"-img\"+idx+\".jpg\",\n    payload: payload\n  });\n  idx++;\n}\n\nreturn prompts;"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -629,7 +629,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        2752,
+        2768,
         -48
       ],
       "id": "b52f98d0-12a5-452f-afb8-a73365103ef4",
@@ -815,6 +815,18 @@
       ],
       "id": "ea666d06-a6a9-4ebc-93c0-4fa0cf8bdd5a",
       "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1392,
+        48
+      ],
+      "id": "46cba6db-2042-4fe0-ac93-d309bf7050eb",
+      "name": "Wait1",
+      "webhookId": "7c82966f-db1b-4861-83f2-99df7b8aac7a"
     }
   ],
   "connections": {
@@ -969,7 +981,8 @@
             "type": "main",
             "index": 0
           }
-        ]
+        ],
+        []
       ]
     },
     "Code in JavaScript2": {
@@ -983,7 +996,7 @@
         ],
         [
           {
-            "node": "Analyze an image",
+            "node": "Wait1",
             "type": "main",
             "index": 0
           }
@@ -1179,14 +1192,29 @@
           }
         ]
       ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Analyze an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
   },
   "triggerCount": 1,
-  "versionId": "86fee3ab-1605-4b54-9c01-9e6ef219a4ae",
+  "versionId": "8cde2c32-6ae8-44e9-9db9-6304c55608a9",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",

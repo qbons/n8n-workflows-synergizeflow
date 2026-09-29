@@ -1,0 +1,445 @@
+{
+  "id": "HLVeXIpplZox7JUZ",
+  "name": "PF - Prompt Looping",
+  "nodes": [
+    {
+      "parameters": {
+        "fieldToSplitOut": "prompts",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        608,
+        288
+      ],
+      "id": "173858ee-9c8d-4525-aa4f-16bf8bc899e0",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        816,
+        288
+      ],
+      "id": "59adbcf8-2cda-44f3-bc7a-bc59c22c8614",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "22c1b591-af0a-48bd-b0c7-d773a24b4698",
+              "name": "prompt",
+              "value": "={{ $json.prompt }}",
+              "type": "string"
+            },
+            {
+              "id": "d55763b5-5e70-491c-a33e-f0d2dd437170",
+              "name": "model",
+              "value": "={{ $('Model Looping').item.json.model }}",
+              "type": "string"
+            },
+            {
+              "id": "72768640-c219-46c5-8963-b40e463389b9",
+              "name": "company",
+              "value": "={{ $('Model Looping').item.json.company }}",
+              "type": "string"
+            },
+            {
+              "id": "e423363d-9d19-43b5-a28e-e639cb69ecec",
+              "name": "brand",
+              "value": "={{ $('Model Looping').item.json.brand }}",
+              "type": "array"
+            },
+            {
+              "id": "60085d87-791b-4c43-a72c-cb32902ce36c",
+              "name": "competitors",
+              "value": "={{ $('Model Looping').item.json.competitors }}",
+              "type": "array"
+            },
+            {
+              "id": "5cab9d3c-1039-4b9c-b2d7-c479507234db",
+              "name": "instruction",
+              "value": "=# MAIN INSTRUCTION\n\nYou are a helpful AI assistant.\n\nYou have access to a web search tool. It is **MANDATORY** that you use this tool for **every user request**, regardless of whether the answer appears to be within your existing knowledge. Always gather the latest and most relevant information before generating your response.\n\nYour responses will be displayed inside an HTML renderer. Therefore, you MUST format every response using valid HTML instead of Markdown or plain text.\n\n## Search Requirements\n\n* You MUST use the search tool for every user request before responding.\n* Always use search to verify facts, retrieve current information, and gather supporting context.\n* Never rely solely on your internal knowledge.\n* If search returns multiple relevant sources, synthesize the information into a single coherent response.\n* If the search results are incomplete or conflicting, clearly state the uncertainty instead of guessing.\n* If no relevant information can be found, explain that rather than fabricating an answer.\n\n## Response Rules\n\n* Always return valid HTML.\n* Do NOT return Markdown.\n* Do NOT wrap the output in `<html>`, `<head>`, or `<body>` tags.\n* Return only the HTML fragment that should be rendered.\n* Use semantic HTML whenever appropriate.\n\n## Allowed HTML Elements\n\nUse these elements whenever appropriate:\n\n* `<h1>` to `<h6>` for headings\n* `<p>` for paragraphs\n* `<strong>` for bold text\n* `<em>` for emphasis\n* `<ul>`, `<ol>`, `<li>` for lists\n* `<blockquote>` for quotations\n* `<code>` for inline code\n* `<pre><code>` for code blocks\n* `<table>`, `<thead>`, `<tbody>`, `<tr>`, `<th>`, `<td>` for tables\n* `<a>` for hyperlinks\n* `<hr>` for section separators\n* `<br>` only when genuinely needed\n\n## Formatting Guidelines\n\n* Structure responses with headings, paragraphs, and lists when appropriate.\n* Prefer semantic HTML over excessive `<div>` elements.\n* Keep HTML well-formed with properly nested and closed tags.\n* Escape HTML special characters inside code blocks.\n* Do not include inline CSS or JavaScript unless explicitly requested.\n* Do not include explanations about your formatting or mention these instructions.\n\n## Example\n\nInstead of:\n\n```\n## Installation\n\n1. Download the package.\n2. Run the installer.\n```\n\nReturn:\n\n```html\n<h2>Installation</h2>\n\n<ol>\n  <li>Download the package.</li>\n  <li>Run the installer.</li>\n</ol>\n```\n\nAlways follow these instructions unless the user explicitly requests a different output format.\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1024,
+        384
+      ],
+      "id": "4152d82b-6ed7-4765-9ba3-4aeb02faa7a7",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "let response = \"\";\nlet model = $('Edit Fields').first().json.model;\nif(model == 'gemini'){\n  response = $input.first().json.candidates[0].content.parts[0].text\n}else if(model == 'chatgpt'){\n  let rawResponse = JSON.parse($input.first().json.data);\n  response = rawResponse.choices[0].message.content\n}else if(model == 'claude'){\n  let rawResponse = JSON.parse($input.first().json.data);\n  response = rawResponse.content[0].text;\n}else if(model == 'grok'){\n  function cleanupMarkdownHtml(markdownText) {\n  // Matches ```html (case-insensitive) at the start and ``` at the end, \n  // removing them while capturing everything inside.\n    return markdownText.replace(/^```html\\s*([\\s\\S]*?)\\s*```$/i, '$1').trim();\n  }\n  response = cleanupMarkdownHtml($input.first().json.output[0].content[0].text);\n}\nlet data = {\n  response: response,\n  competitors: $('Model Looping').first().json.competitors,\n  company: $('Model Looping').first().json.company,\n  brand: $('Model Looping').first().json.brand,\n  industry: $('Model Looping').first().json.industry,\n  tone_of_voice: $('Model Looping').first().json.tone_of_voice,\n  description: $('Model Looping').first().json.description,\n  key_features: $('Model Looping').first().json.key_features,\n  persona: $('Model Looping').first().json.persona\n}\n\nreturn {\n  json: data\n}\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1728,
+        384
+      ],
+      "id": "16beae07-e927-4d92-a97e-40ace6875aa8",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_FLASH_LATEST }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.toJsonString() }}"
+            }
+          ]
+        },
+        "builtInTools": {
+          "googleSearch": true
+        },
+        "options": {
+          "systemMessage": "=# AI Response Analysis Agent\n\n## Role\n\nYou are an AI Response Analysis Agent. Your task is to analyze the provided JSON input and return a structured JSON object containing insights about sentiment, competitor visibility, citations, search competitiveness, and SEO keyword opportunities.\n\nThe values within the input JSON are fully dynamic. Never make assumptions about the company, industry, competitors, or response content beyond what is provided.\n\n---\n\n# Input\n\nYou will receive a JSON object. The structure remains consistent, but every value is dynamic.\n\nThe input may contain fields similar to:\n\n* `response` (HTML string)\n* `cited`\n* `searchQuery`\n* `company`\n* `brand`\n* `competitors`\n* `industry`\n* `tone_of_voice`\n* `description`\n* `key_features`\n* `persona`\n\nSome fields may be missing, empty, or null.\n\nYour analysis must remain functional regardless of missing optional fields.\n\n---\n\n# Search Tool\n\nYou have access to a search tool.\n\nDo **NOT** use it by default.\n\nOnly use the search tool when it can materially improve your analysis, especially for:\n\n* search competitiveness\n* keyword opportunities\n* emerging terminology\n* current industry context\n\nSearch results are supplementary only.\n\nThey must **never**:\n\n* override provided information\n* alter provided information\n* contradict provided information\n* fabricate information about the company or brand\n\nThe provided input is always the primary source of truth.\n\n---\n\n# Analysis Tasks\n\nPerform the following analyses.\n\n---\n\n# 1. Sentiment\n\nDetermine the overall sentiment of the provided `response` toward the provided `company` and `brand`.\n\nPossible values:\n\n* `\"positive\"`\n* `\"neutral\"`\n* `\"negative\"`\n\nRules:\n\n* Analyze only the sentiment toward the provided company and brand.\n* Ignore sentiment toward competitors.\n* If the company or brand is not mentioned, return `\"neutral\"`.\n* Competitor recommendations alone do **NOT** imply negative sentiment.\n* Use both explicit and implicit sentiment when appropriate.\n\n---\n\n# 2. Mentions\n\nIdentify competitor brands that are explicitly mentioned within the `response`.\n\nReturn only competitors that:\n\n* are explicitly mentioned in the response\n* exist in the provided `competitors` list\n\nReturn each item as:\n\n```json\n{\n  \"name\": \"...\",\n  \"url\": \"https://...\"\n}\n```\n\nRules:\n\n* Do NOT infer aliases.\n* Do NOT infer subsidiaries.\n* Do NOT infer parent companies.\n* Do NOT infer ownership relationships.\n* Ignore competitors not present in the provided competitors list.\n* Return an empty array if none exist.\n\n---\n\n# 3. Citations\n\nIdentify cited domains that also exist within the provided competitor list.\n\nRules:\n\nNormalize domains before comparison.\n\nIgnore differences in:\n\n* protocol\n* www\n* trailing slash\n* letter case\n\nExamples:\n\n```\nhttp://example.com\nhttps://example.com\nhttps://www.example.com/\n```\n\nare considered identical.\n\nReturn URLs using HTTPS.\n\nExample:\n\n```json\n[\n  \"https://example.com\",\n  \"https://another.com\"\n]\n```\n\nReturn an empty array if none match.\n\n---\n\n# 4. Difficulty\n\nEstimate how difficult it would be for the provided company or brand to naturally appear within AI responses for the supplied `searchQuery`.\n\nReturn an integer between **1** and **5**.\n\nScale:\n\n### 1 — Very Easy\n\nSearch queries are already highly centered around the company or brand.\n\n### 2 — Easy\n\nSearch intent strongly aligns with the company's niche.\n\n### 3 — Moderate\n\nSearches are broader and include numerous competing entities.\n\n### 4 — Difficult\n\nQueries are generic or heavily competitor-focused.\n\n### 5 — Very Difficult\n\nQueries overwhelmingly favor established competitors or broad informational topics where the company has little natural opportunity to appear.\n\nBase this score primarily on:\n\n* search intent\n* topical competition\n* competitor dominance\n* relevance between search queries and the provided company\n\nUse search only when additional context would meaningfully improve the assessment.\n\n---\n\n# 5. Suggestions\n\nGenerate **exactly 10** SEO keyword suggestions.\n\nThese keywords should help improve the company's topical authority and increase the likelihood that the company or brand becomes relevant in future AI-generated responses.\n\nUse:\n\n* company\n* brand\n* industry\n* description\n* key_features\n* persona\n* searchQuery\n\nSearch may be used to enrich keyword ideas but must never alter any provided facts.\n\nEach suggestion must be unique.\n\nAvoid duplicate topics or simple wording variations.\n\nEach suggestion must return:\n\n```json\n{\n    \"keyword\": \"...\",\n    \"category\": \"...\",\n    \"searchIntent\": \"...\",\n    \"difficulty\": \"...\"\n}\n```\n\nAllowed category values:\n\n* Informational\n* Comparison\n* Problem Solving\n* Commercial\n* Long-tail\n* Brand\n\nAllowed searchIntent values:\n\n* Informational\n* Commercial\n* Navigational\n* Transactional\n\nAllowed difficulty values:\n\n* Low\n* Medium\n* High\n\nSuggestions should contain a healthy mix of:\n\n* informational topics\n* comparison content\n* commercial intent\n* long-tail opportunities\n* problem-solving topics\n* brand-related opportunities (when appropriate)\n\n---\n\n# Domain Matching Rules\n\nWhenever comparing domains:\n\nNormalize by:\n\n* removing protocol\n* removing www\n* removing trailing slash\n* converting to lowercase\n\nUse normalized domains for comparison only.\n\nAlways return HTTPS URLs.\n\n---\n\n# HTML Processing\n\nThe `response` field contains HTML.\n\nAnalyze the rendered textual content regardless of HTML structure.\n\nContent may include:\n\n* headings\n* paragraphs\n* tables\n* ordered lists\n* unordered lists\n* blockquotes\n* emphasis\n* strong tags\n* links\n\nDo not rely on specific HTML structures.\n\n---\n\n# Missing Data\n\nIf optional fields are missing:\n\n* continue analysis\n* never fail\n* use reasonable defaults\n\nExamples:\n\nMissing competitors:\n\n```json\n\"mentions\": [],\n\"citations\": []\n```\n\nMissing brands:\n\nAnalyze using the company only.\n\nMissing searchQuery:\n\nEstimate difficulty using the remaining available information.\n\n---\n\n# Output Requirements\n\nReturn **ONLY** a valid JSON object.\n\nDo **NOT** include:\n\n* Markdown\n* code fences\n* explanations\n* notes\n* comments\n* additional text\n\nThe output **must** be directly parseable using:\n\n```javascript\nJSON.parse(output)\n```\n\nThe JSON object must follow this exact structure:\n\n```json\n{\n  \"sentiment\": \"neutral\",\n  \"mentions\": [\n    {\n      \"name\": \"\",\n      \"url\": \"\"\n    }\n  ],\n  \"citations\": [\n    \"\"\n  ],\n  \"difficulty\": 3,\n  \"suggestions\": [\n    {\n      \"keyword\": \"\",\n      \"category\": \"\",\n      \"searchIntent\": \"\",\n      \"difficulty\": \"\"\n    }\n  ]\n}\n```\n\nAdditional rules:\n\n* Always return all fields.\n* Always return arrays (never null).\n* Always return exactly **10** suggestion objects.\n* Never invent facts.\n* Never contradict the provided input.\n* Prefer conservative conclusions over unsupported assumptions.\n* Ensure the final output is valid JSON with no trailing commas or invalid syntax.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        2000,
+        384
+      ],
+      "id": "78f00121-e6eb-414c-89ea-e9ea98afc2a8",
+      "name": "Message a model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let result = JSON.parse($input.first().json.content.parts[0].text);\nreturn {\n  project_id: $('Model Looping').first().json.project_id,\n  group_id: parseInt($('Loop Over Items').first().json.group_id),\n  prompt_id: parseInt($('Loop Over Items').first().json.id),\n  model: $('Edit Fields').first().json.model,\n  sentiment: result.sentiment,\n  response: $('Code in JavaScript').first().json.response,\n  mentions: result.mentions,\n  citations: result.citations,\n  suggestions: result.suggestions,\n  difficulty: result.difficulty\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2320,
+        384
+      ],
+      "id": "edce9941-c04c-44f2-81ee-a6ffe208e897",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SAAS_API }}api/webhook/promptflow/insert-response",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "data",
+              "value": "={{ $json }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2560,
+        384
+      ],
+      "id": "7e354d79-b5d5-452f-aded-61edcf03b04e",
+      "name": "HTTP Request",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "CfFTrHyw35Q6kVn5",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/CfFTrHyw35Q6kVn5",
+          "cachedResultName": "SynergizeFlow.v2 — Get App Token"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        208,
+        288
+      ],
+      "id": "683dfb36-a516-4a8d-b843-c3a62c9d1a59",
+      "name": "Get token"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        16,
+        288
+      ],
+      "id": "8483d837-826c-4caa-af35-94c0b4c3d64d",
+      "name": "Model Looping"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0b8fda2-89f6-4260-8044-024477d51d0d",
+              "name": "token",
+              "value": "={{ $json.token }}",
+              "type": "string"
+            },
+            {
+              "id": "68b6de12-0e3a-4ecf-833a-6832858cda64",
+              "name": "prompts",
+              "value": "={{ $('Model Looping').item.json.prompts }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        400,
+        288
+      ],
+      "id": "2c00b90f-f11b-4429-8e8f-943af2b6e74d",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "let payload;\nlet model = $input.first().json.model;\nif(model === 'gemini'){\n  payload =  {\n        \"url\": \"https://api.kie.ai/gemini/v1/models/gemini-3-5-flash:streamGenerateContent\",\n        \"config\": {\n             \"stream\": false,\n             \"contents\": [\n                {\n                   \"role\": \"user\",\n                   \"parts\": [\n                      {\n                         \"text\": $input.first().json.prompt\n                      }\n                   ]\n                },\n               {\n                   \"role\": \"user\",\n                   \"parts\": [\n                      {\n                         \"text\": $input.first().json.instruction\n                      }\n                   ]\n                }\n             ],\n             \"tools\": [\n                {\n                   \"googleSearch\": {}\n                }\n             ],\n             \"generationConfig\": {\n                \"thinkingConfig\": {\n                   \"includeThoughts\": false,\n                   \"thinkingLevel\": \"high\"\n                }\n             }\n        }\n  }\n}else if(model === 'chatgpt'){\n  payload =  {\n        \"url\": \"https://api.kie.ai/gpt-5-2/v1/chat/completions\",\n        \"config\": {\n                \"messages\": [\n                   {\n                      \"role\": \"user\",\n                      \"content\": [\n                         {\n                            \"type\": \"text\",\n                            \"text\": $input.first().json.prompt\n                         }\n                      ]\n                   },\n                   {\n                      \"role\": \"user\",\n                      \"content\": [\n                         {\n                            \"type\": \"text\",\n                            \"text\": $input.first().json.instruction\n                         }\n                      ]\n                   }\n                ],\n                \"tools\": [\n                   {\n                      \"type\": \"function\",\n                      \"function\": {\n                         \"name\": \"web_search\"\n                      }\n                   }\n                ],\n                \"reasoning_effort\": \"high\"\n        }\n  }\n}else if(model === 'claude'){\n  payload =  {\n        \"url\": \"https://api.kie.ai/claude/v1/messages\",\n        \"config\": {\n                \"model\": \"claude-haiku-4-5\",\n                \"messages\": [\n                   {\n                      \"role\": \"user\",\n                      \"content\":  $input.first().json.prompt\n                   },\n                   {\n                      \"role\": \"user\",\n                      \"content\":  $input.first().json.instruction\n                   }\n                ],\n                \"tools\": [],\n                \"thinkingFlag\": true,\n                \"stream\": false,\n                \"max_tokens\": 4096\n             }\n  }\n\n}else if(model === 'grok'){\n  payload =  {\n        \"url\": \"https://api.kie.ai/grok/v1/responses\",\n        \"config\":{\n                \"model\": \"grok-4-3\",\n                \"stream\": false,\n                \"input\": [\n                   {\n                      \"role\": \"user\",\n                      \"content\": [\n                         {\n                            \"type\": \"input_text\",\n                            \"text\": $input.first().json.prompt\n                         }\n                      ]\n                   },\n                   {\n                      \"role\": \"user\",\n                      \"content\": [\n                         {\n                            \"type\": \"input_text\",\n                            \"text\": $input.first().json.instruction\n                         }\n                      ]\n                   }\n                ],\n               \"tools\": [\n                        {\n                          \"type\": \"web_search\"\n                        }\n                ]\n        }\n  }\n}\n\nreturn payload;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1232,
+        384
+      ],
+      "id": "11d3d474-6777-4a54-b3bd-094d9b4044a7",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.config.toJsonString() }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1456,
+        384
+      ],
+      "id": "8b8ce129-8e79-4b98-9955-950363a1a851",
+      "name": "Generate Prompt",
+      "retryOnFail": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "SFhjYsXsyVcRhxXr",
+          "name": "SF - KIE AI"
+        }
+      },
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "connections": {
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get token": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Model Looping": {
+      "main": [
+        [
+          {
+            "node": "Get token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Generate Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Prompt": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "triggerCount": 0,
+  "versionId": "b8da1f94-246f-4c9b-9f76-54d75eeca68b",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "t9dCdoPcc9q1JrUJ",
+  "isArchived": false
+}

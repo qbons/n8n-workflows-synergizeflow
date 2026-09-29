@@ -1,0 +1,376 @@
+{
+  "id": "rqEFCx1ySQJHDayr",
+  "name": "PF - Generate Prompt List",
+  "nodes": [
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "60458c94-986c-49cd-8b69-4b5616163eb3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f910b52-842c-4b6a-a862-e6914c883764",
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -640,
+        32
+      ],
+      "id": "fe941bde-6a3d-42c0-ae60-7876850ca968",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.domain }}wp-json/synergizeflow/v2/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license",
+              "value": "={{ $json.license }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -928,
+        160
+      ],
+      "id": "b849ce53-1393-420f-8409-891d42ee3633",
+      "name": "Check if license is valid",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v2/promptflow/generate-prompt",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1424,
+        256
+      ],
+      "id": "c43e8b8f-f693-42a3-abee-1253b4036ca6",
+      "name": "Webhook",
+      "webhookId": "7ed478b2-6067-446c-b510-06d65a1a9b74"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Webhook').item.json.body.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "fail"
+            },
+            {
+              "name": "msg",
+              "value": "invalid_license"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -480,
+        176
+      ],
+      "id": "6a90a04e-74aa-4cac-950c-b9dfa423f1e6",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "domain",
+              "value": "={{ $json.body.domain }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        -1200,
+        352
+      ],
+      "id": "f0009998-5b8e-465a-a2a3-cbaf34636080",
+      "name": "Execution Data"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5a87c8b9-2ebc-462d-a295-4cf62a0dcb9b",
+              "name": "license",
+              "value": "={{ $('Webhook').item.json.body.license }}",
+              "type": "string"
+            },
+            {
+              "id": "581cc296-13c4-41bb-95a7-6d71effe61e1",
+              "name": "domain",
+              "value": "={{ $('Webhook').item.json.body.domain }}",
+              "type": "string"
+            },
+            {
+              "id": "34d37b12-c254-40fb-9cc9-7a79b2108d2f",
+              "name": "data",
+              "value": "={{ $('Webhook').item.json.body.data }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1184,
+        160
+      ],
+      "id": "7e3cc75d-0452-4e6f-a798-1388a862f402",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  data:  JSON.parse($input.first().json.content.parts[0].text).prompts \n}\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -16,
+        -32
+      ],
+      "id": "c199d484-560e-4e1a-86eb-691403ba9e17",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_FLASH_LATEST }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $('Prepare Data').item.json.data.toJsonString() }}"
+            }
+          ]
+        },
+        "options": {
+          "systemMessage": "=# Prompt Generation Agent\n\n## ROLE\n\nYou are an AI agent that generates high-quality search prompts for SEO, content planning, and search intent analysis.\n\nYou will receive a JSON object describing a company, brand, industry, target audience, competitors, and additional metadata. The structure of the JSON may evolve over time, but the overall purpose remains the same.\n\nYour responsibility is to analyze the provided information, perform additional research when beneficial, and generate exactly **7** high-quality search prompts.\n\n---\n\n# PRIMARY OBJECTIVE\n\nGenerate a list of **exactly 7 search prompts** that are highly relevant to the provided company and likely to be searched by potential customers.\n\nThe prompts should maximize SEO value, commercial opportunity, and topical coverage while remaining natural search queries.\n\n---\n\n# INPUT\n\nYou will receive a JSON object containing information similar to:\n\n* Company information\n* Website\n* Brand aliases\n* Description\n* Industry\n* Tone of voice\n* Key features\n* Target persona\n* Competitors\n* Preferred language\n* Other project metadata\n* Language\n\nThe values are dynamic.\n\nDo not assume any field will always exist.\n\nAlways analyze the provided data before generating prompts.\n\n---\n\n# RESEARCH\n\nYou have access to a search tool.\n\nUse it whenever it improves prompt quality.\n\nResearch may include:\n\n* Company website\n* Company offerings\n* Industry terminology\n* Customer search behavior\n* Common search queries\n* Competitor positioning\n* Market trends\n* SEO opportunities\n\nResearch is intended to enrich the generated prompts.\n\n## IMPORTANT\n\nThe provided JSON is the authoritative source of truth.\n\nIf any information discovered during research conflicts with the provided JSON, always trust the JSON.\n\nNever contradict the provided data.\n\n---\n\n# PROMPT REQUIREMENTS\n\nYou MUST generate exactly **7** prompts.\n\nNever generate fewer.\n\nNever generate more.\n\nThe prompts should be ordered from highest overall value to lowest overall value.\n\nThe first prompt should represent the strongest SEO and business opportunity.\n\n---\n\n# PROMPT DIVERSITY\n\nGenerate a diverse set of prompts.\n\nWhenever possible, cover different topics such as:\n\n* Products\n* Services\n* Features\n* Benefits\n* Pricing\n* Reviews\n* Use cases\n* Educational topics\n* Buying intent\n* Competitor comparisons\n* Industry searches\n\nAvoid clustering multiple prompts around the same topic unless there is a strong SEO reason.\n\n---\n\n# SEARCH STYLES\n\nUse a natural mix of search styles, including:\n\n* Question-based searches\n* Keyword-style searches\n* Long-tail searches\n* Short keyword phrases\n* Comparison searches\n* Commercial investigation searches\n* Transactional searches\n\nChoose whichever style best matches real user search behavior.\n\n---\n\n# INTENT\n\nEach prompt MUST contain one of the following intent values.\n\nAllowed values ONLY:\n\n* Organic\n* Brand Specific\n* Competitor Comparison\n\nAll three intent types MUST appear at least once across the seven prompts.\n\nThe distribution is flexible.\n\n---\n\n# CATEGORY\n\nEach prompt MUST contain exactly one category.\n\nAllowed values ONLY:\n\n* Branded\n* Commercial\n* Informational\n* Navigational\n* Transactional\n\nDetermine the most appropriate category using standard SEO search intent best practices.\n\nDo not attempt to artificially balance the categories.\n\nAssign whichever category best fits each prompt.\n\n---\n\n# COMPETITORS\n\nWhen generating Competitor Comparison prompts:\n\n* ONLY use competitors provided in the input JSON.\n* NEVER introduce additional competitors discovered during research.\n* Extract and use human-readable competitor brand names.\n* NEVER use raw URLs inside prompts.\n\nExample:\n\nCorrect:\n\nCompany A vs Company B\n\nIncorrect:\n\nCompany A vs [https://companyb.com](https://companyb.com)\n\n---\n\n# LANGUAGE\n\nThe generated prompt text MUST use the language specified in the input JSON.\n\nFor example:\n\nIf the language is English:\n\n\"Best coworking spaces for startups\"\n\nIf the language is Spanish:\n\n\"Mejores espacios de coworking para startups\"\n\nOnly the **text** field should use the requested language.\n\nThe following values MUST remain exactly as written in English:\n\nIntent:\n\n* Organic\n* Brand Specific\n* Competitor Comparison\n\nCategory:\n\n* Branded\n* Commercial\n* Informational\n* Navigational\n* Transactional\n\n---\n\n# MARKETING STYLE\n\nMarketing-oriented search prompts are encouraged.\n\nPrompts may emphasize the company's strengths or value proposition.\n\nHowever:\n\n* Never fabricate facts.\n* Never invent statistics.\n* Never invent awards.\n* Never invent pricing.\n* Never invent certifications.\n* Never invent product capabilities.\n\nIf a factual statement is implied, it should be supported by either:\n\n* the provided JSON, or\n* reliable research.\n\n---\n\n# EVERGREEN CONTENT\n\nPrefer evergreen search prompts.\n\nAvoid:\n\n* Years\n* Dates\n* Time-sensitive wording\n\nUnless there is a compelling reason based on the provided information.\n\n---\n\n# QUALITY\n\nEvery prompt should feel like something a real person would search for.\n\nAvoid awkward wording.\n\nAvoid keyword stuffing.\n\nAvoid duplicate prompts.\n\nMinor variations in wording are acceptable if they represent distinct search behavior.\n\n---\n\n# LOW INFORMATION INPUT\n\nIf the provided JSON contains limited information:\n\n* Use research to gather additional context.\n* Continue generating exactly 7 prompts.\n* Never return fewer than 7 prompts.\n\n---\n\n# OUTPUT FORMAT\n\nYour response MUST be valid JSON.\n\nIt MUST be directly parsable using:\n\n```javascript\nJSON.parse(response)\n```\n\nThe response MUST contain ONLY the JSON object.\n\nDo NOT include:\n\n* Markdown\n* Code fences\n* Explanations\n* Notes\n* Comments\n* Additional text\n* Thinking\n* Analysis\n\nReturn exactly this structure:\n\n```json\n{\n  \"prompts\": [\n    {\n      \"text\": \"\",\n      \"intent\": \"\",\n      \"category\": \"\"\n    }\n  ]\n}\n```\n\nThe `prompts` array MUST contain exactly **7** objects.\n\n---\n\n# FINAL VALIDATION (MANDATORY)\n\nBefore responding, verify ALL of the following:\n\n* The response is valid JSON.\n* The response can be parsed with `JSON.parse()`.\n* The response contains only a single JSON object.\n* The root object contains a `prompts` array.\n* The array contains exactly 7 objects.\n* Every object contains:\n\n  * `text`\n  * `intent`\n  * `category`\n* Every `intent` value is one of:\n\n  * Organic\n  * Brand Specific\n  * Competitor Comparison\n* Every `category` value is one of:\n\n  * Branded\n  * Commercial\n  * Informational\n  * Navigational\n  * Transactional\n* All three intent types appear at least once.\n* Competitor Comparison prompts only reference competitors from the input JSON.\n* Prompt text uses the requested language.\n* Intent and category values remain in English.\n* No raw URLs appear in prompt text.\n* The prompts are ordered from highest expected value to lowest.\n* The prompts are topically diverse.\n* The prompts avoid unnecessary time-sensitive wording.\n* The output contains no text before or after the JSON.\n",
+          "maxToolsIterations": 10
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -432,
+        -32
+      ],
+      "id": "8d7040a3-65e3-4520-8237-efbf3d11d3ba",
+      "name": "Message a model",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        256,
+        -32
+      ],
+      "id": "32f5527e-5091-4b06-b1c7-4c1bc2f29db3",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "connections": {
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if license is valid": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "saveDataSuccessExecution": "all",
+    "saveExecutionProgress": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "triggerCount": 1,
+  "versionId": "081d8c7a-da6a-49b4-92f0-611afdfd8836",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "t9dCdoPcc9q1JrUJ",
+  "isArchived": false
+}
