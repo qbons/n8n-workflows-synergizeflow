@@ -2643,12 +2643,12 @@
     "availableInMCP": false
   },
   "triggerCount": 1,
-  "versionId": "5924481a-050d-4f64-a322-804705b89e2d",
+  "versionId": "ae61634a-b435-4f65-bfbe-0000a2fbab51",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",
     "teamName": "SynergizeFlow.v2"
   },
   "parentFolderId": "icCJSa6WgYRUBtVb",
-  "isArchived": false
+  "isArchived": true
 }

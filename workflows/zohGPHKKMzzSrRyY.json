@@ -34,7 +34,7 @@
                 },
                 "conditions": [
                   {
-                    "leftValue": "={{ $json.body.type }}",
+                    "leftValue": "={{ $('Webhook').item.json.body.type }}",
                     "rightValue": "specific",
                     "operator": {
                       "type": "string",
@@ -59,7 +59,7 @@
                 "conditions": [
                   {
                     "id": "a5186224-ca74-4d4c-a127-5fb69ad212b8",
-                    "leftValue": "={{ $json.body.type }}",
+                    "leftValue": "={{ $('Webhook').item.json.body.type }}",
                     "rightValue": "specific",
                     "operator": {
                       "type": "string",
@@ -203,7 +203,7 @@
         "operation": "analyze",
         "modelId": {
           "__rl": true,
-          "value": "=models/{{$vars.GEMINI_NANO_BANANA}}",
+          "value": "=models/{{$vars.GEMINI_FLASH_LATEST}}",
           "mode": "id"
         },
         "text": "={{ $('Prepare Data').item.json.prompt }}",
@@ -450,7 +450,7 @@
     "availableInMCP": false
   },
   "triggerCount": 1,
-  "versionId": "6895a776-d786-4f2f-a43a-b05ba61425df",
+  "versionId": "462a951e-f0a9-46b3-89e9-601ead51d38b",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",

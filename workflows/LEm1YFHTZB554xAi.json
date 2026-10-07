@@ -61,7 +61,7 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.2,
       "position": [
-        -528,
+        -784,
         16
       ],
       "id": "7d5b26b4-7d60-49af-9e96-7265f4bfd2d2",
@@ -85,8 +85,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -752,
-        144
+        -1168,
+        208
       ],
       "id": "700dfddb-3b91-42a1-ab4b-fafd1531efbf",
       "name": "Check if license is valid",
@@ -103,8 +103,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -1424,
-        240
+        -2064,
+        208
       ],
       "id": "a4630c3f-4d8f-4036-a047-7423f7067205",
       "name": "Webhook",
@@ -145,8 +145,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -320,
-        256
+        -608,
+        224
       ],
       "id": "efe3156e-df6a-49b5-bfd2-0ee6e8338185",
       "name": "HTTP Request3"
@@ -165,8 +165,8 @@
       "type": "n8n-nodes-base.executionData",
       "typeVersion": 1.1,
       "position": [
-        -1200,
-        336
+        -1840,
+        304
       ],
       "id": "df012eaa-1599-4857-80a2-c4822dfddd55",
       "name": "Execution Data"
@@ -193,8 +193,8 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
       "position": [
-        -1200,
-        144
+        -1840,
+        112
       ],
       "id": "8a52db6c-eef2-4a7e-b4df-878300520a61",
       "name": "Get token"
@@ -268,6 +268,12 @@
               "name": "identifier",
               "value": "={{ $('Webhook').item.json.body.identifier }}",
               "type": "string"
+            },
+            {
+              "id": "f306f182-7fb4-4fcc-9fa8-3d3ab493dff5",
+              "name": "engine_type",
+              "value": "={{ $('Webhook').item.json.body.engine_type }}",
+              "type": "string"
             }
           ]
         },
@@ -276,8 +282,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -976,
-        144
+        -1616,
+        112
       ],
       "id": "00f243d8-de12-4a26-a3e2-3adc2eb293b7",
       "name": "Prepare Data"
@@ -367,8 +373,8 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        -320,
-        -80
+        -576,
+        -112
       ],
       "id": "d692b225-ed75-42ad-8003-b110dd356fe6",
       "name": "Switch1"
@@ -395,8 +401,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        -112,
-        -192
+        -80,
+        -176
       ],
       "id": "96814780-edf9-4368-9f81-46fe1a193982",
       "name": "HTTP Request"
@@ -436,7 +442,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        64,
+        272,
         -192
       ],
       "id": "5cb96a47-6e4b-457b-b3cc-03bc2ce2aae0",
@@ -457,7 +463,7 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1,
       "position": [
-        688,
+        896,
         -192
       ],
       "id": "3955832a-9ca7-427a-9cab-d82e2e3ea6a6",
@@ -489,7 +495,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        960,
+        1168,
         -208
       ],
       "id": "702ebd48-075e-426e-ab4e-2bb34fe9f30c",
@@ -517,7 +523,7 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1,
       "position": [
-        1792,
+        2000,
         -512
       ],
       "id": "550d97b0-55f7-46d5-a741-681249cded91",
@@ -537,7 +543,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2208,
+        2416,
         -528
       ],
       "id": "7fbf4637-0518-4dda-b945-d2e261026d09",
@@ -549,7 +555,7 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        2080,
+        2288,
         -448
       ],
       "id": "1331ec09-35a1-4ee7-8496-6f88bcaa9812",
@@ -563,7 +569,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1296,
+        1504,
         -32
       ],
       "id": "f905f2e7-c643-4cc0-a639-f5056a4f28ca",
@@ -654,7 +660,7 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        1504,
+        1712,
         -48
       ],
       "id": "9748d2cd-2773-46d6-92a6-990ab392e441",
@@ -674,7 +680,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2544,
+        2752,
         -544
       ],
       "id": "de708463-e6df-4693-9762-64e020a4f0ca",
@@ -692,7 +698,7 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        3056,
+        3264,
         -352
       ],
       "id": "8cf40495-71a8-44a7-bbe6-0043d610d3e9",
@@ -708,7 +714,7 @@
       "type": "n8n-nodes-base.convertToFile",
       "typeVersion": 1.1,
       "position": [
-        2864,
+        3072,
         -560
       ],
       "id": "43dfcc41-f50a-4f60-a6cb-e2950bba2c80",
@@ -776,7 +782,7 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        3072,
+        3280,
         -656
       ],
       "id": "7517359a-d7a2-4526-b82c-8ffc775685c6",
@@ -799,7 +805,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        3600,
+        3808,
         -736
       ],
       "id": "47d3b74e-7b32-41e2-b24b-8648a34608c8",
@@ -818,7 +824,7 @@
       "type": "n8n-nodes-base.convertToFile",
       "typeVersion": 1.1,
       "position": [
-        3776,
+        3984,
         -736
       ],
       "id": "56a6f429-57ab-4825-91ed-233b84f32eec",
@@ -835,7 +841,7 @@
       "type": "n8n-nodes-base.extractFromFile",
       "typeVersion": 1,
       "position": [
-        3952,
+        4160,
         -736
       ],
       "id": "5039c8e2-c345-49e3-a989-9e1b8d46501d",
@@ -849,7 +855,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        4240,
+        4448,
         -528
       ],
       "id": "542b6fd1-9ae1-444c-b7a6-7c1245c53f85",
@@ -862,7 +868,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        560,
+        768,
         32
       ],
       "id": "0b5b1bb3-6f2d-4e56-9287-a09cfbefe9bd",
@@ -875,7 +881,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        560,
+        768,
         256
       ],
       "id": "fe403034-8432-44cb-a9d6-500d26aea7dc",
@@ -895,7 +901,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        4512,
+        4720,
         -528
       ],
       "id": "de3f86be-3e27-44bd-b3ac-a1abf7819f5a",
@@ -983,7 +989,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        4784,
+        4992,
         -544
       ],
       "id": "f42bdde8-17c9-44c1-9240-c4f8213bf4fb",
@@ -1013,7 +1019,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
       "position": [
-        496,
+        704,
         -192
       ],
       "id": "73f6a431-cd63-4499-b970-73fcf60fed07",
@@ -1054,7 +1060,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        272,
+        480,
         -192
       ],
       "id": "af600fd4-023a-4fbd-ad39-6319f603d3f2",
@@ -1082,7 +1088,7 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1,
       "position": [
-        1840,
+        2048,
         -32
       ],
       "id": "1a951ca9-1793-480c-ad87-990dbabfd591",
@@ -1100,7 +1106,7 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        2128,
+        2336,
         48
       ],
       "id": "d3f55438-ce5a-442b-9ffc-63a8341ef23a",
@@ -1114,7 +1120,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2256,
+        2464,
         -48
       ],
       "id": "bfc4056d-77e2-4b0d-920f-391366fd1510",
@@ -1135,7 +1141,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2544,
+        2752,
         -64
       ],
       "id": "66675515-0ef7-4f14-8bdb-ccfd7079a1fd",
@@ -1170,7 +1176,7 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1,
       "position": [
-        2816,
+        3024,
         -80
       ],
       "id": "dabab501-f854-44f2-82d0-4567f0db67d5",
@@ -1188,7 +1194,7 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        3104,
+        3312,
         -16
       ],
       "id": "b4c5b13f-ff1a-4341-b978-69e2c1bc184c",
@@ -1202,7 +1208,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3472,
+        3680,
         -112
       ],
       "id": "fd10a96c-da74-4d21-878b-03c50463897e",
@@ -1215,7 +1221,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3264,
+        3472,
         -96
       ],
       "id": "1b4b067f-1021-4230-a7c3-bf52a22f4c99",
@@ -1236,7 +1242,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        3744,
+        3952,
         -112
       ],
       "id": "e03a612e-2814-47e5-9991-5b1935fb88e8",
@@ -1324,7 +1330,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        4016,
+        4224,
         -128
       ],
       "id": "596bda82-5c76-4dd1-8bf4-700c75a5f390",
@@ -1351,7 +1357,7 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1,
       "position": [
-        1840,
+        2048,
         368
       ],
       "id": "2d921465-f4a9-43ba-a3b5-ef618f106e0a",
@@ -1369,7 +1375,7 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        2128,
+        2336,
         448
       ],
       "id": "bb776b3c-b445-4480-b119-06514a7353f6",
@@ -1383,7 +1389,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2368,
+        2576,
         320
       ],
       "id": "b4a1a964-7572-4358-8b0d-abe95d11c6cd",
@@ -1399,7 +1405,7 @@
       "type": "n8n-nodes-base.convertToFile",
       "typeVersion": 1.1,
       "position": [
-        3232,
+        3440,
         336
       ],
       "id": "449f6d4b-946c-4203-be99-34f701a44d88",
@@ -1416,7 +1422,7 @@
       "type": "n8n-nodes-base.s3",
       "typeVersion": 1,
       "position": [
-        3472,
+        3680,
         336
       ],
       "id": "a05958a6-6734-4630-9813-734b398c816c",
@@ -1435,7 +1441,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3680,
+        3888,
         336
       ],
       "id": "4cf7851d-b0f4-4fbf-83a8-afe8ffe1910e",
@@ -1476,7 +1482,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        3888,
+        4096,
         336
       ],
       "id": "0995b17d-8b7c-4c8c-9b5c-f996a61c9c0f",
@@ -1500,7 +1506,7 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1,
       "position": [
-        3376,
+        3584,
         -720
       ],
       "id": "dfcf229c-2e16-4d45-8f95-a7a781a8afb2",
@@ -1528,7 +1534,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2640,
+        2848,
         320
       ],
       "id": "264fbd00-59d9-45d9-98d8-afe0f49c33a2",
@@ -1566,11 +1572,214 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
       "position": [
-        2928,
+        3136,
         336
       ],
       "id": "ba8b7b6e-6433-401c-a6a5-fe65020c7ce9",
       "name": "KIE AI Pooling"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.engine_type }}",
+                    "rightValue": "laravel",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "907b2f9b-be27-42ee-8fa3-054e4bcebd71"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "laravel"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "edf94958-5b02-4af8-9ddd-99b2b0f4605b",
+                    "leftValue": "={{ $json.engine_type }}",
+                    "rightValue": "wordpress",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "wordpress"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -1408,
+        112
+      ],
+      "id": "aee1bbf3-a95f-49f3-8962-60f1d9be26c4",
+      "name": "Switch4"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.domain }}api/synergizeflow/v2/validate-license",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-SynergizeFlow-Key",
+              "value": "={{ $json.license }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license",
+              "value": "={{ $json.license }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1168,
+        32
+      ],
+      "id": "145e21f5-e127-494e-8794-e5aea07e6901",
+      "name": "Check if license is valid1",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Prepare Data').item.json.engine_type }}",
+                    "rightValue": "laravel",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "907b2f9b-be27-42ee-8fa3-054e4bcebd71"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "laravel"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "edf94958-5b02-4af8-9ddd-99b2b0f4605b",
+                    "leftValue": "={{ $('Prepare Data').item.json.engine_type }}",
+                    "rightValue": "wordpress",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "wordpress"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -304,
+        -272
+      ],
+      "id": "fcdedaf4-d430-4c03-85b7-d363aec338c0",
+      "name": "Switch5"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.domain }}api/synergizeflow/v2/get-single-post",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-SynergizeFlow-Key",
+              "value": "={{ $json.license }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "id",
+              "value": "={{ $('Prepare Data').item.json.source_meta.blog_id }}"
+            },
+            {
+              "name": "license",
+              "value": "={{ $('Prepare Data').item.json.license }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -80,
+        -320
+      ],
+      "id": "1f4e30eb-88d4-44a6-9a04-8edc47d9cb0b",
+      "name": "HTTP Request4"
     }
   ],
   "connections": {
@@ -1641,7 +1850,7 @@
       "main": [
         [
           {
-            "node": "Check if license is valid",
+            "node": "Switch4",
             "type": "main",
             "index": 0
           }
@@ -1652,7 +1861,7 @@
       "main": [
         [
           {
-            "node": "HTTP Request",
+            "node": "Switch5",
             "type": "main",
             "index": 0
           }
@@ -2201,6 +2410,71 @@
           }
         ]
       ]
+    },
+    "Switch4": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if license is valid1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch5": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request4": {
+      "main": [
+        [
+          {
+            "node": "Blog Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -2214,7 +2488,7 @@
     "availableInMCP": false
   },
   "triggerCount": 1,
-  "versionId": "ed223463-94d5-43fe-8975-734a0e7cdc3a",
+  "versionId": "830906a0-27f1-4d86-b09b-922bc4ea0790",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",

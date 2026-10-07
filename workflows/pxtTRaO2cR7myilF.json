@@ -1,0 +1,581 @@
+{
+  "id": "pxtTRaO2cR7myilF",
+  "name": "SF - Blog Agent Multi Language Laravel",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        912,
+        1008
+      ],
+      "id": "141ef720-dbf9-44b6-beb8-846890b4273e",
+      "name": "Blog Agent"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "CfFTrHyw35Q6kVn5",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/CfFTrHyw35Q6kVn5",
+          "cachedResultName": "SynergizeFlow.v2 — Get App Token"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1232,
+        1008
+      ],
+      "id": "b60fe277-a34a-46e3-8283-be6f2ed203e1",
+      "name": "Get token1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5a87c8b9-2ebc-462d-a295-4cf62a0dcb9b",
+              "name": "license",
+              "value": "={{ $('Blog Agent').item.json.license }}",
+              "type": "string"
+            },
+            {
+              "id": "581cc296-13c4-41bb-95a7-6d71effe61e1",
+              "name": "domain",
+              "value": "={{ $('Blog Agent').item.json.domain }}",
+              "type": "string"
+            },
+            {
+              "id": "a6a5466a-5c10-4a04-bdac-515345d4d1e2",
+              "name": "agent_id",
+              "value": "={{ $('Blog Agent').item.json.agent_id }}",
+              "type": "number"
+            },
+            {
+              "id": "a588bfae-1014-44e1-a9ba-74273ae3a576",
+              "name": "parent_id",
+              "value": "={{ $('Blog Agent').item.json.parent_id }}",
+              "type": "number"
+            },
+            {
+              "id": "afbca853-fa37-4fc2-bced-85dfdb9b374d",
+              "name": "language",
+              "value": "={{ $('Blog Agent').item.json.language }}",
+              "type": "array"
+            },
+            {
+              "id": "290f5675-dee3-4772-b15e-b3e38a45bf59",
+              "name": "data",
+              "value": "={{ $('Blog Agent').item.json.data }}",
+              "type": "object"
+            },
+            {
+              "id": "c4a09bbb-e67b-4448-a2c6-79dcc91128a8",
+              "name": "token",
+              "value": "={{ $json.token }}",
+              "type": "string"
+            },
+            {
+              "id": "4c1a8219-8778-45db-8471-92f125f2e614",
+              "name": "image",
+              "value": "={{ $('Blog Agent').item.json.image }}",
+              "type": "string"
+            },
+            {
+              "id": "c4d92e84-c0e7-4dc2-b9c4-7874f6214fd0",
+              "name": "faq_count",
+              "value": "={{ $('Blog Agent').item.json.faq }}",
+              "type": "number"
+            },
+            {
+              "id": "3d34d03f-0af7-489f-b8c6-d2a2a337b8c7",
+              "name": "post_status",
+              "value": "={{ $('Blog Agent').item.json.post_status }}",
+              "type": "string"
+            },
+            {
+              "id": "b000ee45-087e-4dd5-a791-a52d0aedf5e7",
+              "name": "categories",
+              "value": "={{ $('Blog Agent').item.json.categories }}",
+              "type": "array"
+            },
+            {
+              "id": "e45b748f-d986-4105-b0e6-eae30f815f60",
+              "name": "author",
+              "value": "={{ $('Blog Agent').item.json.author }}",
+              "type": "number"
+            },
+            {
+              "id": "b1f4de00-503c-42a0-a721-86446b569b3a",
+              "name": "seo_provider",
+              "value": "={{ $('Blog Agent').item.json.seo_provider }}",
+              "type": "string"
+            },
+            {
+              "id": "99abedb0-116d-45b5-96b6-9f1041fa66e1",
+              "name": "webhook",
+              "value": "={{ $('Blog Agent').item.json.webhook }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1440,
+        1008
+      ],
+      "id": "4b44c4d7-0e1f-4ab8-be2a-5b3b3647007c",
+      "name": "Prepare Data1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "language",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1664,
+        1008
+      ],
+      "id": "d6ec5be9-23b7-4c23-b39e-f8a9d4313fa3",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1872,
+        1008
+      ],
+      "id": "8b78b22a-69da-4d56-a720-488c11979b80",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "jsCode": "let data = $('Prepare Data1').first().json.data;\ndata.language = $input.first().json.language;\nreturn data;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2112,
+        1296
+      ],
+      "id": "4b4fa735-7959-462e-a3ce-22d368aa0305",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_TEXT }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{  $json.toJsonString() }}"
+            }
+          ]
+        },
+        "options": {
+          "systemMessage": "=# Translation Agent — System Instruction\n\nYou are a professional translation agent.\n\nYour task is to translate the received JSON data into the language specified by the `language` field.\n\n## Core Objective\n\nTranslate the content of the input JSON from its current language into the target language defined by:\n\n```json\n\"language\": \"TARGET_LANGUAGE\"\n```\n\nThe output MUST preserve the exact same JSON structure as the input.\n\nYou must NOT add, remove, rename, or reorder fields.\n\n---\n\n## Translation Rules\n\n### 1. Preserve the JSON structure\n\nThe output must have exactly the same:\n\n* JSON object structure\n* Property names\n* Array structure\n* Number of array items\n* Nested objects\n* HTML structure\n* URLs\n* HTML attributes\n* Formatting markers\n\nOnly translate the textual content.\n\nFor example, if the input contains:\n\n```json\n{\n  \"title\": \"...\",\n  \"content\": \"...\",\n  \"keywords\": [\"...\", \"...\"],\n  \"excerpt\": \"...\",\n  \"language\": \"nl\"\n}\n```\n\nthe output must contain exactly these same fields:\n\n```json\n{\n  \"title\": \"...\",\n  \"content\": \"...\",\n  \"keywords\": [\"...\", \"...\"],\n  \"excerpt\": \"...\",\n  \"language\": \"nl\"\n}\n```\n\n---\n\n### 2. Translate all user-facing textual content\n\nTranslate the values of fields containing human-readable content, including:\n\n* `title`\n* `content`\n* `keywords`\n* `excerpt`\n* Any other textual fields that may appear in the input\n\nDo not assume that only these fields will exist. If another field contains natural-language content, translate it as well.\n\n---\n\n### 3. Preserve HTML\n\nThe `content` field may contain HTML.\n\nTranslate the visible text inside the HTML while preserving the HTML structure exactly.\n\nFor example:\n\nInput:\n\n```html\n<h2>Why family-friendly jobs matter</h2>\n<p>Flexible work helps employees.</p>\n```\n\nOutput:\n\n```html\n<h2>[translated heading]</h2>\n<p>[translated paragraph]</p>\n```\n\nDo NOT:\n\n* Remove HTML tags\n* Add HTML tags\n* Change tag names\n* Change attributes\n* Change HTML nesting\n* Change links\n* Change URLs\n* Change `target`, `class`, `id`, or other attributes\n\n---\n\n### 4. Preserve URLs\n\nNever translate, modify, replace, or remove URLs.\n\nFor example:\n\n```html\n<a href=\"https://example.com/some-page\">Some text</a>\n```\n\nOnly translate:\n\n```html\nSome text\n```\n\nKeep this exactly unchanged:\n\n```html\nhttps://example.com/some-page\n```\n\n---\n\n### 5. Preserve keywords as individual items\n\nIf `keywords` is an array, translate each keyword individually while preserving:\n\n* The array\n* The number of items\n* The order of items\n\nExample:\n\n```json\n\"keywords\": [\n  \"keyword one\",\n  \"keyword two\",\n  \"keyword three\"\n]\n```\n\nmust remain:\n\n```json\n\"keywords\": [\n  \"translated keyword one\",\n  \"translated keyword two\",\n  \"translated keyword three\"\n]\n```\n\nDo not combine, remove, reorder, or add keywords.\n\n---\n\n### 6. Preserve meaning and intent\n\nTranslate naturally for the target language.\n\nDo not perform a literal word-for-word translation when it would sound unnatural.\n\nPreserve:\n\n* Meaning\n* Context\n* Tone\n* Intent\n* Claims\n* Calls to action\n* Industry terminology\n* Brand messaging\n\nDo not rewrite, summarize, expand, shorten, improve, fact-check, or otherwise modify the original content.\n\nThe task is translation, not content optimization.\n\n---\n\n### 7. Preserve brand names and proper nouns\n\nDo not translate brand names, company names, product names, domain names, URLs, or other proper nouns unless the input explicitly indicates that they should be translated.\n\nFor example:\n\n```text\nGlansPro\nSynergizeFlow\nWordPress\nGoogle\n```\n\nshould remain unchanged.\n\n---\n\n### 8. Preserve technical terminology when appropriate\n\nTechnical, marketing, SEO, HTML, programming, and industry-specific terminology should be translated appropriately for the target language while maintaining the original meaning.\n\nDo not unnecessarily translate established technical terms when they are normally used in their original form in the target language.\n\n---\n\n### 9. Preserve placeholders and variables\n\nNever translate or modify placeholders, variables, template expressions, or dynamic values.\n\nExamples:\n\n```text\n{{name}}\n{{ $now }}\n{{ $json.title }}\n%USERNAME%\n{keyword}\n[VARIABLE]\n```\n\nThese must remain exactly unchanged.\n\n---\n\n### 10. Preserve special characters and formatting\n\nPreserve meaningful formatting such as:\n\n* Line breaks\n* HTML entities\n* Markdown syntax\n* Escape characters\n* Special symbols\n* Numeric values\n* Dates\n* Percentages\n* Currency values\n\nDo not change factual values merely because they appear inside translatable content.\n\n---\n\n## Language Field\n\nThe `language` field specifies the target language.\n\nThe value of the `language` field MUST remain unchanged in the output.\n\nFor example, if:\n\n```json\n\"language\": \"nl\"\n```\n\nthen translate the content into Dutch, but keep:\n\n```json\n\"language\": \"nl\"\n```\n\nDo not translate `\"nl\"` into `\"Dutch\"` or any other value.\n\n---\n\n## JSON-Only Output\n\nYour response MUST contain valid JSON only.\n\nDo NOT output:\n\n* Markdown\n* Code fences\n* Explanations\n* Comments\n* Notes\n* Introduction text\n* Translation summaries\n* Additional fields\n\nIncorrect:\n\n```text\nHere is the translated content:\n\n{\n  ...\n}\n```\n\nCorrect:\n\n```json\n{\n  ...\n}\n```\n\n---\n\n## Strict Output Requirements\n\nBefore returning the response, verify that:\n\n1. The output is valid JSON.\n2. The JSON structure exactly matches the input.\n3. No fields were added.\n4. No fields were removed.\n5. No field names were changed.\n6. Array lengths are unchanged.\n7. Array ordering is unchanged.\n8. HTML structure is preserved.\n9. URLs are unchanged.\n10. HTML attributes are unchanged.\n11. Placeholders and variables are unchanged.\n12. Brand names and protected proper nouns are preserved.\n13. All translatable textual content is translated.\n14. The `language` field remains unchanged.\n15. No text exists outside the JSON object.\n\nReturn ONLY the translated JSON object.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        2336,
+        1296
+      ],
+      "id": "8e789327-067f-44a0-84b3-73d37ff00df1",
+      "name": "Message a model1",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "function getValidJsonObject(rawText) {\n\n    if (typeof rawText !== 'string' || rawText.trim() === '') {\n        console.error(\"Invalid input or empty text field.\");\n        return null;\n    }\n\n    let jsonString = rawText.trim();\n\n    // 2. Check for and remove the markdown JSON block fences.\n    // This regex is robust and handles variations in whitespace.\n    const markdownRegex = /^```json\\s*([\\s\\S]*?)\\s*```$/;\n    const match = jsonString.match(markdownRegex);\n\n    if (match) {\n        // If it's a match, the actual JSON string is in the first capture group.\n        jsonString = match[1];\n    }\n\n    // 3. Parse the cleaned string into a JSON object.\n    try {\n        return JSON.parse(jsonString);\n    } catch (error) {\n        console.error(\"Failed to parse JSON string:\", error);\n        console.error(\"Problematic string:\", jsonString);\n        return null;\n    }\n}\nreturn getValidJsonObject($input.first().json.content.parts[0].text);"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2720,
+        1296
+      ],
+      "id": "d9bac189-ab46-4b0a-ba6c-6b4320fc1e1f",
+      "name": "Original Blog1",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8ee5a866-7fe1-45be-8e1a-60a13ee3fbf8",
+              "name": "image",
+              "value": "={{ $('Prepare Data1').item.json.image }}",
+              "type": "string"
+            },
+            {
+              "id": "29c81488-142a-40dd-af9e-0eb1004b153c",
+              "name": "title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "fa758b99-67ae-45b2-ad02-e1b704fdd403",
+              "name": "keyword",
+              "value": "={{ $json.keywords }}",
+              "type": "array"
+            },
+            {
+              "id": "38bc61c4-34f8-4e5e-9b3b-70779aea7aa9",
+              "name": "content",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "23c71d05-3ca8-4f5e-b4d3-7c03d4b440c7",
+              "name": "key",
+              "value": "={{$vars.STATIC_TOKEN}}",
+              "type": "string"
+            },
+            {
+              "id": "0b7d5b13-c05f-42a1-9e2d-0dfec25de1d3",
+              "name": "excerpt",
+              "value": "={{ $json.excerpt }}",
+              "type": "string"
+            },
+            {
+              "id": "c929aa0a-8005-473e-9ba8-181fbf8aeded",
+              "name": "language",
+              "value": "={{ $json.language }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2976,
+        1280
+      ],
+      "id": "7fa2ccb1-7246-4c9d-8fc4-eac91eaca4bf",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data1').item.json.domain }}api/synergizeflow/v2/insert-blog",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-SynergizeFlow-Key",
+              "value": "={{ $('Prepare Data1').item.json.license }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license",
+              "value": "={{ $('Prepare Data1').item.json.license }}"
+            },
+            {
+              "name": "category",
+              "value": "={{ $('Prepare Data1').item.json.categories }}"
+            },
+            {
+              "name": "author",
+              "value": "={{ $('Prepare Data1').item.json.author }}"
+            },
+            {
+              "name": "status",
+              "value": "={{ $('Prepare Data1').item.json.post_status }}"
+            },
+            {
+              "name": "title",
+              "value": "={{ $json.title }}"
+            },
+            {
+              "name": "content",
+              "value": "={{ $json.content }}"
+            },
+            {
+              "name": "excerpt",
+              "value": "={{ $json.excerpt }}"
+            },
+            {
+              "name": "image",
+              "value": "={{ $json.image }}"
+            },
+            {
+              "name": "keyword",
+              "value": "={{ $json.keyword }}"
+            },
+            {
+              "name": "provider",
+              "value": "={{ $('Prepare Data1').item.json.seo_provider }}"
+            },
+            {
+              "name": "language",
+              "value": "={{ $json.language }}"
+            },
+            {
+              "name": "parent",
+              "value": "={{ $('Prepare Data1').item.json.parent_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3168,
+        1280
+      ],
+      "id": "68a9d0ef-b115-4fd4-b745-3fe40d038949",
+      "name": "Insert data to website1",
+      "retryOnFail": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data1').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data1').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data1').item.json.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "={{ $json.status }}"
+            },
+            {
+              "name": "data",
+              "value": "={{ $json.data }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3888,
+        1440
+      ],
+      "id": "2622b805-53da-4c8d-aecd-59f574a53bea",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "let data = $input.first().json.data\ndata.blog_parent_id = $('Prepare Data1').first().json.parent_id;\ndata.language = $('Loop Over Items1').first().json.language;\nreturn {data:data};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3376,
+        1264
+      ],
+      "id": "ef4fa137-c0a1-4f0b-b521-bdf1aa303af7",
+      "name": "Payload Response1"
+    }
+  ],
+  "connections": {
+    "Blog Agent": {
+      "main": [
+        [
+          {
+            "node": "Get token1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get token1": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data1": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model1": {
+      "main": [
+        [
+          {
+            "node": "Original Blog1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Original Blog1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Insert data to website1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert data to website1": {
+      "main": [
+        [
+          {
+            "node": "Payload Response1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Payload Response1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "triggerCount": 0,
+  "versionId": "a7ba1ccb-2c36-4211-ba48-b7e9b75f4296",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "icCJSa6WgYRUBtVb",
+  "isArchived": false
+}

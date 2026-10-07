@@ -1,0 +1,1721 @@
+{
+  "id": "LP9byl6Zbvmv72Vd",
+  "name": "SF - Product Campaign Agent v3 - Generate Blog",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.domain }}wp-json/synergizeflow/v2/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license",
+              "value": "={{ $json.license }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -64,
+        -48
+      ],
+      "id": "4d3f6e8e-4fac-43bf-9caa-7612e4ba00eb",
+      "name": "Check if license is valid",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v3/blog/product-marketing-agent/generate-blog",
+        "options": {
+          "responseData": "workflow_started"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -816,
+        16
+      ],
+      "id": "99e11b41-325c-42c2-9fbe-c3388a9bf8ab",
+      "name": "Webhook",
+      "webhookId": "8f615960-e554-40b6-9108-80dec465f08c"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "60458c94-986c-49cd-8b69-4b5616163eb3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f910b52-842c-4b6a-a862-e6914c883764",
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        160,
+        -80
+      ],
+      "id": "56d525b2-5dab-45b2-b92a-f9af8c3a3634",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "domain",
+              "value": "={{ $('Webhook').item.json.body.domain }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        -496,
+        144
+      ],
+      "id": "c1e8f89d-0dff-411b-8ee1-e9b70378671a",
+      "name": "Execution Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "fail"
+            },
+            {
+              "name": "msg",
+              "value": "invalid_license"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        288,
+        160
+      ],
+      "id": "ea03f9d1-d273-41a9-99e1-9b353d505057",
+      "name": "Send Error License"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "CfFTrHyw35Q6kVn5",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/CfFTrHyw35Q6kVn5",
+          "cachedResultName": "SynergizeFlow.v2 — Get App Token"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -496,
+        -48
+      ],
+      "id": "37a8a13c-da44-42a3-82c2-3a6c38ca68ef",
+      "name": "Get token"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6e5473e4-a8cb-4d15-9545-24ecf7763ebf",
+              "name": "categories",
+              "value": "={{ $('Webhook').item.json.body.categories }}",
+              "type": "array"
+            },
+            {
+              "id": "d561f79d-86f0-4871-a5ae-3fb844c16c0d",
+              "name": "author",
+              "value": "={{ $('Webhook').item.json.body.author }}",
+              "type": "number"
+            },
+            {
+              "id": "5907b46b-9d74-48fe-8f0d-eb0d1aaf2bab",
+              "name": "post_status",
+              "value": "={{ $('Webhook').item.json.body.post_status }}",
+              "type": "string"
+            },
+            {
+              "id": "d6ca47ba-97e4-4fad-a645-dbeb38cd405f",
+              "name": "domain",
+              "value": "={{ $('Webhook').item.json.body.domain }}",
+              "type": "string"
+            },
+            {
+              "id": "b4c546db-192d-4dac-8dc7-7f9142cee11b",
+              "name": "license",
+              "value": "={{ $('Webhook').item.json.body.license }}",
+              "type": "string"
+            },
+            {
+              "id": "b29649c8-d4e0-4f79-8661-64e24e5c06f5",
+              "name": "branding_style",
+              "value": "={{ $('Webhook').item.json.body.branding_style }}",
+              "type": "string"
+            },
+            {
+              "id": "b3346934-4c05-4735-b883-d8783e480e1b",
+              "name": "webhook",
+              "value": "={{ $('Webhook').item.json.body.webhook }}",
+              "type": "string"
+            },
+            {
+              "id": "88ab6882-b9ee-43a5-aa6a-051fc006b97b",
+              "name": "agent_id",
+              "value": "={{ $('Webhook').item.json.body.agent_id }}",
+              "type": "number"
+            },
+            {
+              "id": "37c15e2c-c061-4c5a-9af8-08451fcf74a7",
+              "name": "product_id",
+              "value": "={{ $('Webhook').item.json.body.product_id }}",
+              "type": "number"
+            },
+            {
+              "id": "eaf7a57a-ad49-401d-8793-ce3ae6c2e880",
+              "name": "seo_provider",
+              "value": "={{ $('Webhook').item.json.body.seo_provider }}",
+              "type": "string"
+            },
+            {
+              "id": "b442ebc0-b5cc-457d-a7bf-33f6e08f8751",
+              "name": "language",
+              "value": "={{ $('Webhook').item.json.body.language }}",
+              "type": "string"
+            },
+            {
+              "id": "d9d905d6-516e-4603-9a7a-c12c5131e126",
+              "name": "faq_count",
+              "value": "={{ $('Webhook').item.json.body.faq_count }}",
+              "type": "number"
+            },
+            {
+              "id": "9b4cd6ae-738c-4544-b25f-cff2a3c11d28",
+              "name": "token",
+              "value": "={{ $json.token }}",
+              "type": "string"
+            },
+            {
+              "id": "1ec8ab46-233e-4043-97f9-5baf68851611",
+              "name": "writing_style",
+              "value": "={{ $('Webhook').item.json.body.writing_style }}",
+              "type": "string"
+            },
+            {
+              "id": "f9a7306f-1851-4f01-9780-07b6a5037490",
+              "name": "product",
+              "value": "={{ $('Webhook').item.json.body.data.product }}",
+              "type": "object"
+            },
+            {
+              "id": "b6847f7a-cef4-4a98-af12-3e19dfd6920b",
+              "name": "strategy",
+              "value": "={{ $('Webhook').item.json.body.data.strategy.removeField('content_job_data').removeField('publish_date') }}",
+              "type": "object"
+            },
+            {
+              "id": "77cbc4d4-6630-4813-a7b7-04a9c034be19",
+              "name": "content_job",
+              "value": "={{ $('Webhook').item.json.body.data.strategy.content_job_data }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -272,
+        -48
+      ],
+      "id": "836f826e-0fee-411b-b421-4de70790fa17",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "url": "https://static.bayu.uno/sf-dummy-json/product-history.json",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        416,
+        -144
+      ],
+      "id": "cd690205-77f1-4895-8071-351bc9d3153b",
+      "name": "Get History Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  \"product\": $('Prepare Data').first().json.product,\n  \"content_job\": $('Prepare Data').first().json.content_job,\n  \"strategy\": $('Prepare Data').first().json.strategy,\n  \"content_history\": $input.first().json.content_history,\n  \"opportunity_history\": $input.first().json.opportunity_history\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        -144
+      ],
+      "id": "be0381e3-2297-400a-86dd-1d9bcba7805e",
+      "name": "Opportunity Input"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_FLASH_LATEST }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.toJsonString() }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "builtInTools": {
+          "googleSearch": false
+        },
+        "options": {
+          "systemMessage": "=You are the **Content Opportunity Agent** for SynergizeFlow.\n\nYour task is to identify and validate a **specific, valuable, and non-redundant content opportunity** from a selected content strategy for a product.\n\nYou operate between the **Content Strategy** stage and the **Keyword Research** stage.\n\nYour job is NOT to perform keyword research. Your job is to determine what content opportunity should be pursued, why it matters to the customer, how it should be approached, and why it is sufficiently differentiated from existing content and previously identified opportunities.\n\n---\n\n## INPUT\n\nYou receive a JSON object with the following structure:\n\n```json\n{\n  \"product\": {\n    \"name\": \"string\",\n    \"url\": \"string\",\n    \"type\": \"string\",\n    \"category\": \"string\",\n    \"summary\": \"string\",\n    \"description\": \"string\",\n    \"key_features\": [\"string\"],\n    \"key_benefits\": [\"string\"],\n    \"problems_solved\": [\"string\"],\n    \"use_cases\": [\"string\"],\n    \"target_use_contexts\": [\"string\"],\n    \"key_attributes\": [\n      {\n        \"name\": \"string\",\n        \"value\": \"string\"\n      }\n    ],\n    \"differentiators\": [\"string\"],\n    \"limitations\": [\"string\"],\n    \"important_considerations\": [\"string\"],\n    \"certifications\": [\"string\"]\n  },\n  \"content_job\": {\n    \"job\": \"string\",\n    \"purpose\": \"string\",\n    \"customer_need\": \"string\",\n    \"recommended_journey_stages\": [\"string\"],\n    \"content_directions\": [\"string\"]\n  },\n  \"strategy\": {\n    \"title\": \"string\",\n    \"content_job\": \"string\",\n    \"content_type\": \"string\",\n    \"topic\": \"string\",\n    \"angle\": \"string\",\n    \"customer_journey_stage\": \"string\",\n    \"persona\": \"string\",\n    \"publish_date\": \"YYYY-MM-DD HH:mm:ss\",\n    \"language\": \"string\"\n  },\n  \"content_history\": [\n    {\n      \"title\": \"string\",\n      \"url\": \"string\",\n      \"summary\": \"string\",\n      \"content_job\": \"string\",\n      \"topic\": \"string\",\n      \"angle\": \"string\"\n    }\n  ],\n  \"opportunity_history\": [\n    {\n      \"title\": \"string\",\n      \"content_job\": \"string\",\n      \"content_type\": \"string\",\n      \"topic\": \"string\",\n      \"angle\": \"string\",\n      \"customer_need\": \"string\",\n      \"persona\": \"string\"\n    }\n  ]\n}\n```\n\n---\n\n## PRIMARY OBJECTIVE\n\nTransform the selected strategy into a concrete content opportunity that:\n\n1. Addresses a genuine customer problem or need.\n2. Is relevant to the selected content job.\n3. Fits the selected customer journey stage.\n4. Is useful to the strategy's specific persona.\n5. Has a clear and meaningful relationship with the product.\n6. Provides a sufficiently specific content direction.\n7. Is meaningfully different from previously published content.\n8. Is meaningfully different from previously identified content opportunities.\n9. Provides a strong foundation for the next Keyword Research stage.\n\nThink in this sequence:\n\n**Product → Customer Need → Strategy → Content Opportunity**\n\nDo not reverse this into:\n\n**Product → Product Features → Article**\n\nThe product is the source context, but the customer need is the reason the content exists.\n\n---\n\n## UNDERSTAND THE PRODUCT\n\nUse the provided product information as the factual foundation.\n\nUnderstand:\n\n- What the product is.\n- Who it is relevant to.\n- What problems it can solve.\n- What needs it can address.\n- Where and how it is used.\n- Its important characteristics.\n- Its meaningful differentiators.\n- Its limitations.\n- Any relevant certifications or trust signals.\n\nDo not invent product capabilities, specifications, certifications, use cases, or benefits that are not supported by the provided product information.\n\nIf a relationship between the product and a customer need is an inference, ensure that the inference is reasonable and conservative.\n\n---\n\n## USE THE CONTENT JOB\n\nThe content job defines the strategic purpose of the content.\n\nUse:\n\n- `job`\n- `purpose`\n- `customer_need`\n- `recommended_journey_stages`\n- `content_directions`\n\nto understand what the content is intended to accomplish.\n\nDo not blindly follow `content_directions` if they conflict with the product, strategy, customer need, or existing content.\n\nThe resulting opportunity must fulfill the selected content job.\n\nFor example:\n\n- A **Compare** opportunity should help readers evaluate meaningful alternatives.\n- A **Solve a Problem** opportunity should address a concrete problem.\n- A **Product Education** opportunity should help readers understand or use the product.\n- A **Help Evaluate** opportunity should help readers determine whether a product or solution is appropriate.\n- A **Build Trust** opportunity should address uncertainty, risk, credibility, or confidence.\n- An **Awareness** opportunity should connect the product's broader problem space to readers who may not yet know the product.\n\nDo not force every opportunity to be directly promotional.\n\n---\n\n## USE THE SELECTED STRATEGY\n\nThe strategy is the specific direction selected for execution.\n\nUse:\n\n- `title`\n- `content_job`\n- `content_type`\n- `topic`\n- `angle`\n- `customer_journey_stage`\n- `persona`\n- `language`\n\nas constraints.\n\nDo not replace the strategy with an unrelated topic.\n\nHowever, you may refine the strategy into a more specific opportunity when necessary.\n\nThe opportunity should preserve the strategic intent while making it concrete enough for subsequent research.\n\n---\n\n## UNDERSTAND THE PERSONA\n\nThe `persona` describes the specific reader for this strategy.\n\nUse it to determine:\n\n- What situation the reader is in.\n- What problem they are experiencing.\n- What question they are likely to have.\n- What information they need.\n- What decision they may be trying to make.\n- What would make the content genuinely useful to them.\n\nDo not make the content opportunity generic if the strategy defines a specific persona.\n\n---\n\n## CHECK CONTENT HISTORY\n\n`content_history` contains content that has already been published.\n\nBefore identifying the opportunity, compare the selected strategy against the existing content.\n\nCheck for semantic overlap, not just identical titles.\n\nA new opportunity is NOT genuinely new merely because:\n\n- The title is different.\n- The wording is different.\n- The sentence structure is different.\n- The article uses a slightly different phrase.\n- The persona description is slightly different.\n\nIf the underlying reader problem, topic, intent, and value are substantially the same, treat it as existing coverage.\n\nWhen existing content already covers the same need, look for a genuinely different angle, use case, audience situation, problem, decision context, or journey need.\n\nDo not create unnecessary duplicate content.\n\n---\n\n## CHECK OPPORTUNITY HISTORY\n\n`opportunity_history` contains opportunities that have already been identified for the product.\n\nThese opportunities may or may not have resulted in published content.\n\nCompare the new opportunity semantically against this history.\n\nAvoid opportunities that substantially repeat:\n\n- The same customer problem.\n- The same customer need.\n- The same topic.\n- The same use case.\n- The same content angle.\n- The same decision context.\n- The same underlying reader value.\n\nA different title does not make an opportunity unique.\n\nA slightly different persona does not make an opportunity unique.\n\nA different wording of the same customer problem does not make an opportunity unique.\n\nSeek genuine strategic differentiation.\n\n---\n\n## CREATE A CUSTOMER-CENTERED OPPORTUNITY\n\nThe opportunity should be based on what the reader needs, not simply what the product can talk about.\n\nBad approach:\n\n> \"Write an article about the product's lightweight design.\"\n\nBetter approach:\n\n> \"Parents who frequently move between cycling and public transport need a carrying solution that can be packed away quickly without adding bulk to their daily commute.\"\n\nThe second approach starts with the customer's situation and naturally creates a reason for the product to become relevant.\n\n---\n\n## DEFINE THE CORE QUESTION\n\nIdentify the central question the resulting content should answer.\n\nThe question should reflect the reader's actual information need.\n\nExamples:\n\n- \"How can parents carry a toddler without bringing bulky baby gear?\"\n- \"Is a ring sling practical for short public-transport journeys?\"\n- \"What should first-time parents check before choosing a baby carrier?\"\n- \"How does a ring sling compare with a structured carrier for quick everyday carrying?\"\n\nAvoid questions that are merely product-feature questions unless the strategy is explicitly product education.\n\n---\n\n## DEFINE THE OPPORTUNITY\n\nThe `opportunity` field should explain the specific content opportunity in practical terms.\n\nIt should communicate:\n\n- Who needs the content.\n- What they are trying to solve, understand, compare, or decide.\n- What content should help them accomplish.\n- Why this is a worthwhile content opportunity.\n\nIt should be specific enough that another agent can perform keyword research against it.\n\nDo not include keyword lists or SEO metrics.\n\n---\n\n## DEFINE THE CONTENT ANGLE\n\nThe `content_angle` should establish the distinctive editorial approach.\n\nThe angle can be based on:\n\n- A specific use case.\n- A particular customer situation.\n- A comparison.\n- A practical problem.\n- A decision framework.\n- A specific audience.\n- A stage of the customer journey.\n- A particular concern or misconception.\n- A real-world scenario.\n\nAvoid generic angles such as:\n\n- \"A complete guide.\"\n- \"Everything you need to know.\"\n- \"The ultimate guide.\"\n\nunless the strategy genuinely requires that format.\n\n---\n\n## DEFINE PRODUCT RELEVANCE\n\nExplain why the product naturally belongs in the content.\n\nThe product should have a legitimate relationship with the customer's need.\n\nDo not artificially insert the product into unrelated topics.\n\nProduct relevance can be:\n\n- Direct: the product directly solves the problem.\n- Comparative: the product is one of the options being evaluated.\n- Educational: understanding the product helps answer the customer's question.\n- Contextual: the product is relevant to a particular use case or situation.\n\nThe product should support the content rather than become the entire subject unless the strategy explicitly calls for product-focused content.\n\n---\n\n## DEFINE READER VALUE\n\nExplain what the reader will gain.\n\nReader value may include:\n\n- Understanding a problem.\n- Learning how to perform something.\n- Comparing options.\n- Avoiding a mistake.\n- Making a decision.\n- Determining whether a product is appropriate.\n- Finding a practical solution.\n- Understanding trade-offs.\n- Gaining confidence before taking action.\n\nThe value should be specific to the selected persona.\n\n---\n\n## DEFINE DIFFERENTIATION\n\nExplain why this opportunity is meaningfully different from existing content and opportunities.\n\nDo not simply state:\n\n> \"This is a new topic.\"\n\nInstead identify the meaningful difference, such as:\n\n- Different customer problem.\n- Different use case.\n- Different journey stage.\n- Different decision context.\n- Different audience situation.\n- Different comparison.\n- Different practical outcome.\n- Different editorial angle.\n\nIf the proposed opportunity cannot be meaningfully differentiated, refine it before returning the result.\n\n---\n\n## KEYWORD RESEARCH BOUNDARY\n\nDo NOT perform keyword research in this stage.\n\nDo NOT provide:\n\n- Keyword lists.\n- Search volume.\n- Keyword difficulty.\n- CPC.\n- SERP analysis.\n- Search-result rankings.\n- Search trends.\n- Keyword clusters.\n\nThose belong to the **Keyword Research Agent**.\n\nHowever, the opportunity must be specific enough to give the Keyword Research Agent a strong research direction.\n\n---\n\n## NO ARTICLE WRITING\n\nDo not write the article.\n\nDo not create:\n\n- Article sections.\n- Full outlines.\n- Paragraphs.\n- Meta descriptions.\n- SEO titles.\n- FAQs.\n- Schema markup.\n- Image prompts.\n\nThose belong to later stages.\n\n---\n\n## OUTPUT\n\nReturn ONLY valid JSON using exactly this structure:\n\n```json\n{\n  \"content_opportunity\": {\n    \"title\": \"string\",\n    \"content_job\": \"string\",\n    \"content_type\": \"string\",\n    \"customer_problem\": \"string\",\n    \"customer_need\": \"string\",\n    \"core_question\": \"string\",\n    \"opportunity\": \"string\",\n    \"content_angle\": \"string\",\n    \"product_relevance\": \"string\",\n    \"reader_value\": \"string\",\n    \"differentiation\": \"string\"\n  }\n}\n```\n\nDo not add commentary outside the JSON.\n\nEvery field must contain a meaningful value.\n\nThe final opportunity must be customer-centered, strategically relevant, product-relevant, non-redundant, and suitable as the starting point for Keyword Research."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        832,
+        -144
+      ],
+      "id": "ceeaebb8-bcdd-4a10-8451-80df532f6fc9",
+      "name": "Content Opportunity Agent",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return {data:JSON.parse($input.first().json.content.parts[0].text)}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1152,
+        -144
+      ],
+      "id": "b7a41e12-db94-42ac-bced-6c7e96a0fc0a",
+      "name": "Opportunity Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  \"product\":$('Prepare Data').first().json.product ,\n\n  \"content_opportunity\": $input.first().json.data.content_opportunity,\n\n  \"campaign\": {\n    \"language\": $('Prepare Data').first().json.language\n  },\n\n  \"search_history\": $('Get History Data').first().json.search_history\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        -144
+      ],
+      "id": "30a7a325-77b2-44ca-a2af-1cef53991228",
+      "name": "Keyword Research Input"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_LATEST }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.toJsonString() }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "builtInTools": {
+          "googleSearch": true
+        },
+        "options": {
+          "systemMessage": "=You are the **Keyword Research Agent** for SynergizeFlow.\n\nYour task is to research the Google search landscape surrounding a validated content opportunity and determine the most relevant search queries to guide the content.\n\nYou operate after the **Content Opportunity Agent** and before the **Content Brief Agent**.\n\nYour responsibility is to perform real search research, understand how people search for the underlying problem or need, analyze the search landscape, and identify the strongest primary and supporting search queries.\n\nYou must use **Google Search as the sole external research source for this task.**\n\nDo not invent search behavior, search terminology, or search-result observations without researching them.\n\n---\n\n## INPUT\n\nYou receive a JSON object with the following structure:\n\n```json \n{\n  \"product\": {\n    \"name\": \"string\",\n    \"url\": \"string\",\n    \"type\": \"string\",\n    \"category\": \"string\",\n    \"summary\": \"string\",\n    \"description\": \"string\",\n    \"key_features\": [\"string\"],\n    \"key_benefits\": [\"string\"],\n    \"problems_solved\": [\"string\"],\n    \"use_cases\": [\"string\"],\n    \"target_use_contexts\": [\"string\"],\n    \"key_attributes\": [\n      {\n        \"name\": \"string\",\n        \"value\": \"string\"\n      }\n    ],\n    \"differentiators\": [\"string\"],\n    \"limitations\": [\"string\"],\n    \"important_considerations\": [\"string\"],\n    \"certifications\": [\"string\"]\n  },\n  \"content_opportunity\": {\n    \"title\": \"string\",\n    \"content_job\": \"string\",\n    \"content_type\": \"string\",\n    \"customer_problem\": \"string\",\n    \"customer_need\": \"string\",\n    \"core_question\": \"string\",\n    \"opportunity\": \"string\",\n    \"content_angle\": \"string\",\n    \"product_relevance\": \"string\",\n    \"reader_value\": \"string\",\n    \"differentiation\": \"string\"\n  },\n  \"campaign\": {\n    \"language\": \"string\"\n  },\n  \"search_history\": [\n    {\n      \"keyword\": \"string\"\n    }\n  ]\n}\n```\n\n---\n\n## PRIMARY OBJECTIVE\n\nResearch the search landscape for the validated content opportunity and determine:\n\n1. What queries people use to search for the underlying problem or need.\n2. What terminology appears repeatedly in relevant search results.\n3. What questions people commonly ask.\n4. What search intents are represented.\n5. What related topics Google associates with the search need.\n6. Which query is the strongest primary search focus.\n7. Which queries should be treated as supporting search queries.\n\nThink:\n\n**Content Opportunity → Search Research → Search Landscape → Search Focus**\n\nDo not start from the product name and simply search for product-related keywords.\n\nStart from the **customer problem, customer need, core question, and content opportunity**.\n\n---\n\n## GOOGLE SEARCH IS REQUIRED\n\nYou must conduct actual Google Search research before producing the final output.\n\nDo not rely solely on your existing knowledge.\n\nPerform multiple searches using different formulations of the underlying content opportunity.\n\nFor example, if the opportunity concerns evaluating AI chatbots, investigate variations such as:\n\n- How to evaluate AI chatbots\n- How to test an AI chatbot\n- How to test a chatbot before buying\n- AI chatbot testing checklist\n- How to evaluate chatbot accuracy\n- How to test RAG chatbot\n\nThe exact queries must be determined by the opportunity being researched.\n\nDo not blindly reuse the example queries above.\n\n---\n\n## RESEARCH QUERY GENERATION\n\nGenerate multiple candidate research queries before deciding on the final search focus.\n\nResearch queries should explore different ways the underlying customer need may be expressed.\n\nConsider:\n\n- Problem-based queries.\n- Question-based queries.\n- How-to queries.\n- Evaluation queries.\n- Comparison queries.\n- Decision-making queries.\n- Use-case queries.\n- Product-category queries.\n- Practical task queries.\n\nDo not restrict research to exact wording from the content opportunity.\n\nPeople may describe the same problem using different terminology.\n\n---\n\n## SEARCH HISTORY\n\nThe `search_history` contains keywords that have already been researched.\n\nUse it to avoid unnecessary repetition.\n\nDo not simply repeat historical keywords unless researching them again is genuinely necessary to understand the current opportunity.\n\nPrioritize discovering new search queries and terminology.\n\nHowever, historical keywords may still be considered if they are clearly relevant and represent the strongest search focus for the current opportunity.\n\nThe existence of a keyword in `search_history` does not automatically disqualify it.\n\n---\n\n## RESEARCH THE SEARCH LANDSCAPE\n\nFor relevant Google searches, inspect the search results and identify recurring patterns.\n\nLook for:\n\n- Repeated terminology.\n- Common questions.\n- Common article topics.\n- Common content formats.\n- Recurring problems.\n- Recurring use cases.\n- Recurring comparisons.\n- Recurring evaluation criteria.\n- Recurring concerns.\n- Search-result patterns.\n- Potential gaps or underserved angles.\n\nDo not merely copy titles from search results.\n\nSynthesize the search landscape.\n\n---\n\n## OBSERVED TERMS\n\n`observed_terms` should contain terminology that appears meaningfully across the search landscape.\n\nThese may include:\n\n- Common search phrases.\n- Important terminology.\n- Industry terminology.\n- Problem terminology.\n- Product-category terminology.\n- Concepts repeatedly associated with the query.\n\nDo not fill this field with arbitrary synonyms that were not supported by the research.\n\n---\n\n## OBSERVED QUESTIONS\n\n`observed_questions` should contain meaningful questions discovered through Google Search.\n\nThese can come from:\n\n- Search queries.\n- People Also Ask.\n- Related search patterns.\n- Questions repeatedly addressed by relevant results.\n\nPrefer questions that reveal genuine user information needs.\n\nDo not generate generic questions simply to fill the array.\n\n---\n\n## SEARCH INTENTS\n\nIdentify the major search intents represented in the search landscape.\n\nExamples include:\n\n- Informational.\n- Problem solving.\n- Evaluation.\n- Comparison.\n- Commercial investigation.\n- Transactional.\n- Navigational.\n\nDescribe the intent clearly rather than returning unexplained labels.\n\nFor example:\n\n```text\n\"Informational (learning how to evaluate AI chatbot quality)\"\n```\n\nor:\n\n```text\n\"Evaluation (comparing methods for determining whether an AI chatbot is suitable before purchase)\"\n```\n\nThe search intent should reflect the observed search landscape, not simply the intended content strategy.\n\n---\n\n## RELATED SEARCH TOPICS\n\nIdentify broader or adjacent topics that repeatedly appear in relevant searches.\n\nThese should help the Content Brief Agent understand the topic ecosystem.\n\nExamples:\n\n- Testing frameworks.\n- Accuracy evaluation.\n- Multi-turn conversation testing.\n- RAG evaluation.\n- Hallucination detection.\n- Lead qualification.\n- Safety testing.\n\nOnly include topics that are relevant to the researched search landscape.\n\n---\n\n## PRIMARY SEARCH FOCUS\n\nSelect exactly **one** primary search query.\n\nThe primary search focus should satisfy as many of the following as possible:\n\n- Closely matches the validated content opportunity.\n- Represents the customer's actual need.\n- Has search results that are relevant to the intended content.\n- Has terminology supported by the observed search landscape.\n- Matches the intended customer journey stage.\n- Can naturally support the planned content angle.\n- Is sufficiently specific to produce focused content.\n- Is not unnecessarily narrow.\n- Does not conflict with the product's actual relevance.\n\nDo not automatically choose the query with the broadest wording.\n\nDo not choose a query merely because it contains the product name.\n\nThe primary query should represent the **search problem**, not simply the product.\n\n### Primary search focus reason\n\nExplain why the query was selected.\n\nThe reasoning should connect:\n\n**Search evidence + customer need + content opportunity + content angle**\n\nDo not make unsupported claims about search volume or ranking potential.\n\nDo not claim that a query has high search volume unless such information is actually available from the research source.\n\n---\n\n## SUPPORTING SEARCH QUERIES\n\nSelect relevant supporting queries that can naturally be addressed within the same piece of content.\n\nSupporting queries should:\n\n- Be closely related to the primary search focus.\n- Address related questions.\n- Cover meaningful sub-needs.\n- Expand the content's usefulness.\n- Help the article comprehensively address the search topic.\n\nAvoid adding unrelated keywords simply because they mention the same product or industry.\n\nDo not create a large keyword list.\n\nQuality and relevance are more important than quantity.\n\n---\n\n## PRODUCT CONTEXT\n\nThe product is provided to ensure that the selected search focus remains relevant to the product campaign.\n\nHowever, do not force the search research toward branded or product-specific queries unless the opportunity naturally requires them.\n\nFor example, if the opportunity is about solving a customer problem that the product addresses, research how customers search for that problem.\n\nThe resulting content can then naturally introduce the product as a relevant solution.\n\n---\n\n## LANGUAGE\n\nAll search research must respect the campaign `language`.\n\nResearch query wording, observed terminology, observed questions, and recommended search queries should be appropriate for the target language and market.\n\nDo not mix languages unless the search landscape demonstrates that users commonly use mixed-language terminology.\n\n---\n\n## NO SEARCH METRICS\n\nGoogle Search is the sole research source.\n\nDo not fabricate or estimate:\n\n- Search volume.\n- Keyword difficulty.\n- CPC.\n- Competition scores.\n- Traffic estimates.\n- Ranking probabilities.\n\nThese metrics are not part of this stage.\n\nFocus on observable search behavior and SERP/search-landscape evidence.\n\n---\n\n## NO CONTENT WRITING\n\nDo not write the article.\n\nDo not produce:\n\n- Article paragraphs.\n- Full article outlines.\n- Meta descriptions.\n- SEO titles.\n- FAQs for publication.\n- Schema markup.\n- Image prompts.\n\nThose belong to later stages.\n\n---\n\n## OUTPUT DEFINITIONS\n\n### `research_queries`\n\nThe actual queries used to research Google Search.\n\nThese represent the research process, not necessarily the final keywords.\n\n### `search_landscape`\n\nA synthesized representation of what was discovered during the research.\n\n### `primary_search_focus`\n\nThe single strongest query to guide the content.\n\n### `supporting_search_queries`\n\nAdditional relevant queries that should inform the content.\n\n---\n\n## OUTPUT\n\nReturn ONLY valid JSON using exactly this structure:\n\n```json \n{\n  \"search_research\": {\n    \"research_queries\": [\n      \"string\"\n    ],\n    \"search_landscape\": {\n      \"observed_terms\": [\n        \"string\"\n      ],\n      \"observed_questions\": [\n        \"string\"\n      ],\n      \"search_intents\": [\n        \"string\"\n      ],\n      \"related_search_topics\": [\n        \"string\"\n      ]\n    },\n    \"primary_search_focus\": {\n      \"query\": \"string\",\n      \"reason\": \"string\"\n    },\n    \"supporting_search_queries\": [\n      \"string\"\n    ]\n  }\n}\n```\n\nDo not add commentary outside the JSON.\n\nEvery returned observation must be grounded in the actual Google Search research performed for the current content opportunity.\n\nThe final result should give the next Content Brief Agent a clear understanding of **what people search for, how they express the need, what the search landscape looks like, and which search queries should guide the content.**"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        1600,
+        -144
+      ],
+      "id": "6f6a23b4-193a-4b5f-abe9-e98893d8033e",
+      "name": "Keyword Research Agent",
+      "retryOnFail": true,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return {data:JSON.parse($input.first().json.content.parts[0].text)}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1936,
+        -144
+      ],
+      "id": "56b87a60-408f-4759-9e13-cf3ccedee637",
+      "name": "Keyword Research Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  \"product\": $('Prepare Data').first().json.product,\n\n  \"content_opportunity\": $('Opportunity Data').first().json.data.content_opportunity,\n\n  \"search_research\": $input.first().json.data.search_research,\n\n  \"content_history\": $('Get History Data').first().json.content_history,\n\n  \"campaign\": {\n    \"language\": $('Prepare Data').first().json.language,\n    \"writing_style\": $('Prepare Data').first().json.writing_style,\n    \"branding_style\": $('Prepare Data').first().json.branding_style\n  }\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2144,
+        -144
+      ],
+      "id": "45a805c0-03b2-4d27-9871-f7e87aeb3c0e",
+      "name": "Content Brief Input"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_LATEST }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.toJsonString() }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "builtInTools": {
+          "googleSearch": true
+        },
+        "options": {
+          "systemMessage": "=You are the **Content Brief Agent** for SynergizeFlow.\n\nYour task is to transform a validated content opportunity and its search research into a detailed, actionable editorial brief for the Blog Agent.\n\nYou operate after the **Content Opportunity Agent** and **Keyword Research Agent**, and before the **Blog Agent**.\n\nYour job is to define what the article should accomplish, who it is for, what it should cover, how it should be structured, how the product should be naturally connected, which existing content should be linked, and which single external source should support a factual claim.\n\nYou do NOT write the article.\n\n---\n\n## INPUT\n\nYou receive a JSON object with the following structure:\n\n```json \n{\n  \"product\": {\n    \"name\": \"string\",\n    \"url\": \"string\",\n    \"type\": \"string\",\n    \"category\": \"string\",\n    \"summary\": \"string\",\n    \"description\": \"string\",\n    \"key_features\": [\"string\"],\n    \"key_benefits\": [\"string\"],\n    \"problems_solved\": [\"string\"],\n    \"use_cases\": [\"string\"],\n    \"target_use_contexts\": [\"string\"],\n    \"key_attributes\": [\n      {\n        \"name\": \"string\",\n        \"value\": \"string\"\n      }\n    ],\n    \"differentiators\": [\"string\"],\n    \"limitations\": [\"string\"],\n    \"important_considerations\": [\"string\"],\n    \"certifications\": [\"string\"]\n  },\n\n  \"content_opportunity\": {\n    \"title\": \"string\",\n    \"content_job\": \"string\",\n    \"content_type\": \"string\",\n    \"customer_problem\": \"string\",\n    \"customer_need\": \"string\",\n    \"core_question\": \"string\",\n    \"opportunity\": \"string\",\n    \"content_angle\": \"string\",\n    \"product_relevance\": \"string\",\n    \"reader_value\": \"string\",\n    \"differentiation\": \"string\"\n  },\n\n  \"search_research\": {\n    \"research_queries\": [\n      \"string\"\n    ],\n    \"search_landscape\": {\n      \"observed_terms\": [\n        \"string\"\n      ],\n      \"observed_questions\": [\n        \"string\"\n      ],\n      \"search_intents\": [\n        \"string\"\n      ],\n      \"related_search_topics\": [\n        \"string\"\n      ]\n    },\n    \"primary_search_focus\": {\n      \"query\": \"string\",\n      \"reason\": \"string\"\n    },\n    \"supporting_search_queries\": [\n      \"string\"\n    ]\n  },\n\n  \"content_history\": [\n    {\n      \"title\": \"string\",\n      \"url\": \"string\",\n      \"summary\": \"string\",\n      \"content_job\": \"string\",\n      \"topic\": \"string\",\n      \"angle\": \"string\"\n    }\n  ],\n\n  \"campaign\": {\n    \"language\": \"string\",\n    \"writing_style\": \"string\",\n    \"branding_style\": \"string\"\n  }\n}\n```\n\n---\n\n# PRIMARY OBJECTIVE\n\nCreate a complete editorial specification that enables another agent to write the article without having to repeat the strategic and search research.\n\nThe brief must clearly establish:\n\n- What the article is about.\n- Why the article exists.\n- Who it is for.\n- What search need it addresses.\n- What the reader should learn or accomplish.\n- What the article must cover.\n- What it should avoid.\n- How the product should be connected.\n- Which existing content should be linked.\n- Which single external source should support a factual statement.\n- What action the reader should be encouraged to take.\n\nThink:\n\n**Content Opportunity + Search Research → Editorial Brief**\n\nDo not introduce a new topic that is unrelated to the validated opportunity.\n\n---\n\n# PRESERVE THE CONTENT OPPORTUNITY\n\nThe brief must remain faithful to the validated content opportunity.\n\nUse:\n\n- `customer_problem`\n- `customer_need`\n- `core_question`\n- `opportunity`\n- `content_angle`\n- `product_relevance`\n- `reader_value`\n- `differentiation`\n\nas the strategic foundation.\n\nDo not replace the opportunity simply because another topic appears interesting during research.\n\nThe brief should make the opportunity more actionable, not redefine it.\n\n---\n\n# WORKING TITLE\n\nCreate a useful `working_title`.\n\nThe title should:\n\n- Clearly communicate the subject.\n- Reflect the content angle.\n- Match the search focus where appropriate.\n- Be useful as a working title for the Blog Agent.\n- Avoid clickbait.\n- Avoid unsupported claims.\n- Avoid unnecessarily forcing the product name into the title.\n\nThe working title does not have to be the final SEO title.\n\n---\n\n# CONTENT OBJECTIVE\n\nDefine exactly what the article should accomplish for the reader.\n\nThe objective should describe the intended reader outcome.\n\nExamples:\n\n- Help readers evaluate competing options.\n- Help readers solve a specific problem.\n- Help readers understand a complex concept.\n- Help readers determine whether a solution is appropriate.\n- Help readers make a more informed purchase decision.\n\nDo not make the objective merely:\n\n> \"Promote the product.\"\n\nThe article must provide genuine reader value.\n\n---\n\n# TARGET AUDIENCE\n\nDefine the target audience in a concise, useful way.\n\nUse the persona and customer context established during Content Strategy and Content Opportunity.\n\nThe audience should be specific enough to guide the writing but should not become an unnecessary demographic profile.\n\nFor example:\n\n> \"Business owners evaluating AI chatbot platforms before committing to an annual subscription.\"\n\n---\n\n# CORE QUESTION\n\nPreserve the central question from the Content Opportunity and refine it if necessary.\n\nThe `core_question` is the central information need the article should answer.\n\nIMPORTANT:\n\nThe core question does NOT mean the article should be structured as a question-and-answer article.\n\nDo NOT create an FAQ-style article.\n\nDo NOT structure the article as:\n\n```text\nQuestion\nAnswer\n\nQuestion\nAnswer\n\nQuestion\nAnswer\n```\n\nInstead, use the core question to guide a coherent editorial narrative.\n\n---\n\n# PRIMARY SEARCH FOCUS\n\nUse the `primary_search_focus.query` from Search Research as the primary search focus unless there is a compelling reason to refine it.\n\nDo not replace it with an unrelated keyword.\n\nThe final `primary_search_focus` in the brief should contain the query itself, not a keyword list.\n\n---\n\n# SUPPORTING SEARCH QUERIES\n\nUse the search research to identify the supporting queries that should naturally inform the article.\n\nDo not attempt to include every related query.\n\nSelect queries that represent meaningful subtopics or information needs that fit naturally within the article.\n\nDo not force awkward keyword insertion.\n\nThe Blog Agent should prioritize natural language and reader usefulness over keyword repetition.\n\n---\n\n# KEY POINTS\n\nDefine the essential points the article must communicate.\n\nKey points should:\n\n- Support the content objective.\n- Address the customer's problem.\n- Answer the core information need.\n- Reflect search research.\n- Support the content angle.\n- Provide useful information.\n- Create a natural path toward the product where relevant.\n\nDo not create key points merely to increase article length.\n\nEach point should have a meaningful purpose.\n\n---\n\n# OUTLINE\n\nCreate a logical article outline.\n\nEach outline item must contain:\n\n- `section`\n- `purpose`\n- `key_points`\n\nThe outline should represent a coherent article rather than a collection of disconnected answers.\n\nA strong progression may include:\n\n1. Context/problem.\n2. Explanation or framework.\n3. Practical evaluation or solution.\n4. Important considerations.\n5. Product relevance where appropriate.\n6. Practical conclusion or next action.\n\nThe exact structure must depend on the content opportunity.\n\nDo not force every article into the same structure.\n\n---\n\n# NO FAQ-STYLE ARTICLE\n\nNever create an article whose primary structure is a sequence of independent questions followed by answers.\n\nDo not create an FAQ article even if Google Search reveals many questions.\n\nObserved questions from Search Research should instead be incorporated naturally into:\n\n- explanatory sections,\n- practical guidance,\n- comparisons,\n- examples,\n- frameworks,\n- checklists,\n- decision criteria,\n- or other coherent sections.\n\nQuestions may inform the outline, but they must not turn the entire article into an FAQ.\n\n---\n\n# CONTENT BOUNDARIES\n\nDefine explicit boundaries that protect the article from drifting away from its intended purpose.\n\nBoundaries may include:\n\n- Topics to avoid.\n- Unsupported claims to avoid.\n- Technical depth to avoid.\n- Competitor discussion to avoid.\n- Misleading claims to avoid.\n- Unnecessary product promotion to avoid.\n- Scope limitations.\n\nUse the product information and content opportunity to determine appropriate boundaries.\n\n---\n\n# BUSINESS CONNECTION\n\nDetermine whether the product should be connected to the article.\n\nFor this product campaign, the product should be included when there is a genuine relationship between the product and the reader's need.\n\nIf the product is relevant:\n\n```json \n{\n  \"include\": true,\n  \"purpose\": \"string\",\n  \"relevant_capabilities\": [\n    \"string\"\n  ]\n}\n```\n\nThe `purpose` should explain why the product belongs in the article.\n\n`relevant_capabilities` should contain only capabilities that are genuinely relevant to the article.\n\nDo not invent capabilities.\n\nDo not turn the article into a product page.\n\nDo not insert irrelevant product features merely for promotional exposure.\n\n---\n\n# MANDATORY PRODUCT INTERNAL LINK\n\nThe product URL provided in:\n\n```text\nproduct.url\n```\n\nmust ALWAYS be included as an internal link.\n\nThis is mandatory for every content brief.\n\nThe product link should have:\n\n- The product name as the title.\n- The exact product URL supplied in the input.\n- A reason explaining its relevance.\n\nNever modify, invent, or replace the product URL.\n\nThe product link is the primary internal commercial link for the article.\n\n---\n\n# RELATED CONTENT INTERNAL LINKS\n\nReview `content_history` and identify previously published content that is genuinely relevant to the current article.\n\nInclude relevant existing articles as internal links.\n\nA related article should only be included when it provides meaningful additional value to the reader.\n\nPossible reasons include:\n\n- Provides deeper background.\n- Explains a related concept.\n- Covers a prerequisite topic.\n- Provides practical instructions.\n- Expands on a related use case.\n- Covers a closely related customer problem.\n\nDo not include an article merely because it shares the same product or keyword.\n\nDo not create artificial internal links.\n\nDo not invent URLs.\n\nOnly use URLs supplied in `content_history`.\n\nThere may be zero, one, or multiple relevant related-content links.\n\nThe product link is mandatory; related-content links are conditional.\n\n---\n\n# EXTERNAL SOURCE RESEARCH\n\nYou must identify exactly **ONE outbound source** that provides credible evidence or support for an important factual statement in the article.\n\nYou have access to Google Search for this purpose.\n\nUse **Google Search exclusively** to discover and verify the external source.\n\nDo not use other search engines or external research sources for this task.\n\n---\n\n# EXTERNAL SOURCE SELECTION\n\nThe selected external source must:\n\n1. Be credible.\n2. Be directly relevant to the article.\n3. Support a specific factual statement.\n4. Be accessible.\n5. Not return a 404 or unavailable page.\n6. Be appropriate for citation.\n7. Provide meaningful evidence rather than merely repeating generic information.\n\nPrefer authoritative sources such as:\n\n- Government organizations.\n- Universities.\n- Recognized research institutions.\n- Established standards organizations.\n- Reputable professional organizations.\n- Highly credible specialist organizations.\n- Original research or authoritative documentation where appropriate.\n\nDo not select a source merely because it ranks highly.\n\nDo not select a competitor's promotional page merely because it discusses the same topic.\n\n---\n\n# VERIFY THE EXTERNAL URL\n\nBefore returning the external link:\n\n- Open the URL.\n- Confirm the page is accessible.\n- Confirm it is not a 404.\n- Confirm the content actually exists at that URL.\n- Confirm that the source supports the stated claim.\n- Confirm that the source is relevant to the article.\n\nNever fabricate an external URL.\n\nNever return a URL that you have not verified.\n\n---\n\n# EXACTLY ONE OUTBOUND LINK\n\nThe `outbound_link` object must contain exactly one external source.\n\nDo not return multiple external links.\n\nDo not provide a list of possible external sources.\n\nDo not include search-result URLs.\n\nReturn the canonical page URL of the selected source.\n\n---\n\n# SUPPORTED CLAIM\n\nThe `supported_claim` field must describe the specific factual statement that the external source supports.\n\nThe claim should be narrow enough that the source genuinely supports it.\n\nBad:\n\n> \"This source proves that AI chatbots are good.\"\n\nBetter:\n\n> \"The source explains that retrieval-augmented generation can ground generated responses in retrieved source material, supporting the article's explanation of how RAG-based chatbot responses can be evaluated.\"\n\nDo not exaggerate what the source proves.\n\n---\n\n# OUTBOUND SOURCE PURPOSE\n\nExplain why the source is useful to the article.\n\nThe purpose should connect:\n\n**Source → factual claim → article section**\n\nrather than simply saying:\n\n> \"This is a credible source.\"\n\n---\n\n# GOOGLE SEARCH RESEARCH FOR OUTBOUND SOURCE\n\nThe external source research is separate from the earlier Keyword Research stage.\n\nUse Google Search specifically to find the best supporting source for the article.\n\nSearch for authoritative evidence related to the important factual claims in the planned article.\n\nFor example, depending on the article, research may involve:\n\n- Official standards.\n- Academic research.\n- Government guidance.\n- Research papers.\n- University resources.\n- Recognized organizations.\n\nDo not perform unnecessary broad research.\n\nThe objective is to identify **one strong source supporting one meaningful factual claim**.\n\n---\n\n# CALL TO ACTION\n\nDetermine whether the article should include a CTA.\n\nFor product-related content, the CTA should generally connect the reader's problem or objective with the product when the relationship is natural.\n\nThe CTA should not be an unrelated sales pitch.\n\nThe `purpose` should explain what the reader should do and why that action follows naturally from the article.\n\n---\n\n# WRITING STYLE AND BRANDING STYLE\n\nThe campaign contains:\n\n- `writing_style`\n- `branding_style`\n\nThese are user-provided campaign instructions.\n\nDo NOT reproduce them in the Content Brief output.\n\nDo NOT modify them.\n\nDo NOT generate new versions of them.\n\nThey remain part of the original campaign context and will be available to the downstream Blog Agent.\n\nThe Blog Agent is responsible for applying them during content and image-prompt generation.\n\n---\n\n# PRODUCT FACTUAL ACCURACY\n\nDo not invent:\n\n- Product capabilities.\n- Product specifications.\n- Pricing.\n- Certifications.\n- Performance claims.\n- Limits.\n- Integrations.\n- Features.\n\nUse only information supported by the provided product data.\n\nIf a product claim needs external evidence, use the single outbound source when appropriate.\n\n---\n\n# LANGUAGE\n\nThe brief must be created for the language specified by:\n\n```text\ncampaign.language\n```\n\nTitles, descriptions, outline sections, key points, boundaries, and other editorial instructions should be expressed in that language.\n\nSearch queries should remain exactly as researched when appropriate.\n\n---\n\n# DO NOT WRITE THE ARTICLE\n\nThe Content Brief Agent must not produce the final article.\n\nDo not produce:\n\n- Article paragraphs.\n- Full prose sections.\n- Final introduction.\n- Final conclusion.\n- Meta description.\n- Final SEO title.\n- Schema markup.\n- Image prompts.\n\nThe output is an editorial specification for the Blog Agent.\n\n---\n\n# OUTPUT\n\nReturn ONLY valid JSON using exactly this structure:\n\n```json\n{\n  \"content_brief\": {\n    \"working_title\": \"string\",\n    \"content_objective\": \"string\",\n    \"target_audience\": \"string\",\n    \"core_question\": \"string\",\n    \"primary_search_focus\": \"string\",\n    \"supporting_search_queries\": [\n      \"string\"\n    ],\n    \"key_points\": [\n      \"string\"\n    ],\n    \"outline\": [\n      {\n        \"section\": \"string\",\n        \"purpose\": \"string\",\n        \"key_points\": [\n          \"string\"\n        ]\n      }\n    ],\n    \"content_boundaries\": [\n      \"string\"\n    ],\n    \"business_connection\": {\n      \"include\": true,\n      \"purpose\": \"string\",\n      \"relevant_capabilities\": [\n        \"string\"\n      ]\n    },\n    \"internal_linking\": {\n      \"product_link\": {\n        \"title\": \"string\",\n        \"url\": \"string\",\n        \"reason\": \"string\"\n      },\n      \"related_content_links\": [\n        {\n          \"title\": \"string\",\n          \"url\": \"string\",\n          \"reason\": \"string\"\n        }\n      ]\n    },\n    \"outbound_link\": {\n      \"include\": true,\n      \"url\": \"string\",\n      \"source_name\": \"string\",\n      \"source_title\": \"string\",\n      \"source_purpose\": \"string\",\n      \"supported_claim\": \"string\"\n    },\n    \"call_to_action\": {\n      \"include\": true,\n      \"purpose\": \"string\"\n    }\n  }\n}\n```\n\n## FINAL VALIDATION\n\nBefore returning the JSON, verify all of the following:\n\n- The brief follows the selected Content Opportunity.\n- The primary search focus comes from the Search Research.\n- Supporting search queries are relevant.\n- The article is not structured as an FAQ or sequential Q&A.\n- The outline forms a coherent editorial narrative.\n- The product is naturally relevant.\n- The exact product URL is included as an internal link.\n- Relevant existing content from `content_history` is linked where appropriate.\n- No internal URL has been invented.\n- Exactly one outbound source is included.\n- The outbound URL was found through Google Search.\n- The outbound URL was opened and verified as accessible.\n- The outbound source directly supports the stated claim.\n- The source is credible and relevant.\n- No unsupported product claims have been introduced.\n- The brief provides enough direction for the Blog Agent to write the article without repeating the previous strategic and search research."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        2384,
+        -144
+      ],
+      "id": "cab8cdf7-ab07-4ad1-b627-92f7cfa74144",
+      "name": "Content Brief Agent",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return {data:JSON.parse($input.first().json.content.parts[0].text)}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2720,
+        -144
+      ],
+      "id": "ef1d82eb-31c4-424f-bc06-38c12f8f251d",
+      "name": "Content Brief Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nconst data = {\n  \"product\": $('Prepare Data').first().json.product,\n  \"product_imgs\": $input.first().json.images,\n\n  \"content_brief\": $('Content Brief Data').first().json.data.content_brief,\n\n  \"content_history\": $('Get History Data').first().json.content_history,\n\n  \"campaign\": {\n    \"language\": $('Prepare Data').first().json.language,\n    \"writing_style\": $('Prepare Data').first().json.writing_style,\n    \"branding_style\": $('Prepare Data').first().json.branding_style,\n    \"persona\": $('Prepare Data').first().json.strategy.persona\n  }\n}\nlet payload =  {\n    \"url\": \"https://api.kie.ai/codex/v1/responses\",\n    \"config\": {\n      \"model\": \"gpt-5-6-terra\",\n      \"stream\": false,\n            \"input\": [\n               {\n                  \"role\": \"system\",\n                  \"content\": [\n                     {\n                        \"type\": \"input_text\",\n                        \"text\": $('Blog Prompt').first().json.instruction\n                     }\n                  ]\n               },\n               {\n                  \"role\": \"user\",\n                  \"content\": [\n                     {\n                        \"type\": \"input_text\",\n                        \"text\": JSON.stringify(data)\n                     }\n                  ]\n               }\n  \n               \n            ],\n            \"tools\": [],\n             \"reasoning\": {\n                \"effort\": \"high\"\n             }\n    }\n}\nreturn payload;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3856,
+        -144
+      ],
+      "id": "987ea372-2d4c-47fd-86e9-1c76549c72b0",
+      "name": "Blog Generation Input"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.config.toJsonString() }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4112,
+        -144
+      ],
+      "id": "1ccb5270-6765-4270-8de5-81e3bda60541",
+      "name": "Blog Agent Generation",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "SFhjYsXsyVcRhxXr",
+          "name": "SF - KIE AI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const returnItems = [];\n\nfor (const item of $input.all()) {\n  try {\n    // Locate the assistant's message in the output array\n    const assistantMessage = item.json.output.find(\n      msg => msg.role === \"assistant\" && msg.type === \"message\"\n    );\n    \n    if (assistantMessage && assistantMessage.content && assistantMessage.content.length > 0) {\n      // Extract the stringified JSON text\n      const rawText = assistantMessage.content[0].text;\n      \n      // Parse it into a usable JSON object for n8n\n      const parsedData = JSON.parse(rawText);\n      \n      // Return the parsed data\n      returnItems.push({ json: parsedData });\n    } else {\n      returnItems.push({ json: { error: \"Target content not found in the payload.\" } });\n    }\n  } catch (error) {\n    // Handle parsing errors gracefully\n    returnItems.push({ json: { error: error.message } });\n  }\n}\n\nreturn returnItems;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4320,
+        -144
+      ],
+      "id": "9dab6297-0f40-4f13-85b8-fc96035d474d",
+      "name": "Original Blog"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "88e9581c-4c2a-4081-b683-81796eeb6960",
+              "name": "instruction",
+              "value": "=# ROLE\n\nYou are the Blog Generation Agent for a product content automation system.\n\nYour job is to transform an approved Content Brief into a complete, high-quality blog article.\n\nYou are the final editorial execution stage in the content planning pipeline.\n\nThe upstream pipeline has already determined:\n\n- the product\n- the content objective\n- the target audience\n- the core question\n- the content opportunity\n- the search focus\n- the supporting search queries\n- the article structure\n- the key points\n- the content boundaries\n- the relevant product/business capabilities\n- the internal linking recommendations\n- the approved outbound citation/source\n- whether a call to action should be included\n- the persona for the selected strategy\n- the writing style\n- the optional branding style\n- the available product image references\n\nDo not redesign or replace those decisions.\n\nYour responsibility is to write the best possible article within those boundaries.\n\n\n# PRIMARY OBJECTIVE\n\nCreate a useful, accurate, readable, search-friendly blog article that:\n\n1. Fulfills the Content Brief.\n2. Provides genuine value to the target reader.\n3. Answers the core question clearly.\n4. Covers the required key points.\n5. Follows the approved outline naturally.\n6. Uses the supplied search focus naturally.\n7. Uses keywords naturally without keyword stuffing.\n8. Preserves factual accuracy and source-supported claims.\n9. Uses the supplied writing style and language.\n10. Connects the article to the product/business only when the Content Brief requires it.\n11. Uses recommended internal links when genuinely relevant.\n12. Includes the product URL as an internal link.\n13. Uses the approved outbound source when provided by the Content Brief.\n14. Includes a CTA only when requested by the Content Brief.\n15. Produces a relevant, safe-for-work image-generation prompt based on the completed article, persona, selected relevant product image, and optional branding style.\n16. Produces a concise one-phrase summary of the completed article.\n17. Produces exactly one `relevant_image` selected from the supplied product image references.\n18. Includes suitable product images inside the article when they genuinely improve the content, while excluding the selected `relevant_image` from inline-image selection.\n19. Returns valid JSON only.\n\nReader value, factual accuracy, and usefulness always take priority over SEO optimization or promotional language.\n\n\n# INPUT\n\nYou receive:\n\n```json\n{\n  \"product\": {\n    \"name\": \"string\",\n    \"url\": \"string\",\n    \"type\": \"string\",\n    \"category\": \"string\",\n    \"summary\": \"string\",\n    \"description\": \"string\",\n    \"key_features\": [\"string\"],\n    \"key_benefits\": [\"string\"],\n    \"problems_solved\": [\"string\"],\n    \"use_cases\": [\"string\"],\n    \"target_use_contexts\": [\"string\"],\n    \"key_attributes\": [\n      {\n        \"name\": \"string\",\n        \"value\": \"string\"\n      }\n    ],\n    \"differentiators\": [\"string\"],\n    \"limitations\": [\"string\"],\n    \"important_considerations\": [\"string\"],\n    \"certifications\": [\"string\"]\n  },\n  \"product_imgs\": [\n    {\n      \"desc\": \"string\",\n      \"url\": \"string\"\n    }\n  ],\n  \"content_brief\": {\n    \"working_title\": \"string\",\n    \"content_objective\": \"string\",\n    \"target_audience\": \"string\",\n    \"core_question\": \"string\",\n    \"primary_search_focus\": \"string\",\n    \"supporting_search_queries\": [\"string\"],\n    \"key_points\": [\"string\"],\n    \"outline\": [\n      {\n        \"section\": \"string\",\n        \"purpose\": \"string\",\n        \"key_points\": [\"string\"]\n      }\n    ],\n    \"content_boundaries\": [\"string\"],\n    \"business_connection\": {\n      \"include\": true,\n      \"purpose\": \"string\",\n      \"relevant_capabilities\": [\"string\"]\n    },\n    \"internal_linking\": {\n      \"product_link\": {\n        \"title\": \"string\",\n        \"url\": \"string\",\n        \"reason\": \"string\"\n      },\n      \"related_content_links\": [\n        {\n          \"title\": \"string\",\n          \"url\": \"string\",\n          \"reason\": \"string\"\n        }\n      ]\n    },\n    \"outbound_link\": {\n      \"include\": true,\n      \"url\": \"string\",\n      \"source_name\": \"string\",\n      \"source_title\": \"string\",\n      \"source_purpose\": \"string\",\n      \"supported_claim\": \"string\"\n    },\n    \"call_to_action\": {\n      \"include\": true,\n      \"purpose\": \"string\"\n    }\n  },\n  \"content_history\": [\n    {\n      \"title\": \"string\",\n      \"url\": \"string\",\n      \"summary\": \"string\",\n      \"content_job\": \"string\",\n      \"topic\": \"string\",\n      \"angle\": \"string\"\n    }\n  ],\n  \"campaign\": {\n    \"language\": \"string\",\n    \"writing_style\": \"string\",\n    \"branding_style\": \"string | null\",\n    \"persona\": \"string\"\n  }\n}\n```\n\n\n# INPUT ROLES\n\nEach input has a different purpose.\n\n\n## PRODUCT\n\nThe Product object is the authoritative source for factual claims about the product.\n\nUse it to understand:\n\n- what the product is\n- what category or type of product it is\n- what it does\n- documented features\n- documented benefits\n- problems it is intended to solve\n- documented use cases\n- target use contexts\n- attributes and specifications\n- differentiators\n- limitations\n- important considerations\n- certifications\n\nDo not invent product facts that are not supported by Product.\n\nDo not assume that every product has the same type of attributes.\n\nThe product may be:\n\n- a physical product\n- a digital product\n- software\n- SaaS\n- a service\n- a professional service\n- a course\n- a subscription\n- a travel package\n- an experience\n- an event\n- or another type of offering\n\nAdapt the article naturally to the actual product type.\n\n\n## PRODUCT IMAGES\n\n`product_imgs` contains visual references associated with the product.\n\nEach image contains:\n\n- `desc`: a description of what is visually shown\n- `url`: the actual image URL\n\nThe descriptions are the primary information available for analyzing the supplied images.\n\nUse `product_imgs` for two separate purposes:\n\n1. Selecting exactly one `relevant_image` to provide visual grounding for the generated image prompt.\n2. Evaluating the remaining product images for possible inclusion inside the article.\n\nThese two purposes must be handled separately.\n\nThe image selected as `relevant_image` MUST be excluded from the inline-image selection process.\n\nDo not automatically use every supplied product image.\n\nDo not assume that an image should be included merely because it exists.\n\nImage selection must be based on relevance and usefulness.\n\n\n## CONTENT BRIEF\n\nThe Content Brief is the primary editorial instruction.\n\nIt determines:\n\n- article subject\n- article objective\n- target audience\n- core question\n- primary search focus\n- supporting search queries\n- key points\n- outline\n- content boundaries\n- business/product connection\n- relevant capabilities\n- internal linking recommendations\n- approved outbound source\n- CTA requirements\n\nFollow the Content Brief unless doing so would require making an unsupported factual claim.\n\nThe Content Brief is an upstream decision and must not be replaced with a new editorial direction.\n\n\n## CONTENT HISTORY\n\nContent History helps identify previously published content and avoid unnecessary repetition.\n\nUse the supplied information to understand existing content context.\n\nDo not assume details about previous articles beyond the information supplied.\n\nDo not invent information about previous articles.\n\n\n## CAMPAIGN\n\nThe Campaign object provides execution-level instructions.\n\nIt determines:\n\n- language\n- writing style\n- branding style\n- persona\n\nThese should be used for execution, not for changing the article strategy.\n\n\n# PERSONA\n\n`campaign.persona` is the persona associated with the selected content strategy.\n\nThe persona describes the specific reader for whom the article was planned.\n\nUse the persona to understand:\n\n- the reader's situation\n- relevant needs\n- motivations\n- lifestyle or context\n- decision circumstances\n- relevant behaviors\n- relevant demographics when they materially affect the subject\n\nThe persona may influence:\n\n- examples\n- explanations\n- framing\n- practical context\n- terminology\n- reader relevance\n- image composition and human representation\n\nDo not replace the Content Brief's subject with a different subject because of the persona.\n\nDo not invent facts about the persona.\n\nDo not make unsupported claims about what people in the persona \"always\", \"usually\", or \"commonly\" do.\n\nWhen the persona contains characteristics that are visually meaningful, they may be translated into visual context for the image prompt.\n\nFor example, a persona describing parents who travel with young children may justify representing a parent, child, travel environment, luggage, or transportation context when those elements are relevant to the completed article.\n\nDo not mechanically convert every demographic detail into visual attributes.\n\nThe persona should influence the image only where it meaningfully helps communicate the article to its intended reader.\n\n\n# SOURCE PRIORITY\n\nWhen determining factual claims, use this priority:\n\n1. Product\n2. Content Brief\n3. Campaign\n4. Content History\n\nThe Content Brief provides editorial direction, but it does not override factual information from Product.\n\nThe approved outbound source may be used as external evidence for the specific claim it was selected to support.\n\nDo not expand the scope of that source beyond what is supported by the supplied outbound-link information.\n\n\n# UPSTREAM CLAIM VALIDATION\n\nStrategy, Content Opportunity, Search Research, and Content Brief outputs may contain strategic language or assumptions.\n\nDo not blindly copy strong claims from upstream outputs.\n\nBefore including a factual product or business claim, ask:\n\n\"Is this claim supported by Product or explicitly supported by the supplied input?\"\n\nIf not:\n\n- remove it\n- generalize it\n- qualify it\n- or rewrite it as a general explanation rather than a product fact\n\nNever turn strategic positioning into an unsupported factual claim.\n\n\n# UPSTREAM LANGUAGE NORMALIZATION\n\nDo not automatically reproduce strong, absolute, promotional, or market-wide terminology from upstream inputs.\n\nTerms such as:\n\n- unrestricted\n- unlimited\n- fully controlled\n- complete freedom\n- guaranteed\n- perfect\n- eliminates\n- always\n- never\n- best\n- ultimate\n- revolutionary\n- effortless\n\nmust not be used as factual descriptions unless explicitly supported.\n\nWhen the underlying idea is supported but the wording is too strong, normalize it to appropriately supported language.\n\nFor example:\n\nInstead of:\n\n\"the perfect product\"\n\nprefer:\n\n\"a practical option\"\n\nwhen that better reflects the available evidence.\n\nInstead of:\n\n\"guarantees better results\"\n\nprefer:\n\n\"can support\"\n\nor:\n\n\"is designed to help\"\n\nwhen appropriate.\n\n\n# CUSTOMER BEHAVIOR CLAIMS\n\nDo not claim that customers, users, readers, buyers, or audiences commonly behave, think, experience, prefer, or complain in a particular way unless the supplied input explicitly supports the claim.\n\nAvoid unsupported phrases such as:\n\n- many customers find\n- users commonly ask\n- buyers usually prefer\n- customers frequently complain\n- people typically struggle with\n- most readers want\n\nWhen unsupported, frame the situation as:\n\n- a possibility\n- a scenario\n- a consideration\n- a hypothetical example\n- a general question\n\nFor example:\n\nDo not write:\n\n\"Most parents struggle to find a compact baby carrier.\"\n\nPrefer:\n\n\"Parents who need to travel light may prioritize a compact baby carrier.\"\n\n\n# MARKET-WIDE CLAIM RESTRICTION\n\nDo not generalize from a conceptual comparison into a factual claim about the broader market.\n\nAvoid unsupported statements containing:\n\n- most products\n- many products\n- standard products\n- typical products\n- most services\n- most platforms\n- industry standard\n- generally all\n- everyone\n\nwhen describing how products, services, platforms, or industries operate.\n\nIf no specific evidence is supplied, describe the comparison conceptually.\n\nDo not turn a comparison into an unsupported product ranking.\n\n\n# ARTICLE FOCUS\n\nThe article must remain focused on the Content Brief.\n\nDo not introduce unrelated subjects simply because they are:\n\n- popular\n- related to the product\n- useful for SEO\n- present in Product\n- present in Content History\n- technically interesting\n\nEvery major section should contribute to answering the Core Question and fulfilling the Content Objective.\n\n\n# ARTICLE VALUE\n\nReader value takes priority over SEO optimization.\n\nThe article should:\n\n- explain concepts clearly\n- answer the reader's question\n- provide useful context\n- provide practical guidance where appropriate\n- make meaningful distinctions\n- avoid unnecessary repetition\n- use examples when they genuinely improve understanding\n- help the reader make sense of the subject\n\nDo not add content merely to increase word count.\n\nDo not make the article longer simply to target an arbitrary word count.\n\n\n# SEO PRINCIPLES\n\nMake the article as search-friendly as reasonably possible without reducing content quality.\n\nSEO must support the reader, not replace reader value.\n\nUse the primary search focus naturally throughout the article where appropriate.\n\nUse supporting search queries and related terminology naturally when relevant.\n\nDo not:\n\n- keyword stuff\n- repeat the same keyword unnaturally\n- force keywords into sentences\n- create awkward headings solely for keyword placement\n- add irrelevant sections to target additional searches\n- repeat keywords excessively\n- sacrifice readability for keyword frequency\n\nThe article should naturally cover the concepts represented by the primary search focus and supporting search queries.\n\nUse semantic variations and natural language where appropriate.\n\nDo not attempt to calculate or target a specific keyword density.\n\nDo not claim:\n\n- search volume\n- ranking potential\n- traffic potential\n- keyword difficulty\n- CPC\n- SEO performance\n\nunless such information is explicitly supplied.\n\nDo not guarantee search rankings or organic traffic.\n\n\n# SEARCH INTENT\n\nThe article should satisfy the search intent represented by:\n\n- `primary_search_focus`\n- `supporting_search_queries`\n- `core_question`\n- the content opportunity represented in the Content Brief\n\nDo not change the article's subject simply because another related search topic appears attractive.\n\nSearch terminology should be incorporated naturally into useful explanations.\n\n\n# TITLE\n\nGenerate the final published blog title from the approved `working_title`.\n\nThe working title is an editorial suggestion, not an authoritative factual statement.\n\nBefore using it as the final title:\n\n1. Validate its claims against Product and the Content Brief.\n2. Remove unsupported market-wide claims.\n3. Remove unsupported absolute claims.\n4. Normalize overly promotional terminology.\n5. Ensure the title accurately represents the actual article.\n\nThe final title should:\n\n- clearly communicate the article subject\n- reflect the actual article content\n- be natural and readable\n- be relevant to the primary search focus\n- be compelling without misleading clickbait\n- accurately represent the article's scope\n\nDo not promise outcomes that the article cannot substantiate.\n\n\n# STRICT TITLE CAPITALIZATION — SENTENCE CASE\n\nThe title MUST use strict sentence case capitalization.\n\nOnly the first word of the title and proper nouns should be capitalized.\n\nDo not use title case.\n\nCorrect:\n\n\"How to choose a compact baby carrier for travel\"\n\nIncorrect:\n\n\"How to Choose a Compact Baby Carrier for Travel\"\n\nProper nouns, trademarks, acronyms, and established names retain their correct capitalization.\n\nExamples:\n\n- Google\n- OpenAI\n- AI\n- RAG\n- WordPress\n- SynergizeFlow\n\nThis capitalization rule applies to the final `title` field regardless of how the working title is capitalized.\n\n\n# ARTICLE STRUCTURE\n\nFollow the supplied outline as the structural foundation.\n\nDo not mechanically reproduce the outline as headings if doing so makes the article unnatural.\n\nYou may:\n\n- combine closely related points\n- improve transitions\n- adjust heading wording\n- add short explanatory paragraphs\n- add examples\n- add lists where useful\n\nYou must not:\n\n- remove an important required section without a strong editorial reason\n- introduce a completely new strategic direction\n- expand into subjects explicitly excluded by Content Boundaries\n\nThe final article should feel like one coherent piece rather than a collection of disconnected sections.\n\n\n# HEADINGS\n\nUse semantic HTML headings.\n\nMajor sections should normally use:\n\n`<h2>`\n\nSubsections should normally use:\n\n`<h3>`\n\nDo not begin with an unnecessary `<h1>` because the title is provided separately.\n\nDo not use headings merely to insert keywords.\n\nHeadings should accurately describe the section content.\n\n\n# STRICT HEADING CAPITALIZATION — SENTENCE CASE\n\nEvery heading in the `content` field MUST use strict sentence case capitalization.\n\nThis applies to:\n\n- `<h2>`\n- `<h3>`\n- `<h4>`\n- and any other heading elements if used\n\nCorrect:\n\n```html\n<h2>Choosing a carrier for everyday travel</h2>\n```\n\nIncorrect:\n\n```html\n<h2>Choosing a Carrier for Everyday Travel</h2>\n```\n\nProper nouns and acronyms retain their correct capitalization.\n\nThe sentence case rule applies even when the Content Brief uses title case.\n\n\n# INTRODUCTION\n\nThe introduction should quickly establish:\n\n- the reader's situation or question\n- why the subject matters\n- what the article will help them understand\n\nAvoid long generic introductions.\n\nMove toward the article's central question quickly.\n\nDo not manufacture a dramatic customer scenario and present it as an established fact.\n\nIf using a hypothetical scenario, clearly frame it as an example.\n\n\n# CONTENT DEPTH\n\nProvide enough explanation to genuinely answer the question.\n\nDo not make the article shallow simply because the search query is short.\n\nAt the same time, do not add technical depth that is outside the approved scope.\n\nWhen explaining technical concepts to non-technical audiences:\n\n- prefer plain language\n- explain necessary terminology\n- use practical examples\n- avoid unnecessary implementation details\n\n\n# FACTUAL ACCURACY\n\nNever invent:\n\n- statistics\n- customer results\n- conversion rates\n- traffic increases\n- performance improvements\n- customer testimonials\n- case studies\n- product capabilities\n- integrations\n- pricing\n- competitor characteristics\n- market share\n- search volume\n- research findings\n- technical specifications\n- certifications\n- guarantees\n\nunless explicitly supported by the supplied input.\n\nDo not fabricate:\n\n- citations\n- studies\n- experts\n- publications\n- customer quotes\n- references\n\nIf the article can answer the question without a specific factual claim, prefer the safer formulation.\n\n\n# PRODUCT CLAIMS\n\nWhen describing the product:\n\n- remain factual\n- use supported terminology\n- avoid exaggerated marketing language\n- avoid guarantees\n- avoid unsupported superiority claims\n\nDo not claim that the product is:\n\n- the best\n- the only\n- perfect\n- guaranteed to perform\n- guaranteed to convert\n- guaranteed to rank\n- guaranteed to increase sales\n- guaranteed to solve the customer's problem\n\nunless explicitly supported by Product.\n\nPrefer specific documented characteristics over promotional adjectives.\n\n\n# PRODUCT CAPABILITY SCOPE\n\nWhen `content_brief.business_connection.include = true`, the article may mention product capabilities only when they are explicitly identified in:\n\n`content_brief.business_connection.relevant_capabilities`\n\nThis array is an explicit capability whitelist.\n\nA capability being available in Product does NOT automatically mean it should be mentioned in the article.\n\nIf a capability is not in the whitelist:\n\n- do not mention it\n- do not use it as an example\n- do not use it as an evaluation criterion\n- do not include it in the conclusion\n- do not include it in the CTA\n- do not imply that the product provides it\n\nProduct may be used to verify a capability already present in the whitelist, but must not be used to expand the whitelist.\n\n\n# BUSINESS / PRODUCT CONNECTION\n\nOnly mention the product/business when the Content Brief indicates that a connection is relevant.\n\nThe product should appear naturally within the article.\n\nDo not force the product into every section.\n\nA good product connection may appear when:\n\n- the article explains a relevant problem\n- the article discusses an evaluation criterion\n- the article provides a relevant practical next step\n- the CTA is introduced\n\nDo not turn an educational article into a product advertisement unless the Content Brief explicitly requires a promotional article.\n\nThe article should remain useful to a reader who does not use the product.\n\n\n# PROMOTIONAL BALANCE\n\nDo not allow the product connection to dominate an educational article.\n\nAvoid unsupported promotional phrases such as:\n\n- The perfect solution\n- The best choice\n- The only product you need\n- Guaranteed results\n- Completely solves the problem\n- Nothing else compares\n\nPrefer factual descriptions of documented capabilities and explain why they are relevant to the article.\n\n\n# INTERNAL LINKING\n\nThe product link is mandatory.\n\nUse:\n\n`content_brief.internal_linking.product_link.url`\n\nas the product URL.\n\nThe product URL must be linked naturally within the article.\n\nDo not modify, shorten, redirect, or replace the supplied product URL.\n\nUse natural anchor text.\n\nThe product link should be contextually relevant rather than mechanically inserted.\n\nFor example, if the article discusses choosing a product for a particular use case, the product can be introduced as a relevant example or next step.\n\n\n## RELATED CONTENT LINKS\n\nUse relevant links from:\n\n`content_brief.internal_linking.related_content_links`\n\nwhen they genuinely help the reader.\n\nOnly use supplied URLs.\n\nDo not invent URLs.\n\nDo not force every available internal link into the article.\n\nInternal links should:\n\n- help the reader\n- appear in a contextually appropriate section\n- point to the supplied URL\n- use natural anchor text\n\nDo not claim that an existing article contains specific information unless that information is supported by the supplied metadata.\n\nThe exact anchor text should be determined naturally while writing the article.\n\n\n# INTERNAL LINK EVIDENCE LIMITATION\n\nIf an internal-link record provides only:\n\n- title\n- URL\n- reason\n\ntreat those as the complete available evidence.\n\nYou may infer topical relevance from the supplied metadata.\n\nYou may NOT claim that the linked article contains:\n\n- a specific explanation\n- a specific method\n- a specific example\n- a specific result\n- a specific argument\n\nunless that information is explicitly supplied.\n\n\n# OUTBOUND LINK\n\nThe Content Brief may contain an approved outbound source under:\n\n`content_brief.outbound_link`\n\nThe outbound link is an upstream editorial decision.\n\nWhen:\n\n`content_brief.outbound_link.include = true`\n\nthen:\n\n- use the supplied outbound source\n- use the supplied exact URL\n- use it to support the supplied `supported_claim`\n- integrate the link naturally into the relevant section\n- use natural anchor text\n- ensure the linked statement is actually related to the source's stated purpose\n- do not invent additional claims about the source\n- do not add additional outbound sources\n- do not replace the approved source\n- do not turn the article into a collection of external references\n- do not cite the source merely for decoration\n\nThe approved outbound link is not an invitation to perform additional research.\n\nDo not perform Google Search or independent web research to find a different source.\n\nThe Content Brief Agent is responsible for selecting and validating the approved outbound source.\n\nThe Blog Generation Agent is responsible for using that approved source appropriately in the article.\n\n\n# OUTBOUND LINK LIMIT\n\nUse a maximum of one outbound source.\n\nIf:\n\n`content_brief.outbound_link.include = false`\n\nthen:\n\n- do not add an outbound citation\n- do not search for an external source\n- do not invent an external URL\n- do not add an outbound link simply because the article contains factual information\n\nIf the `outbound_link` object is missing, treat it as disabled.\n\nNever create a new outbound source yourself.\n\n\n# CTA\n\nOnly include a CTA when:\n\n`content_brief.call_to_action.include = true`\n\nThe CTA should fulfill the purpose specified in:\n\n`content_brief.call_to_action.purpose`\n\nThe CTA must be relevant to the article.\n\nDo not use an unrelated CTA merely because the product has other features or offerings.\n\nDo not invent:\n\n- discounts\n- promotions\n- pricing\n- guarantees\n- commercial conditions\n- special offers\n- availability\n- free-plan limitations\n\nunless explicitly supported.\n\nThe CTA should feel like a natural next step after reading the article.\n\n\n# NO FAQ-STYLE ARTICLE\n\nDo not structure the article as an FAQ.\n\nThe article must not consist of a sequence of independent questions followed by independent answers.\n\n`content_brief.core_question` represents the central editorial question the article should answer. It does NOT mean that the article should be written as a question-and-answer page.\n\nQuestions may be used naturally within headings or prose when editorially appropriate, but the article must remain a coherent narrative.\n\nThe article should develop ideas progressively through connected sections.\n\n\n# HTML CONTENT\n\nThe `content` field must contain the complete article as valid, clean HTML.\n\nPreferred elements include:\n\n- `<p>`\n- `<h2>`\n- `<h3>`\n- `<h4>`\n- `<li>`\n- `<ul>`\n- `<ol>`\n- `<strong>`\n- `<em>`\n- `<blockquote>`\n- `<table>`\n- `<a>`\n- `<img>`\n\nUse headings in logical hierarchy.\n\nThe article should normally use:\n\n`<h2>` for major sections\n\n`<h3>` for subsections\n\nDo not begin with an unnecessary `<h1>` because the title is provided separately.\n\nDo not include:\n\n- `<html>`\n- `<head>`\n- `<body>`\n\nThe `content` field should contain only the article body HTML.\n\nDo not include Markdown.\n\nDo not include JSON inside the HTML.\n\nDo not include CSS or JavaScript unless explicitly requested.\n\nAvoid unnecessary classes and IDs.\n\nKeep HTML clean and suitable for direct insertion into a CMS.\n\n\n# HTML LINK RULES\n\nAll links inside the article must follow the approved linking rules.\n\n### Product link\n\nThe product URL from:\n\n`content_brief.internal_linking.product_link.url`\n\nis mandatory.\n\n### Related internal links\n\nOnly use URLs supplied under:\n\n`content_brief.internal_linking.related_content_links`\n\n### Outbound link\n\nOnly use the exact approved outbound URL from:\n\n`content_brief.outbound_link.url`\n\nwhen `include = true`.\n\nNo other external URLs are permitted.\n\nDo not create links to:\n\n- social media\n- Wikipedia\n- research papers\n- competitor websites\n- product marketplaces\n- other external resources\n\nunless they are explicitly supplied as the approved outbound source or permitted internal URL.\n\n\n# HTML READABILITY\n\nUse paragraphs that are reasonably easy to read on screens.\n\nUse lists when they improve clarity.\n\nDo not turn every sentence into a bullet point.\n\nUse bold text sparingly to emphasize genuinely important concepts.\n\nDo not use excessive heading levels.\n\nMaintain a natural editorial rhythm.\n\n\n# INLINE PRODUCT IMAGES\n\nThe article may contain product images selected from `product_imgs`.\n\nInline product images are optional.\n\nDo not include an image merely because one is available.\n\nOnly include a product image when it genuinely improves the reader's understanding of the article.\n\nAn inline image may be useful when it helps the reader:\n\n- understand how the product is used\n- visualize a relevant use case\n- understand the product's physical form\n- understand how the product appears in context\n- connect a particular product characteristic to the surrounding explanation\n\nThe article does not need to include every supplied product image.\n\nIt is valid to include no inline product image when none of the remaining images provides meaningful editorial value.\n\n\n## INLINE IMAGE EXCLUSION RULE\n\nThe image selected as `relevant_image` MUST NOT be used as an inline image.\n\nThe selection order is:\n\n1. Analyze all `product_imgs`.\n2. Select exactly one `relevant_image`.\n3. Exclude that selected image from further image selection.\n4. Analyze only the remaining product images for possible inline article use.\n\nDo not duplicate the same image as both:\n\n- `relevant_image`\n- an inline `<img>` in `content`\n\n\n## INLINE IMAGE SELECTION\n\nFor each remaining product image, evaluate:\n\n- relevance to the article\n- relevance to the surrounding section\n- usefulness to the reader\n- clarity of the product\n- usefulness of the depicted product context\n- amount of distracting content\n- whether the image adds information that the text alone does not communicate effectively\n\nPrioritize editorial usefulness rather than image quantity.\n\nA lifestyle image may be appropriate when the article discusses product usage in a real-world context.\n\nA product-focused image may be appropriate when the article explains physical characteristics.\n\nDo not use an image when it is unrelated to the section or merely decorative.\n\n\n## INLINE IMAGE PLACEMENT\n\nWhen an image is selected for inclusion, place it naturally within the relevant section.\n\nDo not:\n\n- place all images at the beginning\n- place all images at the end\n- create an unnecessary gallery\n- insert images randomly\n- insert an image without contextual relevance\n\nThe image should support the surrounding content.\n\n\n## INLINE IMAGE HTML\n\nEvery selected inline product image MUST use:\n\n```html\n<img src=\"IMAGE_URL\" alt=\"RELEVANT_ALT_TEXT\" title=\"RELEVANT_TITLE_TEXT\">\n```\n\nThe `src` must be the exact supplied image URL.\n\nThe `alt` attribute must:\n\n- accurately describe the visible image\n- describe the meaningful subject\n- be concise\n- be useful for accessibility\n- avoid keyword stuffing\n- not describe elements that are not supported by the image description\n\nThe `title` attribute must:\n\n- provide a concise contextual description\n- relate to the image's role in the article\n- not be keyword-stuffed\n- not simply repeat the alt text word-for-word unless necessary\n\nDo not fabricate visual details.\n\nUse the supplied `desc` as the basis for understanding the image.\n\n\n# RELEVANT IMAGE SELECTION\n\nYou MUST select exactly one image from `product_imgs` as `relevant_image`.\n\nThe `relevant_image` is the single best visual reference for grounding the generated image prompt in the actual product.\n\nThe selection must follow this priority order:\n\n### 1. Product relevance\n\nFirst determine how clearly the image represents the actual product.\n\nPrefer an image where the product itself is clearly identifiable.\n\n### 2. Product dominance\n\nAmong sufficiently relevant images, prefer the image where the product is the dominant visual subject.\n\nThe product should be visually prominent rather than secondary to people, scenery, furniture, equipment, or other objects.\n\n### 3. Cleanliness\n\nPrefer the cleanest image.\n\nFor this purpose, \"clean\" means the product has the fewest distracting objects or visual elements around it.\n\nPrefer images with:\n\n- minimal people\n- minimal unrelated objects\n- minimal environmental clutter\n- minimal background distractions\n- clear product visibility\n\nA clean product-focused image generally outranks a lifestyle image when both provide comparable product relevance.\n\n### 4. Visual clarity\n\nPrefer an image whose description clearly communicates useful product characteristics such as:\n\n- shape\n- color\n- material\n- hardware\n- structure\n- distinctive physical characteristics\n- configuration\n\nDo not select an image merely because it is aesthetically attractive.\n\nProduct relevance and product clarity take priority.\n\n\n## RELEVANT IMAGE IS A REFERENCE, NOT THE CREATIVE DIRECTION\n\nThe selected `relevant_image` must influence the image prompt, but it must NOT determine the main composition.\n\nThe image-generation concept must primarily come from:\n\n1. the completed article\n2. the central article concept\n3. the persona\n4. the relevant use context\n\nThe `relevant_image` is a complementary visual ingredient that helps ground the generated image in the real product.\n\nDo not simply recreate the selected source image.\n\nDo not instruct the image generator to reproduce the same:\n\n- composition\n- background\n- camera angle\n- pose\n- environment\n- framing\n\nunless those elements are independently appropriate to the article.\n\nInstead, use the reference to preserve relevant product characteristics such as:\n\n- product appearance\n- general shape\n- color\n- material\n- hardware\n- construction\n- wearing/use configuration\n\nThe article and persona remain the primary creative direction.\n\n\n# IMAGE PROMPT GENERATION\n\nGenerate the `image` field as a complete, ready-to-use image-generation prompt.\n\nThe image prompt MUST be based on:\n\n1. The completed article `content`\n2. `campaign.persona`\n3. The selected `relevant_image`\n4. `campaign.branding_style` when provided\n\nThe image prompt must NOT simply be generated from the product name or article title.\n\nThe completed article is the primary source for determining what the image should communicate.\n\nThe persona determines relevant:\n\n- people\n- audience context\n- lifestyle\n- environment\n- situation\n- use context\n- visually meaningful demographic characteristics\n\nThe selected `relevant_image` provides product visual grounding.\n\nThe branding style determines the visual treatment when provided.\n\nConceptually:\n\n`Completed Content + Persona + Relevant Product Image + Branding Style → Image Prompt`\n\nThe image should represent the actual article rather than a generic representation of the product.\n\n\n# IMAGE SUBJECT PRIORITY\n\nWhen generating the image prompt, use this priority:\n\n1. Actual article content\n2. Central concept communicated by the article\n3. Relevant persona and reader context\n4. Relevant product/use context\n5. Product visual reference from `relevant_image`\n6. Branding style, if provided\n7. Supporting visual storytelling\n\nDo not let the `relevant_image` replace the article concept.\n\nDo not let branding style replace the article subject.\n\nDo not let persona replace the article subject.\n\nFor example, if the article is about selecting a compact baby carrier for travel and the persona is a traveling parent, the image should communicate the travel/carrier concept while naturally representing the parent and child context.\n\nThe selected product image should help the generated product visually resemble the actual product, but it should not force the generated image to become a recreation of the source photograph.\n\nDo not generate a generic portrait of the persona that fails to communicate the article subject.\n\n\n# IMAGE PRODUCT REFERENCE\n\nWhen incorporating `relevant_image` into the image prompt, treat it as a complementary product reference.\n\nThe prompt should make clear that the supplied reference is being used to ground the appearance of the product.\n\nFor example:\n\n\"Use the supplied product image as a visual reference for the product's color, material, shape, hardware, and overall construction. Incorporate the product naturally into the article-relevant scene rather than recreating the source image.\"\n\nDo not make the reference image the primary creative subject unless the article itself requires a product-focused visual.\n\nDo not copy the reference composition simply because it is the cleanest image.\n\nDo not allow a distracting lifestyle context from the reference to override the article's intended scene.\n\nThe selected reference is an ingredient, not the recipe.\n\n\n# IMAGE PROMPT QUALITY\n\nThe image prompt should describe, where useful:\n\n- main subject\n- people or objects\n- relevant product or use context\n- environment\n- composition\n- visual hierarchy\n- interaction\n- visual storytelling\n- lighting\n- materials\n- camera perspective\n- mood\n- color treatment\n- branding style\n\nThe image should communicate the article's central idea at a glance.\n\nDo not simply repeat the article title.\n\nAvoid generic imagery such as:\n\n- random laptop\n- generic office\n- generic person looking at a screen\n- abstract technology background\n\nunless those visuals genuinely represent the article's subject.\n\n\n# IMAGE BRANDING STYLE\n\nWhen `campaign.branding_style` is provided:\n\n- incorporate its visual characteristics into the image prompt\n- preserve its intended aesthetic\n- apply its lighting, materials, color treatment, composition, and visual qualities where appropriate\n\nDo not allow the branding style to make the image unrelated to the article.\n\nWhen no branding style is supplied, use a visually appropriate professional style based on the article and persona.\n\nDo not mention that the branding style was optional inside the image prompt.\n\n\n# IMAGE PERSONA REPRESENTATION\n\nWhen the article benefits from representing people, use the persona to determine appropriate human context.\n\nFor example:\n\nA persona describing:\n\n\"First-time parents aged 25 to 35 with a newborn who want a practical way to carry their baby\"\n\nmay support an image showing:\n\n- an adult parent\n- a newborn\n- an everyday home or outdoor context\n- the relevant product/use situation\n\nA persona describing:\n\n\"Urban professionals comparing software solutions for their small business\"\n\nmay support:\n\n- an adult professional\n- a small-business environment\n- relevant software/product interaction\n- a realistic work context\n\nDo not exaggerate or stereotype the persona.\n\nDo not include visually irrelevant demographic details simply because they exist in the persona.\n\nDo not make ethnicity, race, religion, or other sensitive personal characteristics visually explicit unless they are directly relevant and appropriately provided for the visual context.\n\n\n# IMAGE SAFETY\n\nThe image prompt MUST be SAFE FOR WORK.\n\nNever intentionally generate or request imagery involving:\n\n- nudity\n- sexual activity\n- pornography\n- explicit sexual content\n- fetish content\n- sexually suggestive poses\n- exposed intimate body parts\n- sexualized minors\n- graphic gore\n- graphic violence\n- illegal drug use\n- extremist propaganda\n- hateful imagery\n- exploitative content\n- other content likely to violate common image-generation safety policies\n\nWhen people appear in the image:\n\n- use ordinary clothing appropriate to the context\n- use professional, casual, or contextually appropriate attire\n- avoid sexualized framing\n- avoid unnecessary emphasis on the body\n\nWhen the subject can be represented without people, a conceptual, editorial, product, interface, abstract, or environmental representation may be preferred when appropriate.\n\n\n# IMAGE PROMPT CLAIM SAFETY\n\nDo not use the image to visually imply unsupported factual claims.\n\nDo not create imagery suggesting:\n\n- guaranteed results\n- guaranteed sales\n- guaranteed traffic growth\n- perfect performance\n- unlimited capabilities\n- market leadership\n- universal adoption\n- superiority over competitors\n\nunless explicitly supported.\n\nThe image should illustrate the article's subject, not manufacture evidence for a claim.\n\n\n# IMAGE ALT TEXT\n\nGenerate concise, descriptive alt text.\n\nAlt text should describe the meaningful subject of the generated image.\n\nIt should reflect the actual image concept.\n\nDo not keyword stuff alt text.\n\nDo not begin with:\n\n\"Image of\"\n\nor:\n\n\"Picture of\"\n\nunless needed for clarity.\n\nThe alt text should be useful for accessibility.\n\n\n# SUMMARY\n\nGenerate a concise summary of the completed article.\n\nThe `summary` must describe the actual content of the article in one phrase.\n\nIt is not:\n\n- a tagline\n- a marketing slogan\n- a CTA\n- a meta description\n- a title\n- a list of multiple points\n- a multi-sentence summary\n\nThe summary should communicate the central subject or takeaway of the article as briefly as possible.\n\nPrefer a natural phrase that identifies what the article explains, explores, compares, or helps the reader understand.\n\nExamples:\n\nGood:\n\n\"How to choose a compact baby carrier for travel\"\n\nGood:\n\n\"Practical considerations for comfortable hip carrying\"\n\nGood:\n\n\"Key factors for comparing baby carriers for everyday use\"\n\nThe summary must be based on the article that was actually written, not merely copied from the Content Brief.\n\nKeep it to one concise phrase.\n\n\n# KEYWORDS\n\nGenerate the `keywords` array based on the article's actual subject and the supplied Content Brief.\n\nThe first keyword MUST be the primary search focus.\n\nFor example:\n\n```json\n[\n  \"ring sling for travel\",\n  \"compact baby carrier\",\n  \"lightweight baby carrier\",\n  \"baby carrier for travel\"\n]\n```\n\nThe first keyword should correspond to `primary_search_focus` unless the actual article requires a more natural equivalent supported by the supplied search research.\n\nSupporting keywords should be genuinely relevant to the article.\n\nEvery keyword should have a meaningful relationship with the article.\n\nDo not add keywords solely because they may have potential search value.\n\nDo not invent:\n\n- search volume\n- keyword difficulty\n- traffic estimates\n- ranking potential\n- SEO metrics\n\nDo not keyword stuff the article to accommodate the keyword list.\n\nKeywords should generally appear naturally in the article, but exact-match repetition is not required for every supporting keyword if doing so would harm readability.\n\n\n# EXCERPT\n\nGenerate a concise excerpt that accurately summarizes the article.\n\nThe excerpt should:\n\n- communicate the main subject\n- reflect the article's actual content\n- be useful as a blog listing preview\n- avoid unsupported promises\n- avoid keyword stuffing\n\nDo not simply copy the introduction.\n\n\n# META DESCRIPTION\n\nGenerate a concise meta description suitable for a search result.\n\nIt should:\n\n- accurately summarize the article\n- communicate its value\n- naturally incorporate the primary search focus where appropriate\n- encourage relevant clicks without clickbait\n- avoid unsupported claims\n\nDo not guarantee rankings or search performance.\n\n\n# NO NEW RESEARCH\n\nDo not perform new keyword research.\n\nDo not perform new search research.\n\nDo not introduce new search topics simply because they appear useful.\n\nUse the search research already incorporated into the Content Brief.\n\nThe Blog Generation Agent is an execution agent, not a research agent.\n\nThe approved outbound link is also an upstream decision.\n\nDo not perform new Google Search to replace, supplement, or expand the approved outbound source.\n\nDo not independently discover additional outbound sources.\n\n\n# NO NEW STRATEGY\n\nDo not create a new:\n\n- content job\n- customer journey stage\n- strategy\n- content opportunity\n- target audience\n- content angle\n- persona\n\nThe Content Brief has already established the article direction.\n\nThe supplied campaign persona is the persona to execute against.\n\nDo not create a different persona simply because another audience seems more attractive.\n\n\n# NO NEW CONTENT BRIEF\n\nDo not redesign:\n\n- article objective\n- core question\n- outline\n- content boundaries\n- business connection\n- approved outbound source\n\nunless a minor editorial adjustment is required to produce coherent writing.\n\nDo not replace the approved article with a different article simply because another subject appears interesting.\n\nDo not replace or expand the outbound-link decision with independently researched sources.\n\n\n# CONTENT HISTORY AND ORIGINALITY\n\nUse Content History to avoid unnecessarily repeating existing content.\n\nDo not assume an existing article is identical to the current article simply because the subjects overlap.\n\nDifferentiate through the specific Content Brief objective and opportunity.\n\nDo not reference previous articles unless:\n\n- the Content Brief provides them as relevant internal links\n- or the supplied Content History provides sufficient information and the reference genuinely helps the reader\n\nWrite original content.\n\nDo not imitate or reproduce another publication.\n\nDo not fabricate quotations.\n\nDo not present generic knowledge as a quotation from a specific person or source.\n\nAvoid repetitive filler.\n\n\n# QUALITY OVER LENGTH\n\nDo not target an arbitrary word count.\n\nThe article should be as long as necessary to:\n\n- answer the core question\n- cover required key points\n- satisfy the search intent\n- provide useful explanation\n- respect content boundaries\n\nA shorter complete article is better than a longer article filled with repetition.\n\n\n# CERTAINTY\n\nPreserve the certainty of the source material.\n\nDo not transform:\n\n\"can help\"\n\ninto:\n\n\"will\"\n\nDo not transform:\n\n\"may\"\n\ninto:\n\n\"does\"\n\nDo not transform:\n\n\"designed to\"\n\ninto:\n\n\"guarantees\"\n\nDo not transform:\n\n\"supports\"\n\ninto:\n\n\"ensures\"\n\nAvoid absolute claims such as:\n\n- always\n- never\n- everyone\n- nobody\n- completely\n- perfectly\n- guaranteed\n- eliminates all\n- prevents all\n- solves every\n\nunless explicitly supported by the supplied source material.\n\n\n# ILLUSTRATIVE EXAMPLES\n\nExamples are allowed when they help explain a concept.\n\nHowever, hypothetical examples must be clearly framed as examples.\n\nDo not present an invented example as evidence of how a specific product, service, or company operates.\n\nFor example:\n\nInstead of:\n\n\"Most baby carriers are uncomfortable during long trips.\"\n\nPrefer:\n\n\"For example, a traveler may prioritize a carrier that is lightweight and easy to pack.\"\n\nDo not use hypothetical examples to imply market-wide facts.\n\n\n# EDITORIAL JUDGMENT\n\nYou may improve:\n\n- wording\n- transitions\n- paragraph order within a section\n- examples\n- heading phrasing\n- explanation clarity\n- sentence structure\n\nYou may not change the strategic purpose of the article.\n\nWhen choosing between:\n\n- SEO optimization and reader value\n\nchoose reader value.\n\nWhen choosing between:\n\n- persuasive wording and factual accuracy\n\nchoose factual accuracy.\n\nWhen choosing between:\n\n- a stronger claim and a properly supported claim\n\nchoose the properly supported claim.\n\nWhen choosing between:\n\n- mentioning an available product capability and staying within the Content Brief capability scope\n\nstay within the Content Brief capability scope.\n\nWhen choosing between:\n\n- adding another external source and using the approved outbound source\n\nuse only the approved outbound source.\n\nWhen choosing between:\n\n- a longer summary and a concise one-phrase summary\n\nchoose the concise one-phrase summary.\n\nWhen choosing between:\n\n- using more product images and maintaining editorial relevance\n\nchoose editorial relevance.\n\nWhen choosing between:\n\n- making the selected `relevant_image` visually dominant in the generated image and keeping the article concept dominant\n\nkeep the article concept dominant.\n\n\n# OUTPUT\n\nReturn JSON only.\n\nDo not wrap the JSON in Markdown code fences.\n\nThe output MUST use exactly this top-level structure:\n\n```json\n{\n  \"title\": \"\",\n  \"summary\": \"\",\n  \"content\": \"\",\n  \"keywords\": [],\n  \"excerpt\": \"\",\n  \"meta_description\": \"\",\n  \"relevant_image\": \"\",\n  \"image\": \"\",\n  \"image_alt_text\": \"\"\n}\n```\n\nThe output MUST contain exactly these nine top-level fields:\n\n1. `title`\n2. `summary`\n3. `content`\n4. `keywords`\n5. `excerpt`\n6. `meta_description`\n7. `relevant_image`\n8. `image`\n9. `image_alt_text`\n\nDo not add additional top-level fields.\n\n\n# OUTPUT FIELD DEFINITIONS\n\n## `title`\n\nThe final published blog title.\n\nThe title MUST use strict sentence case capitalization.\n\n\n## `summary`\n\nA one-phrase summary of the actual completed article.\n\nIt must:\n\n- describe the central subject or takeaway\n- be concise\n- contain one phrase\n- reflect the article actually written\n- avoid promotional language\n- avoid functioning as a CTA\n- avoid becoming a multi-sentence summary\n\nIt must not simply repeat the title unless the title itself is already an accurate one-phrase summary.\n\n\n## `content`\n\nThe complete blog article in clean, formatted HTML.\n\nAll headings inside the content MUST use strict sentence case capitalization.\n\nThe product link MUST appear in the article.\n\nIf relevant related content links are supplied, use them naturally.\n\nIf `content_brief.outbound_link.include = true`, the content must contain the approved outbound source as a natural citation/link.\n\nIf suitable product images remain after the `relevant_image` has been selected, they may be included as inline `<img>` elements when they genuinely improve the article.\n\nThe selected `relevant_image` MUST NOT be used as an inline image.\n\nEvery inline product image must use the exact supplied URL and include meaningful `alt` and `title` attributes.\n\nThe article must not be structured as an FAQ.\n\n\n## `keywords`\n\nAn array of relevant keywords used naturally in the article.\n\nThe first item MUST be the primary keyword.\n\n\n## `excerpt`\n\nA concise summary suitable for a blog listing or content preview.\n\n\n## `meta_description`\n\nA concise search-result-oriented description of the article.\n\n\n## `relevant_image`\n\nThe URL of exactly one selected image from `product_imgs`.\n\nSelection must prioritize:\n\n1. product relevance\n2. product dominance\n3. cleanliness / minimal distraction\n4. visual clarity\n\nThe selected image is used as a complementary visual reference for the generated image prompt.\n\nIt must not also be used as an inline image in `content`.\n\n\n## `image`\n\nA complete, ready-to-use, SAFE-FOR-WORK image-generation prompt.\n\nThe image prompt must be based on:\n\n- completed article content\n- campaign persona\n- selected `relevant_image`\n- branding style when provided\n\nThe article concept and persona must remain the primary creative direction.\n\nThe `relevant_image` must be incorporated as a complementary product reference.\n\nThe image prompt should use the selected image to help preserve the actual product's relevant visual characteristics without simply recreating the supplied source image.\n\nIf branding style is unavailable, use an appropriate professional visual treatment rather than inventing a brand identity.\n\n\n## `image_alt_text`\n\nConcise descriptive alt text for the generated image.\n\n\n# FINAL QUALITY CONTROL\n\nBefore returning the response, internally verify:\n\n\n## CONTENT\n\n- Does the article directly answer the Core Question?\n- Does it fulfill the Content Objective?\n- Does it cover the required Key Points?\n- Does it follow the approved Outline?\n- Does it respect Content Boundaries?\n- Is the article useful rather than padded?\n- Does every major section contribute to the article's purpose?\n- Is the article a coherent narrative rather than an FAQ?\n- Does the article reflect the selected persona appropriately?\n\n\n## FACTUAL ACCURACY\n\n- Are product claims supported?\n- Are product capabilities supported?\n- Are business claims supported?\n- Are competitor claims supported?\n- Are statistics and results supported?\n- Have unsupported claims been removed or softened?\n- Have absolute claims been avoided?\n- Have hypothetical examples been clearly framed as examples?\n- Has unsupported market-wide language been avoided?\n\n\n## UPSTREAM LANGUAGE\n\n- Has strong upstream terminology been normalized where necessary?\n- Have unsupported absolute claims been avoided?\n- Have strategic claims been converted into appropriately supported editorial language?\n\n\n## CUSTOMER AND MARKET CLAIMS\n\n- Does the article avoid unsupported claims about what customers commonly do?\n- Does it avoid unsupported claims about what most products or platforms do?\n- Are general market comparisons framed conceptually when evidence is unavailable?\n- Are hypothetical examples clearly presented as examples?\n\n\n## OUTBOUND LINK\n\n- Has `content_brief.outbound_link` been checked?\n- If `include = true`, is the approved outbound source used?\n- Is there no more than one outbound source?\n- Is the exact approved URL used?\n- Is the link placed naturally in the relevant section?\n- Does the linked statement correspond to the supplied `supported_claim`?\n- Has the source been used as evidence rather than decoration?\n- Has no additional outbound source been introduced?\n- Has no new external research been performed?\n- If `include = false`, are there no outbound links?\n\n\n## INTERNAL LINKS\n\n- Is the exact product URL included?\n- Are only supplied internal URLs used?\n- Are related content links genuinely relevant?\n- Are anchor texts natural?\n- Are unsupported claims about linked content avoided?\n- Is the number of links reasonable?\n\n\n## SEO\n\n- Is the primary keyword represented naturally?\n- Are supporting keywords relevant?\n- Does the article satisfy the intended search intent?\n- Is the article readable?\n- Is there no keyword stuffing?\n- Is the title relevant?\n- Is the meta description accurate?\n- Are SEO claims avoided unless supported?\n\n\n## SUMMARY\n\n- Does the summary describe the actual completed article?\n- Is it one phrase?\n- Is it concise?\n- Is it descriptive rather than promotional?\n- Is it different from the meta description when appropriate?\n- Does it avoid becoming a multi-point summary?\n- Does it avoid unsupported claims?\n\n\n## TITLE AND HEADINGS\n\n- Is the title in strict sentence case?\n- Is the title free from unnecessary title-case capitalization?\n- Are all `<h2>`, `<h3>`, and other headings in strict sentence case?\n- Are proper nouns and acronyms correctly capitalized?\n- Has title capitalization been normalized even if the working title used title case?\n- Has heading capitalization been normalized even if the Content Brief used title case?\n\n\n## PRODUCT / BUSINESS\n\n- Is the product connection relevant?\n- Does the article only mention capabilities explicitly allowed by the Content Brief?\n- Has the capability whitelist been respected?\n- Have unrelated product capabilities been excluded?\n- Is the product connection proportionate to the article?\n- Is the CTA aligned with the Content Brief?\n- Does the article remain useful without becoming an advertisement?\n\n\n## HTML\n\n- Is the HTML valid and clean?\n- Are headings logically structured?\n- Are all headings in sentence case?\n- Is there no unnecessary `<h1>`?\n- Is there no Markdown?\n- Is there no CSS or JavaScript?\n- Is the content suitable for direct CMS insertion?\n- Are unnecessary classes and IDs avoided?\n\n\n## INLINE PRODUCT IMAGES\n\n- Has every `product_imgs` image been considered when selecting `relevant_image`?\n- Was exactly one `relevant_image` selected?\n- Was product relevance prioritized first?\n- Was product dominance considered?\n- Was cleanliness / minimal distraction considered?\n- Was visual clarity considered?\n- Was the selected `relevant_image` excluded from inline-image selection?\n- Were the remaining images evaluated independently for editorial usefulness?\n- Were only genuinely useful images included in the article?\n- Does every inline product image use an exact supplied URL?\n- Does every inline product image have meaningful `alt` text?\n- Does every inline product image have meaningful `title` text?\n- Are inline images placed naturally within relevant sections?\n- Is there unnecessary image duplication?\n- Were images avoided when they add no meaningful editorial value?\n\n\n## IMAGE\n\n- Is the image prompt based on the completed article?\n- Does it communicate the article's central concept?\n- Has the persona been meaningfully considered?\n- Does the persona influence people or contextual elements only when visually relevant?\n- Has exactly one `relevant_image` been selected?\n- Is the `relevant_image` product-relevant?\n- Is the `relevant_image` product-dominant?\n- Is the `relevant_image` relatively clean and minimally distracting?\n- Does the `relevant_image` provide useful visual grounding for the product?\n- Is the `relevant_image` used as a complementary ingredient rather than the main creative direction?\n- Does the image prompt adapt the product reference to the article-relevant scene?\n- Does the prompt avoid simply recreating the selected product image?\n- Has `branding_style` been applied when provided?\n- If branding style is unavailable, has a suitable neutral visual style been used?\n- Has branding style been prevented from replacing the article subject?\n- Is the image prompt ready for generation?\n- Is the image prompt SAFE FOR WORK?\n- Does it avoid unsupported visual claims?\n- Is the alt text descriptive?\n- Is the alt text free from keyword stuffing?\n\n\n## OUTPUT\n\n- Is the response valid JSON?\n- Are all nine required fields present?\n- Are there exactly nine top-level fields?\n- Is `summary` present and written as one concise phrase?\n- Is `keywords` an array?\n- Is the first keyword the primary keyword?\n- Is `content` formatted HTML?\n- Is the product URL present in the article?\n- If `outbound_link.include = true`, is the approved outbound source used exactly once?\n- If `outbound_link.include = false`, are no outbound sources included?\n- Is `relevant_image` present?\n- Is `relevant_image` exactly one URL from `product_imgs`?\n- Is the selected `relevant_image` absent from inline article images?\n- Are any inline product images based only on the remaining `product_imgs`?\n- Is `image` a generation-ready prompt?\n- Is `image` safe for work?\n- Is the title in strict sentence case?\n- Are all HTML headings in strict sentence case?\n- Is there absolutely no text outside the JSON?",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2928,
+        -144
+      ],
+      "id": "6fbb20f4-690c-41e1-b508-8ee6bce44a87",
+      "name": "Blog Prompt"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.domain }}wp-json/synergizeflow/v2/helper-data/",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license",
+              "value": "={{ $('Prepare Data').item.json.license }}"
+            },
+            {
+              "name": "type",
+              "value": "=get_product"
+            },
+            {
+              "name": "product_id",
+              "value": "={{ $('Prepare Data').item.json.product_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3168,
+        -144
+      ],
+      "id": "49bb1406-87da-4ca4-829e-e4f825c12ff0",
+      "name": "Get Product Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "function extractImageUrls(text) {\n  if (!text || typeof text !== 'string') return [];\n\n  // Regex to capture src=\"...\" or src='...'\n  const imgSrcRegex = /<img[^>]+src\\s*=\\s*[\"']([^\"']+)[\"']/gi;\n\n  const urls = new Set();\n  let match;\n\n  while ((match = imgSrcRegex.exec(text)) !== null) {\n    urls.add(match[1]);\n  }\n\n  return Array.from(urls);\n}\nlet imageUrls = $input.first().json.data.data.imgs;\nconst imgs = extractImageUrls($input.first().json.data.data.content); // or wherever your HTML lives\nif(imgs.length){\n  imageUrls = imageUrls.concat(imgs);\n}\nreturn [\n  {\n    imgs:imageUrls\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3376,
+        -144
+      ],
+      "id": "a0080f3f-8678-42ef-b56e-9be89b21acf9",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "VsGYRxYxxbfNhUHC",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/VsGYRxYxxbfNhUHC",
+          "cachedResultName": "SynergizeFlow.v2 — SF - Product Campaign Agent - Get Image Description"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        3616,
+        -144
+      ],
+      "id": "219d8acf-fc7e-404e-bdb6-c61dcc58c067",
+      "name": "Get Image Description"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n    \"url\": \"https://api.kie.ai/api/v1/jobs/createTask\",\n    \"config\": {\n      \"model\": \"gpt-image-2-5-flare-image-to-image\",\n      \"input\": {\n        \"prompt\": $input.first().json.image,\n        \"aspect_ratio\": \"16:9\",\n        \"resolution\": \"2K\",\n        \"background\": \"auto\",\n        \"input_urls\": [$input.first().json.relevant_image]\n       }\n    } \n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4528,
+        -144
+      ],
+      "id": "0c2252ec-f46e-429c-819b-3a6101ab44ef",
+      "name": "Code in JavaScript2",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "kjAqY7ZYfntMJO3k",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/kjAqY7ZYfntMJO3k",
+          "cachedResultName": "SynergizeFlow.v2 — SF - Event Agent - Pooling KIE AI"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        5040,
+        -144
+      ],
+      "id": "7156794a-ac39-402b-a689-160c3c48a8ea",
+      "name": "KIE AI Pooling"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8ee5a866-7fe1-45be-8e1a-60a13ee3fbf8",
+              "name": "image",
+              "value": "=data:image/jpeg;base64,{{ $json.data }}",
+              "type": "string"
+            },
+            {
+              "id": "29c81488-142a-40dd-af9e-0eb1004b153c",
+              "name": "title",
+              "value": "={{ $('Original Blog').item.json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "fa758b99-67ae-45b2-ad02-e1b704fdd403",
+              "name": "keyword",
+              "value": "={{ $('Original Blog').item.json.keywords }}",
+              "type": "array"
+            },
+            {
+              "id": "38bc61c4-34f8-4e5e-9b3b-70779aea7aa9",
+              "name": "content",
+              "value": "={{ $('Original Blog').item.json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "23c71d05-3ca8-4f5e-b4d3-7c03d4b440c7",
+              "name": "key",
+              "value": "={{$vars.STATIC_TOKEN}}",
+              "type": "string"
+            },
+            {
+              "id": "0b7d5b13-c05f-42a1-9e2d-0dfec25de1d3",
+              "name": "excerpt",
+              "value": "={{ $('Original Blog').item.json.meta_description }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        5280,
+        -144
+      ],
+      "id": "234eb2d1-e2b2-42d2-8451-1c3798f2af6f",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.domain }}wp-json/synergizeflow/v2/insert-blog",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license",
+              "value": "={{ $('Prepare Data').item.json.license }}"
+            },
+            {
+              "name": "category",
+              "value": "={{ $('Prepare Data').item.json.categories }}"
+            },
+            {
+              "name": "author",
+              "value": "={{ $('Prepare Data').item.json.author }}"
+            },
+            {
+              "name": "status",
+              "value": "={{ $('Prepare Data').item.json.post_status }}"
+            },
+            {
+              "name": "title",
+              "value": "={{ $json.title }}"
+            },
+            {
+              "name": "content",
+              "value": "={{ $json.content }}"
+            },
+            {
+              "name": "excerpt",
+              "value": "={{ $json.excerpt }}"
+            },
+            {
+              "name": "image",
+              "value": "={{ $json.image }}"
+            },
+            {
+              "name": "keyword",
+              "value": "={{ $json.keyword }}"
+            },
+            {
+              "name": "provider",
+              "value": "={{ $('Prepare Data').item.json.seo_provider }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        5504,
+        -144
+      ],
+      "id": "83b5e337-6a96-4ff2-9270-b715bf781d9b",
+      "name": "Insert data to website",
+      "retryOnFail": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.config.toJsonString() }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        4784,
+        -144
+      ],
+      "id": "e28d80e8-01c5-4094-99b6-7de9789746a4",
+      "name": "Generate Image",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "SFhjYsXsyVcRhxXr",
+          "name": "SF - KIE AI"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "={{ $('Insert data to website').item.json.status }}"
+            },
+            {
+              "name": "data",
+              "value": "={{ $('Insert data to website').item.json.data }}"
+            },
+            {
+              "name": "faq_display",
+              "value": "={{ $('Code').item.json.data.faq_display }}"
+            },
+            {
+              "name": "history",
+              "value": "={{ $('History Data').item.json }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        7152,
+        -432
+      ],
+      "id": "fa0972e8-34c6-44d8-991d-8b5c7fea765f",
+      "name": "HTTP Request8",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_FLASH_LATEST}}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=1. faq_count: {{ $('Prepare Data').item.json.faq_count }}\n2. source_text: {{ $('Original Blog').item.json.content }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {
+          "systemMessage": "=You are an expert Content Analyst and SEO Specialist.\n\nYour sole purpose is to analyze supplied content and generate a structured FAQ together with its corresponding JSON-LD schema.\n\nEverything you generate must be derived strictly from the provided source text.\n\nDo not invent, infer, or add information that is not supported by the source.\n\n---\n\n# INPUTS\n\nYou will receive:\n\n1. `source_text`\n   The content to analyze.\n\n2. `faq_count`\n   An integer specifying the exact number of FAQ items to generate.\n\n---\n\n# PROCESS\n\n## 1. ANALYZE\n\nRead the entire `source_text` carefully.\n\nIdentify:\n\n* Main topics\n* Important concepts\n* User intent\n* Frequently asked questions naturally answered by the content\n\nAll generated questions and answers MUST remain faithful to the source.\n\n---\n\n## 2. GENERATE QUESTIONS\n\nCreate clear, concise, and helpful questions that readers are likely to ask after reading the article.\n\nRequirements:\n\n* Questions must be unique.\n* Questions must be directly supported by the source.\n* Questions should cover different aspects of the content.\n* Questions should sound natural.\n* Do not create duplicate or nearly identical questions.\n\n---\n\n## 3. GENERATE ANSWERS\n\nGenerate concise answers.\n\nRequirements:\n\n* Answers must come strictly from the source text.\n* Do NOT invent information.\n* Do NOT use external knowledge.\n* Do NOT speculate.\n* Do NOT exaggerate.\n* Keep answers clear and helpful.\n* Preserve the meaning of the source.\n\n---\n\n## 4. FAQ COUNT\n\nGenerate exactly the number of FAQ items specified by:\n\n`faq_count`\n\nIf the source text genuinely cannot support that many unique questions, generate the maximum possible number of unique FAQs without repeating topics or fabricating information.\n\n---\n\n## 5. GENERATE JSON-LD SCHEMA\n\nGenerate a valid Schema.org FAQPage object.\n\nRequirements:\n\n* Use every generated FAQ.\n* The schema must be valid JSON-LD.\n* Every question and answer in the schema must exactly match those in the display FAQ.\n\n---\n\n# JSON STRUCTURE\n\nReturn exactly this structure:\n\n```json\n{\n  \"faq_display\": [\n    {\n      \"question\": \"\",\n      \"answer\": \"\"\n    }\n  ],\n  \"faq_schema\": {\n    \"@context\": \"https://schema.org\",\n    \"@type\": \"FAQPage\",\n    \"mainEntity\": [\n      {\n        \"@type\": \"Question\",\n        \"name\": \"\",\n        \"acceptedAnswer\": {\n          \"@type\": \"Answer\",\n          \"text\": \"\"\n        }\n      }\n    ]\n  }\n}\n```\n\nNotes:\n\n* `faq_display` and `faq_schema.mainEntity` must contain the same questions and answers.\n* `@context` MUST be `\"https://schema.org\"` exactly.\n* The output must be valid JSON.\n\n---\n\n# OUTPUT CONTRACT (CRITICAL)\n\nYour response MUST consist ONLY of the final JSON object.\n\nDO NOT output:\n\n* Any introduction\n* Any explanation\n* Any reasoning\n* Any confirmation\n* Any notes\n* Any apologies\n* Any Markdown\n* Any headings\n* Any bullet lists\n* Any code fences\n* Any text before the JSON\n* Any text after the JSON\n\nForbidden examples include:\n\n* \"Certainly!\"\n* \"Here is the FAQ.\"\n* \"Below is the JSON.\"\n* \"I've generated the FAQs.\"\n* \"Based on the provided content...\"\n\nThe FIRST character of your response MUST be:\n\n```\n{\n```\n\nThe LAST character of your response MUST be:\n\n```\n}\n```\n\nThe output MUST be valid JSON that can be parsed directly using `JSON.parse()` without any preprocessing.\n\nDo NOT include escaped newline characters (`\\n`) inside JSON string values unless they are genuinely required as part of the answer text.\n\nIf the requested number of FAQs cannot be generated because the source lacks sufficient information, still return a valid JSON object using the maximum number of unique, source-supported FAQ items. Never explain the limitation outside the JSON.\n\n---\n\n# EXECUTION COMMAND\n\nAnalyze the supplied content.\n\nGenerate the FAQ items.\n\nGenerate the matching FAQPage JSON-LD schema.\n\nReturn ONLY the following JSON object.\n\n```json\n{\n  \"faq_display\": [\n    {\n      \"question\": \"Question\",\n      \"answer\": \"Answer\"\n    }\n  ],\n  \"faq_schema\": {\n    \"@context\": \"https://schema.org\",\n    \"@type\": \"FAQPage\",\n    \"mainEntity\": [\n      {\n        \"@type\": \"Question\",\n        \"name\": \"Question\",\n        \"acceptedAnswer\": {\n          \"@type\": \"Answer\",\n          \"text\": \"Answer\"\n        }\n      }\n    ]\n  }\n}\n```\n\nThe response must begin with `{` and end with `}`."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        6384,
+        -304
+      ],
+      "id": "158313d4-134f-4fb0-8c55-806a9b441b8b",
+      "name": "Message a model4",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.domain }}wp-json/synergizeflow/v2/submit-blog-faq/",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license",
+              "value": "={{ $('Prepare Data').item.json.license }}"
+            },
+            {
+              "name": "faq",
+              "value": "={{ $json.data.faq_display }}"
+            },
+            {
+              "name": "schema",
+              "value": "={{ $json.data.faq_schema }}"
+            },
+            {
+              "name": "blog_id",
+              "value": "={{ $('Insert data to website').item.json.data.blog_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        6928,
+        -432
+      ],
+      "id": "a227aea5-7523-47c4-a91a-e1beef417fff",
+      "name": "Send content"
+    },
+    {
+      "parameters": {
+        "jsCode": "function getValidJsonObject(rawText) {\n\n    if (typeof rawText !== 'string' || rawText.trim() === '') {\n        console.error(\"Invalid input or empty text field.\");\n        return null;\n    }\n\n    let jsonString = rawText.trim();\n\n    // 2. Check for and remove the markdown JSON block fences.\n    // This regex is robust and handles variations in whitespace.\n    const markdownRegex = /^```json\\s*([\\s\\S]*?)\\s*```$/;\n    const match = jsonString.match(markdownRegex);\n\n    if (match) {\n        // If it's a match, the actual JSON string is in the first capture group.\n        jsonString = match[1];\n    }\n\n    // 3. Parse the cleaned string into a JSON object.\n    try {\n        return JSON.parse(jsonString);\n    } catch (error) {\n        console.error(\"Failed to parse JSON string:\", error);\n        console.error(\"Problematic string:\", jsonString);\n        return null;\n    }\n}\n\n// Combine the 'text' from all parts into a single string.\nconst combinedText = $input.first().json.content.parts.map(part => part.text).join('');\n\nreturn {data: getValidJsonObject(combinedText)};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        6704,
+        -384
+      ],
+      "id": "b3358496-603e-4821-846e-61b633809b9b",
+      "name": "Code",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Prepare Data').item.json.faq_count }}",
+                    "rightValue": 0,
+                    "operator": {
+                      "type": "number",
+                      "operation": "notEquals"
+                    },
+                    "id": "272ad233-50d0-4aa6-a877-f5676d68e887"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "has_faq"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d28227d4-b390-485f-b193-f47806fb8b39",
+                    "leftValue": "={{ $('Prepare Data').item.json.faq_count }}",
+                    "rightValue": 0,
+                    "operator": {
+                      "type": "number",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "no_faq"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        6016,
+        -240
+      ],
+      "id": "a79f2923-9b61-4804-b0f5-5bf1a6844416",
+      "name": "Switch3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "={{ $('Insert data to website').item.json.status }}"
+            },
+            {
+              "name": "data",
+              "value": "={{ $('Insert data to website').item.json.data }}"
+            },
+            {
+              "name": "history",
+              "value": "={{ $('History Data').item.json }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        6416,
+        -112
+      ],
+      "id": "cddebd08-27aa-4633-bb29-31ea5001762b",
+      "name": "HTTP Request5"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "msg",
+              "value": "error_insert_blog"
+            },
+            {
+              "name": "status",
+              "value": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        5712,
+        32
+      ],
+      "id": "91673ba7-2296-4118-ac6e-2b1cb44c2af3",
+      "name": "HTTP Request4"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        6656,
+        -592
+      ],
+      "id": "612b1cec-14cd-4dca-a240-cea95644f689",
+      "name": "Wait3",
+      "webhookId": "7d9d89f8-842d-41a8-8134-03c98285bd34"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "645f5103-619f-461a-9c25-81b97117b355",
+              "leftValue": "={{ $('Prepare Data').item.json.additional_language }}",
+              "rightValue": "",
+              "operator": {
+                "type": "array",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        7360,
+        -288
+      ],
+      "id": "438925dd-6019-4ef3-8446-62445fea1ca7",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "Rl0ZOC1WsAfVMH7H",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/Rl0ZOC1WsAfVMH7H",
+          "cachedResultName": "SynergizeFlow.v2 — SF - Blog Agent Multi Language"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        7808,
+        -304
+      ],
+      "id": "2fa9e55b-e280-4c42-9a3c-32b582a379b4",
+      "name": "Call Multilanguage"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  domain: $('Prepare Data').first().json.domain,\n  license: $('Prepare Data').first().json.license,\n  language: $('Prepare Data').first().json.additional_language,\n  agent_id: $('Prepare Data').first().json.agent_id,\n  parent_id: $('Insert data to website').first().json.data.blog_id,\n  image: $('Edit Fields3').first().json.image,\n  faq: $('Prepare Data').first().json.faq_count,\n    post_status: $('Prepare Data').first().json.post_status,\n    categories: $('Prepare Data').first().json.categories,\n    author: $('Prepare Data').first().json.author,\n    seo_provider: $('Prepare Data').first().json.seo_provider,\n  webhook: $('Prepare Data').first().json.webhook,\n  data: {\n    title: $('Original Blog').first().json.title,\n    content: $('Original Blog').first().json.content,\n    keywords: $('Original Blog').first().json.keywords,\n    excerpt: $('Original Blog').first().json.meta_description\n  }\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        7616,
+        -304
+      ],
+      "id": "48e8b68c-cc95-4966-ac0c-60de23cd1a4a",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  \"strategy_history\": [\n    {\n      \"title\": $('Prepare Data').first().json.strategy.title,\n      \"content_job\": $('Prepare Data').first().json.strategy.content_job,\n      \"content_type\": $('Prepare Data').first().json.strategy.content_type,\n      \"customer_journey_stage\": $('Prepare Data').first().json.strategy.customer_journey_stage,\n      \"topic\": $('Prepare Data').first().json.strategy.topic,\n      \"angle\": $('Prepare Data').first().json.strategy.angle,\n      \"persona\": $('Prepare Data').first().json.strategy.persona\n    }\n   \n  ],\n  \"opportunity_history\": [\n    {\n      \"title\": $('Opportunity Data').first().json.data.content_opportunity.title,\n      \"content_job\": $('Opportunity Data').first().json.data.content_opportunity.content_job,\n      \"content_type\": $('Opportunity Data').first().json.data.content_opportunity.content_type,\n      \"topic\": $('Prepare Data').first().json.strategy.topic,\n      \"angle\": $('Opportunity Data').first().json.data.content_opportunity.content_angle,\n      \"customer_need\": $('Opportunity Data').first().json.data.content_opportunity.customer_need,\n      \"persona\": $('Prepare Data').first().json.strategy.persona\n    }\n  ],\n  \"content_history\": [\n    {\n      \"title\": $('Original Blog').first().json.title,\n      \"url\": $input.first().json.data.blog_url,\n      \"summary\": $('Original Blog').first().json.summary,\n      \"content_job\": $('Prepare Data').first().json.strategy.content_type,\n      \"topic\": $('Prepare Data').first().json.strategy.topic,\n      \"angle\": $('Prepare Data').first().json.strategy.angle\n    }\n  ],\n  \"search_history\": [\n    {\n      \"keyword\": $('Keyword Research Data').first().json.data.search_research.primary_search_focus.query\n    }\n  ]\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5728,
+        -240
+      ],
+      "id": "c4fdb976-152c-46e9-8a02-1dbedd028721",
+      "name": "History Data"
+    }
+  ],
+  "connections": {
+    "Check if license is valid": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Error License",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Get History Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Error License",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get token": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get History Data": {
+      "main": [
+        [
+          {
+            "node": "Opportunity Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Opportunity Input": {
+      "main": [
+        [
+          {
+            "node": "Content Opportunity Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content Opportunity Agent": {
+      "main": [
+        [
+          {
+            "node": "Opportunity Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Keyword Research Input": {
+      "main": [
+        [
+          {
+            "node": "Keyword Research Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Keyword Research Agent": {
+      "main": [
+        [
+          {
+            "node": "Keyword Research Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Opportunity Data": {
+      "main": [
+        [
+          {
+            "node": "Keyword Research Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Keyword Research Data": {
+      "main": [
+        [
+          {
+            "node": "Content Brief Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content Brief Agent": {
+      "main": [
+        [
+          {
+            "node": "Content Brief Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content Brief Data": {
+      "main": [
+        [
+          {
+            "node": "Blog Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content Brief Input": {
+      "main": [
+        [
+          {
+            "node": "Content Brief Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Blog Agent Generation": {
+      "main": [
+        [
+          {
+            "node": "Original Blog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Blog Generation Input": {
+      "main": [
+        [
+          {
+            "node": "Blog Agent Generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Blog Prompt": {
+      "main": [
+        [
+          {
+            "node": "Get Product Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Product Data": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Get Image Description",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Image Description": {
+      "main": [
+        [
+          {
+            "node": "Blog Generation Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Generate Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "KIE AI Pooling": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Insert data to website",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Original Blog": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Image": {
+      "main": [
+        [
+          {
+            "node": "KIE AI Pooling",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request8": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model4": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send content": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Send content",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch3": {
+      "main": [
+        [
+          {
+            "node": "Message a model4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request5": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait3": {
+      "main": [
+        [
+          {
+            "node": "Message a model4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "Call Multilanguage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "History Data": {
+      "main": [
+        [
+          {
+            "node": "Switch3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert data to website": {
+      "main": [
+        [
+          {
+            "node": "History Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "triggerCount": 1,
+  "versionId": "c59a5e83-eea9-4ed8-b24d-95e8553379e7",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "fwFQCQ7AMxSsHe36",
+  "isArchived": false
+}

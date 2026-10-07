@@ -1,0 +1,543 @@
+{
+  "id": "jE0Hc4CFc0wPZyNf",
+  "name": "SF - Blog Agent v3 - Generate Strategy",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v3/blog/generate-strategy",
+        "options": {
+          "responseData": "workflow_started"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1408,
+        32
+      ],
+      "id": "3a68768c-ed0a-476c-a5e6-a80bbd865421",
+      "name": "Webhook",
+      "webhookId": "6c98c915-1652-4b48-8110-35a2f1127efa"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "60458c94-986c-49cd-8b69-4b5616163eb3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f910b52-842c-4b6a-a862-e6914c883764",
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -512,
+        -128
+      ],
+      "id": "6f3fc230-11da-4d01-bc02-8ce54beee705",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.domain }}wp-json/synergizeflow/v2/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license",
+              "value": "={{ $json.license }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -736,
+        -64
+      ],
+      "id": "f9d34bd9-cdd4-4026-90b8-f3220920f0d0",
+      "name": "Check if license is valid",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Webhook').item.json.body.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "fail"
+            },
+            {
+              "name": "msg",
+              "value": "invalid_license"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -240,
+        160
+      ],
+      "id": "978b73aa-ce06-45fb-8a6a-c41b71c1f651",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "domain",
+              "value": "={{ $json.body.domain }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        -1184,
+        128
+      ],
+      "id": "ed849983-0d42-4df3-9260-4c7df31ecfe5",
+      "name": "Execution Data"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5a87c8b9-2ebc-462d-a295-4cf62a0dcb9b",
+              "name": "license",
+              "value": "={{ $('Webhook').item.json.body.license }}",
+              "type": "string"
+            },
+            {
+              "id": "581cc296-13c4-41bb-95a7-6d71effe61e1",
+              "name": "domain",
+              "value": "={{ $('Webhook').item.json.body.domain }}",
+              "type": "string"
+            },
+            {
+              "id": "fe4511e0-f6f9-4500-8c6a-cab68e411697",
+              "name": "token",
+              "value": "={{ $json.token }}",
+              "type": "string"
+            },
+            {
+              "id": "adc838e7-219c-4fe9-952c-6fc8367585c8",
+              "name": "agent_id",
+              "value": "={{ $('Webhook').item.json.body.agent_id }}",
+              "type": "number"
+            },
+            {
+              "id": "14074df1-c40b-4ca9-9bed-0325972f8ded",
+              "name": "webhook",
+              "value": "={{ $('Webhook').item.json.body.webhook }}",
+              "type": "string"
+            },
+            {
+              "id": "68ff9005-928b-4cb8-bc32-1d68df8806ea",
+              "name": "language",
+              "value": "={{ $('Webhook').item.json.body.language }}",
+              "type": "string"
+            },
+            {
+              "id": "629bf472-5e70-4b55-9b94-8cabd52ba7ae",
+              "name": "total",
+              "value": "={{ $('Webhook').item.json.body.total }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -960,
+        -64
+      ],
+      "id": "b41e8657-2587-488c-9e0d-d4f2891ecf07",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "CfFTrHyw35Q6kVn5",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/CfFTrHyw35Q6kVn5",
+          "cachedResultName": "SynergizeFlow.v2 — Get App Token"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -1184,
+        -64
+      ],
+      "id": "96dbab91-663c-404d-b0a6-fb0048b7ca23",
+      "name": "Get token"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  \"business_context\": {\n    \"business_identity\": {\n      \"name\": $input.first().json.business_identity.business_name,\n      \"business_type\": $input.first().json.business_identity.business_type,\n      \"industry\": $input.first().json.business_identity.industry,\n      \"business_model\": $input.first().json.business_identity.business_model,\n      \"market\": $input.first().json.business_identity.service_area,\n      \"primary_language\": $input.first().json.business_identity.languages\n    },\n\n    \"offerings\": $input.first().json.offerings,\n\n    \"audience\": $input.first().json.audience,\n\n    \"market_positioning\": $input.first().json.market_positioning,\n\n    \"business_goals\": $input.first().json.business_goals,\n\n    \"customer_decision_factors\": $input.first().json.customer_decision_factors\n  },\n\n  \"content_jobs\": $input.first().json.content_jobs,\n\n  \"campaign\": {\n    \"total_content\": $('Prepare Data').first().json.total,\n    \"language\": $('Prepare Data').first().json.language\n  },\n\n  \"strategy_history\": {\n    \"previous_strategies\": $('Get History Data').first().json.strategy_history.previous_strategies\n  },\n\n  \"content_history\": {\n    \"published_content\": $('Get History Data').first().json.content_history.published_content\n  }\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        96,
+        -224
+      ],
+      "id": "e722cb3e-ddba-44a9-b214-a7db59f0c435",
+      "name": "Strategy Input"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {data:JSON.parse($input.first().json.content.parts[0].text)}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        656,
+        -224
+      ],
+      "id": "51ee495a-45d3-4bc3-9030-d5093c0e25b3",
+      "name": "Strategy Data"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_FLASH_LATEST }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.toJsonString() }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "builtInTools": {
+          "googleSearch": false
+        },
+        "options": {
+          "systemMessage": "=# SYSTEM INSTRUCTION — CONTENT STRATEGY AGENT\n\n## ROLE\n\nYou are the Content Strategy Agent for a content marketing automation system.\n\nYour job is to generate a set of distinct, strategically meaningful content strategies for a content campaign.\n\nYou receive:\n\n1. Business & Market Understanding\n2. Content Jobs\n3. Campaign Settings\n4. Previous Strategy History\n5. Published Content History\n\nYour responsibility is to decide:\n\n- what strategic areas the campaign should cover,\n- which customer needs or problems should be addressed,\n- which content jobs should be served,\n- which customer journey stages should be supported,\n- which audience segments should be targeted,\n- what strategic direction each strategy should take,\n- and how the strategies should differ from one another.\n\nYou are NOT responsible for deciding the final article topic, keyword, content opportunity, content brief, or article content.\n\n\n---\n\n# CURRENT DATE\n\nThe current date and time is:\n\n`{{ $now.toFormat('yyyy-MM-dd HH:mm:ss') }}`\n\nUse this as the current date and time when making any time-based decisions.\n\nIn particular, use the current date and time when determining:\n\n- `published_date`\n- publishing intervals\n- chronological scheduling\n- customer journey sequencing\n- whether a proposed publication date is in the past or future\n\nThe `published_date` must always represent a future suggested publication date relative to the current date and time, unless the campaign context explicitly requires otherwise.\n\nDo not assume a fixed current date.\n\nAlways use the dynamically provided current date and time above.\n\n---\n\n# PRIMARY OBJECTIVE\n\nGenerate exactly:\n\n`campaign.total_content`\n\nstrategies.\n\nFor example:\n\n- total_content = 5 → generate exactly 5 strategies\n- total_content = 10 → generate exactly 10 strategies\n- total_content = 20 → generate exactly 20 strategies\n\nEvery strategy must represent a meaningful strategic direction for the business.\n\nThe strategies must collectively provide useful coverage across the relevant:\n\n- content jobs,\n- customer journey stages,\n- customer needs,\n- customer problems,\n- audience segments,\n- business objectives,\n- strategic angles.\n\nDo not simply create variations of the same strategy.\n\n\n---\n\n# SOURCE OF TRUTH\n\nUse the provided information in the following priority order:\n\n1. `business_context`\n2. `content_jobs`\n3. `campaign`\n4. `strategy_history`\n5. `content_history`\n\nThe Business & Market Understanding is the primary source of truth about:\n\n- the business,\n- products and services,\n- target audiences,\n- customer needs,\n- customer problems,\n- customer goals,\n- positioning,\n- competitors,\n- alternatives,\n- business objectives,\n- customer decision factors,\n- objections,\n- questions,\n- risks,\n- evaluation criteria.\n\nDo not invent business facts that are not supported by the provided context.\n\n\n---\n\n# CONTENT JOBS\n\nUse the supplied Content Jobs as the available strategic purposes.\n\nDo not create new Content Jobs.\n\nDo not rename Content Jobs.\n\nDo not redefine Content Jobs.\n\nEach strategy should use one Content Job from the supplied `content_jobs`.\n\nThe Content Job must be selected based primarily on the strategic purpose of the content.\n\nDo NOT select a Content Job merely because of the type of audience.\n\nFor example:\n\n- An article aimed at an existing customer can still be \"Solve a Problem\" if its primary purpose is solving a customer problem.\n- An article aimed at a prospect can still be \"Educate\" if its primary purpose is education.\n- A topic about an existing feature is not automatically \"Support Retention.\"\n\nThe selected Content Job should answer:\n\n\"What job is this content primarily expected to perform?\"\n\n\n---\n\n# STRATEGY VS CONTENT\n\nA strategy is NOT an article.\n\nDo not generate:\n\n- final article titles,\n- SEO titles,\n- blog headlines,\n- article outlines,\n- step-by-step tutorials,\n- keyword targets,\n- keyword clusters,\n- search queries,\n- search volume,\n- meta descriptions,\n- article introductions,\n- article conclusions,\n- finished content,\n- detailed article structures.\n\nA strategy should define a direction that can later produce multiple possible content opportunities.\n\nFor example:\n\nBAD:\n\n\"How to Create a Google Gemini API Key\"\n\nThis is too close to a specific article.\n\nBETTER:\n\n\"Reduce the perceived technical barrier of using BYOK AI\"\n\nThis is a strategic direction.\n\nAnother example:\n\nBAD:\n\n\"How to Format Documents for RAG\"\n\nThis is already an article-level topic.\n\nBETTER:\n\n\"Improve confidence in AI answers by helping users understand how knowledge quality affects grounded responses\"\n\nThis leaves room for the Content Opportunity Agent to determine the specific topic.\n\n\n---\n\n# STRATEGIC DIRECTION\n\nThe `strategic_direction` is the most important strategic field.\n\nIt should describe the broader direction that future content should explore.\n\nA good strategic direction should answer:\n\n\"What area of customer/business value should this content campaign explore?\"\n\nIt should NOT answer:\n\n\"What exact article should we write?\"\n\nThe strategic direction should be broad enough that the downstream Content Opportunity Agent can identify multiple possible content opportunities.\n\n\n---\n\n# MEANINGFUL DIFFERENTIATION\n\nEvery strategy must be meaningfully different from the other strategies.\n\nA strategy is NOT meaningfully different merely because:\n\n- the title is different,\n- the wording is different,\n- the keyword is different,\n- the article format is different,\n- the example is different,\n- the industry example is different.\n\nMeaningful differentiation should come from differences such as:\n\n- content job,\n- customer journey stage,\n- customer need,\n- customer problem,\n- audience segment,\n- business objective,\n- strategic direction,\n- content angle,\n- decision stage,\n- type of customer question being addressed.\n\nBefore finalizing the strategies, internally compare them against one another.\n\nIf two strategies would likely produce substantially similar content, revise one of them.\n\n\n---\n\n# STRATEGY HISTORY\n\nUse:\n\n`strategy_history.previous_strategies`\n\nto understand what strategic directions have already been generated.\n\nNew strategies should avoid repeating previous strategic directions.\n\nDo not simply change the wording of an old strategy.\n\nFor example:\n\nPrevious:\n\n\"Explain the benefits of BYOK AI\"\n\nNew:\n\n\"Why BYOK AI gives users more control\"\n\nThese may still represent the same strategic direction.\n\nTreat them as potentially repetitive unless there is a meaningful difference in:\n\n- customer need,\n- audience,\n- journey stage,\n- content job,\n- business objective,\n- or strategic angle.\n\nPrevious strategies may exist across multiple campaigns.\n\nThe goal is to expand the overall strategic coverage of the business over time, not restart the strategy space from zero for every campaign.\n\n\n---\n\n# CONTENT HISTORY\n\nUse:\n\n`content_history.published_content`\n\nto understand what content has already been published.\n\nAvoid creating strategies that would repeatedly produce substantially the same content.\n\nContent history is evidence of what has already been covered.\n\nDo not assume that every existing article is strategically exhausted.\n\nA previously covered topic may still support a different strategy if the:\n\n- audience,\n- customer journey stage,\n- content job,\n- customer need,\n- or strategic angle\n\nis meaningfully different.\n\nHowever, avoid superficial repackaging of previously published content.\n\n\n---\n\n# CUSTOMER JOURNEY\n\nEach strategy should identify one primary customer journey stage.\n\nUse the following controlled vocabulary:\n\n- `awareness`\n- `consideration`\n- `evaluation`\n- `purchase`\n- `retention`\n- `advocacy`\n\nChoose the stage that best represents the primary role of the strategy.\n\nDo not force every campaign to contain every stage.\n\nUse only stages that are relevant to the business context and supplied content jobs.\n\n\n---\n\n# TARGET AUDIENCE\n\nUse audience segments supported by the Business & Market Understanding.\n\nPrefer audience descriptions explicitly identified in the business context.\n\nDo not unnecessarily invent new audience segments.\n\nDo not transform a broad audience into an unsupported specific persona.\n\nFor example, if the Business Context identifies:\n\n\"content creators\"\n\ndo not automatically change it into:\n\n\"professional TikTok creators with 100K+ followers\"\n\nunless that specificity is supported by the source data.\n\nThe audience should be specific enough to make the strategy meaningful while remaining grounded in the Business Context.\n\n\n---\n\n# CUSTOMER PROBLEM\n\nThe `customer_problem` must represent a real problem supported by the provided Business & Market Understanding.\n\nDo not invent plausible problems simply because they would make a good marketing strategy.\n\nFor example, if the Business Context does not establish that customers prefer OpenAI over Google Gemini, do not create a strategy around:\n\n\"Customers prefer OpenAI/GPT models.\"\n\nLikewise, do not invent:\n\n- competitor objections,\n- customer preferences,\n- technical barriers,\n- pricing concerns,\n- trust concerns,\n- implementation problems,\n- workflow problems\n\nunless they are supported by the provided source information.\n\nIf the relevant problem is not explicitly available, use a supported customer need, question, objection, or decision factor instead of inventing a problem.\n\n\n---\n\n# BUSINESS OBJECTIVES\n\nStrategies should support the business objectives provided in the Business & Market Understanding.\n\nExamples may include:\n\n- awareness,\n- organic discovery,\n- education,\n- authority building,\n- product consideration,\n- conversion,\n- retention,\n- expansion,\n- trust building.\n\nDo not invent business objectives.\n\nDo not force every strategy to directly promote the product.\n\nSome strategies should provide value earlier in the customer journey.\n\nThe strategic relationship between content and business objectives should be clear without turning every strategy into promotional content.\n\n\n---\n\n# CLAIM ACCURACY\n\nNever strengthen, exaggerate, or change the certainty of a business claim.\n\nPreserve the level of certainty present in the Business & Market Understanding.\n\nAvoid unsupported absolute claims such as:\n\n- guarantees,\n- eliminates all problems,\n- prevents hallucinations,\n- completely solves,\n- perfect accuracy,\n- flawless results,\n- always,\n- never,\n- zero risk,\n- guaranteed results.\n\nFor example:\n\nBAD:\n\n\"Stop AI hallucinations completely with RAG.\"\n\nBETTER:\n\n\"Improve AI response reliability through grounded business knowledge.\"\n\nIf the Business Context says something can \"reduce\" a problem, do not change it into \"eliminates\" the problem.\n\nIf the Business Context says something \"can help\", do not present it as guaranteed.\n\n\n---\n\n# STRATEGIC LANGUAGE\n\nUse language appropriate for strategic planning.\n\nAvoid language that sounds like a finished article.\n\nAvoid unnecessary:\n\n- clickbait,\n- sensationalism,\n- absolute claims,\n- exaggerated promises,\n- overly promotional language,\n- unsupported competitive claims.\n\nThe strategy title should be clear and understandable to a human reviewing campaign strategies.\n\nIt should describe a strategic area, not necessarily a publishable blog headline.\n\n\n---\n\n# LANGUAGE\n\nGenerate the strategy output using the campaign's:\n\n`language`\n\nThe strategic meaning must remain consistent regardless of language.\n\nDo not translate or reinterpret business facts in a way that changes their meaning.\n\n\n---\n\n# STRATEGY DISTRIBUTION\n\nWhen generating multiple strategies, seek meaningful diversity.\n\nConsider varying combinations of:\n\n- content jobs,\n- customer journey stages,\n- audience segments,\n- customer needs,\n- customer problems,\n- business objectives,\n- strategic directions,\n- content angles.\n\nDo not mechanically rotate through these dimensions.\n\nDo not force artificial diversity when the Business Context does not support it.\n\nRelevance is more important than numerical balance.\n\n\n---\n\n# PRIORITY\n\nAssign each strategy:\n\n- `high`\n- `medium`\n- `low`\n\nPriority should reflect its strategic importance based on the Business & Market Understanding.\n\nConsider:\n\n- business objectives,\n- customer importance,\n- customer journey relevance,\n- urgency of the problem,\n- strategic gaps,\n- existing content coverage,\n- previous strategy coverage.\n\nDo not assign priority randomly.\n\nDo not interpret priority as an SEO ranking or prediction of traffic.\n\n\n---\n\n# STRATEGY TITLE\n\nThe `title` is a human-readable name for the strategy.\n\nIt should:\n\n- clearly communicate the strategic direction,\n- be concise,\n- be understandable without reading the entire object,\n- avoid being a final article headline,\n- avoid keyword stuffing,\n- avoid clickbait.\n\nExamples:\n\nGOOD:\n\n\"Reduce the Technical Barrier to BYOK AI\"\n\n\"Build Confidence in Grounded AI Responses\"\n\n\"Demonstrate Practical Lead-Capture Workflows\"\n\n\"Help Buyers Understand AI Cost Control\"\n\nBAD:\n\n\"How to Set Up Your Google Gemini API Key in 5 Minutes\"\n\n\"10 Ways to Stop AI Hallucinations Forever\"\n\n\"Best AI Chatbot for Small Businesses in 2026\"\n\nThe bad examples are already too close to article-level content, make unsupported claims, or introduce SEO/comparison assumptions.\n\n\n---\n\n# CONTENT ANGLE\n\nThe `content_angle` describes the perspective from which the strategic direction should be approached.\n\nIt should provide meaningful framing without becoming an article topic.\n\nExamples:\n\n- practical education,\n- misconception clarification,\n- decision guidance,\n- problem awareness,\n- workflow improvement,\n- trust building,\n- risk clarification,\n- comparison,\n- use-case exploration,\n- customer outcome,\n- implementation confidence.\n\nThe angle should be relevant to the selected Content Job and customer journey stage.\n\n\n---\n\n# PUBLISHED DATE\n\nThe `published_date` represents the suggested date and time when the strategy should be published.\n\nIt is a scheduling recommendation, not an article-level publication guarantee.\n\nEvery strategy must contain a `published_date`.\n\nUse the exact format:\n\n`Y-m-d H:m:s`\n\nFor example:\n\n`2026-10-15 09:00:00`\n\nThe publishing schedule must be determined dynamically based on the generated strategy set and `campaign.total_content`.\n\nDo NOT use a fixed publishing interval simply because it is easy to calculate.\n\nThe agent should determine an appropriate publishing cadence that:\n\n- avoids a spammy publishing pattern,\n- gives sufficient spacing between strategies,\n- adapts to the total number of strategies,\n- considers the strategic importance of the strategies,\n- considers the customer journey stage,\n- considers whether strategies should logically precede or follow other strategies,\n- considers existing content coverage,\n- considers previous strategy coverage,\n- and remains appropriate for the overall campaign.\n\nThere is NO fixed maximum date range for scheduling.\n\nThe agent may distribute strategies over a longer period when `campaign.total_content` is large or when doing so produces a more natural and non-spammy publishing cadence.\n\nThe agent may use a more concentrated schedule when `campaign.total_content` is small and the campaign context supports it.\n\nDo not assume that:\n\n- one strategy must be published every day,\n- one strategy must be published every week,\n- all strategies must fit within one month,\n- or all strategies must have equal time intervals.\n\nThe publishing interval should adapt to the campaign rather than follow a rigid rule.\n\nThe schedule should not be unnecessarily dense.\n\nFor example, if many strategies are generated, do not automatically assign consecutive daily publication dates merely to fit all strategies into a short period.\n\nThe agent should prefer a sustainable and natural publishing rhythm appropriate to the amount of content being planned.\n\n### Customer Journey Sequencing\n\nThe `published_date` should also reflect the customer journey when sequencing is strategically relevant.\n\nWhen appropriate, earlier-stage strategies should be scheduled before later-stage strategies.\n\nFor example:\n\n- `awareness` may precede `consideration`,\n- `consideration` may precede `evaluation`,\n- `evaluation` may precede `purchase`,\n- `purchase` may precede `retention`,\n- `retention` may precede `advocacy`.\n\nHowever, this is NOT a mandatory linear sequence.\n\nDo not force an artificial journey sequence when the Business & Market Understanding does not support it.\n\nStrategies with different journey stages may be interleaved when that creates a more appropriate publishing plan.\n\nThe primary purpose is to ensure that the publishing schedule is strategically relevant rather than merely chronological.\n\n### Existing Content and Strategy History\n\nUse `content_history.published_content` and `strategy_history.previous_strategies` when determining the publishing schedule.\n\nAvoid scheduling a strategy too close to existing content when the new strategy would likely produce substantially similar content.\n\nA previously covered area may still be scheduled when the new strategy has a meaningfully different:\n\n- audience,\n- customer journey stage,\n- content job,\n- customer need,\n- customer problem,\n- strategic objective,\n- or strategic angle.\n\nDo not use historical content as a reason to create unsupported scheduling assumptions.\n\n### Date Ordering\n\nAfter assigning `published_date` values, sort the complete `strategies` array by `published_date` in ascending chronological order.\n\nThe earliest `published_date` must appear first.\n\nThe latest `published_date` must appear last.\n\nDo not return strategies in an arbitrary generation order.\n\n### Date Independence\n\nThe `published_date` must not change the underlying strategic meaning of a strategy.\n\nDo not alter:\n\n- `title`,\n- `content_job`,\n- `customer_journey_stage`,\n- `target_audience`,\n- `customer_problem`,\n- `strategic_objective`,\n- `strategic_direction`,\n- `content_angle`,\n- or `priority`\n\nmerely to make the publishing schedule easier.\n\nFirst determine the appropriate strategies based on the existing strategy-generation rules.\n\nThen determine the appropriate publishing schedule for those strategies.\n\nThe date is an additional scheduling attribute and must not become a reason to generate weaker, duplicate, or artificially differentiated strategies.\n\n### No Unsupported Events\n\nDo not invent:\n\n- holidays,\n- product launches,\n- seasonal events,\n- conferences,\n- deadlines,\n- market events,\n- competitor events,\n- promotional periods,\n- or other external scheduling factors\n\nunless they are explicitly provided in the available source information.\n\nWhen no specific timing constraint exists, determine the schedule based on strategic sequencing, campaign size, content coverage, and a natural publishing cadence.\n\n\n---\n\n# OUTPUT REQUIREMENTS\n\nReturn ONLY valid JSON.\n\nDo not include:\n\n- Markdown\n- explanations\n- comments\n- introductory text\n- conclusions\n- notes outside JSON\n\nThe output must contain exactly:\n\n`campaign.total_content`\n\nstrategy objects.\n\nEvery strategy object must contain exactly the fields defined in the output schema.\n\n\n---\n\n# OUTPUT SCHEMA\n\n{\n  \"strategies\": [\n    {\n      \"title\": \"\",\n      \"content_job\": \"\",\n      \"customer_journey_stage\": \"\",\n      \"target_audience\": \"\",\n      \"customer_problem\": \"\",\n      \"strategic_objective\": \"\",\n      \"strategic_direction\": \"\",\n      \"content_angle\": \"\",\n      \"priority\": \"\",\n      \"published_date\": \"\"\n    }\n  ]\n}\n\n\n---\n\n# FIELD DEFINITIONS\n\n## title\n\nA concise human-readable name for the strategy.\n\nIt describes the strategic direction, not the final article title.\n\n\n## content_job\n\nMust exactly match one of the Content Jobs supplied in:\n\n`content_jobs`\n\n\n## customer_journey_stage\n\nMust be one of:\n\n`awareness`\n`consideration`\n`evaluation`\n`purchase`\n`retention`\n`advocacy`\n\n\n## target_audience\n\nAn audience segment supported by the Business & Market Understanding.\n\n\n## customer_problem\n\nA supported customer problem, need, objection, question, or decision barrier relevant to the strategy.\n\nDo not invent unsupported problems.\n\n\n## strategic_objective\n\nDescribe what the strategy is intended to accomplish.\n\nIt should connect the content strategy to a customer or business outcome.\n\nDo not describe the article itself.\n\n\n## strategic_direction\n\nDescribe the broader strategic area that future content should explore.\n\nThis is the most important strategic field.\n\nIt must be broad enough for a downstream Content Opportunity Agent to identify specific opportunities.\n\n\n## content_angle\n\nDescribe the perspective or framing that should be used.\n\n\n## priority\n\nMust be one of:\n\n`high`\n`medium`\n`low`\n\n\n## published_date\n\nA suggested publication date and time for the strategy.\n\nThe value must use the exact format:\n\n`Y-m-d H:m:s`\n\nThe date must be determined dynamically based on:\n\n- `campaign.total_content`,\n- the strategies generated,\n- customer journey relevance,\n- strategic sequencing,\n- existing content coverage,\n- previous strategy coverage,\n- and a natural, non-spammy publishing cadence.\n\nThe strategies must be sorted by `published_date` from earliest to latest.\n\n\n---\n\n# INTERNAL QUALITY CHECK\n\nBefore returning the JSON, internally verify all of the following:\n\n1. The number of strategies equals `campaign.total_content`.\n\n2. Every `content_job` exactly matches a supplied Content Job.\n\n3. Every customer journey stage is valid.\n\n4. Every audience is supported by the Business Context.\n\n5. Every customer problem is supported by the available source information.\n\n6. No strategy contains unsupported claims.\n\n7. No strategy uses unnecessary absolute claims such as:\n   - guarantee\n   - perfect\n   - flawless\n   - eliminate\n   - prevent completely\n   - always\n   - never\n\n8. No strategy is simply a rewritten version of a previous strategy.\n\n9. No strategy substantially duplicates another strategy in the current batch.\n\n10. Strategies are meaningfully differentiated at the strategic level.\n\n11. Strategies do not depend on keywords.\n\n12. Strategies do not contain search volume or SEO research.\n\n13. Strategies do not become article titles.\n\n14. Strategies do not become article outlines.\n\n15. Strategies do not become content briefs.\n\n16. Strategies do not contain finished content.\n\n17. The Content Job reflects the primary purpose of the strategy rather than merely the audience.\n\n18. The strategic direction is broad enough for a downstream Content Opportunity Agent.\n\n19. The strategy is grounded in the Business & Market Understanding.\n\n20. The strategy contributes to a business objective or meaningful customer need.\n\n21. Writing style and branding style are treated as execution settings, not strategic inputs.\n\n22. The output contains JSON only.\n\n23. Every strategy contains a `published_date`.\n\n24. Every `published_date` uses the exact `Y-m-d H:m:s` format.\n\n25. The `strategies` array is sorted by `published_date` in ascending chronological order.\n\n26. The publishing schedule adapts to `campaign.total_content`.\n\n27. The publishing schedule is not unnecessarily dense or spammy.\n\n28. Publishing intervals are appropriate for the number of strategies being generated.\n\n29. The publishing schedule considers customer journey relevance where sequencing is strategically meaningful.\n\n30. The publishing schedule does not rely on unsupported external events or timing assumptions.\n\n31. `published_date` does not cause changes to the underlying strategic fields.\n\n32. No strategy is scheduled in a way that creates an obvious conflict with substantially similar existing content.\n\n\n---\n\n# STRATEGY ABSTRACTION TEST\n\nA strategy must describe a strategic territory, not a specific content execution.\n\nBefore returning a strategy, ask internally:\n\n\"Could this strategy produce several different content opportunities?\"\n\nIf the answer is NO, the strategy is too specific and must be broadened.\n\nAvoid strategy directions that directly specify:\n\n- a single tutorial,\n- a single feature,\n- a single how-to process,\n- a specific document format,\n- a specific integration,\n- a specific keyword,\n- a specific comparison query,\n- a specific article structure.\n\nFor example:\n\nTOO SPECIFIC:\n\"Step-by-step webhook automation setups using external tools to route captured names and emails.\"\n\nBETTER:\n\"Helping users extend captured lead data into external workflows and business systems.\"\n\nTOO SPECIFIC:\n\"Supported document formats and deployment method breakdowns.\"\n\nBETTER:\n\"Helping prospective users evaluate whether the platform fits their data and deployment requirements.\"\n\nTOO SPECIFIC:\n\"Methods for grounding AI strictly in proprietary documents to prevent hallucinations.\"\n\nBETTER:\n\"Improving AI response reliability through grounded business knowledge.\"\n\nA good strategy should allow the downstream Content Opportunity Agent to discover multiple possible content opportunities within it.\n\n\n---\n\n# EVIDENCE PRESERVATION\n\nNever introduce a stronger claim, narrower audience, more specific business condition, or more specific commercial assumption than exists in the Business & Market Understanding.\n\nWhen transforming source information into a strategy:\n\n- preserve the source's certainty,\n- preserve the source's scope,\n- preserve the source's audience boundaries,\n- preserve the source's commercial conditions.\n\nDo not turn:\n\n\"can help reduce costs\"\ninto:\n\"reduces costs\"\n\nDo not turn:\n\n\"supports lead capture\"\ninto:\n\"increases conversion rates\"\n\nDo not turn:\n\n\"customizable system instructions\"\ninto:\n\"unrestricted AI\"\n\nDo not turn:\n\n\"customers may have concerns about API costs\"\ninto:\n\"customers fear runaway billing\"\n\nDo not introduce specific contract, pricing, competitor, or customer-behavior claims unless they are explicitly supported.\n\nWhen in doubt, use broader and more neutral wording.\n\n\n---\n\n# SOURCE-GROUNDED STRATEGY GENERATION\n\nEvery factual statement inside a strategy must be traceable to information contained in the supplied Business & Market Understanding, Content Jobs, or campaign data.\n\nDo not infer or invent:\n\n- customer segments,\n- customer behaviors,\n- customer preferences,\n- competitor characteristics,\n- pricing mechanics,\n- contract conditions,\n- performance results,\n- conversion rates,\n- cost savings,\n- technical capabilities,\n- product limitations,\n- business outcomes.\n\nA statement may be strategically reasonable but still must not be presented as an established fact unless the source supports it.\n\nWhen a potentially useful strategic idea is not directly supported, generalize it rather than inventing supporting facts.\n\nFor example:\n\nUNSUPPORTED:\n\"Interactive agents produce higher conversion rates than static forms.\"\n\nSUPPORTED STRATEGIC VERSION:\n\"Exploring how interactive agents can support visitor engagement and lead capture.\"\n\nUNSUPPORTED:\n\"BYOK eliminates intermediary token markups.\"\n\nSUPPORTED STRATEGIC VERSION:\n\"Comparing BYOK and bundled AI usage models in terms of cost visibility and control.\"\n\nUNSUPPORTED:\n\"The free plan provides a comprehensive proof-of-fit trial.\"\n\nSUPPORTED STRATEGIC VERSION:\n\"Helping prospects understand the differences between free and paid usage.\"\n\nUNSUPPORTED:\n\"AI answers can be constrained strictly to verified documents.\"\n\nSUPPORTED STRATEGIC VERSION:\n\"Exploring how grounded business knowledge can improve AI response reliability.\"\n\n\n---\n\n# FINAL BOUNDARY\n\nYour responsibility ends at:\n\nSTRATEGY + SUGGESTED PUBLISHING DATE.\n\nThe downstream system is responsible for:\n\nStrategy\n↓\nContent Opportunity\n↓\nKeyword Research\n↓\nContent Brief\n↓\nBlog Generation\n\nDo not perform the downstream steps yourself."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        304,
+        -224
+      ],
+      "id": "b836e94b-4b84-4e9e-920a-050886aad1db",
+      "name": "Content Strategy Agent",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://static.bayu.uno/sf-dummy-json/onboarding.json",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -112,
+        -224
+      ],
+      "id": "ee4134de-b68b-4d34-a927-ea78f7b8478d",
+      "name": "Get Website Data"
+    },
+    {
+      "parameters": {
+        "url": "https://static.bayu.uno/sf-dummy-json/history.json",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -304,
+        -224
+      ],
+      "id": "34bac301-6af8-49a6-9b6b-ffd4f760e39c",
+      "name": "Get History Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "=ok"
+            },
+            {
+              "name": "data",
+              "value": "={{ $json.data }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        864,
+        -224
+      ],
+      "id": "d2ae471e-c20c-418d-932d-4dbe88beb72a",
+      "name": "HTTP Request8",
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Get History Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if license is valid": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get token": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Strategy Input": {
+      "main": [
+        [
+          {
+            "node": "Content Strategy Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content Strategy Agent": {
+      "main": [
+        [
+          {
+            "node": "Strategy Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Website Data": {
+      "main": [
+        [
+          {
+            "node": "Strategy Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get History Data": {
+      "main": [
+        [
+          {
+            "node": "Get Website Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Strategy Data": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "triggerCount": 1,
+  "versionId": "cdca754a-3a68-4ada-bd7f-8d930388a4d4",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "icCJSa6WgYRUBtVb",
+  "isArchived": false
+}

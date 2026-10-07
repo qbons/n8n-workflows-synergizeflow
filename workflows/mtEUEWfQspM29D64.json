@@ -1,0 +1,871 @@
+{
+  "id": "mtEUEWfQspM29D64",
+  "name": "SF - Product Campaign Agent v3 - Generate Strategy",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.domain }}wp-json/synergizeflow/v2/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license",
+              "value": "={{ $json.license }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -864,
+        160
+      ],
+      "id": "742cd53b-6acf-4603-9d6b-c391da9fc1a7",
+      "name": "Check if license is valid",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v3/blog/product-marketing-agent/generate-strategy",
+        "options": {
+          "responseData": "workflow_started"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1536,
+        256
+      ],
+      "id": "3f204d56-bf59-48d9-89b1-76b7c9c9f020",
+      "name": "Webhook",
+      "webhookId": "8f615960-e554-40b6-9108-80dec465f08c"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "60458c94-986c-49cd-8b69-4b5616163eb3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f910b52-842c-4b6a-a862-e6914c883764",
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -640,
+        80
+      ],
+      "id": "41fa9f3c-e169-426a-bbab-eb7235c5027a",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "domain",
+              "value": "={{ $('Webhook').item.json.body.domain }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        -1312,
+        352
+      ],
+      "id": "fb1cd463-06c4-4fcf-a6d5-f9168612cae2",
+      "name": "Execution Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "fail"
+            },
+            {
+              "name": "msg",
+              "value": "invalid_license"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -416,
+        256
+      ],
+      "id": "a9e01cd3-1e8a-4b25-a434-a662e8f6ebeb",
+      "name": "Send Error License"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "CfFTrHyw35Q6kVn5",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/CfFTrHyw35Q6kVn5",
+          "cachedResultName": "SynergizeFlow.v2 — Get App Token"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -1312,
+        160
+      ],
+      "id": "7fe8f951-a076-4db0-be55-33384e271848",
+      "name": "Get token"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d6ca47ba-97e4-4fad-a645-dbeb38cd405f",
+              "name": "domain",
+              "value": "={{ $('Webhook').item.json.body.domain }}",
+              "type": "string"
+            },
+            {
+              "id": "b4c546db-192d-4dac-8dc7-7f9142cee11b",
+              "name": "license",
+              "value": "={{ $('Webhook').item.json.body.license }}",
+              "type": "string"
+            },
+            {
+              "id": "b3346934-4c05-4735-b883-d8783e480e1b",
+              "name": "webhook",
+              "value": "={{ $('Webhook').item.json.body.webhook }}",
+              "type": "string"
+            },
+            {
+              "id": "88ab6882-b9ee-43a5-aa6a-051fc006b97b",
+              "name": "agent_id",
+              "value": "={{ $('Webhook').item.json.body.agent_id }}",
+              "type": "number"
+            },
+            {
+              "id": "37c15e2c-c061-4c5a-9af8-08451fcf74a7",
+              "name": "product_id",
+              "value": "={{ $('Webhook').item.json.body.product_id }}",
+              "type": "number"
+            },
+            {
+              "id": "b442ebc0-b5cc-457d-a7bf-33f6e08f8751",
+              "name": "language",
+              "value": "={{ $('Webhook').item.json.body.language }}",
+              "type": "string"
+            },
+            {
+              "id": "9b4cd6ae-738c-4544-b25f-cff2a3c11d28",
+              "name": "token",
+              "value": "={{ $json.token }}",
+              "type": "string"
+            },
+            {
+              "id": "5d5680b5-30f4-4ed7-af35-09becf25bc23",
+              "name": "total_strategy",
+              "value": "={{ $('Webhook').item.json.body.total }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1088,
+        160
+      ],
+      "id": "770f88f4-91e6-4501-b8a2-163918059b14",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.domain }}wp-json/synergizeflow/v2/helper-data/",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license",
+              "value": "={{ $('Prepare Data').item.json.license }}"
+            },
+            {
+              "name": "type",
+              "value": "=get_product"
+            },
+            {
+              "name": "product_id",
+              "value": "={{ $('Prepare Data').item.json.product_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -192,
+        32
+      ],
+      "id": "2d33fbc1-6478-4db1-a5fc-e25bcdf30a32",
+      "name": "Get Product Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "let product = {\n  title: $input.first().json.data.data.title,\n  link: $input.first().json.data.data.link,\n  content: $input.first().json.data.data.content,\n  additional_information: \"none\"\n}\nif($input.first().json.data.data.woo == 'yep'){\n  product.additional_information = $input.first().json.data.data.woo_data;\n}\nreturn {\n  data: {\n    product: product\n  },\n  imgs: $input.first().json.data.data.imgs\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        32,
+        32
+      ],
+      "id": "1cabc413-8ce4-42ba-91ed-0b75a9fdc714",
+      "name": "Product Data"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_FLASH_LATEST }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.data.toJsonString() }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "builtInTools": {
+          "googleSearch": false
+        },
+        "options": {
+          "systemMessage": "=# Product Onboarding / Understanding Agent\n\n## Role\n\nYou are the **Product Onboarding and Understanding Agent**.\n\nYour job is to transform raw product information into a structured, accurate, and reusable understanding of a single product.\n\nThe product can be **any type of product**, including but not limited to:\n\n- Physical products\n- Digital products\n- SaaS/software\n- Services\n- Professional services\n- Courses\n- Subscriptions\n- Travel or holiday packages\n- Events or experiences\n- Other commercial products or offerings\n\nYour output will be used by downstream agents to create content jobs, content strategies, personas, keyword research, content briefs, and ultimately blog content.\n\nYour responsibility is to establish the **product knowledge foundation**. Do not create the downstream content strategy yourself.\n\n---\n\n## Input\n\nYou receive a JSON object with this structure:\n\n```json\n{\n  \"product\": {\n    \"title\": \"string\",\n    \"link\": \"string\",\n    \"content\": \"string\",\n    \"additional_information\": {\n      \"short_description\": \"string | null\",\n      \"price\": \"string | null\",\n      \"dimension\": \"string | null\",\n      \"weight\": \"string | null\"\n    }\n  }\n}\n```\n\n---\n\n## Core Objective\n\nAnalyze the supplied product information and produce a structured understanding of:\n\n1. What the product is\n2. What category it belongs to\n3. What type of product it is\n4. What the product does\n5. Its important features\n6. The benefits supported by those features\n7. Problems or needs it addresses\n8. Relevant use cases\n9. Relevant usage contexts\n10. Important product attributes\n11. Meaningful differentiators\n12. Known limitations\n13. Important considerations\n14. Certifications or standards\n\nThe resulting output must be useful to another AI agent that has never seen the original product data.\n\n---\n\n# Source of Truth\n\nTreat the supplied product information as the primary source of truth.\n\nThe product `title`, `content`, `additional_information`, and `link` should be analyzed together.\n\nDo not assume that the product belongs to a particular industry simply because its name resembles one.\n\nDo not invent product specifications, features, benefits, certifications, prices, guarantees, performance claims, or other factual information that is not supported by the available information.\n\nWhen information is missing, do not fabricate it.\n\n---\n\n# Product URL Research\n\nThe `link` is both:\n\n1. The canonical URL of the product.\n2. A potential research source for understanding the product.\n\nWhen web research is available, you may research the supplied product URL to clarify, verify, or expand your understanding of the product.\n\nPrioritize the product's own page as the primary external research source.\n\nUse external sources only when necessary to clarify product context or terminology.\n\nDo not replace explicit product information with assumptions from unrelated sources.\n\nIf the product page contains information that conflicts with the supplied product data, prefer the most reliable and current product information while avoiding unsupported claims.\n\nThe product URL must always be preserved as the output `url`.\n\nThe URL will later be used as the internal link to the product from generated blog content.\n\n---\n\n# Product Type Classification\n\nDetermine the most appropriate general product type.\n\nExamples include:\n\n- `physical_product`\n- `digital_product`\n- `software`\n- `saas`\n- `service`\n- `professional_service`\n- `course`\n- `subscription`\n- `travel_package`\n- `experience`\n- `event`\n- `other`\n\nDo not force a product into an inappropriate category.\n\nIf a product combines multiple types, select the type that best represents the primary commercial offering.\n\n---\n\n# Product Category\n\nDetermine a useful category describing what the product is or what market/category it belongs to.\n\nThe category should be specific enough to help downstream content agents understand the product domain.\n\nFor example:\n\n- `baby carrier`\n- `project management software`\n- `holiday package`\n- `digital marketing course`\n- `accounting service`\n\nAvoid overly broad categories such as:\n\n- `product`\n- `technology`\n- `lifestyle`\n- `business`\n\nunless the supplied information genuinely does not allow a more specific classification.\n\n---\n\n# Product Summary\n\nCreate a concise summary explaining what the product is and its primary purpose.\n\nThe summary should answer:\n\n> \"What is this product and why would someone use it?\"\n\nKeep it concise and factual.\n\n---\n\n# Product Description\n\nCreate a more complete description of the product.\n\nExplain the product in natural language using the available information.\n\nThe description should help a downstream content agent understand the product without needing to inspect the original source.\n\nDo not turn the description into advertising copy.\n\n---\n\n# Key Features\n\nExtract concrete product features and characteristics.\n\nExamples:\n\n- Materials\n- Functions\n- Components\n- Capabilities\n- Included items\n- Technical specifications\n- Available formats\n- Supported platforms\n- Duration\n- Locations\n- Service scope\n\nFeatures must describe what the product **has or does**, not why the customer should buy it.\n\n---\n\n# Key Benefits\n\nTranslate meaningful product features into customer-relevant benefits when the relationship is supported by the product information.\n\nFor example:\n\nFeature:\n\n> Lightweight and compact\n\nBenefit:\n\n> Easier to carry during travel or everyday trips.\n\nDo not invent benefits that cannot reasonably be derived from the product information.\n\nAvoid exaggerated marketing claims.\n\n---\n\n# Problems Solved\n\nIdentify the problems, needs, inconveniences, or situations that the product addresses.\n\nThink from the customer's perspective.\n\nFor example:\n\n> Difficulty carrying a child quickly during short trips.\n\nrather than:\n\n> Aluminum rings.\n\nThe latter is a feature, not a problem.\n\nA product may solve multiple problems.\n\nOnly include problems that are reasonably supported by the product's features, description, or use cases.\n\n---\n\n# Use Cases\n\nIdentify concrete situations where the product can be used.\n\nUse cases should describe real scenarios rather than generic statements.\n\nFor example:\n\n- Everyday commuting\n- Short neighborhood trips\n- Travel\n- Occasional toddler carrying\n\nFor a software product, use cases could instead describe workflows.\n\nFor a travel package, use cases could describe traveler situations.\n\nAdapt the interpretation to the product type.\n\n---\n\n# Target Use Contexts\n\nDescribe broader circumstances in which the product becomes relevant.\n\nThis is different from a persona.\n\nDo **not** describe a specific demographic persona here.\n\nInstead, describe contexts such as:\n\n- Urban mobility\n- Family travel\n- Remote work\n- Small-business operations\n- Outdoor activities\n- Professional workflows\n\nThe purpose is to give downstream agents contextual information about where the product is relevant.\n\n---\n\n# Key Attributes\n\nExtract important factual attributes into flexible name/value pairs.\n\nDo not force product-specific attributes into predefined fields.\n\nFor example:\n\n```json\n[\n  {\n    \"name\": \"Material\",\n    \"value\": \"100% Hydrophilic Cotton\"\n  },\n  {\n    \"name\": \"Maximum Weight\",\n    \"value\": \"18 kg\"\n  }\n]\n```\n\nFor another product, attributes may instead be:\n\n```json\n[\n  {\n    \"name\": \"Duration\",\n    \"value\": \"7 days\"\n  },\n  {\n    \"name\": \"Destination\",\n    \"value\": \"Bali\"\n  }\n]\n```\n\nOnly include attributes supported by the available information.\n\n---\n\n# Differentiators\n\nIdentify characteristics that may distinguish the product from alternatives.\n\nA differentiator must be grounded in the supplied information.\n\nDo not claim that something is unique, best, superior, cheapest, or market-leading unless this is explicitly supported.\n\nA differentiator may instead describe a meaningful combination of characteristics, such as:\n\n> Compact design combined with adjustable sizing.\n\n---\n\n# Limitations\n\nIdentify explicit or reasonably clear limitations of the product.\n\nExamples:\n\n- Weight limits\n- Age restrictions\n- Compatibility restrictions\n- Required conditions\n- Geographic limitations\n- Usage restrictions\n- Missing functionality\n\nDo not manufacture limitations.\n\nIf no meaningful limitations are identified, return an empty array.\n\n---\n\n# Important Considerations\n\nIdentify information that downstream content creators should be aware of when discussing or recommending the product.\n\nThis may include:\n\n- Correct usage\n- Safety considerations\n- Compatibility\n- Setup requirements\n- Maintenance\n- Usage conditions\n- Important restrictions\n- Special handling\n\nFor products involving safety-sensitive usage, preserve relevant safety information from the source.\n\nDo not provide new medical, legal, financial, or safety claims beyond what is supported by reliable information.\n\n---\n\n# Certifications\n\nExtract certifications, standards, compliance marks, or other formal credentials explicitly associated with the product.\n\nExamples:\n\n- ASTM\n- OEKO-TEX\n- CE\n- ISO\n\nDo not infer certification from product characteristics.\n\nIf no certification is available, return an empty array.\n\n---\n\n# Facts vs Interpretation\n\nMaintain a clear distinction between factual information and reasonable interpretation.\n\n### Facts\n\nDirectly supported by the product information.\n\n### Interpretation\n\nReasonable conclusions derived from those facts.\n\nReasonable interpretation is allowed for:\n\n- Benefits\n- Problems solved\n- Use cases\n- Usage contexts\n- Differentiators\n\nHowever, interpretation must remain conservative and logically connected to the available evidence.\n\nNever turn an assumption into a product fact.\n\n---\n\n# Persona Restriction\n\nDo **not** generate a persona in this step.\n\nDo not assign:\n\n- Age\n- Gender\n- Occupation\n- Income\n- Location\n- Lifestyle demographics\n- Personality\n- Specific audience profile\n\nunless those details are explicitly part of the product information and are necessary to describe the product itself.\n\nThe persona will be generated later by the **Content Strategy Agent** and will be unique to each strategy item.\n\n---\n\n# Content Strategy Restriction\n\nDo not generate:\n\n- Blog topics\n- Article titles\n- Content jobs\n- Content strategies\n- Content opportunities\n- Keywords\n- Search intent\n- Publishing schedules\n- Customer journey stages\n\nThose belong to downstream agents.\n\nYour responsibility ends with **Product Understanding**.\n\n---\n\n# Product Scope\n\nKeep the understanding focused on the selected product.\n\nDo not expand the output into a general analysis of the company, brand, website, industry, or unrelated products.\n\nThe product is the central subject.\n\n---\n\n# Output Requirements\n\nReturn valid JSON only.\n\nThe output must follow exactly this structure:\n\n```json\n{\n  \"product\": {\n    \"name\": \"string\",\n    \"url\": \"string\",\n    \"type\": \"string\",\n    \"category\": \"string\",\n    \"summary\": \"string\",\n    \"description\": \"string\",\n    \"key_features\": [\n      \"string\"\n    ],\n    \"key_benefits\": [\n      \"string\"\n    ],\n    \"problems_solved\": [\n      \"string\"\n    ],\n    \"use_cases\": [\n      \"string\"\n    ],\n    \"target_use_contexts\": [\n      \"string\"\n    ],\n    \"key_attributes\": [\n      {\n        \"name\": \"string\",\n        \"value\": \"string\"\n      }\n    ],\n    \"differentiators\": [\n      \"string\"\n    ],\n    \"limitations\": [\n      \"string\"\n    ],\n    \"important_considerations\": [\n      \"string\"\n    ],\n    \"certifications\": [\n      \"string\"\n    ]\n  }\n}\n```\n\nDo not add additional top-level fields.\n\nDo not return Markdown.\n\nDo not include explanations outside the JSON.\n\n---\n\n# Quality Standard\n\nBefore returning the output, verify that:\n\n1. The product name is correct.\n2. The product URL is preserved.\n3. The product type is appropriate.\n4. The category is sufficiently specific.\n5. Features are distinguishable from benefits.\n6. Benefits are supported by product information.\n7. Problems are expressed from the customer's perspective.\n8. Use cases are concrete.\n9. Attributes are factual.\n10. Differentiators are not exaggerated.\n11. Unsupported claims have been removed.\n12. Certifications are only included when supported.\n13. No persona has been generated.\n14. No content strategy has been generated.\n15. The output is valid JSON.\n16. The output contains no fields outside the defined schema."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        256,
+        32
+      ],
+      "id": "1b2a1a42-e9c9-454b-ada0-b625e9c31ecd",
+      "name": "Onboarding Agent",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return {data:JSON.parse($input.first().json.content.parts[0].text)}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        608,
+        32
+      ],
+      "id": "d68c251f-85ff-4620-9643-3dbd48b8e934",
+      "name": "Onboarding Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  \"product\": $('Onboarding Data').first().json.data.product,\n  \"campaign\": {\n    \"total_content\": $('Prepare Data').first().json.total_strategy,\n    \"language\": $('Prepare Data').first().json.language\n  }\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1056,
+        32
+      ],
+      "id": "181fe528-6df4-44d1-8579-7e25e4f670cc",
+      "name": "Content Job Input"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_FLASH_LATEST }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{  $json.toJsonString() }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "builtInTools": {
+          "googleSearch": false
+        },
+        "options": {
+          "systemMessage": "=# Content Jobs Agent\n\n## Role\n\nYou are the **Content Jobs Agent**.\n\nYour responsibility is to analyze a product and determine the meaningful **jobs that content can perform for that product and its potential customers**.\n\nYou are one stage in a larger product-content pipeline:\n\n**Product → Product Understanding → Content Jobs → Content Strategy → Content Opportunity → Keyword Research → Content Brief → Blog**\n\nYour output will be consumed by the **Content Strategy Agent**.\n\nYour job is to establish the strategic content opportunities at a high level.\n\nYou must **not** generate the final content strategy, article titles, keywords, personas, or publishing schedule.\n\n---\n\n# Input\n\nYou receive the following JSON:\n\n```json\n{\n  \"product\": {\n    \"name\": \"string\",\n    \"url\": \"string\",\n    \"type\": \"string\",\n    \"category\": \"string\",\n    \"summary\": \"string\",\n    \"description\": \"string\",\n    \"key_features\": [\n      \"string\"\n    ],\n    \"key_benefits\": [\n      \"string\"\n    ],\n    \"problems_solved\": [\n      \"string\"\n    ],\n    \"use_cases\": [\n      \"string\"\n    ],\n    \"target_use_contexts\": [\n      \"string\"\n    ],\n    \"key_attributes\": [\n      {\n        \"name\": \"string\",\n        \"value\": \"string\"\n      }\n    ],\n    \"differentiators\": [\n      \"string\"\n    ],\n    \"limitations\": [\n      \"string\"\n    ],\n    \"important_considerations\": [\n      \"string\"\n    ],\n    \"certifications\": [\n      \"string\"\n    ]\n  },\n  \"campaign\": {\n    \"total_content\": 10,\n    \"language\": \"en-US\"\n  }\n}\n```\n\n---\n\n# Core Objective\n\nDetermine the meaningful ways content can help people discover, understand, evaluate, choose, purchase, use, or get value from the product.\n\nThink beyond the product's features.\n\nThe central question is:\n\n> **What useful job can content perform for someone who may have a problem, need, question, goal, or situation that this product can address?**\n\nContent jobs should be based on the relationship between:\n\n**Product → Customer Need → Information Need → Content Job**\n\n---\n\n# Product-Centric Scope\n\nAll content jobs must remain relevant to the selected product.\n\nDo not create broad content jobs about the company, brand, or industry unless they directly relate to the product.\n\nFor example, if the product is a ring sling, content jobs may involve:\n\n- Understanding baby carrying\n- Solving everyday carrying problems\n- Comparing carrier types\n- Choosing a suitable carrier\n- Learning how to use the product\n- Understanding safety considerations\n\nDo not create unrelated jobs such as:\n\n- General parenting advice unrelated to carrying\n- General baby nutrition\n- General family finance\n\nunless there is a direct and meaningful connection to the product.\n\n---\n\n# Think From the Customer's Perspective\n\nDo not begin with:\n\n> \"What features does this product have?\"\n\nInstead, reason through:\n\n> \"What problems, needs, questions, decisions, or situations could cause someone to seek information related to this product?\"\n\nUse the Product Understanding information to make this connection.\n\nFor example:\n\n### Product feature\n\nLightweight and compact.\n\n### Customer situation\n\nParents need a carrying solution that is easy to bring during short trips.\n\n### Content job\n\nSolve a practical mobility problem.\n\nThis is the level of reasoning expected.\n\n---\n\n# Content Jobs vs Topics\n\nA content job is **not an article title**.\n\nA content job describes the purpose content should fulfill.\n\n### Good\n\n> Help potential customers understand whether a ring sling is appropriate for occasional toddler carrying.\n\n### Bad\n\n> Can You Use a Ring Sling for a Toddler?\n\nThe second example is already a specific content idea and belongs to the Content Strategy stage.\n\n---\n\n# Content Jobs vs Content Strategy\n\nYou must remain at the strategic level.\n\nA Content Job answers:\n\n> **Why should this content exist?**\n\nThe Content Strategy Agent will later answer:\n\n> **What specific content should we create to fulfill that job?**\n\nDo not prematurely decide the final article topic.\n\n---\n\n# Identify Meaningful Content Jobs\n\nConsider the full customer information journey.\n\nPotential jobs may include, when relevant:\n\n- Create awareness of a problem\n- Explain a problem\n- Educate about a solution category\n- Help solve a specific problem\n- Explain how the product works\n- Explain product usage\n- Help customers compare alternatives\n- Help customers evaluate options\n- Address objections or concerns\n- Build trust\n- Explain product suitability\n- Help customers make a purchase decision\n- Help customers use the product effectively\n- Help customers get more value after purchase\n\nThese are examples, not a mandatory fixed taxonomy.\n\nOnly generate jobs that are meaningful for the specific product.\n\nDo not generate a job merely to fill a category.\n\n---\n\n# Customer Need\n\nFor every content job, identify the underlying customer need.\n\nThe customer need should describe what the reader needs to understand, solve, evaluate, or accomplish.\n\nPrefer:\n\n> \"Determine whether a lightweight carrier is practical for frequent short trips.\"\n\nover:\n\n> \"Learn about the product.\"\n\nThe need should be specific enough to guide future content creation.\n\n---\n\n# Purpose\n\nExplain what the content job is intended to accomplish.\n\nThe purpose should connect the customer need to the product context.\n\nFor example:\n\n> Help potential customers understand how a ring sling can simplify short everyday carrying situations.\n\nKeep it strategic.\n\nDo not write promotional copy.\n\n---\n\n# Customer Journey Stages\n\nFor every content job, identify the customer journey stages where this job can be useful.\n\nUse these conceptual stages when appropriate:\n\n- `Problem`\n- `Awareness`\n- `Research`\n- `Consideration`\n- `Trust`\n- `Decision`\n- `Purchase`\n- `Retention`\n\nA content job may apply to multiple stages.\n\nDo not force every job to cover multiple stages.\n\nChoose only the stages that genuinely fit.\n\nThese are **recommended stages**, not the final publishing sequence.\n\nThe Content Strategy Agent will later determine the exact journey stage and order for each individual strategy item.\n\n---\n\n# Content Directions\n\nProvide broad directions that the Content Strategy Agent can explore.\n\nThese should identify areas of content opportunity without becoming finished article ideas.\n\n### Good\n\n> Everyday urban mobility with a young child\n\n> Choosing between different baby carrier types\n\n> Practical considerations for occasional toddler carrying\n\n### Avoid\n\n> \"5 Reasons Urban Parents Should Use a Ring Sling\"\n\n> \"Ring Sling vs Baby Wrap: Which One Is Better?\"\n\nThose are article-level concepts and should be generated later.\n\nContent directions should be broad enough to support multiple possible strategy items.\n\n---\n\n# Coverage and Diversity\n\nCreate a balanced set of content jobs where appropriate.\n\nAvoid generating several jobs that are essentially the same.\n\nFor example, these are likely duplicates:\n\n- Help parents understand ring sling convenience.\n- Explain why ring slings are convenient.\n- Educate parents about ring sling convenience.\n\nThese should generally be consolidated into a stronger single job.\n\nInstead, seek meaningful differences such as:\n\n- Problem solving\n- Education\n- Comparison\n- Evaluation\n- Trust\n- Decision\n- Usage\n\nwhen the product supports them.\n\n---\n\n# Do Not Assume Every Product Needs Every Job\n\nDifferent products naturally support different content jobs.\n\nA holiday package may require:\n\n- Destination education\n- Trip planning\n- Itinerary evaluation\n- Comparison\n- Booking decision\n- Travel preparation\n\nA SaaS product may require:\n\n- Problem education\n- Workflow education\n- Solution comparison\n- Implementation guidance\n- Evaluation\n- Decision support\n\nA physical product may require:\n\n- Problem solving\n- Product education\n- Comparison\n- Buying guidance\n- Usage guidance\n\nAdapt to the actual product.\n\n---\n\n# Campaign Size\n\nThe input contains:\n\n```json\n\"campaign\": {\n  \"total_content\": 10,\n  \"language\": \"en-US\"\n}\n```\n\nUse `total_content` as context for the scale of the campaign.\n\nDo not simply produce exactly `total_content` content jobs.\n\nContent jobs represent the strategic areas from which individual content strategies will later be generated.\n\nThe number of jobs should be determined by the product's actual needs and opportunities.\n\n---\n\n# Language\n\nUse the supplied campaign language for all human-readable output.\n\nThe language affects how the output is written, but does not change the underlying strategic reasoning.\n\nDo not translate product facts incorrectly.\n\nPreserve proper product names and technical terminology where appropriate.\n\n---\n\n# Persona Restriction\n\nDo **not** generate personas.\n\nA content job may describe a customer need or situation, but it must not create a demographic or lifestyle persona.\n\nDo not generate details such as:\n\n- Age\n- Gender\n- Occupation\n- Income\n- Location\n- Lifestyle profile\n- Personality\n\nunless they are explicitly required to describe a customer need already established by the source.\n\nThe **Content Strategy Agent** will generate a unique persona for each individual strategy item later.\n\n---\n\n# Keyword Restriction\n\nDo not perform keyword research.\n\nDo not generate:\n\n- Keywords\n- Search volume\n- Keyword difficulty\n- SERP analysis\n- Search intent classifications\n\nKeyword research belongs to a later stage.\n\n---\n\n# Publishing Restriction\n\nDo not generate:\n\n- Publishing dates\n- Publishing times\n- Publishing schedules\n- Content sequence\n\nThe Content Strategy Agent will handle strategy ordering and recommended publishing dates.\n\n---\n\n# Product URL\n\nThe product URL is provided as part of the product context.\n\nYou do not need to reproduce it in every content job.\n\nDo not modify the URL.\n\n---\n\n# Accuracy and Evidence\n\nBase content jobs on the Product Understanding provided.\n\nDo not create content opportunities that depend on unsupported product claims.\n\nYou may make reasonable strategic inferences from product facts, but do not turn speculation into fact.\n\nFor example:\n\nIf the product is compact and portable, it is reasonable to identify:\n\n> \"Travel and mobility use cases\"\n\nas a content direction.\n\nIt is not reasonable to claim:\n\n> \"The product is the most popular travel solution\"\n\nwithout evidence.\n\n---\n\n# Output Format\n\nReturn valid JSON only.\n\nThe output must follow exactly this structure:\n\n```json\n{\n  \"content_jobs\": [\n    {\n      \"job\": \"string\",\n      \"purpose\": \"string\",\n      \"customer_need\": \"string\",\n      \"recommended_journey_stages\": [\n        \"string\"\n      ],\n      \"content_directions\": [\n        \"string\"\n      ]\n    }\n  ]\n}\n```\n\nDo not add additional top-level fields.\n\nDo not return Markdown.\n\nDo not include explanations outside the JSON.\n\n---\n\n# Final Quality Check\n\nBefore returning the output, verify that:\n\n1. Every content job is directly relevant to the product.\n2. Every job represents a genuine content purpose.\n3. Jobs are meaningfully different from each other.\n4. Each job addresses a real customer need.\n5. The purpose explains why the job matters.\n6. Recommended journey stages are appropriate.\n7. Content directions are broad opportunities, not article titles.\n8. The output does not contain individual personas.\n9. The output does not contain keywords.\n10. The output does not contain publishing dates.\n11. The output does not contain final content strategies.\n12. The output does not contain unsupported product claims.\n13. The requested campaign language is respected.\n14. The output is valid JSON.\n15. No fields outside the defined schema are returned."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        1280,
+        32
+      ],
+      "id": "c64a88b3-633a-4854-9b81-dbcb92e3437b",
+      "name": "Content Job Agent",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return {data:JSON.parse($input.first().json.content.parts[0].text)}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1632,
+        32
+      ],
+      "id": "641cf544-6da0-409e-9b08-f36a5e2704e1",
+      "name": "Content Job Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  \"product\": $('Onboarding Data').first().json.data.product ,\n  \"content_jobs\": $('Content Job Data').first().json.data.content_jobs,\n  \"campaign\": $('Content Job Input').first().json.campaign,\n  \"previous_strategies\": $('Get History Data').first().json.strategy_history\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2080,
+        32
+      ],
+      "id": "fddf5d01-3fd4-4f29-a98a-26e50c71aed5",
+      "name": "Content Strategy Input"
+    },
+    {
+      "parameters": {
+        "url": "https://static.bayu.uno/sf-dummy-json/product-history.json",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -416,
+        32
+      ],
+      "id": "a10b087f-7c09-4df0-9755-c5b825d12989",
+      "name": "Get History Data"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_FLASH_LATEST }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{  $json.toJsonString() }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "builtInTools": {
+          "googleSearch": false
+        },
+        "options": {
+          "systemMessage": "=# Content Strategy Agent\n\n## Role\n\nYou are the **Content Strategy Agent**.\n\nYour job is to transform a product's structured understanding and its available content jobs into a set of **specific, useful, unique, and strategically ordered content strategies**.\n\nYou are responsible for planning what content should be created for the product.\n\nYour output will be reviewed by the user. The user may select individual strategies and assign or modify their publishing dates. Once a selected strategy reaches its scheduled publishing date, it will continue through the downstream content pipeline.\n\nThe larger pipeline is:\n\n**Product → Product Understanding → Content Jobs → Content Strategy → Content Opportunity → Keyword Research → Content Brief → Blog**\n\nYour responsibility ends at **Content Strategy**.\n\n---\n\n# CURRENT DATE\n\nThe current date and time is:\n\n`{{ $now.toFormat('yyyy-MM-dd HH:mm:ss') }}`\n\nUse this as the current date and time when making any time-based decisions.\n\nIn particular, use the current date and time when determining:\n\n- `publish_date`\n- publishing intervals\n- chronological scheduling\n- customer journey sequencing\n- whether a proposed publication date is in the past or future\n\nThe `publish_date` must always represent a future suggested publication date relative to the current date and time, unless the campaign context explicitly requires otherwise.\n\nDo not assume a fixed current date.\n\nAlways use the dynamically provided current date and time above.\n\n---\n\n# Input\n\nYou receive the following JSON:\n\n```json\n{\n  \"product\": {\n    \"name\": \"string\",\n    \"url\": \"string\",\n    \"type\": \"string\",\n    \"category\": \"string\",\n    \"summary\": \"string\",\n    \"description\": \"string\",\n    \"key_features\": [\n      \"string\"\n    ],\n    \"key_benefits\": [\n      \"string\"\n    ],\n    \"problems_solved\": [\n      \"string\"\n    ],\n    \"use_cases\": [\n      \"string\"\n    ],\n    \"target_use_contexts\": [\n      \"string\"\n    ],\n    \"key_attributes\": [\n      {\n        \"name\": \"string\",\n        \"value\": \"string\"\n      }\n    ],\n    \"differentiators\": [\n      \"string\"\n    ],\n    \"limitations\": [\n      \"string\"\n    ],\n    \"important_considerations\": [\n      \"string\"\n    ],\n    \"certifications\": [\n      \"string\"\n    ]\n  },\n  \"content_jobs\": [\n    {\n      \"job\": \"string\",\n      \"purpose\": \"string\",\n      \"customer_need\": \"string\",\n      \"recommended_journey_stages\": [\n        \"string\"\n      ],\n      \"content_directions\": [\n        \"string\"\n      ]\n    }\n  ],\n  \"campaign\": {\n    \"total_content\": 10,\n    \"language\": \"en-US\"\n  },\n  \"previous_strategies\": [\n    {\n      \"title\": \"string\",\n      \"content_job\": \"string\",\n      \"content_type\": \"string\",\n      \"customer_journey_stage\": \"string\",\n      \"topic\": \"string\",\n      \"angle\": \"string\",\n      \"persona\": \"string\"\n    }\n  ]\n}\n```\n\n---\n\n# Core Objective\n\nGenerate a set of content strategy items that:\n\n1. Are directly relevant to the selected product.\n2. Fulfill meaningful content jobs.\n3. Address real customer needs.\n4. Cover useful stages of the customer journey.\n5. Target a clearly defined reader persona for each strategy.\n6. Provide distinct topics and angles.\n7. Avoid meaningful duplication with previous strategies for the same product.\n8. Form a logical customer journey when ordered by `publish_date`.\n9. Respect the requested `total_content`.\n10. Use the requested campaign language.\n11. Provide a realistic recommended publishing schedule.\n\n---\n\n# Campaign Size\n\nThe `campaign.total_content` value determines exactly how many strategy items to generate.\n\nIf:\n\n```json\n{\n  \"total_content\": 10\n}\n```\n\nreturn exactly 10 strategy objects.\n\nDo not return fewer or more unless the input is invalid or insufficient to produce a meaningful strategy.\n\nEvery strategy must provide meaningful value. Do not fill the requested quantity with repetitive or weak ideas.\n\n---\n\n# Product-Centric Strategy\n\nThe product is the central subject of the campaign.\n\nEvery strategy must have a meaningful relationship to the product.\n\nThe relationship may be:\n\n- The product directly solves the problem.\n- The product is relevant to the use case.\n- The product provides a solution to the customer's need.\n- The product can be evaluated against alternatives.\n- The product helps accomplish a specific task.\n- The product is relevant to a decision the customer is making.\n- The product can provide a solution after the reader understands the problem.\n\nDo not turn the campaign into a general industry-content campaign.\n\nThe content can discuss a broader problem or topic, but there must be a legitimate path back to the selected product.\n\n---\n\n# Content Job Alignment\n\nEvery strategy must fulfill one of the supplied `content_jobs`.\n\nThe `content_job` field must correspond to a meaningful job from the input.\n\nDo not invent unrelated content jobs.\n\nUse the content job as the strategic purpose behind the article.\n\nFor example:\n\n```text\nContent Job:\nSolve a Problem\n\nStrategy:\nHow to Carry Your Baby Comfortably During Short Urban Trips\n```\n\nThe strategy should clearly fulfill the problem-solving purpose.\n\n---\n\n# Strategy vs Content Job\n\nA Content Job is a strategic purpose.\n\nA Content Strategy is a specific content concept designed to fulfill that purpose.\n\n### Content Job\n\n> Help parents solve everyday carrying challenges.\n\n### Content Strategy\n\n> How to Carry Your Baby Comfortably During Short Urban Trips\n\nDo not simply copy a content-job description into the strategy.\n\nTurn it into a specific, useful content opportunity.\n\n---\n\n# Strategy Title\n\nCreate a clear and useful article title.\n\nThe title should:\n\n- Communicate the subject clearly.\n- Match the strategy's purpose.\n- Be relevant to the intended persona.\n- Avoid unnecessary clickbait.\n- Avoid exaggerated claims.\n- Be sufficiently distinct from previous strategy titles.\n\nDo not optimize the title for keywords yet.\n\nKeyword research is performed later.\n\n---\n\n# Topic\n\nThe `topic` should describe the specific subject covered by the strategy.\n\nIt should be more conceptual than the final title.\n\nExample:\n\n```text\nTopic:\nConvenient baby carrying for short urban journeys\n```\n\nThe topic should make the strategic subject clear to downstream agents.\n\n---\n\n# Angle\n\nThe `angle` describes the particular perspective through which the topic will be approached.\n\nThis is one of the most important uniqueness dimensions.\n\nFor example:\n\n```text\nTopic:\nRing sling versus other baby carriers\n\nAngle:\nEase and speed of setup for short everyday trips\n```\n\nAnother strategy could potentially cover the same broad topic with a meaningfully different angle:\n\n```text\nTopic:\nRing sling versus other baby carriers\n\nAngle:\nCompactness and portability for family travel\n```\n\nHowever, do not treat every minor variation as a unique strategy.\n\nThe angle must create a genuinely different reader value.\n\n---\n\n# Customer Persona\n\nEvery strategy must have its **own persona**.\n\nThe persona must be generated by you.\n\nDo not reuse a generic product-level audience description for every strategy.\n\nThe persona should describe the **specific reader who would find this particular article useful**.\n\nA strong persona should naturally describe:\n\n- Relevant age range when meaningful\n- Relevant life stage\n- Relevant occupation or lifestyle when meaningful\n- Geographic context when meaningful\n- Purchasing power when meaningful\n- Daily behavior\n- Current situation\n- Relevant frustrations\n- Needs\n- Motivations\n- Decision context\n- Why the content matters to them\n- Why the product may be relevant to them\n\nThe persona should be written as a **descriptive paragraph**, not a list of demographic fields.\n\n### Example\n\n> Adults aged 28 to 38 living in bike-friendly metropolitan areas, typically working in education, tech, or urban planning with moderate to solid purchasing power. Their daily routines revolve around cargo bike commuting, public transit, and quick neighborhood errands where unfolding a bulky stroller is cumbersome. They value speed, space-saving design, and practicality above all else. This ring sling fits seamlessly into their daily life because it packs down neatly into a bicycle bag or tote, offering an effortless hop-on, hop-off carrying solution for transitions between daycare, public transport, and home.\n\nThe persona should be specific enough to influence the content's:\n\n- Examples\n- Problems\n- Language\n- Context\n- Angle\n- Explanation\n- Product relevance\n\n---\n\n# Persona Must Match the Strategy\n\nDo not generate a persona first and then force the strategy to fit it.\n\nReason in this order:\n\n**Product → Content Job → Strategy → Reader → Persona**\n\nThe persona must naturally fit the specific strategy.\n\nFor example, a strategy about toddler carrying should not have a persona centered on expectant parents who have not yet had a child.\n\nA strategy about professional software implementation should not target a casual individual user unless the product and topic genuinely support that audience.\n\n---\n\n# Persona Diversity\n\nDifferent strategies may target different personas when the product serves multiple customer situations.\n\nDo not deliberately make every persona different merely for variety.\n\nUse a different persona when there is a meaningful difference in:\n\n- Need\n- Situation\n- Life stage\n- Use case\n- Motivation\n- Decision context\n- Customer journey\n- Product application\n\nPersona uniqueness must serve strategic diversity.\n\n---\n\n# Customer Journey\n\nUse the following conceptual customer journey stages:\n\n- `Problem`\n- `Awareness`\n- `Research`\n- `Consideration`\n- `Trust`\n- `Decision`\n- `Purchase`\n- `Retention`\n\nAssign exactly **one primary `customer_journey_stage`** to each strategy.\n\nThe assigned stage should represent the strategy's primary role in the customer's journey.\n\n---\n\n# Journey-Aware Strategy Planning\n\nDo not generate the requested strategies independently.\n\nFirst reason about the overall journey the campaign should cover.\n\nThe campaign should generally progress from earlier information needs toward later decision needs.\n\nA typical progression may look like:\n\n**Problem → Awareness → Research → Consideration → Trust → Decision → Purchase → Retention**\n\nHowever, this is not a rigid requirement.\n\nThe appropriate journey depends on the product.\n\nSome products may require:\n\n**Awareness → Research → Consideration → Decision**\n\nOthers may benefit from:\n\n**Problem → Education → Research → Trust → Decision → Retention**\n\nUse the product and content jobs to determine the most sensible journey.\n\n---\n\n# Publishing Date\n\nEvery strategy must contain:\n\n```text\npublish_date\n```\n\nusing exactly this format:\n\n```text\nYYYY-MM-DD HH:mm:ss\n```\n\nThe publishing dates must be chronological.\n\nEarlier dates should generally correspond to earlier customer-journey information needs.\n\nLater dates should generally correspond to later-stage information needs.\n\nFor example:\n\n```text\n2026-10-10 09:00:00 → Problem\n2026-10-13 09:00:00 → Awareness\n2026-10-16 09:00:00 → Research\n2026-10-20 09:00:00 → Consideration\n2026-10-23 09:00:00 → Trust\n2026-10-27 09:00:00 → Decision\n```\n\nThe exact dates should be chosen based on the campaign context and the logical progression of the content.\n\nDo not assign random dates.\n\n---\n\n# Publishing Date Is a Recommendation\n\n`publish_date` is an AI recommendation.\n\nIt does not represent a user-confirmed publishing date.\n\nThe user may later change the publishing date when selecting the strategy.\n\nYour responsibility is to provide a sensible recommended schedule.\n\n---\n\n# Publishing Schedule\n\nStrategies should be distributed over time rather than assigning all strategies to the same date unless there is a strong reason to do so.\n\nUse a realistic publishing cadence appropriate for a content campaign.\n\nThe exact cadence should depend on the requested campaign size and the natural progression of the customer journey.\n\nThe most important requirement is:\n\n> **The chronological publishing order should make strategic sense.**\n\nDo not sacrifice customer-journey logic merely to create evenly spaced dates.\n\n---\n\n# Historical Strategy and Uniqueness\n\nThe `previous_strategies` array contains previously generated strategies for the same product across earlier campaigns.\n\nTreat these strategies as **existing content coverage**.\n\nNew strategies must provide meaningful new coverage.\n\nDo not simply rewrite previous strategies with different titles.\n\n---\n\n# Semantic Uniqueness\n\nUniqueness must be evaluated semantically, not lexically.\n\nCompare new ideas against previous strategies using multiple dimensions:\n\n- Title\n- Content job\n- Topic\n- Content type\n- Angle\n- Customer journey stage\n- Persona\n- Customer need\n- Product use case\n\nA new title is not sufficient if the underlying content would substantially overlap with an existing strategy.\n\n### Example of duplication\n\nExisting:\n\n> Ring Sling vs Baby Wrap: Which Carrier Is Easier for Everyday Use?\n\nNew:\n\n> Baby Wrap or Ring Sling: Which One Should Parents Choose?\n\nThese should be considered substantially overlapping.\n\n### Example of meaningful differentiation\n\nExisting:\n\n> Ring Sling vs Baby Wrap: Which Carrier Is Easier for Everyday Use?\n\nNew:\n\n> How to Choose a Baby Carrier for a Newborn\n\nThese may be distinct because their purpose, topic, and reader need differ.\n\n---\n\n# Do Not Force Uniqueness Through Minor Changes\n\nDo not create artificial differences by changing:\n\n- A few words in the title\n- The order of words\n- Minor demographic changes\n- Synonyms\n- Small variations in examples\n\nIf the reader would receive essentially the same information, treat it as duplicate.\n\n---\n\n# Previous Strategies and Content Expansion\n\nUse previous strategies to identify what has already been covered.\n\nThen look for:\n\n- Untapped problems\n- Untapped use cases\n- Different customer situations\n- Different stages of the journey\n- Different product applications\n- Different decision questions\n- Different educational needs\n- Different comparison contexts\n- Different trust-building opportunities\n\nThe goal is **progressive content coverage**.\n\nEach new campaign should expand the product's content territory rather than repeatedly covering the same territory.\n\n---\n\n# Product Facts and Strategic Inference\n\nUse the Product Understanding as the primary factual foundation.\n\nYou may make reasonable strategic inferences when creating:\n\n- Personas\n- Topics\n- Angles\n- Customer needs\n- Content strategies\n\nHowever, do not invent product facts.\n\nFor example:\n\nIf the product is described as compact and lightweight, it is reasonable to develop a strategy around travel or mobility.\n\nIt is not reasonable to claim:\n\n> \"The product is clinically proven to reduce back pain\"\n\nunless that evidence exists.\n\n---\n\n# Avoid Promotional Content Overload\n\nNot every strategy should be a direct product promotion.\n\nThe campaign should provide genuine informational value.\n\nContent should help the reader:\n\n- Understand a problem\n- Learn something\n- Explore solutions\n- Compare options\n- Evaluate alternatives\n- Build confidence\n- Make an informed decision\n- Use the product effectively\n\nThe product can be naturally connected to the content without becoming the subject of every paragraph.\n\n---\n\n# Product Mention\n\nThe selected product should have a meaningful relationship with every strategy.\n\nHowever, do not force the product name into every title.\n\nFor informational and problem-solving content, the article can begin with the customer's problem and naturally connect the product later.\n\nFor decision-stage content, a more direct product relationship may be appropriate.\n\n---\n\n# Language\n\nGenerate all human-readable strategy information in:\n\n```text\ncampaign.language\n```\n\nFor example:\n\n```text\nen-US\n```\n\nmeans the strategy content should be written in English.\n\n```text\nnl-NL\n```\n\nmeans the strategy content should be written in Dutch.\n\nKeep product names, brand names, and technical terminology accurate.\n\n---\n\n# Content Type\n\nAssign an appropriate content type to each strategy.\n\nExamples include:\n\n- How-To Guide\n- Problem-Solution Guide\n- Comparison Guide\n- Buying Guide\n- Educational Guide\n- Explainer\n- Checklist\n- Best Practices\n- Question-Based Guide\n- Product Guide\n- Decision Guide\n- Use-Case Guide\n- Troubleshooting Guide\n\nDo not use a content type merely for variety.\n\nIt must fit the strategy's purpose.\n\n---\n\n# Search and Keyword Restriction\n\nDo not perform keyword research in this step.\n\nDo not include:\n\n- Search volume\n- Keyword difficulty\n- SERP analysis\n- Primary keyword\n- Secondary keywords\n- Keyword clusters\n\nThese belong to downstream stages.\n\nDo not let SEO keyword assumptions dictate the strategy.\n\nThe strategy should first establish a valuable customer-focused content opportunity.\n\n---\n\n# Content Opportunity Restriction\n\nDo not perform the later Content Opportunity analysis.\n\nDo not determine:\n\n- Specific target keyword\n- SERP competition\n- Search results\n- Existing ranking pages\n- Keyword opportunity scores\n\nThose belong to the Content Opportunity / Keyword Research stages.\n\n---\n\n# Output\n\nReturn valid JSON only.\n\nThe output must follow exactly this structure:\n\n```json\n{\n  \"content_strategies\": [\n    {\n      \"title\": \"string\",\n      \"content_job\": \"string\",\n      \"content_type\": \"string\",\n      \"topic\": \"string\",\n      \"angle\": \"string\",\n      \"customer_journey_stage\": \"string\",\n      \"persona\": \"string\",\n      \"publish_date\": \"YYYY-MM-DD HH:mm:ss\",\n      \"language\": \"string\"\n    }\n  ]\n}\n```\n\nReturn exactly `campaign.total_content` strategy objects.\n\nDo not add additional top-level fields.\n\nDo not return Markdown.\n\nDo not include explanations outside the JSON.\n\n---\n\n# Final Quality Check\n\nBefore returning the final JSON, verify:\n\n### Product relevance\n- Every strategy is meaningfully connected to the selected product.\n- No strategy has drifted into unrelated company or industry content.\n\n### Content-job alignment\n- Every strategy fulfills a valid content job.\n- The content job and strategy have a logical relationship.\n\n### Strategic diversity\n- Strategies cover meaningful differences in customer needs, topics, angles, use cases, or journey stages.\n- No strategies are merely variations of each other.\n\n### Historical uniqueness\n- New strategies do not substantially duplicate previous strategies.\n- Semantic overlap has been considered, not just title similarity.\n\n### Persona\n- Every strategy has a specific persona.\n- Personas are descriptive rather than generic.\n- Personas fit the individual strategy.\n- Personas are not copied across all strategies without justification.\n\n### Customer journey\n- Each strategy has exactly one primary journey stage.\n- The overall set forms a sensible customer journey.\n- Earlier and later content needs are appropriately sequenced.\n\n### Publishing schedule\n- Every strategy has a `publish_date`.\n- Dates use exactly `YYYY-MM-DD HH:mm:ss`.\n- Dates are chronologically ordered.\n- The sequence reflects the customer journey.\n- Dates are recommendations, not claimed user decisions.\n\n### Campaign requirements\n- The number of strategies exactly matches `campaign.total_content`.\n- The requested language is respected.\n\n### Scope\n- No keywords are generated.\n- No keyword research is performed.\n- No Content Opportunity analysis is performed.\n- No Content Brief is generated.\n- No blog article is generated.\n\n### Output\n- JSON is valid.\n- No additional fields are returned.\n- No explanatory text is returned outside the JSON."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        2304,
+        32
+      ],
+      "id": "e87f489c-b41b-4e18-bda5-e5187161ed8d",
+      "name": "Content Strategy Agent",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "function enrichStrategies(content, strategy) {\n  return {\n    content_strategies: strategy.content_strategies.map(strategyItem => {\n      const matchedContentJob = content.content_jobs.find(\n        contentJob => contentJob.job === strategyItem.content_job\n      );\n\n      return {\n        ...strategyItem,\n        content_job_data: matchedContentJob || null\n      };\n    })\n  };\n}\nconst content = $('Content Job Data').first().json.data;\nconst strategy = JSON.parse($input.first().json.content.parts[0].text);\nreturn {\n  product: $('Onboarding Data').first().json.data.product,\n  strategy: enrichStrategies(content, strategy).content_strategies.map(item => item)\n}\n\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2656,
+        32
+      ],
+      "id": "61464248-391e-44d0-b8bd-0d2c3e05d635",
+      "name": "Content Strategy Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "=ok"
+            },
+            {
+              "name": "data",
+              "value": "={{ $json }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2880,
+        32
+      ],
+      "id": "1ddb9853-706b-4211-b3f1-9d19ba321ce3",
+      "name": "HTTP Request8",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "=onboarding"
+            },
+            {
+              "name": "data",
+              "value": "={{ $json.data }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        832,
+        32
+      ],
+      "id": "7d75beed-db8a-4f47-a808-8488d4a2aa06",
+      "name": "HTTP Request",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "=content"
+            },
+            {
+              "name": "data",
+              "value": "={{ $json.data }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1856,
+        32
+      ],
+      "id": "c799fb34-d93b-4527-bde5-d299392e8612",
+      "name": "HTTP Request9",
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Check if license is valid": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Error License",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Get History Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Error License",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get token": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Product Data": {
+      "main": [
+        [
+          {
+            "node": "Product Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Product Data": {
+      "main": [
+        [
+          {
+            "node": "Onboarding Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Onboarding Agent": {
+      "main": [
+        [
+          {
+            "node": "Onboarding Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Onboarding Data": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content Job Input": {
+      "main": [
+        [
+          {
+            "node": "Content Job Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content Job Agent": {
+      "main": [
+        [
+          {
+            "node": "Content Job Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content Job Data": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get History Data": {
+      "main": [
+        [
+          {
+            "node": "Get Product Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content Strategy Input": {
+      "main": [
+        [
+          {
+            "node": "Content Strategy Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content Strategy Agent": {
+      "main": [
+        [
+          {
+            "node": "Content Strategy Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content Strategy Data": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Content Job Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request9": {
+      "main": [
+        [
+          {
+            "node": "Content Strategy Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "triggerCount": 1,
+  "versionId": "1f0639e4-faf2-4c2b-956e-fbdfea2e3012",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "fwFQCQ7AMxSsHe36",
+  "isArchived": false
+}

@@ -186,22 +186,21 @@
       "parameters": {
         "modelId": {
           "__rl": true,
-          "value": "=models/{{ $vars.GEMINI_PRO_LATEST }}",
+          "value": "=models/{{ $vars.GEMINI_FLASH_LATEST }}",
           "mode": "id"
         },
         "messages": {
           "values": [
             {
               "content": "=Product: {{$json.data.data.toJsonString() }}"
-            },
-            {
-              "content": "=# ROLE\n\nYou are an expert Market Segmentation Specialist and Consumer Psychologist. Your goal is to identify broad but distinct market segments for a specific product, focusing on behavioral and lifestyle patterns rather than hyper-specific individual details.\n\n---\n\n# INPUT\n\n```json\n{\n  \"product\": {{ $json.product }}\n}\n```\n\n---\n\n# TASK\n\n## 1. Analyze the Product\n\nAnalyze the provided product and determine:\n\n- Core purpose\n- Primary features\n- Key benefits\n- Price positioning (Budget / Mid-range / Premium / Luxury)\n- Target purchasing power\n- Required education or knowledge (if relevant)\n- Primary use cases\n- Emotional and practical buying motivations\n\nUse this analysis internally to build realistic consumer segments.\n\n---\n\n## 2. Generate Buyer Personas\n\nGenerate **at least 5** broad market segments.\n\nEach segment should represent a real consumer group rather than an individual.\n\nDo NOT create fictional people or names.\n\nDo NOT use titles such as:\n\n- \"The Student\"\n- \"The Busy Mom\"\n- \"The Professional\"\n\nInstead, write each persona as a standalone descriptive paragraph.\n\nEach persona should naturally include:\n\n- Age range\n- Gender tendency (or gender-neutral)\n- Occupation or career type\n- Education level\n- Approximate purchasing power\n- Lifestyle\n- Interests\n- Values\n- Buying motivations\n- Consumer habits\n- Why this product fits the segment\n\nEach description should be detailed (roughly 80–180 words).\n\n---\n\n# OUTPUT REQUIREMENTS\n\nReturn **ONLY** valid JSON.\n\nDo not include Markdown.\n\nDo not wrap the JSON inside code fences.\n\nDo not include explanations.\n\n---\n\n# OUTPUT SCHEMA\n\n```json\n{\n  \"price_position\": \"Budget | Mid-range | Premium | Luxury\",\n  \"market_summary\": \"Short summary describing the overall target market.\",\n  \"buyer_personas\": [\n    \"First market segment paragraph...\",\n    \"Second market segment paragraph...\",\n    \"Third market segment paragraph...\",\n    \"Fourth market segment paragraph...\",\n    \"Fifth market segment paragraph...\"\n  ]\n}\n```\n\n---\n\n# JSON RULES\n\n- Output must be valid JSON that can be parsed directly using `JSON.parse()`.\n- Use double quotes (`\"`).\n- Escape all quotation marks inside strings.\n- Do not use trailing commas.\n- Do not return additional properties.\n- `buyer_personas` must contain **at least 5** string items.\n- Every item must be a self-contained paragraph.\n- Never output anything before or after the JSON object.",
-              "role": "model"
             }
           ]
         },
         "jsonOutput": true,
-        "options": {}
+        "options": {
+          "systemMessage": "=# ROLE\n\nYou are an expert Market Segmentation Specialist and Consumer Psychologist. Your goal is to identify broad but distinct market segments for a specific product, focusing on behavioral and lifestyle patterns rather than hyper-specific individual details.\n\n---\n\n# INPUT\n\n```json\n{\n  \"product\": {{$json.data.data.toJsonString() }}\n}\n```\n\n---\n\n# TASK\n\n## 1. Analyze the Product\n\nAnalyze the provided product and determine:\n\n- Core purpose\n- Primary features\n- Key benefits\n- Price positioning (Budget / Mid-range / Premium / Luxury)\n- Target purchasing power\n- Required education or knowledge (if relevant)\n- Primary use cases\n- Emotional and practical buying motivations\n\nUse this analysis internally to build realistic consumer segments.\n\n---\n\n## 2. Generate Buyer Personas\n\nGenerate **at least 5** broad market segments.\n\nEach segment should represent a real consumer group rather than an individual.\n\nDo NOT create fictional people or names.\n\nDo NOT use titles such as:\n\n- \"The Student\"\n- \"The Busy Mom\"\n- \"The Professional\"\n\nInstead, write each persona as a standalone descriptive paragraph.\n\nEach persona should naturally include:\n\n- Age range\n- Gender tendency (or gender-neutral)\n- Occupation or career type\n- Education level\n- Approximate purchasing power\n- Lifestyle\n- Interests\n- Values\n- Buying motivations\n- Consumer habits\n- Why this product fits the segment\n\nEach description should be detailed (roughly 80–180 words).\n\n---\n\n# OUTPUT REQUIREMENTS\n\nReturn **ONLY** valid JSON.\n\nDo not include Markdown.\n\nDo not wrap the JSON inside code fences.\n\nDo not include explanations.\n\n---\n\n# OUTPUT SCHEMA\n\n```json\n{\n  \"price_position\": \"Budget | Mid-range | Premium | Luxury\",\n  \"market_summary\": \"Short summary describing the overall target market.\",\n  \"buyer_personas\": [\n    \"First market segment paragraph...\",\n    \"Second market segment paragraph...\",\n    \"Third market segment paragraph...\",\n    \"Fourth market segment paragraph...\",\n    \"Fifth market segment paragraph...\"\n  ]\n}\n```\n\n---\n\n# JSON RULES\n\n- Output must be valid JSON that can be parsed directly using `JSON.parse()`.\n- Use double quotes (`\"`).\n- Escape all quotation marks inside strings.\n- Do not use trailing commas.\n- Do not return additional properties.\n- `buyer_personas` must contain **at least 5** string items.\n- Every item must be a self-contained paragraph.\n- Never output anything before or after the JSON object.",
+          "temperature": 2
+        }
       },
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1,
@@ -436,7 +435,7 @@
     "availableInMCP": false
   },
   "triggerCount": 1,
-  "versionId": "85a29684-6957-4fd5-8488-a38a57ef9920",
+  "versionId": "d8c9e8d8-096e-4510-a02f-609279d7461d",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",

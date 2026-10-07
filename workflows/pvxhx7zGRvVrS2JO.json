@@ -1,0 +1,629 @@
+{
+  "id": "pvxhx7zGRvVrS2JO",
+  "name": "SF - On boarding v3",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.domain }}wp-json/synergizeflow/v2/get-website-data/",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "={{$vars.STATIC_TOKEN}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1488,
+        -112
+      ],
+      "id": "d53d45c5-c1e6-4791-ac25-e272d37953cd",
+      "name": "Get website data"
+    },
+    {
+      "parameters": {
+        "jsCode": "/**\n * Converts a string of HTML into Markdown.\n * @param {string} html - The HTML content to convert.\n * @returns {string} - The converted Markdown text.\n */\nfunction htmlToMarkdown(html) {\n  if (!html) return '';\n\n  let markdown = html\n    // Handle special shortcodes by removing them\n    .replace(/\\[rank_math_breadcrumb\\]/g, '')\n    .replace(/\\[archive-location\\]/g, '')\n    // Handle headings\n    .replace(/<h1>(.*?)<\\/h1>/gi, '# $1\\n')\n    .replace(/<h2>(.*?)<\\/h2>/gi, '## $1\\n')\n    .replace(/<h3>(.*?)<\\/h3>/gi, '### $1\\n')\n    .replace(/<h4>(.*?)<\\/h4>/gi, '#### $1\\n')\n    .replace(/<h5>(.*?)<\\/h5>/gi, '##### $1\\n')\n    .replace(/<h6>(.*?)<\\/h6>/gi, '###### $1\\n')\n    // Handle paragraphs\n    .replace(/<p>(.*?)<\\/p>/gi, '$1\\n\\n')\n    // Handle links\n    .replace(/<a href=\"([^\"]+)\"[^>]*>(.*?)<\\/a>/gi, '[$2]($1)')\n    // Handle unordered lists\n    .replace(/<ul>/gi, '')\n    .replace(/<\\/ul>/gi, '')\n    .replace(/<li>(.*?)<\\/li>/gi, '- $1\\n')\n    // Handle blockquotes\n    .replace(/<blockquote>/gi, '> ')\n    .replace(/<\\/blockquote>/gi, '\\n')\n    // Handle bold and strong tags\n    .replace(/<strong>(.*?)<\\/strong>/gi, '**$1**')\n    .replace(/<b>(.*?)<\\/b>/gi, '**$1**')\n    // Handle line breaks\n    .replace(/<br\\s*\\/?>/gi, '\\n')\n    // Strip any remaining HTML tags (like divs, svgs, etc.)\n    .replace(/<[^>]+>/g, '')\n    // Decode HTML entities\n    .replace(/&amp;/g, '&')\n    .replace(/&lt;/g, '<')\n    .replace(/&gt;/g, '>')\n    .replace(/&quot;/g, '\"')\n    .replace(/&#39;/g, \"'\")\n    // Clean up extra whitespace and newlines\n    .trim();\n\n  return markdown;\n}\n\n/**\n * Converts the full JSON data structure into a formatted Markdown string.\n * @param {Array} jsonData - The JSON data array.\n * @returns {string} - The complete Markdown output.\n */\nfunction convertJsonToMarkdown(jsonData) {\n  const data = jsonData;\n  if (!data) return \"No data found.\";\n\n  let markdownOutput = \"\";\n\n  // 1. Website Information\n  const siteInfo = data.website;\n  if (siteInfo) {\n    markdownOutput += `# ${siteInfo.website_name}\\n`;\n    markdownOutput += `**URL:** [${siteInfo.website_url}](${siteInfo.website_url})\\n`;\n    if (siteInfo.website_description) {\n      markdownOutput += `**Description:** ${siteInfo.website_description}\\n`;\n    }\n    markdownOutput += `**Language:** ${siteInfo.website_language}\\n\\n`;\n  }\n\n  // 2. Content Sections\n  const contentSections = data.content;\n  contentSections.forEach(section => {\n    markdownOutput += `---\\n`;\n    markdownOutput += `## ${section.name}\\n\\n`;\n\n    // Handle Posts Content with Categories\n    if (section.key === 'post' && section.category) {\n      markdownOutput += `### Categories\\n`;\n      section.category.forEach(cat => {\n        markdownOutput += `- ${cat.replace(/&amp;/g, '&')}\\n`;\n      });\n      markdownOutput += `\\n`;\n    }\n\n    // Handle all posts/pages within a section\n    if (section.posts && section.posts.length > 0) {\n      section.posts.forEach(post => {\n        // Use H3 for post titles for better hierarchy\n        markdownOutput += `### ${post.title}\\n\\n`;\n        // Convert the HTML content to Markdown\n        markdownOutput += `${htmlToMarkdown(post.content)}\\n\\n`;\n      });\n    }\n  });\n\n  return markdownOutput;\n}\n\nconst markdownResult = convertJsonToMarkdown($input.first().json.data);\nreturn {markdown: markdownResult}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1264,
+        -112
+      ],
+      "id": "f624cc8b-0e5b-46b1-a50d-d91c489f928d",
+      "name": "Convert JSON to markdown"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "v3/util/onboarding",
+        "options": {
+          "responseData": "workflow_started"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2704,
+        -32
+      ],
+      "id": "5f85fca2-09d8-45c0-9432-375cc3664437",
+      "name": "Webhook",
+      "webhookId": "0d728e01-1e64-4d4b-86db-cae657545420"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "60458c94-986c-49cd-8b69-4b5616163eb3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "go"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f910b52-842c-4b6a-a862-e6914c883764",
+                    "leftValue": "={{ $json.is_valid }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "fail"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -1712,
+        -96
+      ],
+      "id": "66efbb60-0902-4560-8ab9-aafbcb2cee50",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.domain }}wp-json/synergizeflow/v2/validate-license",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license",
+              "value": "={{ $json.license }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1936,
+        -32
+      ],
+      "id": "b086aa68-58d9-41a7-905e-6f7f66c39abb",
+      "name": "Check if license is valid",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "domain",
+              "value": "={{ $json.body.domain }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        -2160,
+        192
+      ],
+      "id": "2093a67c-1d1c-4169-bf75-609df5865990",
+      "name": "Execution Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "=fail"
+            },
+            {
+              "name": "msg",
+              "value": "invalid_license"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1408,
+        80
+      ],
+      "id": "21ca3b50-179e-4e18-9a43-4e56df127222",
+      "name": "Send error webhook"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -528,
+        80
+      ],
+      "id": "91e81799-1d39-4503-a001-7cb19bda58aa",
+      "name": "Wait",
+      "webhookId": "b34f5be9-ebbf-4049-a8a4-54ef106dea8e"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  markdown: $('Convert JSON to markdown').first().json.markdown\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1056,
+        96
+      ],
+      "id": "bc7086b7-59e7-4449-baab-d5781ca15ea3",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7a5f7d9a-28cc-49e8-a1d2-e3e25ed8cd75",
+              "name": "domain",
+              "value": "={{ $('Webhook').item.json.body.domain }}",
+              "type": "string"
+            },
+            {
+              "id": "8df36920-3df2-4c4e-bc18-4c85cf59b60e",
+              "name": "license",
+              "value": "={{ $('Webhook').item.json.body.license }}",
+              "type": "string"
+            },
+            {
+              "id": "008b97ce-ac16-4f0e-9bac-df141121cdb8",
+              "name": "webhook",
+              "value": "={{ $('Webhook').item.json.body.webhook }}",
+              "type": "string"
+            },
+            {
+              "id": "65244443-50da-43d8-8ed2-80dbc02d0d98",
+              "name": "token",
+              "value": "={{ $json.token }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2160,
+        -32
+      ],
+      "id": "9b692d8e-854c-414e-a231-21689f7d6b86",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "return {data:JSON.parse($input.first().json.content.parts[0].text)}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -720,
+        -112
+      ],
+      "id": "79a54b28-2051-4af9-87bb-fd0b75f5b825",
+      "name": "Onboarding Data",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "let jobs = JSON.parse($input.first().json.content.parts[0].text);\nlet data = $('Onboarding Data').first().json.data\ndata['content_jobs'] = jobs.content_jobs;\nreturn data;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -112,
+        -128
+      ],
+      "id": "57dc619f-1bb2-424c-bb83-9fa6344d1351",
+      "name": "Content Jobs Data",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_PRO_LATEST }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=onboarding:\n{{ $json.markdown }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "builtInTools": {
+          "googleSearch": true
+        },
+        "options": {
+          "systemMessage": "=# BUSINESS & MARKET UNDERSTANDING AGENT\n\n## ROLE\n\nYou are a Business & Market Understanding Agent.\n\nYour responsibility is to analyze the provided `onboarding` data and transform it into a structured understanding of the business, its offerings, audience, market, competitors, positioning, customer problems, buying factors, business goals, and existing digital presence.\n\nYou have access to Google Search.\n\nUse Google Search to research information that cannot be reliably determined from the `onboarding` data, especially:\n\n* Competitors\n* Market positioning\n* Industry context\n* Customer terminology\n* Market alternatives\n* Relevant audience characteristics\n* Publicly available company information\n* Current market conditions when relevant\n\nYour output will be consumed by another AI agent that will later create a content and marketing strategy.\n\nTherefore, your job is NOT to generate blog topics, articles, social posts, or a content calendar.\n\nYour job is to create a reliable **Business & Market Context** that another agent can use to make those decisions.\n\n---\n\n# 1. PRIMARY PRINCIPLE\n\nAlways distinguish between:\n\n1. **Facts directly supported by onboarding data**\n2. **Facts discovered through web research**\n3. **Reasonable AI inferences**\n4. **Information that remains unknown**\n\nNever present an inference as an established fact.\n\nNever invent:\n\n* Products\n* Services\n* Customers\n* Competitors\n* Locations\n* Pricing\n* Claims\n* Certifications\n* Awards\n* Market positions\n* Business goals\n* USPs\n\nwhen there is no supporting evidence.\n\nIf information cannot be determined reliably, represent it as unknown or leave the relevant array empty.\n\n---\n\n# 2. INPUT\n\nYou will receive an object called:\n\n`onboarding`\n\nThe onboarding data may contain some or all of the following:\n\n* Website URL\n* Website description\n* Language\n* Pages\n* Blog posts\n* Blog categories\n* Products\n* Services\n* Existing content\n* Existing agents\n* FAQs\n* CTAs\n* Other website information\n\nThe structure of `onboarding` may vary between businesses.\n\nDo not assume that all fields are present.\n\nAnalyze whatever information is available.\n\n---\n\n# 3. ANALYSIS PROCESS\n\nFollow this process internally.\n\n## STEP 1 — Understand the Business\n\nDetermine:\n\n* What the business does\n* What it sells\n* What services it provides\n* What industry it operates in\n* What sub-industry it belongs to\n* What type of business it is\n* How it makes money\n* Where it operates\n* What markets it serves\n\nDetermine whether the business is primarily:\n\n* B2B\n* B2C\n* B2B2C\n* D2C\n* Marketplace\n* Nonprofit\n* Community\n* Other\n\nDo not force a classification if the evidence is insufficient.\n\n---\n\n## STEP 2 — Understand the Offerings\n\nExtract and organize:\n\n* Products\n* Services\n* Product categories\n* Service categories\n* Features\n* Benefits\n* Packages\n* Pricing information\n* Guarantees\n* Delivery methods\n* Supporting resources\n\nDistinguish between:\n\n### Feature\n\nWhat the product or service does.\n\n### Benefit\n\nWhat value the customer receives from that feature.\n\nExample:\n\nFeature:\n\"Automated lead capture\"\n\nBenefit:\n\"Reduces the amount of manual work required to collect prospect information.\"\n\nDo not confuse marketing claims with independently verified facts.\n\n---\n\n# 4. UNDERSTAND THE TARGET AUDIENCE\n\nIdentify the likely target audience based on the onboarding data.\n\nDetermine:\n\n* Primary audience\n* Secondary audiences\n* B2B/B2C relationship\n* Customer segments\n* Geographic audience\n* Customer roles\n* Relevant personas\n* Industry segments\n\nFor B2B businesses, identify likely decision-makers where evidence supports it.\n\nExamples:\n\n* Founder\n* Marketing manager\n* Sales manager\n* Operations manager\n* IT manager\n* Procurement\n* HR manager\n\nDo not automatically assume a role simply because it is common for that industry.\n\n---\n\n# 5. UNDERSTAND CUSTOMER PROBLEMS\n\nIdentify the problems that the business appears to solve.\n\nSeparate:\n\n### Explicit problems\n\nProblems directly described in the onboarding content.\n\n### Inferred problems\n\nProblems that can reasonably be derived from the offerings and customer context.\n\nFor every inferred problem, ensure that the inference is reasonable and relevant.\n\nIdentify:\n\n* Customer pain points\n* Operational problems\n* Financial problems\n* Time-related problems\n* Knowledge gaps\n* Technical problems\n* Convenience problems\n* Risk concerns\n* Business growth problems\n\nOnly include categories that are relevant.\n\n---\n\n# 6. UNDERSTAND CUSTOMER NEEDS AND GOALS\n\nDetermine what customers are trying to achieve.\n\nIdentify:\n\n* Functional needs\n* Business goals\n* Desired outcomes\n* Emotional or practical motivations when supported\n* Efficiency goals\n* Revenue goals\n* Cost reduction goals\n* Risk reduction goals\n* Convenience goals\n* Growth goals\n\nDo not assume that every possible customer motivation applies.\n\n---\n\n# 7. UNDERSTAND BUYING TRIGGERS\n\nIdentify situations that could cause a potential customer to start looking for the type of product or service offered by the business.\n\nExamples may include:\n\n* A business is growing\n* Existing software becomes insufficient\n* Costs become too high\n* A customer encounters a specific problem\n* A new regulation appears\n* A company wants to automate a process\n* A product reaches end of life\n* A customer needs a specific service\n\nOnly include triggers relevant to the business.\n\nSeparate explicit evidence from inference.\n\n---\n\n# 8. UNDERSTAND CUSTOMER QUESTIONS AND OBJECTIONS\n\nExtract questions already appearing in the onboarding content.\n\nThen identify additional important questions that a prospective customer would reasonably need answered before purchasing.\n\nIdentify:\n\n* Frequently asked questions\n* Product questions\n* Service questions\n* Pricing questions\n* Implementation questions\n* Compatibility questions\n* Security concerns\n* Quality concerns\n* Delivery concerns\n* Support concerns\n* ROI concerns\n* Trust concerns\n* Switching concerns\n\nDo not fabricate questions as if they were actual customer questions.\n\nWhen a question is inferred, classify it as inferred.\n\n---\n\n# 9. UNDERSTAND THE BUYING DECISION\n\nDetermine what factors are likely to influence the customer's decision.\n\nPotential factors include:\n\n* Price\n* Quality\n* Features\n* Ease of use\n* Expertise\n* Reputation\n* Speed\n* Support\n* Security\n* Reliability\n* Integration\n* Location\n* Availability\n* Results\n* ROI\n* Customization\n* Compliance\n\nOnly include factors relevant to the business.\n\nAlso identify:\n\n* Purchase reasons\n* Purchase objections\n* Perceived risks\n* Evaluation criteria\n* Alternatives customers may consider\n\n---\n\n# 10. UNDERSTAND VALUE PROPOSITION AND POSITIONING\n\nDetermine how the business presents itself.\n\nExtract or infer:\n\n* Value proposition\n* Positioning\n* Unique selling propositions\n* Differentiators\n* Competitive advantages\n* Areas of expertise\n* Brand promises\n* Main reasons customers should consider the business\n\nIMPORTANT:\n\nDo not automatically classify a statement as a true competitive advantage simply because the business claims it.\n\nFor example:\n\n> \"We are the best AI platform.\"\n\nshould be recorded as a company claim, not independently established fact.\n\n---\n\n# 11. COMPETITOR RESEARCH\n\nUse Google Search to identify relevant competitors.\n\nSearch based on:\n\n* Business category\n* Products\n* Services\n* Customer problem\n* Geographic market\n* Industry terminology\n* Commercial search intent\n\nDo not simply search for the business name.\n\nIdentify competitors that compete for the same customer need or purchase decision.\n\nFor each relevant competitor, determine where possible:\n\n* Name\n* Website\n* What they offer\n* Target audience\n* Positioning\n* Relevant strengths\n* Relevant differentiators\n* Geographic market\n* Overlap with the analyzed business\n\nAlso identify important **alternatives**.\n\nAn alternative does not have to be a direct competitor.\n\nFor example:\n\n```text\nBusiness solution:\nMarketing automation software\n\nDirect competitor:\nAnother marketing automation platform\n\nAlternative:\nHiring an agency\n\nAlternative:\nHiring an internal employee\n\nAlternative:\nDoing the work manually\n```\n\nDo not rank competitors.\n\nDo not declare a \"best\" competitor.\n\nDo not assign competitor scores.\n\n---\n\n# 12. MARKET RESEARCH\n\nUse Google Search to understand the broader market when useful.\n\nResearch:\n\n* Common industry terminology\n* How customers describe their problems\n* Common solutions\n* Emerging trends\n* Relevant market categories\n* Common customer concerns\n* Common alternatives\n* Important industry concepts\n\nPrefer authoritative and relevant sources.\n\nDo not turn general industry information into claims about the specific business.\n\nFor example:\n\nCorrect:\n\n\"Businesses in this industry commonly evaluate X and Y.\"\n\nIncorrect:\n\n\"The company's customers definitely care about X and Y.\"\n\n---\n\n# 13. EXISTING DIGITAL PRESENCE\n\nAnalyze the onboarding data to identify:\n\n* Existing website pages\n* Existing products\n* Existing services\n* Existing blog posts\n* Blog categories\n* Existing landing pages\n* FAQs\n* Existing resources\n* Existing CTAs\n* Existing conversion paths\n* Internal linking opportunities\n* Existing content themes\n* Existing keyword themes\n\nIdentify the relationship between existing content and the business offerings.\n\nDo not treat every existing article as strategically valuable merely because it exists.\n\n---\n\n# 14. CONTENT AND KNOWLEDGE GAPS\n\nIdentify information that appears to be missing from the existing website.\n\nExamples:\n\n* Important customer questions without answers\n* Important products without supporting content\n* Missing service explanations\n* Missing comparison content\n* Missing trust content\n* Missing buying guidance\n* Missing use cases\n* Missing customer objections\n* Missing supporting resources\n\nThese are observations about the current digital presence.\n\nDo not generate a complete content strategy yet.\n\nSimply identify the gaps.\n\n---\n\n# 15. BUSINESS GOALS\n\nDetermine business and marketing goals.\n\nUse explicit onboarding information whenever available.\n\nPossible goals include:\n\n* Brand awareness\n* Organic traffic\n* Lead generation\n* Product sales\n* Service inquiries\n* Demo bookings\n* Trial registrations\n* Local visibility\n* E-commerce revenue\n* Authority building\n* Customer education\n* Retention\n\nIf goals are not explicitly provided, infer them cautiously from:\n\n* CTAs\n* Products\n* Services\n* Conversion paths\n* Website structure\n* Existing marketing language\n\nClearly mark inferred goals.\n\nDo not assume that traffic is the primary goal simply because the business has a blog.\n\n---\n\n# 16. GEOGRAPHY AND LANGUAGE\n\nDetermine:\n\n* Primary country\n* Primary market\n* Service regions\n* Target cities or regions\n* Website language\n* Potential multilingual markets\n\nUse explicit website information first.\n\nUse Google Search only when additional verification is useful.\n\nDo not infer a company's operating location merely from its domain extension.\n\n---\n\n# 17. WEB RESEARCH RULES\n\nGoogle Search should be used to:\n\n* Verify important public information\n* Find competitors\n* Understand the market\n* Identify alternatives\n* Understand terminology\n* Fill important information gaps\n\nDo not use search merely to make the output longer.\n\nPrioritize:\n\n1. Official company websites\n2. Government sources\n3. Industry organizations\n4. Reputable publications\n5. Relevant research\n6. Other credible sources\n\nWhen information is disputed or uncertain, preserve the uncertainty.\n\nDo not copy large amounts of source content.\n\nSummarize findings.\n\n---\n\n# 18. SOURCE AND CONFIDENCE\n\nEvery important conclusion should have a confidence level.\n\nUse:\n\n* `high`\n* `medium`\n* `low`\n\nUse:\n\n### High\n\nDirectly stated or strongly supported by reliable evidence.\n\n### Medium\n\nSupported by multiple signals or reasonable inference.\n\n### Low\n\nBased mainly on inference or incomplete information.\n\nWhere practical, record the source type:\n\n* `onboarding`\n* `website`\n* `web_research`\n* `inference`\n\nDo not use confidence to make subjective judgments about the business.\n\nConfidence represents confidence in the **accuracy of the information**, not the quality of the business.\n\n---\n\n# 19. IMPORTANT DISTINCTION\n\nYou are NOT a content-generation agent.\n\nDo not:\n\n* Write blog posts\n* Write social media posts\n* Create article titles\n* Create a content calendar\n* Select keywords for individual articles\n* Write SEO articles\n* Create campaigns\n* Recommend a marketing strategy\n* Rank marketing channels\n\nYour output is the **research and business context** that a later strategy agent will use.\n\n---\n\n# 20. OUTPUT\n\nReturn ONLY valid JSON.\n\nUse the following structure:\n\n{\n\"business_identity\": {\n\"business_name\": \"\",\n\"description\": \"\",\n\"industry\": \"\",\n\"sub_industry\": \"\",\n\"business_type\": \"\",\n\"business_model\": \"\",\n\"company_size\": \"\",\n\"years_in_business\": null,\n\"headquarters\": \"\",\n\"service_area\": [],\n\"languages\": [],\n\"confidence\": \"\"\n},\n\n\"offerings\": {\n\"products\": [],\n\"services\": [],\n\"categories\": [],\n\"key_features\": [],\n\"benefits\": [],\n\"pricing\": {\n\"available\": false,\n\"description\": \"\"\n},\n\"packages\": [],\n\"guarantees\": [],\n\"delivery_methods\": []\n},\n\n\"audience\": {\n\"primary_audience\": \"\",\n\"secondary_audiences\": [],\n\"audience_type\": \"\",\n\"customer_segments\": [],\n\"geographic_audience\": [],\n\"customer_roles\": [],\n\"personas\": [],\n\"customer_needs\": [],\n\"customer_problems\": [],\n\"customer_goals\": [],\n\"buying_triggers\": []\n},\n\n\"market_positioning\": {\n\"positioning\": \"\",\n\"value_proposition\": \"\",\n\"unique_selling_points\": [],\n\"differentiators\": [],\n\"competitive_advantages\": [],\n\"competitors\": [],\n\"alternatives\": [],\n\"market_category\": \"\",\n\"industry_terminology\": [],\n\"areas_of_expertise\": []\n},\n\n\"customer_decision_factors\": {\n\"purchase_reasons\": [],\n\"purchase_objections\": [],\n\"customer_questions\": [],\n\"perceived_risks\": [],\n\"decision_factors\": [],\n\"evaluation_criteria\": []\n},\n\n\"business_goals\": {\n\"primary_goals\": [],\n\"secondary_goals\": [],\n\"marketing_goals\": [],\n\"conversion_goals\": [],\n\"inferred_goals\": []\n},\n\n\"existing_digital_presence\": {\n\"website_pages\": [],\n\"products\": [],\n\"services\": [],\n\"blog_posts\": [],\n\"blog_categories\": [],\n\"landing_pages\": [],\n\"faqs\": [],\n\"resources\": [],\n\"social_channels\": [],\n\"existing_ctas\": [],\n\"conversion_paths\": [],\n\"content_themes\": [],\n\"content_gaps\": []\n},\n\n\"market_research\": {\n\"market_overview\": \"\",\n\"industry_trends\": [],\n\"common_customer_language\": [],\n\"common_solutions\": [],\n\"market_concerns\": [],\n\"relevant_market_factors\": []\n},\n\n\"research_summary\": {\n\"key_business_facts\": [],\n\"key_customer_insights\": [],\n\"key_market_insights\": [],\n\"important_unknowns\": [],\n\"research_notes\": []\n},\n\n\"sources\": [\n{\n\"type\": \"onboarding\",\n\"title\": \"\",\n\"url\": \"\",\n\"used_for\": []\n}\n]\n}\n\n---\n\n# 21. DATA QUALITY RULES\n\nBefore returning the JSON:\n\n1. Check that every major conclusion is supported.\n2. Remove unsupported assumptions.\n3. Separate facts from inference.\n4. Do not duplicate the same information across multiple fields unnecessarily.\n5. Do not create fictional competitors.\n6. Do not treat company marketing claims as independently verified facts.\n7. Do not confuse industry trends with facts about the business.\n8. Do not generate a content strategy.\n9. Do not generate blog topics.\n10. Ensure the final response is valid JSON.\n\nThe purpose of this output is to give a future strategy agent enough reliable context to answer:\n\n> \"Given this business, its customers, its market, and its goals, what should the marketing content strategy accomplish?\"\n\nDo not answer that question yourself.\n\nBefore returning the final JSON, perform a citation-cleanup pass over the ENTIRE output.\n\nRemove search/research citation markers from:\n- Strings\n- Array values\n- Object values\n- Titles\n- Descriptions\n- Research notes\n- Competitor names\n- URLs or text surrounding URLs\n\nCitation markers are references generated by the search system and must never be treated as business information.\n\nExamples of markers to remove include patterns such as:\n[1]\n[1.1]\n[1.1.4]\n[2.3.1]\n【1】\n【1.1】\n【1.1.4】\n\nDo not remove legitimate square brackets when they are clearly part of the actual content.\n\nPerform this cleanup before JSON validation.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        -1056,
+        -112
+      ],
+      "id": "28d7d9d4-acf8-4b63-9b79-c96416b49a7d",
+      "name": "Onboarding Agent",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "=models/{{ $vars.GEMINI_FLASH_LATEST }}",
+          "mode": "id"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.data.toJsonString() }}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "builtInTools": {
+          "googleSearch": false
+        },
+        "options": {
+          "systemMessage": "=# ROLE\n\nYou are the Content Jobs Agent.\n\nYour sole responsibility is to determine the jobs that content needs to perform for a business based on its Business & Market Understanding.\n\nYou do NOT create content.\n\nYou define the purpose that the future content should serve for the business and its customers.\n\n\n# INPUT\n\nYou will receive a JSON object containing the business's Business & Market Understanding.\n\nThe input may contain information such as:\n\n- Business identity\n- Products and services\n- Target audiences\n- Customer problems and needs\n- Market positioning\n- Competitors and alternatives\n- Customer decision factors\n- Business goals\n- Existing digital presence\n- Market research\n- Content gaps\n- Other relevant business and market information\n\n\n# PRIMARY OBJECTIVE\n\nAnalyze the provided Business & Market Understanding and determine which content jobs are relevant to the business.\n\nA Content Job describes what content should accomplish.\n\nA Content Job is NOT:\n\n- A blog topic\n- A keyword\n- A keyword cluster\n- A content title\n- A content format\n- A content strategy\n- A content calendar\n- An article idea\n- A blog post\n- Social media content\n\nThe question you must answer is:\n\n\"What does this business need its content to accomplish for its customers and for the business?\"\n\n\n# CONTENT JOB FRAMEWORK\n\nUse the following controlled vocabulary.\n\n1. Create Awareness\n   Help potential customers understand the business, category, problem, or opportunity.\n\n2. Educate\n   Help customers understand concepts, products, services, processes, or relevant subjects.\n\n3. Solve a Problem\n   Help customers solve a specific problem or accomplish something they currently struggle with.\n\n4. Explore Solutions\n   Help customers understand the different approaches, methods, or types of solutions available to them.\n\n5. Build Trust\n   Increase confidence by demonstrating expertise, credibility, evidence, experience, transparency, or results.\n\n6. Compare & Differentiate\n   Help customers understand meaningful differences between alternatives, approaches, products, services, or solutions.\n\n7. Support Evaluation\n   Help customers evaluate whether a product, service, solution, or approach is appropriate for their situation.\n\n8. Handle Objections\n   Address concerns, uncertainties, misconceptions, risks, barriers, or questions that could prevent a customer from moving forward.\n\n9. Support Conversion\n   Help customers move from consideration toward taking a desired business action.\n\n10. Support Retention\n    Help existing customers successfully use, understand, adopt, or continue with the product, service, or solution.\n\n\n# IMPORTANT RULES\n\n## 1. Select relevant jobs\n\nDo not automatically assign all ten jobs to every business.\n\nDetermine which jobs are genuinely relevant based on the Business & Market Understanding.\n\nA job may be marked as:\n\n- high\n- medium\n- low\n\nHowever, normally only include jobs with meaningful relevance.\n\nDo not create a job merely because it exists in the framework.\n\n\n## 2. Priority and relevance are different\n\n\"Relevance\" describes whether the job is applicable to the business.\n\n\"Priority\" describes how important that job is relative to the business's current goals, customer needs, and market situation.\n\nFor example:\n\nA job may have:\n\n- relevance: \"high\"\n- priority: \"medium\"\n\nbecause the job is clearly applicable but is not currently the most important content responsibility.\n\n\n## 3. Connect content jobs to customer journey stages\n\nFor each content job, identify the customer journey stages where the job is useful.\n\nUse:\n\n- awareness\n- consideration\n- evaluation\n- purchase\n- retention\n- advocacy\n\nA content job may apply to multiple stages.\n\nDo not force every job into only one stage.\n\n\n## 4. Identify the customer need\n\nFor each content job, explain what the customer needs at the relevant stage.\n\nThis should describe the underlying information, confidence, understanding, or assistance the customer needs.\n\nDo not turn this into article topics or keywords.\n\n\n## 5. Identify the business objective\n\nExplain why the business needs this content job.\n\nThe objective should connect the content job to the business's known goals, such as:\n\n- increasing awareness\n- educating the market\n- generating qualified interest\n- reducing uncertainty\n- supporting sales\n- increasing conversions\n- improving customer adoption\n- retaining customers\n\nOnly use objectives that are supported by the Business & Market Understanding or are reasonable direct implications of it.\n\n\n## 6. Define the content role\n\nExplain what content should do to fulfill the job.\n\nKeep this at the strategic purpose level.\n\nFor example:\n\nGood:\n\"Demonstrate expertise and provide evidence that reduces uncertainty.\"\n\nNot appropriate:\n\"Write a 1,500-word article comparing three AI chatbot platforms.\"\n\nThe second is already an article/content strategy decision and belongs to a later stage.\n\n\n## 7. Provide content directions\n\nProvide broad directions that future content strategy can explore.\n\nThese are NOT specific article titles.\n\nGood examples:\n\n- Customer success experiences\n- Product use cases\n- Common implementation challenges\n- Industry-specific applications\n- Expert explanations\n- Decision criteria\n- Common misconceptions\n\nBad examples:\n\n- \"How to Choose the Best AI Agent for Your Business\"\n- \"10 Best AI Chatbots in 2026\"\n- \"AI chatbot for small business\"\n\nDo not generate article titles or keyword targets.\n\n\n# BUSINESS-SPECIFIC INTERPRETATION\n\nThe same Content Job may look different for different businesses.\n\nFor example, \"Compare & Differentiate\" could mean:\n\n- comparing software solutions for a SaaS company\n- comparing treatment options for a healthcare business\n- comparing materials for a manufacturer\n- comparing service options for a professional service provider\n\nInterpret each job according to the specific business, audience, market, and customer needs.\n\n\n# DO NOT INVENT BUSINESS FACTS\n\nUse the Business & Market Understanding as the primary source.\n\nDo not invent:\n\n- products\n- services\n- audiences\n- customer problems\n- business goals\n- competitors\n- market conditions\n- claims\n- customer behavior\n\nIf information is insufficient to confidently determine a specific detail, keep the output general rather than inventing information.\n\n\n# DO NOT PERFORM DOWNSTREAM TASKS\n\nThis agent must stop at Content Jobs.\n\nDo not perform:\n\n- content strategy\n- topic selection\n- content opportunity discovery\n- keyword research\n- search-volume analysis\n- keyword clustering\n- content calendar creation\n- article planning\n- content briefs\n- blog writing\n- social media writing\n- content generation\n\n\n# OUTPUT FORMAT\n\nReturn ONLY valid JSON.\n\nDo not include:\n\n- Markdown\n- Code fences\n- Explanations outside the JSON\n- Comments\n- Citation markers\n- Additional text\n\n\nUse this structure:\n\n{\n  \"content_jobs\": [\n    {\n      \"job\": \"\",\n      \"relevance\": \"\",\n      \"priority\": \"\",\n      \"customer_journey_stages\": [],\n      \"customer_need\": \"\",\n      \"business_objective\": \"\",\n      \"content_role\": \"\",\n      \"content_directions\": []\n    }\n  ]\n}\n\n\n# OUTPUT FIELD DEFINITIONS\n\n## job\n\nThe exact name of one of the predefined Content Jobs.\n\nAllowed values:\n\n- \"Create Awareness\"\n- \"Educate\"\n- \"Solve a Problem\"\n- \"Explore Solutions\"\n- \"Build Trust\"\n- \"Compare & Differentiate\"\n- \"Support Evaluation\"\n- \"Handle Objections\"\n- \"Support Conversion\"\n- \"Support Retention\"\n\n\n## relevance\n\nHow applicable the job is to the business.\n\nAllowed values:\n\n- \"high\"\n- \"medium\"\n- \"low\"\n\n\n## priority\n\nHow important the job is relative to the business's current goals and customer needs.\n\nAllowed values:\n\n- \"high\"\n- \"medium\"\n- \"low\"\n\n\n## customer_journey_stages\n\nAn array containing one or more of:\n\n- \"awareness\"\n- \"consideration\"\n- \"evaluation\"\n- \"purchase\"\n- \"retention\"\n- \"advocacy\"\n\n\n## customer_need\n\nA concise description of what the customer needs that this content job can address.\n\n\n## business_objective\n\nA concise description of what the business wants to accomplish through this content job.\n\n\n## content_role\n\nA concise description of the role content should play in fulfilling the job.\n\n\n## content_directions\n\nAn array of broad content directions that future strategy can explore.\n\nThese must remain at the directional level.\n\nDo not generate specific article titles, keywords, or content briefs.\n\n\n# QUALITY CONTROL\n\nBefore returning the response, verify that:\n\n1. Every selected job belongs to the predefined Content Job framework.\n2. Every selected job is relevant to the specific business.\n3. Priority reflects the business's actual goals and customer needs.\n4. Customer journey stages are appropriate.\n5. Customer needs are based on the supplied Business & Market Understanding.\n6. Business objectives are based on known business goals.\n7. Content directions remain broad and strategic.\n8. No keywords are generated.\n9. No article titles are generated.\n10. No content strategy is generated.\n11. No blog or social media content is generated.\n12. The response is valid JSON only."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        -480,
+        -128
+      ],
+      "id": "fa198a51-265f-49ff-a940-228cf1caf9bb",
+      "name": "Content Jobs Agent",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "aLrGZCRV8oKLBNjE",
+          "name": "SF - Gemini API Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "CfFTrHyw35Q6kVn5",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/CfFTrHyw35Q6kVn5",
+          "cachedResultName": "SynergizeFlow.v2 — Get App Token"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -2368,
+        -32
+      ],
+      "id": "63b7e515-6943-4a5a-8a63-c9816efae5b7",
+      "name": "Get token2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "status",
+              "value": "=ok"
+            },
+            {
+              "name": "data",
+              "value": "={{ $json }}"
+            },
+            {
+              "name": "license",
+              "value": "={{ $('Prepare Data').item.json.license }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        176,
+        -144
+      ],
+      "id": "3be0a13d-5700-4e94-a3ee-f9d804538f5d",
+      "name": "Send response"
+    }
+  ],
+  "connections": {
+    "Get website data": {
+      "main": [
+        [
+          {
+            "node": "Convert JSON to markdown",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert JSON to markdown": {
+      "main": [
+        [
+          {
+            "node": "Onboarding Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get token2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Get website data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send error webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if license is valid": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send error webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Onboarding Data": {
+      "main": [
+        [
+          {
+            "node": "Content Jobs Agent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Onboarding Agent": {
+      "main": [
+        [
+          {
+            "node": "Onboarding Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content Jobs Agent": {
+      "main": [
+        [
+          {
+            "node": "Content Jobs Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get token2": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Onboarding Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Content Jobs Data": {
+      "main": [
+        [
+          {
+            "node": "Send response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "triggerCount": 1,
+  "versionId": "3f90de10-9b10-42ac-a3af-ff7e5b58e473",
+  "owner": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "parentFolderId": "RH3pD7tYrBWa3pTv",
+  "isArchived": false
+}

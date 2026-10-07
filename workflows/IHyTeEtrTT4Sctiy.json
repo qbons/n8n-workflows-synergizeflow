@@ -14,7 +14,10 @@
         544
       ],
       "id": "44a9a69e-d770-43d4-9cff-af01ebb850ee",
-      "name": "HTTP Request"
+      "name": "HTTP Request",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
@@ -904,7 +907,7 @@
     "availableInMCP": false
   },
   "triggerCount": 0,
-  "versionId": "3f9d6ce2-e267-4158-8d87-5f791178c1ba",
+  "versionId": "b0356932-a821-4ce6-bd3a-51a25551a435",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",

@@ -242,8 +242,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -400,
-        64
+        -176,
+        128
       ],
       "id": "fc361944-401c-4df5-ab6a-5445826871ae",
       "name": "Insert data to website",
@@ -295,7 +295,7 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        -176,
+        64,
         0
       ],
       "id": "b3725ac7-17f1-4338-8b35-f709d6ecbf88",
@@ -339,8 +339,8 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        -5248,
-        736
+        -5744,
+        816
       ],
       "id": "adaac209-aded-4a8c-ab7f-433eb9770881",
       "name": "share contact",
@@ -382,8 +382,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -5024,
-        544
+        -5520,
+        624
       ],
       "id": "c3a78cb9-bad7-4f0a-993d-0021b4c6c109",
       "name": "check if share contact"
@@ -416,8 +416,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -5696,
-        640
+        -6192,
+        720
       ],
       "id": "9fa899f6-532f-41f2-b322-3c818084aecb",
       "name": "check if bot"
@@ -449,8 +449,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -5472,
-        640
+        -5968,
+        720
       ],
       "id": "1ffa6958-f4bc-4adc-8ea0-b68b220ce9a1",
       "name": "check if start"
@@ -486,8 +486,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -4688,
-        832
+        -5184,
+        912
       ],
       "id": "ad5e3d77-9923-417f-a824-02f7b1b28f70",
       "name": "get domain by phone number and save user id to saas",
@@ -566,7 +566,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2544,
+        -2672,
         160
       ],
       "id": "f7601fc8-e5e4-4b44-8407-1d12c38e7e3e",
@@ -579,7 +579,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2768,
+        -2896,
         160
       ],
       "id": "82a0a600-9f32-4d00-b8b3-32265df664ab",
@@ -600,8 +600,8 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        -4016,
-        832
+        -4480,
+        928
       ],
       "id": "31bb9b28-8d5c-45ce-a1aa-60c75bd57381",
       "name": "send number saved or phone number not found in saas",
@@ -643,8 +643,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -4544,
-        176
+        -5040,
+        256
       ],
       "id": "1fca1768-a77f-4918-8746-68883ca92688",
       "name": "check user id"
@@ -686,7 +686,7 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        -176,
+        64,
         160
       ],
       "id": "4ae25463-4772-4262-9487-13e5799bee18",
@@ -810,8 +810,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -4320,
-        80
+        -4432,
+        128
       ],
       "id": "31049e2d-0f5d-4343-8583-5767df53ab5d",
       "name": "Check if license is valid"
@@ -864,8 +864,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -2320,
-        160
+        -2272,
+        208
       ],
       "id": "bb1f5512-b3d7-4d1e-91a2-cb4ad6d3e339",
       "name": "get titles"
@@ -887,8 +887,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -4240,
-        928
+        -4704,
+        1024
       ],
       "id": "91527bb4-d378-4cdf-96d6-e5d165c2f6b2",
       "name": "Edit Fields2"
@@ -910,8 +910,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -4240,
-        736
+        -4704,
+        832
       ],
       "id": "a68f9aca-518a-4abf-8ce4-e2f7af3ee658",
       "name": "Edit Fields1"
@@ -923,8 +923,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -2096,
-        160
+        -2048,
+        144
       ],
       "id": "2e7e9da0-44ec-4027-9d04-8a74cecd60e2",
       "name": "title list"
@@ -958,7 +958,7 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        -2768,
+        -2896,
         352
       ],
       "id": "93f4aebf-7f9f-4538-986b-1bc376ffd2c1",
@@ -1000,8 +1000,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -4464,
-        928
+        -4960,
+        1008
       ],
       "id": "91c2463d-8179-4ce9-a11d-821d49a8c107",
       "name": "Code in JavaScript"
@@ -1028,8 +1028,8 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
       "position": [
-        -5248,
-        544
+        -5744,
+        624
       ],
       "id": "13517c65-160f-4d90-8377-111d5a8279a0",
       "name": "Get token"
@@ -1044,8 +1044,8 @@
       "type": "n8n-nodes-base.telegramTrigger",
       "typeVersion": 1.2,
       "position": [
-        -5872,
-        640
+        -6368,
+        720
       ],
       "id": "f04d2faa-f17b-4658-a87b-c3cf30792ba1",
       "name": "Telegram Trigger",
@@ -1074,8 +1074,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -4752,
-        352
+        -5248,
+        432
       ],
       "id": "9aeac64b-79c6-465e-8240-b136389fe9c1",
       "name": "check user id req",
@@ -1112,7 +1112,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        48,
+        288,
         0
       ],
       "id": "ebf981e5-ec06-4d51-8e05-ed33bb0cd23c",
@@ -1131,8 +1131,8 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        -4544,
-        416
+        -5040,
+        496
       ],
       "id": "4bca8f47-d20d-49dd-821e-7de3fefde784",
       "name": "Send a text message5",
@@ -1145,6 +1145,332 @@
           "name": "SynergizeFlow Dev Blog"
         }
       }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.engine_type }}",
+                    "rightValue": "laravel",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "907b2f9b-be27-42ee-8fa3-054e4bcebd71"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "laravel"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "edf94958-5b02-4af8-9ddd-99b2b0f4605b",
+                    "leftValue": "={{ $json.engine_type }}",
+                    "rightValue": "wordpress",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "wordpress"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -4704,
+        0
+      ],
+      "id": "0c8fe652-1566-4a74-a8db-964e21d376c0",
+      "name": "Switch4"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('check user id').item.json.url }}/api/synergizeflow/v2/validate-license",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-SynergizeFlow-Key",
+              "value": "={{ $json.license_key }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license",
+              "value": "={{ $json.license_key }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -4432,
+        -48
+      ],
+      "id": "02128aae-1e0d-4ee6-b8d0-55b20133cb13",
+      "name": "Check if license is valid1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('check user id').item.json.engine_type }}",
+                    "rightValue": "laravel",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "907b2f9b-be27-42ee-8fa3-054e4bcebd71"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "laravel"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "edf94958-5b02-4af8-9ddd-99b2b0f4605b",
+                    "leftValue": "={{ $('check user id').item.json.engine_type }}",
+                    "rightValue": "wordpress",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "wordpress"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -2528,
+        160
+      ],
+      "id": "545d2da1-de8a-4b06-831a-de0e66c3d37f",
+      "name": "Switch5"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('check user id').item.json.url }}/api/synergizeflow/v2/helper-data/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-SynergizeFlow-Key",
+              "value": "={{ $('check user id').item.json.license_key }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "type",
+              "value": "get_title"
+            },
+            {
+              "name": "license",
+              "value": "={{ $('check user id').item.json.license_key }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -2272,
+        64
+      ],
+      "id": "01a2ad15-94b3-4735-aff1-3a08be459da0",
+      "name": "get titles1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('check user id req').item.json.engine_type }}",
+                    "rightValue": "laravel",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "907b2f9b-be27-42ee-8fa3-054e4bcebd71"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "laravel"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "edf94958-5b02-4af8-9ddd-99b2b0f4605b",
+                    "leftValue": "={{ $('check user id req').item.json.engine_type }}",
+                    "rightValue": "wordpress",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "wordpress"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -416,
+        64
+      ],
+      "id": "e0734c88-11a2-4df9-a169-618d1d517850",
+      "name": "Switch6"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('check user id').item.json.url }}/api/synergizeflow/v2/insert-blog",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "license",
+              "value": "={{ $('check user id req').item.json.license_key }}"
+            },
+            {
+              "name": "title",
+              "value": "={{ $('return text data1').item.json.title }}"
+            },
+            {
+              "name": "content",
+              "value": "={{ $('return text data1').item.json.content }}"
+            },
+            {
+              "name": "excerpt",
+              "value": "={{ $('return text data1').item.json.excerpt }}"
+            },
+            {
+              "name": "status",
+              "value": "=publish"
+            },
+            {
+              "name": "category_id",
+              "value": "={{ $json.category[0] }}"
+            },
+            {
+              "name": "keyword",
+              "value": "={{ $json.keyword }}"
+            },
+            {
+              "name": "image",
+              "value": "=data:image/{{ $json.extension == 'jpeg' ? 'jpeg' : ($json.extension == 'jpg' ? 'jpg' : 'png') }};base64,{{ $('Extract from File').item.json.data }}"
+            },
+            {
+              "name": "author_id",
+              "value": "={{ $('check user id req').item.json.wp_author_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -176,
+        -16
+      ],
+      "id": "acc8260e-ae6a-420d-821d-442500300a98",
+      "name": "Insert data to website1",
+      "retryOnFail": true,
+      "onError": "continueErrorOutput"
     }
   ],
   "connections": {
@@ -1163,7 +1489,7 @@
       "main": [
         [
           {
-            "node": "Insert data to website",
+            "node": "Switch6",
             "type": "main",
             "index": 0
           }
@@ -1344,7 +1670,7 @@
       "main": [
         [
           {
-            "node": "get titles",
+            "node": "Switch5",
             "type": "main",
             "index": 0
           }
@@ -1366,7 +1692,7 @@
       "main": [
         [
           {
-            "node": "Check if license is valid",
+            "node": "Switch4",
             "type": "main",
             "index": 0
           }
@@ -1546,6 +1872,105 @@
           }
         ]
       ]
+    },
+    "Switch4": {
+      "main": [
+        [
+          {
+            "node": "Check if license is valid1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check if license is valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if license is valid1": {
+      "main": [
+        [
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch5": {
+      "main": [
+        [
+          {
+            "node": "get titles1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "get titles",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get titles1": {
+      "main": [
+        [
+          {
+            "node": "title list",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch6": {
+      "main": [
+        [
+          {
+            "node": "Insert data to website1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Insert data to website",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert data to website1": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -1557,7 +1982,7 @@
     "availableInMCP": false
   },
   "triggerCount": 1,
-  "versionId": "4cdf9d58-80b6-4d22-841c-31626f64bcc8",
+  "versionId": "ffa89f89-84ad-4f6a-bc39-5327bc058689",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",
