@@ -1,0 +1,25 @@
+{
+  "id": "ZAxcT9FRKwKJHmpU",
+  "name": "Media Agent Temp URL",
+  "columns": [
+    {
+      "id": "ePlxviJaThQJjJBf",
+      "name": "media_id",
+      "type": "string",
+      "index": 0
+    },
+    {
+      "id": "E2iKVj3fwAoIrI8m",
+      "name": "media_url",
+      "type": "string",
+      "index": 1
+    }
+  ],
+  "ownedBy": {
+    "type": "team",
+    "teamId": "0Cpv1rjP8dogQgcy",
+    "teamName": "SynergizeFlow.v2"
+  },
+  "createdAt": "2026-10-16T06:53:43.958Z",
+  "updatedAt": "2026-10-26T07:06:10.225Z"
+}
