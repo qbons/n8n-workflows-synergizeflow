@@ -306,7 +306,7 @@
       "parameters": {
         "modelId": {
           "__rl": true,
-          "value": "=models/{{ $vars.GEMINI_PRO_LATEST }}",
+          "value": "=models/{{ $vars.GEMINI_FLASH_LATEST }}",
           "mode": "id"
         },
         "messages": {
@@ -806,7 +806,7 @@
     "availableInMCP": false
   },
   "triggerCount": 1,
-  "versionId": "37a45c40-07f3-435c-92e9-3786123026c9",
+  "versionId": "5511087d-d965-45ec-902c-abb3fcb22479",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",

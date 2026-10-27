@@ -670,7 +670,8 @@
         -64
       ],
       "id": "5c1ad0f1-be4d-48c5-8ffc-3253a6748d6d",
-      "name": "KIE AI Pooling"
+      "name": "KIE AI Pooling",
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -933,6 +934,47 @@
       "id": "14cb9f22-7230-4bc7-9069-b0d62b1a75b3",
       "name": "Check if license is valid1",
       "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "fail"
+            },
+            {
+              "name": "msg",
+              "value": "kie_ai_error"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3408,
+        176
+      ],
+      "id": "7a3caae8-4f97-4379-b443-666844d27f17",
+      "name": "Send Error KIE AI"
     }
   ],
   "connections": {
@@ -1263,6 +1305,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Send Error KIE AI",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -1356,7 +1405,7 @@
     "availableInMCP": false
   },
   "triggerCount": 1,
-  "versionId": "d98a08d4-e32e-4567-b6a1-d5f13d0bb9d0",
+  "versionId": "771ea2d6-79c6-4434-b30f-050a41663989",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",

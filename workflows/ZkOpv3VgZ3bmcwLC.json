@@ -1236,35 +1236,12 @@
     },
     {
       "parameters": {
-        "url": "={{ $vars.SAAS_API }}api/onboarding/{{ $('Prepare Data').item.json.license }}",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Authorization",
-              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        2464,
-        -1504
-      ],
-      "id": "528f612d-799b-4961-b7e2-f4870faf124e",
-      "name": "Get Onboarding Data"
-    },
-    {
-      "parameters": {
         "assignments": {
           "assignments": [
             {
               "id": "97e64401-0705-41a3-9a93-e21a028e4d8b",
               "name": "text",
-              "value": "={{ $json.website_name }} knowledge base\n\nDomain: {{ $json.domain_name }}\nWebsite name: {{ $json.website_name }}\nNiche: {{ $json.website_niche }}\nTarget Audience: {{ $json.target_audience }}\nPurpose: {{ $json.purpose }}\nFearure/Service: {{ $json.features.toJsonString() }}\n",
+              "value": "={{ $json.toJsonString() }}",
               "type": "string"
             }
           ]
@@ -1282,41 +1259,18 @@
     },
     {
       "parameters": {
-        "url": "={{ $vars.SAAS_API }}api/onboarding/{{ $('Prepare Data').item.json.license }}",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Authorization",
-              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        2240,
-        -1312
-      ],
-      "id": "6077a675-801d-475e-a285-a24109444837",
-      "name": "Get Onboarding Data1"
-    },
-    {
-      "parameters": {
         "assignments": {
           "assignments": [
             {
               "id": "97e64401-0705-41a3-9a93-e21a028e4d8b",
               "name": "text",
-              "value": "=Domain: {{ $json.domain_name }}\nWebsite name: {{ $json.website_name }}\nNiche: {{ $json.website_niche }}\nTarget Audience: {{ $json.target_audience }}\nPurpose: {{ $json.purpose }}\nFearure/Service: {{ $json.features.toJsonString() }}\n",
+              "value": "={{ $json.toJsonString() }}",
               "type": "string"
             },
             {
               "id": "c1614b72-0596-48c3-8ed5-fc00812103e2",
               "name": "title",
-              "value": "={{ $json.website_name }} knowledge base",
+              "value": "={{ $json.business_identity.business_name }} knowledge base",
               "type": "string"
             }
           ]
@@ -1331,6 +1285,52 @@
       ],
       "id": "90faee3c-7dec-40f6-8cad-55cff19c0668",
       "name": "Edit Fields6"
+    },
+    {
+      "parameters": {
+        "url": "={{ $vars.SAAS_API }}api/v3/onboarding/{{ $('Prepare Data').item.json.license }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2416,
+        -1504
+      ],
+      "id": "e4d8704a-995a-4ea3-b854-4b797e5ae3ba",
+      "name": "Get Website Data"
+    },
+    {
+      "parameters": {
+        "url": "={{ $vars.SAAS_API }}api/v3/onboarding/{{ $('Prepare Data').item.json.license }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2240,
+        -1312
+      ],
+      "id": "064f07d4-a6e6-44a5-8713-fbc00ae9f08f",
+      "name": "Get Website Data1"
     }
   ],
   "connections": {
@@ -1430,7 +1430,7 @@
       "main": [
         [
           {
-            "node": "Get Onboarding Data",
+            "node": "Get Website Data",
             "type": "main",
             "index": 0
           }
@@ -1499,7 +1499,7 @@
       "main": [
         [
           {
-            "node": "Get Onboarding Data1",
+            "node": "Get Website Data1",
             "type": "main",
             "index": 0
           }
@@ -1674,33 +1674,11 @@
         ]
       ]
     },
-    "Get Onboarding Data": {
-      "main": [
-        [
-          {
-            "node": "Edit Fields1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Edit Fields1": {
       "main": [
         [
           {
             "node": "Message a model",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get Onboarding Data1": {
-      "main": [
-        [
-          {
-            "node": "Edit Fields6",
             "type": "main",
             "index": 0
           }
@@ -1717,14 +1695,40 @@
           }
         ]
       ]
+    },
+    "Get Website Data": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Website Data1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
     "executionOrder": "v1",
-    "binaryMode": "separate"
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "saveDataSuccessExecution": "all",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
   },
   "triggerCount": 1,
-  "versionId": "4b14e27c-199e-4177-ab3c-d67da3a59000",
+  "versionId": "e5b71409-b370-4351-85ec-634a2bb22c81",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",

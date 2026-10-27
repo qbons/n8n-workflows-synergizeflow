@@ -850,7 +850,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const model =  $('Source Data').first().json.output_meta.video_model;\nconst prompt = $('Text speech').first().json.prompt;\n\nif(model == 'veo'){\n  return {\n    \"url\": \"https://api.kie.ai/api/v1/veo/generate\",\n    \"config\": {\n      \"prompt\": prompt,\n      \"model\": \"veo3_fast\",\n      \"aspect_ratio\": $('Source Data').first().json.content_data.aspect_ratio,\n      \"imageUrls\": [\n        $('Source Data').first().json.content_data.img_url\n      ],\n      \"generationType\": \"REFERENCE_2_VIDEO\",\n      \"enableFallback\": false,\n      \"enableTranslation\": false,\n      \"duration\": 8,\n      \"resolution\": \"720p\"\n    } \n  }\n}else if(model == 'runway'){\n  return {\n    \"url\": \"https://api.kie.ai/api/v1/runway/generate\",\n    \"config\": {\n      \"prompt\": prompt,\n      \"aspectRatio\": $('Source Data').first().json.content_data.aspect_ratio,\n      \"quality\": \"720p\",\n      \"duration\": \"10\",\n      \"imageUrl\": $('Source Data').first().json.content_data.img_url\n    } \n  }  \n}else if(model == 'kling'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": \"kling-2.6/image-to-video\",\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_urls\": [\n          $('Source Data').first().json.content_data.img_url\n        ],\n        \"sound\": false,\n        \"duration\": \"10\",\n        \"aspect_ratio\": $('Source Data').first().json.content_data.aspect_ratio\n      }\n    }\n  }\n}else if(model == 'seedance'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": \"bytedance/seedance-1.5-pro\",\n      \"input\":{\n        \"prompt\": prompt,\n        \"input_urls\": [\n          $('Source Data').first().json.content_data.img_url\n        ],\n        \"aspect_ratio\": $('Source Data').first().json.content_data.aspect_ratio,\n        \"duration\": 10,\n        \"resolution\": \"480p\"\n      }\n    }\n  }\n}else if(model == 'grok'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": \"grok-imagine/image-to-video\",\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_urls\": [\n          $('Source Data').first().json.content_data.img_url\n        ],\n        \"duration\": \"10\",\n        \"resolution\": \"480p\",\n        \"mode\": \"normal\",\n        \"aspect_ratio\": $('Source Data').first().json.content_data.aspect_ratio\n      }\n    }\n  }\n}else if(model == 'hailuo'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": \"hailuo/2-3-image-to-video-standard\",\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_url\": $('Source Data').first().json.content_data.img_url,\n        \"duration\": \"10\",\n        \"resolution\": \"768P\"\n      }\n    }\n  }\n}else if(model == 'wan'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": \"wan/2-2-a14b-image-to-video-turbo\",\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_url\": $('Source Data').first().json.content_data.img_url,\n        \"enable_prompt_expansion\": false,\n        \"acceleration\": \"none\",\n        \"resolution\": \"480p\",\n        \"aspect_ratio\": $('Source Data').first().json.content_data.aspect_ratio\n      }\n    }\n  }\n}"
+        "jsCode": "const model =  $('Source Data').first().json.output_meta.video_model;\nconst prompt = $('Text speech').first().json.prompt;\n\nif(model == 'veo'){\n  return {\n    \"url\": \"https://api.kie.ai/api/v1/veo/generate\",\n    \"config\": {\n      \"prompt\": prompt,\n      \"model\": \"veo3_fast\",\n      \"aspect_ratio\": $('Source Data').first().json.content_data.aspect_ratio,\n      \"imageUrls\": [\n        $('Source Data').first().json.content_data.img_url\n      ],\n      \"generationType\": \"REFERENCE_2_VIDEO\",\n      \"enableFallback\": false,\n      \"enableTranslation\": false,\n      \"duration\": 8,\n      \"resolution\": \"720p\"\n    } \n  }\n}else if(model == 'runway'){\n  return {\n    \"url\": \"https://api.kie.ai/api/v1/runway/generate\",\n    \"config\": {\n      \"prompt\": prompt,\n      \"aspectRatio\": $('Source Data').first().json.content_data.aspect_ratio,\n      \"quality\": \"720p\",\n      \"duration\": \"10\",\n      \"imageUrl\": $('Source Data').first().json.content_data.img_url\n    } \n  }  \n}else if(model == 'kling'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": \"kling-2.6/image-to-video\",\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_urls\": [\n          $('Source Data').first().json.content_data.img_url\n        ],\n        \"sound\": false,\n        \"duration\": \"10\",\n        \"aspect_ratio\": $('Source Data').first().json.content_data.aspect_ratio\n      }\n    }\n  }\n}else if(model == 'seedance'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": \"bytedance/seedance-2-fast\",\n      \"input\":{\n        \"prompt\": prompt,\n        \"reference_image_urls\": [\n          $('Source Data').first().json.content_data.img_url\n        ],\n        \"aspect_ratio\": $('Source Data').first().json.content_data.aspect_ratio,\n        \"duration\": 10,\n        \"resolution\": \"480p\",\n        \"return_last_frame\": false,\n        \"generate_audio\": false,\n        \"web_search\": false\n      }\n    }\n  }\n}else if(model == 'grok'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": \"grok-imagine/image-to-video\",\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_urls\": [\n          $('Source Data').first().json.content_data.img_url\n        ],\n        \"duration\": \"10\",\n        \"resolution\": \"480p\",\n        \"mode\": \"normal\",\n        \"aspect_ratio\": $('Source Data').first().json.content_data.aspect_ratio\n      }\n    }\n  }\n}else if(model == 'hailuo'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": \"hailuo/2-3-image-to-video-standard\",\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_url\": $('Source Data').first().json.content_data.img_url,\n        \"duration\": \"10\",\n        \"resolution\": \"768P\"\n      }\n    }\n  }\n}else if(model == 'wan'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": \"wan/2-2-a14b-image-to-video-turbo\",\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_url\": $('Source Data').first().json.content_data.img_url,\n        \"enable_prompt_expansion\": false,\n        \"acceleration\": \"none\",\n        \"resolution\": \"480p\",\n        \"aspect_ratio\": $('Source Data').first().json.content_data.aspect_ratio\n      }\n    }\n  }\n}"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -1203,7 +1203,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const model =  $('Source Data').first().json.output_meta.video_model;\nconst prompt = $input.first().json.obj.prompt\n\nif(model == 'veo'){\n  return {\n    \"url\": \"https://api.kie.ai/api/v1/veo/generate\",\n    \"config\": {\n      \"prompt\": prompt,\n      \"model\": \"veo3_fast\",\n      \"aspect_ratio\": $('Source Data').first().json.content_data.aspect_ratio,\n      \"imageUrls\": [\n        $('Source Data').first().json.content_data.img_url\n      ],\n      \"generationType\": \"REFERENCE_2_VIDEO\",\n      \"enableFallback\": false,\n      \"enableTranslation\": false,\n      \"duration\": 8,\n      \"resolution\": \"720p\"\n    } \n  }\n}else if(model == 'runway'){\n  return {\n    \"url\": \"https://api.kie.ai/api/v1/runway/generate\",\n    \"config\": {\n      \"prompt\": prompt,\n      \"aspectRatio\": $('Source Data').first().json.content_data.aspect_ratio,\n      \"quality\": \"720p\",\n      \"duration\": \"10\",\n      \"imageUrl\": $('Source Data').first().json.content_data.img_url\n    } \n  }  \n}else if(model == 'kling'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": \"kling-2.6/image-to-video\",\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_urls\": [\n          $('Source Data').first().json.content_data.img_url\n        ],\n        \"sound\": false,\n        \"duration\": \"10\",\n        \"aspect_ratio\": $('Source Data').first().json.content_data.aspect_ratio\n      }\n    }\n  }\n}else if(model == 'seedance'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": \"bytedance/seedance-1.5-pro\",\n      \"input\":{\n        \"prompt\": prompt,\n        \"input_urls\": [\n          $('Source Data').first().json.content_data.img_url\n        ],\n        \"aspect_ratio\": $('Source Data').first().json.content_data.aspect_ratio,\n        \"duration\": 10,\n        \"resolution\": \"480p\"\n      }\n    }\n  }\n}else if(model == 'grok'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": \"grok-imagine/image-to-video\",\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_urls\": [\n          $('Source Data').first().json.content_data.img_url\n        ],\n        \"duration\": \"10\",\n        \"resolution\": \"480p\",\n        \"mode\": \"normal\",\n        \"aspect_ratio\": $('Source Data').first().json.content_data.aspect_ratio\n      }\n    }\n  }\n}else if(model == 'hailuo'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": \"hailuo/2-3-image-to-video-standard\",\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_url\": $('Source Data').first().json.content_data.img_url,\n        \"duration\": \"10\",\n        \"resolution\": \"768P\"\n      }\n    }\n  }\n}else if(model == 'wan'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": \"wan/2-2-a14b-image-to-video-turbo\",\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_url\": $('Source Data').first().json.content_data.img_url,\n        \"enable_prompt_expansion\": false,\n        \"acceleration\": \"none\",\n        \"resolution\": \"480p\",\n        \"aspect_ratio\": $('Source Data').first().json.content_data.aspect_ratio\n      }\n    }\n  }\n}"
+        "jsCode": "const model =  $('Source Data').first().json.output_meta.video_model;\nconst prompt = $input.first().json.obj.prompt\n\nif(model == 'veo'){\n  return {\n    \"url\": \"https://api.kie.ai/api/v1/veo/generate\",\n    \"config\": {\n      \"prompt\": prompt,\n      \"model\": \"veo3_fast\",\n      \"aspect_ratio\": $('Source Data').first().json.content_data.aspect_ratio,\n      \"imageUrls\": [\n        $('Source Data').first().json.content_data.img_url\n      ],\n      \"generationType\": \"REFERENCE_2_VIDEO\",\n      \"enableFallback\": false,\n      \"enableTranslation\": false,\n      \"duration\": 8,\n      \"resolution\": \"720p\"\n    } \n  }\n}else if(model == 'runway'){\n  return {\n    \"url\": \"https://api.kie.ai/api/v1/runway/generate\",\n    \"config\": {\n      \"prompt\": prompt,\n      \"aspectRatio\": $('Source Data').first().json.content_data.aspect_ratio,\n      \"quality\": \"720p\",\n      \"duration\": \"10\",\n      \"imageUrl\": $('Source Data').first().json.content_data.img_url\n    } \n  }  \n}else if(model == 'kling'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": \"kling-2.6/image-to-video\",\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_urls\": [\n          $('Source Data').first().json.content_data.img_url\n        ],\n        \"sound\": false,\n        \"duration\": \"10\",\n        \"aspect_ratio\": $('Source Data').first().json.content_data.aspect_ratio\n      }\n    }\n  }\n}else if(model == 'seedance'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": \"bytedance/seedance-2-fast\",\n      \"input\":{\n        \"prompt\": prompt,\n        \"reference_image_urls\": [\n          $('Source Data').first().json.content_data.img_url\n        ],\n        \"aspect_ratio\": $('Source Data').first().json.content_data.aspect_ratio,\n        \"duration\": 10,\n        \"resolution\": \"480p\",\n        \"return_last_frame\": false,\n        \"generate_audio\": false,\n        \"web_search\": false\n      }\n    }\n  }\n}else if(model == 'grok'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": \"grok-imagine/image-to-video\",\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_urls\": [\n          $('Source Data').first().json.content_data.img_url\n        ],\n        \"duration\": \"10\",\n        \"resolution\": \"480p\",\n        \"mode\": \"normal\",\n        \"aspect_ratio\": $('Source Data').first().json.content_data.aspect_ratio\n      }\n    }\n  }\n}else if(model == 'hailuo'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": \"hailuo/2-3-image-to-video-standard\",\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_url\": $('Source Data').first().json.content_data.img_url,\n        \"duration\": \"10\",\n        \"resolution\": \"768P\"\n      }\n    }\n  }\n}else if(model == 'wan'){\n  return {\n    url: \"https://api.kie.ai/api/v1/jobs/createTask\",\n    config: {\n      \"model\": \"wan/2-2-a14b-image-to-video-turbo\",\n      \"input\":{\n        \"prompt\": prompt,\n        \"image_url\": $('Source Data').first().json.content_data.img_url,\n        \"enable_prompt_expansion\": false,\n        \"acceleration\": \"none\",\n        \"resolution\": \"480p\",\n        \"aspect_ratio\": $('Source Data').first().json.content_data.aspect_ratio\n      }\n    }\n  }\n}"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -1576,7 +1576,8 @@
         336
       ],
       "id": "ba8b7b6e-6433-401c-a6a5-fe65020c7ce9",
-      "name": "KIE AI Pooling"
+      "name": "KIE AI Pooling",
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -1780,6 +1781,47 @@
       ],
       "id": "1f4e30eb-88d4-44a6-9a04-8edc47d9cb0b",
       "name": "HTTP Request4"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "fail"
+            },
+            {
+              "name": "msg",
+              "value": "kie_ai_error"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3312,
+        544
+      ],
+      "id": "d9c33830-c84d-4504-bb52-b2c91260b90b",
+      "name": "Send Error KIE AI"
     }
   ],
   "connections": {
@@ -2408,6 +2450,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Send Error KIE AI",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -2488,7 +2537,7 @@
     "availableInMCP": false
   },
   "triggerCount": 1,
-  "versionId": "830906a0-27f1-4d86-b09b-922bc4ea0790",
+  "versionId": "d01dda77-9c02-441f-ba51-90f621ad2d26",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",

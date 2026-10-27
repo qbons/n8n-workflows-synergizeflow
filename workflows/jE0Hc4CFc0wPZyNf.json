@@ -323,7 +323,16 @@
     },
     {
       "parameters": {
-        "url": "https://static.bayu.uno/sf-dummy-json/onboarding.json",
+        "url": "={{ $vars.SAAS_API }}api/v3/onboarding/{{ $('Prepare Data').item.json.license }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -337,7 +346,16 @@
     },
     {
       "parameters": {
-        "url": "https://static.bayu.uno/sf-dummy-json/history.json",
+        "url": "={{ $vars.SAAS_API }}api/v3/content-strategy-histories/{{ $('Prepare Data').item.json.license }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -532,7 +550,7 @@
     "availableInMCP": false
   },
   "triggerCount": 1,
-  "versionId": "cdca754a-3a68-4ada-bd7f-8d930388a4d4",
+  "versionId": "1e4d85ff-314f-4370-8a13-78864653accd",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",

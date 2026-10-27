@@ -40,7 +40,7 @@
         "operation": "analyze",
         "modelId": {
           "__rl": true,
-          "value": "=models/{{ $vars.GEMINI_FLASH_PREVIEW}}",
+          "value": "=models/{{ $vars.GEMINI_FLASH_LATEST}}",
           "mode": "id"
         },
         "text": "=You are analyzing a user-uploaded reference image for an animated explainer video generator.\n\nThe image may be:\n- company logo\n- person/founder/team member\n- product photo\n- app screenshot\n- office/building/place\n- mascot/character\n- document\n- other brand asset\n\nUse the explainer context if available:\nDescription: {{ $('Webhook').item.json.body.description }}\nVisual style: {{ $('Webhook').item.json.body.visual_style }}\nOrientation: {{ $('Webhook').item.json.body.orientation }}\n\nReturn JSON only. No markdown. No explanation.\n\nSchema:\n{\n  \"type\": \"logo | person | product | screenshot | place | mascot | document | other\",\n  \"label\": \"short human-readable label, max 60 chars\",\n  \"description\": \"detailed visual description useful for image generation prompts\",\n  \"usage_note\": \"how this reference should be used in explainer scenes\",\n  \"sensitive_note\": \"optional warning about preserving logo, face, text, UI, or brand accuracy\"\n}\n\nRules:\n- If image contains a logo or wordmark, type must be \"logo\".\n- If image is a person portrait/team photo, type must be \"person\".\n- If image is app UI/dashboard/website screen, type must be \"screenshot\".\n- If image is a physical product, type must be \"product\".\n- If image is a building/office/location, type must be \"place\".\n- Keep label short and clear.\n- description must describe visible colors, objects, text, layout, style, and identity cues.\n- usage_note must tell the storyboard generator when to use it.\n- sensitive_note should mention risks if exact text/logo/face/UI preservation matters.",
@@ -250,7 +250,7 @@
     "errorWorkflow": "onQDQSO8gYYXVpPQ"
   },
   "triggerCount": 1,
-  "versionId": "75d0863d-50f7-4dc7-9552-8da3348f5785",
+  "versionId": "fa2ba765-b338-4ed4-b7ab-7c244890d1ba",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",

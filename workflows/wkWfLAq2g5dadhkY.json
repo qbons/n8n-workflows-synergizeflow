@@ -21,7 +21,7 @@
     },
     {
       "parameters": {
-        "modelName": "=models/{{ $vars.GEMINI_FLASH_PREVIEW }}",
+        "modelName": "=models/{{ $vars.GEMINI_FLASH_LATEST }}",
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
@@ -774,7 +774,7 @@
     "availableInMCP": false
   },
   "triggerCount": 1,
-  "versionId": "67eff12d-c289-4a60-b10c-171ad097178f",
+  "versionId": "ea763619-56d3-4103-bc4f-4e86b278a58c",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",

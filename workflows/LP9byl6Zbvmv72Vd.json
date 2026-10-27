@@ -20,8 +20,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -64,
-        -48
+        -144,
+        -96
       ],
       "id": "4d3f6e8e-4fac-43bf-9caa-7612e4ba00eb",
       "name": "Check if license is valid",
@@ -104,8 +104,8 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.2,
       "position": [
-        160,
-        -80
+        80,
+        -160
       ],
       "id": "56d525b2-5dab-45b2-b92a-f9af8c3a3634",
       "name": "Switch"
@@ -124,8 +124,8 @@
       "type": "n8n-nodes-base.executionData",
       "typeVersion": 1.1,
       "position": [
-        -496,
-        144
+        -592,
+        112
       ],
       "id": "c1e8f89d-0dff-411b-8ee1-e9b70378671a",
       "name": "Execution Data"
@@ -165,8 +165,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        288,
-        160
+        304,
+        16
       ],
       "id": "ea03f9d1-d273-41a9-99e1-9b353d505057",
       "name": "Send Error License"
@@ -193,8 +193,8 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
       "position": [
-        -496,
-        -48
+        -592,
+        -96
       ],
       "id": "37a8a13c-da44-42a3-82c2-3a6c38ca68ef",
       "name": "Get token"
@@ -312,25 +312,11 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -272,
-        -48
+        -368,
+        -96
       ],
       "id": "836f826e-0fee-411b-b421-4de70790fa17",
       "name": "Prepare Data"
-    },
-    {
-      "parameters": {
-        "url": "https://static.bayu.uno/sf-dummy-json/product-history.json",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.4,
-      "position": [
-        416,
-        -144
-      ],
-      "id": "cd690205-77f1-4895-8071-351bc9d3153b",
-      "name": "Get History Data"
     },
     {
       "parameters": {
@@ -339,8 +325,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        624,
-        -144
+        528,
+        -208
       ],
       "id": "be0381e3-2297-400a-86dd-1d9bcba7805e",
       "name": "Opportunity Input"
@@ -370,8 +356,8 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1.2,
       "position": [
-        832,
-        -144
+        752,
+        -208
       ],
       "id": "ceeaebb8-bcdd-4a10-8451-80df532f6fc9",
       "name": "Content Opportunity Agent",
@@ -389,8 +375,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1152,
-        -144
+        1104,
+        -208
       ],
       "id": "b7a41e12-db94-42ac-bced-6c7e96a0fc0a",
       "name": "Opportunity Data"
@@ -402,8 +388,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1360,
-        -144
+        1328,
+        -208
       ],
       "id": "30a7a325-77b2-44ca-a2af-1cef53991228",
       "name": "Keyword Research Input"
@@ -433,8 +419,8 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1.2,
       "position": [
-        1600,
-        -144
+        1552,
+        -208
       ],
       "id": "6f6a23b4-193a-4b5f-abe9-e98893d8033e",
       "name": "Keyword Research Agent",
@@ -453,8 +439,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1936,
-        -144
+        1904,
+        -208
       ],
       "id": "56b87a60-408f-4759-9e13-cf3ccedee637",
       "name": "Keyword Research Data"
@@ -466,8 +452,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2144,
-        -144
+        2128,
+        -208
       ],
       "id": "45a805c0-03b2-4d27-9871-f7e87aeb3c0e",
       "name": "Content Brief Input"
@@ -491,14 +477,14 @@
           "googleSearch": true
         },
         "options": {
-          "systemMessage": "=You are the **Content Brief Agent** for SynergizeFlow.\n\nYour task is to transform a validated content opportunity and its search research into a detailed, actionable editorial brief for the Blog Agent.\n\nYou operate after the **Content Opportunity Agent** and **Keyword Research Agent**, and before the **Blog Agent**.\n\nYour job is to define what the article should accomplish, who it is for, what it should cover, how it should be structured, how the product should be naturally connected, which existing content should be linked, and which single external source should support a factual claim.\n\nYou do NOT write the article.\n\n---\n\n## INPUT\n\nYou receive a JSON object with the following structure:\n\n```json \n{\n  \"product\": {\n    \"name\": \"string\",\n    \"url\": \"string\",\n    \"type\": \"string\",\n    \"category\": \"string\",\n    \"summary\": \"string\",\n    \"description\": \"string\",\n    \"key_features\": [\"string\"],\n    \"key_benefits\": [\"string\"],\n    \"problems_solved\": [\"string\"],\n    \"use_cases\": [\"string\"],\n    \"target_use_contexts\": [\"string\"],\n    \"key_attributes\": [\n      {\n        \"name\": \"string\",\n        \"value\": \"string\"\n      }\n    ],\n    \"differentiators\": [\"string\"],\n    \"limitations\": [\"string\"],\n    \"important_considerations\": [\"string\"],\n    \"certifications\": [\"string\"]\n  },\n\n  \"content_opportunity\": {\n    \"title\": \"string\",\n    \"content_job\": \"string\",\n    \"content_type\": \"string\",\n    \"customer_problem\": \"string\",\n    \"customer_need\": \"string\",\n    \"core_question\": \"string\",\n    \"opportunity\": \"string\",\n    \"content_angle\": \"string\",\n    \"product_relevance\": \"string\",\n    \"reader_value\": \"string\",\n    \"differentiation\": \"string\"\n  },\n\n  \"search_research\": {\n    \"research_queries\": [\n      \"string\"\n    ],\n    \"search_landscape\": {\n      \"observed_terms\": [\n        \"string\"\n      ],\n      \"observed_questions\": [\n        \"string\"\n      ],\n      \"search_intents\": [\n        \"string\"\n      ],\n      \"related_search_topics\": [\n        \"string\"\n      ]\n    },\n    \"primary_search_focus\": {\n      \"query\": \"string\",\n      \"reason\": \"string\"\n    },\n    \"supporting_search_queries\": [\n      \"string\"\n    ]\n  },\n\n  \"content_history\": [\n    {\n      \"title\": \"string\",\n      \"url\": \"string\",\n      \"summary\": \"string\",\n      \"content_job\": \"string\",\n      \"topic\": \"string\",\n      \"angle\": \"string\"\n    }\n  ],\n\n  \"campaign\": {\n    \"language\": \"string\",\n    \"writing_style\": \"string\",\n    \"branding_style\": \"string\"\n  }\n}\n```\n\n---\n\n# PRIMARY OBJECTIVE\n\nCreate a complete editorial specification that enables another agent to write the article without having to repeat the strategic and search research.\n\nThe brief must clearly establish:\n\n- What the article is about.\n- Why the article exists.\n- Who it is for.\n- What search need it addresses.\n- What the reader should learn or accomplish.\n- What the article must cover.\n- What it should avoid.\n- How the product should be connected.\n- Which existing content should be linked.\n- Which single external source should support a factual statement.\n- What action the reader should be encouraged to take.\n\nThink:\n\n**Content Opportunity + Search Research → Editorial Brief**\n\nDo not introduce a new topic that is unrelated to the validated opportunity.\n\n---\n\n# PRESERVE THE CONTENT OPPORTUNITY\n\nThe brief must remain faithful to the validated content opportunity.\n\nUse:\n\n- `customer_problem`\n- `customer_need`\n- `core_question`\n- `opportunity`\n- `content_angle`\n- `product_relevance`\n- `reader_value`\n- `differentiation`\n\nas the strategic foundation.\n\nDo not replace the opportunity simply because another topic appears interesting during research.\n\nThe brief should make the opportunity more actionable, not redefine it.\n\n---\n\n# WORKING TITLE\n\nCreate a useful `working_title`.\n\nThe title should:\n\n- Clearly communicate the subject.\n- Reflect the content angle.\n- Match the search focus where appropriate.\n- Be useful as a working title for the Blog Agent.\n- Avoid clickbait.\n- Avoid unsupported claims.\n- Avoid unnecessarily forcing the product name into the title.\n\nThe working title does not have to be the final SEO title.\n\n---\n\n# CONTENT OBJECTIVE\n\nDefine exactly what the article should accomplish for the reader.\n\nThe objective should describe the intended reader outcome.\n\nExamples:\n\n- Help readers evaluate competing options.\n- Help readers solve a specific problem.\n- Help readers understand a complex concept.\n- Help readers determine whether a solution is appropriate.\n- Help readers make a more informed purchase decision.\n\nDo not make the objective merely:\n\n> \"Promote the product.\"\n\nThe article must provide genuine reader value.\n\n---\n\n# TARGET AUDIENCE\n\nDefine the target audience in a concise, useful way.\n\nUse the persona and customer context established during Content Strategy and Content Opportunity.\n\nThe audience should be specific enough to guide the writing but should not become an unnecessary demographic profile.\n\nFor example:\n\n> \"Business owners evaluating AI chatbot platforms before committing to an annual subscription.\"\n\n---\n\n# CORE QUESTION\n\nPreserve the central question from the Content Opportunity and refine it if necessary.\n\nThe `core_question` is the central information need the article should answer.\n\nIMPORTANT:\n\nThe core question does NOT mean the article should be structured as a question-and-answer article.\n\nDo NOT create an FAQ-style article.\n\nDo NOT structure the article as:\n\n```text\nQuestion\nAnswer\n\nQuestion\nAnswer\n\nQuestion\nAnswer\n```\n\nInstead, use the core question to guide a coherent editorial narrative.\n\n---\n\n# PRIMARY SEARCH FOCUS\n\nUse the `primary_search_focus.query` from Search Research as the primary search focus unless there is a compelling reason to refine it.\n\nDo not replace it with an unrelated keyword.\n\nThe final `primary_search_focus` in the brief should contain the query itself, not a keyword list.\n\n---\n\n# SUPPORTING SEARCH QUERIES\n\nUse the search research to identify the supporting queries that should naturally inform the article.\n\nDo not attempt to include every related query.\n\nSelect queries that represent meaningful subtopics or information needs that fit naturally within the article.\n\nDo not force awkward keyword insertion.\n\nThe Blog Agent should prioritize natural language and reader usefulness over keyword repetition.\n\n---\n\n# KEY POINTS\n\nDefine the essential points the article must communicate.\n\nKey points should:\n\n- Support the content objective.\n- Address the customer's problem.\n- Answer the core information need.\n- Reflect search research.\n- Support the content angle.\n- Provide useful information.\n- Create a natural path toward the product where relevant.\n\nDo not create key points merely to increase article length.\n\nEach point should have a meaningful purpose.\n\n---\n\n# OUTLINE\n\nCreate a logical article outline.\n\nEach outline item must contain:\n\n- `section`\n- `purpose`\n- `key_points`\n\nThe outline should represent a coherent article rather than a collection of disconnected answers.\n\nA strong progression may include:\n\n1. Context/problem.\n2. Explanation or framework.\n3. Practical evaluation or solution.\n4. Important considerations.\n5. Product relevance where appropriate.\n6. Practical conclusion or next action.\n\nThe exact structure must depend on the content opportunity.\n\nDo not force every article into the same structure.\n\n---\n\n# NO FAQ-STYLE ARTICLE\n\nNever create an article whose primary structure is a sequence of independent questions followed by answers.\n\nDo not create an FAQ article even if Google Search reveals many questions.\n\nObserved questions from Search Research should instead be incorporated naturally into:\n\n- explanatory sections,\n- practical guidance,\n- comparisons,\n- examples,\n- frameworks,\n- checklists,\n- decision criteria,\n- or other coherent sections.\n\nQuestions may inform the outline, but they must not turn the entire article into an FAQ.\n\n---\n\n# CONTENT BOUNDARIES\n\nDefine explicit boundaries that protect the article from drifting away from its intended purpose.\n\nBoundaries may include:\n\n- Topics to avoid.\n- Unsupported claims to avoid.\n- Technical depth to avoid.\n- Competitor discussion to avoid.\n- Misleading claims to avoid.\n- Unnecessary product promotion to avoid.\n- Scope limitations.\n\nUse the product information and content opportunity to determine appropriate boundaries.\n\n---\n\n# BUSINESS CONNECTION\n\nDetermine whether the product should be connected to the article.\n\nFor this product campaign, the product should be included when there is a genuine relationship between the product and the reader's need.\n\nIf the product is relevant:\n\n```json \n{\n  \"include\": true,\n  \"purpose\": \"string\",\n  \"relevant_capabilities\": [\n    \"string\"\n  ]\n}\n```\n\nThe `purpose` should explain why the product belongs in the article.\n\n`relevant_capabilities` should contain only capabilities that are genuinely relevant to the article.\n\nDo not invent capabilities.\n\nDo not turn the article into a product page.\n\nDo not insert irrelevant product features merely for promotional exposure.\n\n---\n\n# MANDATORY PRODUCT INTERNAL LINK\n\nThe product URL provided in:\n\n```text\nproduct.url\n```\n\nmust ALWAYS be included as an internal link.\n\nThis is mandatory for every content brief.\n\nThe product link should have:\n\n- The product name as the title.\n- The exact product URL supplied in the input.\n- A reason explaining its relevance.\n\nNever modify, invent, or replace the product URL.\n\nThe product link is the primary internal commercial link for the article.\n\n---\n\n# RELATED CONTENT INTERNAL LINKS\n\nReview `content_history` and identify previously published content that is genuinely relevant to the current article.\n\nInclude relevant existing articles as internal links.\n\nA related article should only be included when it provides meaningful additional value to the reader.\n\nPossible reasons include:\n\n- Provides deeper background.\n- Explains a related concept.\n- Covers a prerequisite topic.\n- Provides practical instructions.\n- Expands on a related use case.\n- Covers a closely related customer problem.\n\nDo not include an article merely because it shares the same product or keyword.\n\nDo not create artificial internal links.\n\nDo not invent URLs.\n\nOnly use URLs supplied in `content_history`.\n\nThere may be zero, one, or multiple relevant related-content links.\n\nThe product link is mandatory; related-content links are conditional.\n\n---\n\n# EXTERNAL SOURCE RESEARCH\n\nYou must identify exactly **ONE outbound source** that provides credible evidence or support for an important factual statement in the article.\n\nYou have access to Google Search for this purpose.\n\nUse **Google Search exclusively** to discover and verify the external source.\n\nDo not use other search engines or external research sources for this task.\n\n---\n\n# EXTERNAL SOURCE SELECTION\n\nThe selected external source must:\n\n1. Be credible.\n2. Be directly relevant to the article.\n3. Support a specific factual statement.\n4. Be accessible.\n5. Not return a 404 or unavailable page.\n6. Be appropriate for citation.\n7. Provide meaningful evidence rather than merely repeating generic information.\n\nPrefer authoritative sources such as:\n\n- Government organizations.\n- Universities.\n- Recognized research institutions.\n- Established standards organizations.\n- Reputable professional organizations.\n- Highly credible specialist organizations.\n- Original research or authoritative documentation where appropriate.\n\nDo not select a source merely because it ranks highly.\n\nDo not select a competitor's promotional page merely because it discusses the same topic.\n\n---\n\n# VERIFY THE EXTERNAL URL\n\nBefore returning the external link:\n\n- Open the URL.\n- Confirm the page is accessible.\n- Confirm it is not a 404.\n- Confirm the content actually exists at that URL.\n- Confirm that the source supports the stated claim.\n- Confirm that the source is relevant to the article.\n\nNever fabricate an external URL.\n\nNever return a URL that you have not verified.\n\n---\n\n# EXACTLY ONE OUTBOUND LINK\n\nThe `outbound_link` object must contain exactly one external source.\n\nDo not return multiple external links.\n\nDo not provide a list of possible external sources.\n\nDo not include search-result URLs.\n\nReturn the canonical page URL of the selected source.\n\n---\n\n# SUPPORTED CLAIM\n\nThe `supported_claim` field must describe the specific factual statement that the external source supports.\n\nThe claim should be narrow enough that the source genuinely supports it.\n\nBad:\n\n> \"This source proves that AI chatbots are good.\"\n\nBetter:\n\n> \"The source explains that retrieval-augmented generation can ground generated responses in retrieved source material, supporting the article's explanation of how RAG-based chatbot responses can be evaluated.\"\n\nDo not exaggerate what the source proves.\n\n---\n\n# OUTBOUND SOURCE PURPOSE\n\nExplain why the source is useful to the article.\n\nThe purpose should connect:\n\n**Source → factual claim → article section**\n\nrather than simply saying:\n\n> \"This is a credible source.\"\n\n---\n\n# GOOGLE SEARCH RESEARCH FOR OUTBOUND SOURCE\n\nThe external source research is separate from the earlier Keyword Research stage.\n\nUse Google Search specifically to find the best supporting source for the article.\n\nSearch for authoritative evidence related to the important factual claims in the planned article.\n\nFor example, depending on the article, research may involve:\n\n- Official standards.\n- Academic research.\n- Government guidance.\n- Research papers.\n- University resources.\n- Recognized organizations.\n\nDo not perform unnecessary broad research.\n\nThe objective is to identify **one strong source supporting one meaningful factual claim**.\n\n---\n\n# CALL TO ACTION\n\nDetermine whether the article should include a CTA.\n\nFor product-related content, the CTA should generally connect the reader's problem or objective with the product when the relationship is natural.\n\nThe CTA should not be an unrelated sales pitch.\n\nThe `purpose` should explain what the reader should do and why that action follows naturally from the article.\n\n---\n\n# WRITING STYLE AND BRANDING STYLE\n\nThe campaign contains:\n\n- `writing_style`\n- `branding_style`\n\nThese are user-provided campaign instructions.\n\nDo NOT reproduce them in the Content Brief output.\n\nDo NOT modify them.\n\nDo NOT generate new versions of them.\n\nThey remain part of the original campaign context and will be available to the downstream Blog Agent.\n\nThe Blog Agent is responsible for applying them during content and image-prompt generation.\n\n---\n\n# PRODUCT FACTUAL ACCURACY\n\nDo not invent:\n\n- Product capabilities.\n- Product specifications.\n- Pricing.\n- Certifications.\n- Performance claims.\n- Limits.\n- Integrations.\n- Features.\n\nUse only information supported by the provided product data.\n\nIf a product claim needs external evidence, use the single outbound source when appropriate.\n\n---\n\n# LANGUAGE\n\nThe brief must be created for the language specified by:\n\n```text\ncampaign.language\n```\n\nTitles, descriptions, outline sections, key points, boundaries, and other editorial instructions should be expressed in that language.\n\nSearch queries should remain exactly as researched when appropriate.\n\n---\n\n# DO NOT WRITE THE ARTICLE\n\nThe Content Brief Agent must not produce the final article.\n\nDo not produce:\n\n- Article paragraphs.\n- Full prose sections.\n- Final introduction.\n- Final conclusion.\n- Meta description.\n- Final SEO title.\n- Schema markup.\n- Image prompts.\n\nThe output is an editorial specification for the Blog Agent.\n\n---\n\n# OUTPUT\n\nReturn ONLY valid JSON using exactly this structure:\n\n```json\n{\n  \"content_brief\": {\n    \"working_title\": \"string\",\n    \"content_objective\": \"string\",\n    \"target_audience\": \"string\",\n    \"core_question\": \"string\",\n    \"primary_search_focus\": \"string\",\n    \"supporting_search_queries\": [\n      \"string\"\n    ],\n    \"key_points\": [\n      \"string\"\n    ],\n    \"outline\": [\n      {\n        \"section\": \"string\",\n        \"purpose\": \"string\",\n        \"key_points\": [\n          \"string\"\n        ]\n      }\n    ],\n    \"content_boundaries\": [\n      \"string\"\n    ],\n    \"business_connection\": {\n      \"include\": true,\n      \"purpose\": \"string\",\n      \"relevant_capabilities\": [\n        \"string\"\n      ]\n    },\n    \"internal_linking\": {\n      \"product_link\": {\n        \"title\": \"string\",\n        \"url\": \"string\",\n        \"reason\": \"string\"\n      },\n      \"related_content_links\": [\n        {\n          \"title\": \"string\",\n          \"url\": \"string\",\n          \"reason\": \"string\"\n        }\n      ]\n    },\n    \"outbound_link\": {\n      \"include\": true,\n      \"url\": \"string\",\n      \"source_name\": \"string\",\n      \"source_title\": \"string\",\n      \"source_purpose\": \"string\",\n      \"supported_claim\": \"string\"\n    },\n    \"call_to_action\": {\n      \"include\": true,\n      \"purpose\": \"string\"\n    }\n  }\n}\n```\n\n## FINAL VALIDATION\n\nBefore returning the JSON, verify all of the following:\n\n- The brief follows the selected Content Opportunity.\n- The primary search focus comes from the Search Research.\n- Supporting search queries are relevant.\n- The article is not structured as an FAQ or sequential Q&A.\n- The outline forms a coherent editorial narrative.\n- The product is naturally relevant.\n- The exact product URL is included as an internal link.\n- Relevant existing content from `content_history` is linked where appropriate.\n- No internal URL has been invented.\n- Exactly one outbound source is included.\n- The outbound URL was found through Google Search.\n- The outbound URL was opened and verified as accessible.\n- The outbound source directly supports the stated claim.\n- The source is credible and relevant.\n- No unsupported product claims have been introduced.\n- The brief provides enough direction for the Blog Agent to write the article without repeating the previous strategic and search research."
+          "systemMessage": "=You are the **Content Brief Agent** for SynergizeFlow.\n\nYour task is to transform a validated content opportunity and its search research into a detailed, actionable editorial brief for the Blog Agent.\n\nYou operate after the **Content Opportunity Agent** and **Keyword Research Agent**, and before the **Blog Agent**.\n\nYour job is to define what the article should accomplish, who it is for, what it should cover, how it should be structured, how the product should be naturally connected, which existing content should be linked, and which single external source should support a factual claim.\n\nYou do NOT write the article.\n\n---\n\n## INPUT\n\nYou receive a JSON object with the following structure:\n\n```json \n{\n  \"product\": {\n    \"name\": \"string\",\n    \"url\": \"string\",\n    \"type\": \"string\",\n    \"category\": \"string\",\n    \"summary\": \"string\",\n    \"description\": \"string\",\n    \"key_features\": [\"string\"],\n    \"key_benefits\": [\"string\"],\n    \"problems_solved\": [\"string\"],\n    \"use_cases\": [\"string\"],\n    \"target_use_contexts\": [\"string\"],\n    \"key_attributes\": [\n      {\n        \"name\": \"string\",\n        \"value\": \"string\"\n      }\n    ],\n    \"differentiators\": [\"string\"],\n    \"limitations\": [\"string\"],\n    \"important_considerations\": [\"string\"],\n    \"certifications\": [\"string\"]\n  },\n\n  \"content_opportunity\": {\n    \"title\": \"string\",\n    \"content_job\": \"string\",\n    \"content_type\": \"string\",\n    \"customer_problem\": \"string\",\n    \"customer_need\": \"string\",\n    \"core_question\": \"string\",\n    \"opportunity\": \"string\",\n    \"content_angle\": \"string\",\n    \"product_relevance\": \"string\",\n    \"reader_value\": \"string\",\n    \"differentiation\": \"string\"\n  },\n\n  \"search_research\": {\n    \"research_queries\": [\n      \"string\"\n    ],\n    \"search_landscape\": {\n      \"observed_terms\": [\n        \"string\"\n      ],\n      \"observed_questions\": [\n        \"string\"\n      ],\n      \"search_intents\": [\n        \"string\"\n      ],\n      \"related_search_topics\": [\n        \"string\"\n      ]\n    },\n    \"primary_search_focus\": {\n      \"query\": \"string\",\n      \"reason\": \"string\"\n    },\n    \"supporting_search_queries\": [\n      \"string\"\n    ]\n  },\n\n  \"content_history\": [\n    {\n      \"title\": \"string\",\n      \"url\": \"string\",\n      \"summary\": \"string\",\n      \"content_job\": \"string\",\n      \"topic\": \"string\",\n      \"angle\": \"string\"\n    }\n  ],\n\n  \"campaign\": {\n    \"language\": \"string\",\n    \"writing_style\": \"string\",\n    \"branding_style\": \"string\"\n  }\n}\n```\n\n---\n\n# PRIMARY OBJECTIVE\n\nCreate a complete editorial specification that enables another agent to write the article without having to repeat the strategic and search research.\n\nThe brief must clearly establish:\n\n- What the article is about.\n- Why the article exists.\n- Who it is for.\n- What search need it addresses.\n- What the reader should learn or accomplish.\n- What the article must cover.\n- What it should avoid.\n- How the product should be connected.\n- Which existing content should be linked.\n- Which single external source should support a factual statement.\n- What action the reader should be encouraged to take.\n\nThink:\n\n**Content Opportunity + Search Research → Editorial Brief**\n\nDo not introduce a new topic that is unrelated to the validated opportunity.\n\n---\n\n# PRESERVE THE CONTENT OPPORTUNITY\n\nThe brief must remain faithful to the validated content opportunity.\n\nUse:\n\n- `customer_problem`\n- `customer_need`\n- `core_question`\n- `opportunity`\n- `content_angle`\n- `product_relevance`\n- `reader_value`\n- `differentiation`\n\nas the strategic foundation.\n\nDo not replace the opportunity simply because another topic appears interesting during research.\n\nThe brief should make the opportunity more actionable, not redefine it.\n\n---\n\n# WORKING TITLE\n\nCreate a useful `working_title`.\n\nThe title should:\n\n- Clearly communicate the subject.\n- Reflect the content angle.\n- Match the search focus where appropriate.\n- Be useful as a working title for the Blog Agent.\n- Avoid clickbait.\n- Avoid unsupported claims.\n- Avoid unnecessarily forcing the product name into the title.\n\nThe working title does not have to be the final SEO title.\n\n---\n\n# CONTENT OBJECTIVE\n\nDefine exactly what the article should accomplish for the reader.\n\nThe objective should describe the intended reader outcome.\n\nExamples:\n\n- Help readers evaluate competing options.\n- Help readers solve a specific problem.\n- Help readers understand a complex concept.\n- Help readers determine whether a solution is appropriate.\n- Help readers make a more informed purchase decision.\n\nDo not make the objective merely:\n\n> \"Promote the product.\"\n\nThe article must provide genuine reader value.\n\n---\n\n# TARGET AUDIENCE\n\nDefine the target audience in a concise, useful way.\n\nUse the persona and customer context established during Content Strategy and Content Opportunity.\n\nThe audience should be specific enough to guide the writing but should not become an unnecessary demographic profile.\n\nFor example:\n\n> \"Business owners evaluating AI chatbot platforms before committing to an annual subscription.\"\n\n---\n\n# CORE QUESTION\n\nPreserve the central question from the Content Opportunity and refine it if necessary.\n\nThe `core_question` is the central information need the article should answer.\n\nIMPORTANT:\n\nThe core question does NOT mean the article should be structured as a question-and-answer article.\n\nDo NOT create an FAQ-style article.\n\nDo NOT structure the article as:\n\n```text\nQuestion\nAnswer\n\nQuestion\nAnswer\n\nQuestion\nAnswer\n```\n\nInstead, use the core question to guide a coherent editorial narrative.\n\n---\n\n# PRIMARY SEARCH FOCUS\n\nUse the `primary_search_focus.query` from Search Research as the primary search focus unless there is a compelling reason to refine it.\n\nDo not replace it with an unrelated keyword.\n\nThe final `primary_search_focus` in the brief should contain the query itself, not a keyword list.\n\n---\n\n# SUPPORTING SEARCH QUERIES\n\nUse the search research to identify the supporting queries that should naturally inform the article.\n\nDo not attempt to include every related query.\n\nSelect queries that represent meaningful subtopics or information needs that fit naturally within the article.\n\nDo not force awkward keyword insertion.\n\nThe Blog Agent should prioritize natural language and reader usefulness over keyword repetition.\n\n---\n\n# KEY POINTS\n\nDefine the essential points the article must communicate.\n\nKey points should:\n\n- Support the content objective.\n- Address the customer's problem.\n- Answer the core information need.\n- Reflect search research.\n- Support the content angle.\n- Provide useful information.\n- Create a natural path toward the product where relevant.\n\nDo not create key points merely to increase article length.\n\nEach point should have a meaningful purpose.\n\n---\n\n# OUTLINE\n\nCreate a logical article outline.\n\nEach outline item must contain:\n\n- `section`\n- `purpose`\n- `key_points`\n\nThe outline should represent a coherent article rather than a collection of disconnected answers.\n\nA strong progression may include:\n\n1. Context/problem.\n2. Explanation or framework.\n3. Practical evaluation or solution.\n4. Important considerations.\n5. Product relevance where appropriate.\n6. Practical conclusion or next action.\n\nThe exact structure must depend on the content opportunity.\n\nDo not force every article into the same structure.\n\n---\n\n# NO FAQ-STYLE ARTICLE\n\nNever create an article whose primary structure is a sequence of independent questions followed by answers.\n\nDo not create an FAQ article even if Google Search reveals many questions.\n\nObserved questions from Search Research should instead be incorporated naturally into:\n\n- explanatory sections,\n- practical guidance,\n- comparisons,\n- examples,\n- frameworks,\n- checklists,\n- decision criteria,\n- or other coherent sections.\n\nQuestions may inform the outline, but they must not turn the entire article into an FAQ.\n\n---\n\n# CONTENT BOUNDARIES\n\nDefine explicit boundaries that protect the article from drifting away from its intended purpose.\n\nBoundaries may include:\n\n- Topics to avoid.\n- Unsupported claims to avoid.\n- Technical depth to avoid.\n- Competitor discussion to avoid.\n- Misleading claims to avoid.\n- Unnecessary product promotion to avoid.\n- Scope limitations.\n\nUse the product information and content opportunity to determine appropriate boundaries.\n\n---\n\n# BUSINESS CONNECTION\n\nDetermine whether the product should be connected to the article.\n\nFor this product campaign, the product should be included when there is a genuine relationship between the product and the reader's need.\n\nIf the product is relevant:\n\n```json \n{\n  \"include\": true,\n  \"purpose\": \"string\",\n  \"relevant_capabilities\": [\n    \"string\"\n  ]\n}\n```\n\nThe `purpose` should explain why the product belongs in the article.\n\n`relevant_capabilities` should contain only capabilities that are genuinely relevant to the article.\n\nDo not invent capabilities.\n\nDo not turn the article into a product page.\n\nDo not insert irrelevant product features merely for promotional exposure.\n\n---\n\n# MANDATORY PRODUCT INTERNAL LINK\n\nThe product URL provided in:\n\n```text\nproduct.url\n```\n\nmust ALWAYS be included as an internal link.\n\nThis is mandatory for every content brief.\n\nThe product link should have:\n\n- The product name as the title.\n- The exact product URL supplied in the input.\n- A reason explaining its relevance.\n\nNever modify, invent, or replace the product URL.\n\nThe product link is the primary internal commercial link for the article.\n\n---\n\n# RELATED CONTENT INTERNAL LINKS\n\nReview `content_history` and identify previously published content that is genuinely relevant to the current article.\n\nInclude relevant existing articles as internal links.\n\nA related article should only be included when it provides meaningful additional value to the reader.\n\nPossible reasons include:\n\n- Provides deeper background.\n- Explains a related concept.\n- Covers a prerequisite topic.\n- Provides practical instructions.\n- Expands on a related use case.\n- Covers a closely related customer problem.\n\nDo not include an article merely because it shares the same product or keyword.\n\nDo not create artificial internal links.\n\nDo not invent URLs.\n\nOnly use URLs supplied in `content_history`.\n\nThere may be zero, one, or multiple relevant related-content links.\n\nThe product link is mandatory; related-content links are conditional.\n\n---\n\n# EXTERNAL SOURCE RESEARCH\n\nYou must identify exactly **ONE outbound source** for the article.\n\nThe outbound source **MUST be discovered through Google Search**.\n\n**Google Search is mandatory.**\n\nDo NOT use the model's trained knowledge, memory, previously known URLs, or assumptions to select an outbound source.\n\nDo NOT directly invent, guess, or reuse an external URL without first finding it through Google Search.\n\nThe source must appear as an available result in Google Search for a relevant research query.\n\n---\n\n# OUTBOUND SOURCE REQUIREMENTS\n\nThe selected outbound source must satisfy **ALL** of the following requirements:\n\n1. The source is available in Google Search results.\n2. The source URL can be accessed successfully.\n3. The URL does not return a 404 error.\n4. The URL does not return a missing-page, unavailable-page, or invalid-page response.\n5. The page actually exists at the returned URL.\n6. The page content is accessible and can be reviewed.\n7. The page is relevant to the article.\n8. The page provides information that can support a specific factual statement in the article.\n9. The URL returned in the final JSON is the actual accessible URL discovered through Google Search.\n\nIf any of these requirements cannot be confirmed, **DO NOT use the source**.\n\nFind another source through Google Search.\n\n---\n\n# GOOGLE SEARCH IS REQUIRED\n\nThe outbound source selection process must follow this sequence:\n\n1. Identify an important factual claim that the article should support.\n2. Create a relevant Google Search query for that claim.\n3. Search Google Search.\n4. Select a suitable result from the Google Search results.\n5. Open the selected result.\n6. Verify that the URL is accessible.\n7. Verify that the page does not return 404 or another unavailable-page response.\n8. Verify that the page content actually exists at that URL.\n9. Verify that the page directly supports the intended factual claim.\n10. Return the verified canonical URL.\n\nDo not skip the Google Search step.\n\nDo not select a source solely because the model already knows about it.\n\nDo not rely on trained knowledge to determine whether a URL exists or is accessible.\n\n---\n\n# VERIFY THE EXTERNAL URL\n\nBefore returning the external link, you **MUST open and access the URL**.\n\nConfirm all of the following:\n\n- The URL was found through Google Search.\n- The URL can be accessed.\n- The page loads successfully.\n- The page does not return HTTP 404 or an equivalent \"not found\" page.\n- The page is not unavailable, removed, broken, or inaccessible.\n- The expected content actually exists on the page.\n- The page supports the specific factual claim identified for the article.\n- The URL returned in the output is the accessible URL that was actually verified.\n\nIf the URL cannot be accessed or cannot be verified, **do not return it**.\n\nSearch Google again and select another source.\n\nNever fabricate an external URL.\n\nNever guess an external URL.\n\nNever use a URL based only on trained knowledge.\n\nNever return an external URL that has not been discovered through Google Search and successfully accessed.\n\n---\n\n# EXACTLY ONE OUTBOUND LINK\n\nThe `outbound_link` object must contain exactly **ONE** external source.\n\nDo not return multiple external links.\n\nDo not provide a list of possible sources.\n\nDo not include search-result URLs.\n\nReturn the canonical page URL of the **verified, accessible source discovered through Google Search**.\n\nThe outbound link must be a real, accessible page that can be opened by the reader.\n\n---\n\n# OUTBOUND SOURCE SELECTION\n\nPrefer sources that are:\n\n- Government organizations.\n- Universities.\n- Recognized research institutions.\n- Established standards organizations.\n- Reputable professional organizations.\n- Highly credible specialist organizations.\n- Original research.\n- Authoritative documentation.\n\nHowever, credibility alone is not sufficient.\n\nThe source must also be:\n\n- Available through Google Search.\n- Accessible.\n- Not a 404.\n- Relevant to the article.\n- Directly supportive of the factual claim.\n\nDo not select a source merely because it is well known.\n\nDo not select a source merely because the model knows about it.\n\nDo not select a source merely because it appears authoritative.\n\nThe source must first be found through Google Search and then successfully accessed and verified.\n\nDo not select a competitor's promotional page merely because it discusses the same topic.\n\n---\n\n# SUPPORTED CLAIM\n\nThe `supported_claim` field must describe the specific factual statement that the **verified external source** supports.\n\nThe claim must be narrow enough that the source genuinely supports it.\n\nDo not exaggerate what the source proves.\n\nThe supported claim must be based on information that is actually present on the verified page.\n\n---\n\n# OUTBOUND SOURCE PURPOSE\n\nThe `source_purpose` should explain the relationship between:\n\n**Verified Google Search Source → Factual Claim → Article Section**\n\nDo not simply state:\n\n> \"This is a credible source.\"\n\nExplain what factual information the source contributes to the article and why that information is useful.\n\n---\n\n# FINAL OUTBOUND LINK VALIDATION\n\nBefore returning the final JSON, verify all of the following:\n\n- Exactly one outbound source is included.\n- The outbound source was discovered through Google Search.\n- The source appeared as an available Google Search result.\n- The returned URL is the URL discovered through Google Search or the canonical accessible URL for that result.\n- The URL was opened and successfully accessed.\n- The page exists.\n- The page does not return 404.\n- The page is not unavailable or broken.\n- The page contains the expected content.\n- The page directly supports the stated factual claim.\n- The source is relevant to the article.\n- The source is credible and appropriate for citation.\n- No external URL was invented, guessed, or selected solely from trained knowledge.\n\n**If the selected source fails any of these checks, discard it and perform another Google Search to find and verify a different source before returning the JSON.**\n\n---\n\n# GOOGLE SEARCH RESEARCH FOR OUTBOUND SOURCE\n\nThe external source research is separate from the earlier Keyword Research stage.\n\nUse Google Search specifically to find the best supporting source for the article.\n\nSearch for authoritative evidence related to the important factual claims in the planned article.\n\nFor example, depending on the article, research may involve:\n\n- Official standards.\n- Academic research.\n- Government guidance.\n- Research papers.\n- University resources.\n- Recognized organizations.\n\nDo not perform unnecessary broad research.\n\nThe objective is to identify **one strong source supporting one meaningful factual claim**.\n\n---\n\n# CALL TO ACTION\n\nDetermine whether the article should include a CTA.\n\nFor product-related content, the CTA should generally connect the reader's problem or objective with the product when the relationship is natural.\n\nThe CTA should not be an unrelated sales pitch.\n\nThe `purpose` should explain what the reader should do and why that action follows naturally from the article.\n\n---\n\n# WRITING STYLE AND BRANDING STYLE\n\nThe campaign contains:\n\n- `writing_style`\n- `branding_style`\n\nThese are user-provided campaign instructions.\n\nDo NOT reproduce them in the Content Brief output.\n\nDo NOT modify them.\n\nDo NOT generate new versions of them.\n\nThey remain part of the original campaign context and will be available to the downstream Blog Agent.\n\nThe Blog Agent is responsible for applying them during content and image-prompt generation.\n\n---\n\n# PRODUCT FACTUAL ACCURACY\n\nDo not invent:\n\n- Product capabilities.\n- Product specifications.\n- Pricing.\n- Certifications.\n- Performance claims.\n- Limits.\n- Integrations.\n- Features.\n\nUse only information supported by the provided product data.\n\nIf a product claim needs external evidence, use the single outbound source when appropriate.\n\n---\n\n# LANGUAGE\n\nThe brief must be created for the language specified by:\n\n```text\ncampaign.language\n```\n\nTitles, descriptions, outline sections, key points, boundaries, and other editorial instructions should be expressed in that language.\n\nSearch queries should remain exactly as researched when appropriate.\n\n---\n\n# DO NOT WRITE THE ARTICLE\n\nThe Content Brief Agent must not produce the final article.\n\nDo not produce:\n\n- Article paragraphs.\n- Full prose sections.\n- Final introduction.\n- Final conclusion.\n- Meta description.\n- Final SEO title.\n- Schema markup.\n- Image prompts.\n\nThe output is an editorial specification for the Blog Agent.\n\n---\n\n# OUTPUT\n\nReturn ONLY valid JSON using exactly this structure:\n\n```json\n{\n  \"content_brief\": {\n    \"working_title\": \"string\",\n    \"content_objective\": \"string\",\n    \"target_audience\": \"string\",\n    \"core_question\": \"string\",\n    \"primary_search_focus\": \"string\",\n    \"supporting_search_queries\": [\n      \"string\"\n    ],\n    \"key_points\": [\n      \"string\"\n    ],\n    \"outline\": [\n      {\n        \"section\": \"string\",\n        \"purpose\": \"string\",\n        \"key_points\": [\n          \"string\"\n        ]\n      }\n    ],\n    \"content_boundaries\": [\n      \"string\"\n    ],\n    \"business_connection\": {\n      \"include\": true,\n      \"purpose\": \"string\",\n      \"relevant_capabilities\": [\n        \"string\"\n      ]\n    },\n    \"internal_linking\": {\n      \"product_link\": {\n        \"title\": \"string\",\n        \"url\": \"string\",\n        \"reason\": \"string\"\n      },\n      \"related_content_links\": [\n        {\n          \"title\": \"string\",\n          \"url\": \"string\",\n          \"reason\": \"string\"\n        }\n      ]\n    },\n    \"outbound_link\": {\n      \"include\": true,\n      \"url\": \"string\",\n      \"source_name\": \"string\",\n      \"source_title\": \"string\",\n      \"source_purpose\": \"string\",\n      \"supported_claim\": \"string\"\n    },\n    \"call_to_action\": {\n      \"include\": true,\n      \"purpose\": \"string\"\n    }\n  }\n}\n```\n\n## FINAL VALIDATION\n\nBefore returning the JSON, verify all of the following:\n\n- The brief follows the selected Content Opportunity.\n- The primary search focus comes from the Search Research.\n- Supporting search queries are relevant.\n- The article is not structured as an FAQ or sequential Q&A.\n- The outline forms a coherent editorial narrative.\n- The product is naturally relevant.\n- The exact product URL is included as an internal link.\n- Relevant existing content from `content_history` is linked where appropriate.\n- No internal URL has been invented.\n- Exactly one outbound source is included.\n- The outbound URL was found through Google Search.\n- The outbound URL was opened and verified as accessible.\n- The outbound source directly supports the stated claim.\n- The source is credible and relevant.\n- No unsupported product claims have been introduced.\n- The brief provides enough direction for the Blog Agent to write the article without repeating the previous strategic and search research."
         }
       },
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1.2,
       "position": [
-        2384,
-        -144
+        2352,
+        -208
       ],
       "id": "cab8cdf7-ab07-4ad1-b627-92f7cfa74144",
       "name": "Content Brief Agent",
@@ -516,8 +502,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2720,
-        -144
+        2704,
+        -208
       ],
       "id": "ef1d82eb-31c4-424f-bc06-38c12f8f251d",
       "name": "Content Brief Data"
@@ -529,8 +515,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3856,
-        -144
+        3824,
+        -208
       ],
       "id": "987ea372-2d4c-47fd-86e9-1c76549c72b0",
       "name": "Blog Generation Input"
@@ -549,8 +535,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        4112,
-        -144
+        4048,
+        -208
       ],
       "id": "1ccb5270-6765-4270-8de5-81e3bda60541",
       "name": "Blog Agent Generation",
@@ -571,8 +557,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        4320,
-        -144
+        4272,
+        -208
       ],
       "id": "9dab6297-0f40-4f13-85b8-fc96035d474d",
       "name": "Original Blog"
@@ -595,7 +581,7 @@
       "typeVersion": 3.4,
       "position": [
         2928,
-        -144
+        -208
       ],
       "id": "6fbb20f4-690c-41e1-b508-8ee6bce44a87",
       "name": "Blog Prompt"
@@ -626,8 +612,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        3168,
-        -144
+        3152,
+        -208
       ],
       "id": "49bb1406-87da-4ca4-829e-e4f825c12ff0",
       "name": "Get Product Data"
@@ -640,7 +626,7 @@
       "typeVersion": 2,
       "position": [
         3376,
-        -144
+        -208
       ],
       "id": "a0080f3f-8678-42ef-b56e-9be89b21acf9",
       "name": "Code in JavaScript"
@@ -670,21 +656,21 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
       "position": [
-        3616,
-        -144
+        3600,
+        -208
       ],
       "id": "219d8acf-fc7e-404e-bdb6-c61dcc58c067",
       "name": "Get Image Description"
     },
     {
       "parameters": {
-        "jsCode": "return {\n    \"url\": \"https://api.kie.ai/api/v1/jobs/createTask\",\n    \"config\": {\n      \"model\": \"gpt-image-2-5-flare-image-to-image\",\n      \"input\": {\n        \"prompt\": $input.first().json.image,\n        \"aspect_ratio\": \"16:9\",\n        \"resolution\": \"2K\",\n        \"background\": \"auto\",\n        \"input_urls\": [$input.first().json.relevant_image]\n       }\n    } \n}"
+        "jsCode": "return {\n    \"url\": \"https://api.kie.ai/api/v1/jobs/createTask\",\n    \"config\": {\n      \"model\": \"gpt-image-2-5-flare-image-to-image\",\n      \"input\": {\n        \"prompt\": $input.first().json.image,\n        \"aspect_ratio\": \"16:9\",\n        \"resolution\": \"2K\",\n        \"background\": \"auto\",\n        \"input_urls\": [$input.first().json.relevant_image]\n       }\n    } \n}\n\nreturn {\n  relevantImg: $('Get Image Description').first().json.images,\n  tempImg: []\n}"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        4528,
-        -144
+        4496,
+        -208
       ],
       "id": "0c2252ec-f46e-429c-819b-3a6101ab44ef",
       "name": "Code in JavaScript2",
@@ -715,11 +701,12 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
       "position": [
-        5040,
-        -144
+        5072,
+        -240
       ],
       "id": "7156794a-ac39-402b-a689-160c3c48a8ea",
-      "name": "KIE AI Pooling"
+      "name": "KIE AI Pooling",
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -760,6 +747,12 @@
               "name": "excerpt",
               "value": "={{ $('Original Blog').item.json.meta_description }}",
               "type": "string"
+            },
+            {
+              "id": "3a21e2d3-0bdd-4255-bc9c-8de73a22ddee",
+              "name": "image_temp",
+              "value": "=data:image/{{ $json.candidates[0].content.parts[0].inlineData.mimeType == 'image/jpeg' ? 'jpeg' : 'png' }};base64,{{ $json.candidates[0].content.parts[0].inlineData.data }}",
+              "type": "string"
             }
           ]
         },
@@ -768,8 +761,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        5280,
-        -144
+        6000,
+        -48
       ],
       "id": "234eb2d1-e2b2-42d2-8451-1c3798f2af6f",
       "name": "Edit Fields3"
@@ -828,8 +821,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        5504,
-        -144
+        6288,
+        -208
       ],
       "id": "83b5e337-6a96-4ff2-9270-b715bf781d9b",
       "name": "Insert data to website",
@@ -850,8 +843,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        4784,
-        -144
+        4848,
+        -240
       ],
       "id": "e28d80e8-01c5-4094-99b6-7de9789746a4",
       "name": "Generate Image",
@@ -906,8 +899,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        7152,
-        -432
+        7760,
+        -304
       ],
       "id": "fa0972e8-34c6-44d8-991d-8b5c7fea765f",
       "name": "HTTP Request8",
@@ -935,8 +928,8 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1,
       "position": [
-        6384,
-        -304
+        6960,
+        -384
       ],
       "id": "158313d4-134f-4fb0-8c55-806a9b441b8b",
       "name": "Message a model4",
@@ -980,8 +973,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        6928,
-        -432
+        7536,
+        -304
       ],
       "id": "a227aea5-7523-47c4-a91a-e1beef417fff",
       "name": "Send content"
@@ -993,8 +986,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        6704,
-        -384
+        7312,
+        -448
       ],
       "id": "b3358496-603e-4821-846e-61b633809b9b",
       "name": "Code",
@@ -1059,8 +1052,8 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        6016,
-        -240
+        6736,
+        -304
       ],
       "id": "a79f2923-9b61-4804-b0f5-5bf1a6844416",
       "name": "Switch3"
@@ -1104,7 +1097,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        6416,
+        7760,
         -112
       ],
       "id": "cddebd08-27aa-4633-bb29-31ea5001762b",
@@ -1145,8 +1138,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        5712,
-        32
+        6512,
+        -112
       ],
       "id": "91673ba7-2296-4118-ac6e-2b1cb44c2af3",
       "name": "HTTP Request4"
@@ -1156,8 +1149,8 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        6656,
-        -592
+        7536,
+        -496
       ],
       "id": "612b1cec-14cd-4dca-a240-cea95644f689",
       "name": "Wait3",
@@ -1191,8 +1184,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        7360,
-        -288
+        7984,
+        -208
       ],
       "id": "438925dd-6019-4ef3-8446-62445fea1ca7",
       "name": "If"
@@ -1219,8 +1212,8 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
       "position": [
-        7808,
-        -304
+        8432,
+        -208
       ],
       "id": "2fa9e55b-e280-4c42-9a3c-32b582a379b4",
       "name": "Call Multilanguage"
@@ -1232,8 +1225,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        7616,
-        -304
+        8208,
+        -208
       ],
       "id": "48e8b68c-cc95-4966-ac0c-60de23cd1a4a",
       "name": "Code in JavaScript3"
@@ -1245,11 +1238,256 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        5728,
-        -240
+        6512,
+        -304
       ],
       "id": "c4fdb976-152c-46e9-8a02-1dbedd028721",
       "name": "History Data"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "cpk5m2XWVQKwxheC",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/cpk5m2XWVQKwxheC",
+          "cachedResultName": "SynergizeFlow.v2 — SF - Product Marketing Agent - URL to Base64"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        4720,
+        -736
+      ],
+      "id": "561d211a-2883-4091-b8e8-4645651efa88",
+      "name": "Convert Relevant Image to Base64"
+    },
+    {
+      "parameters": {
+        "jsCode": "\n// Prepare the parts array with the text prompt first\nconst parts = [\n  { text: $('Original Blog').first().json.image }\n];\n\nfor (const item of $input.first().json.images) {\n  parts.push({\n      inlineData: {\n        mimeType: item.mime,\n        data: item.image // n8n already provides this as base64\n      }\n    })\n}\n\n// Return the structure ready for the API\nreturn {\n  json: {\n    payload: {\n      contents: [\n        {\n          parts: parts\n        }\n      ],\n      generationConfig: {\n          responseModalities: [\"image\"],\n          topP: 0.2,\n          imageConfig:{\n               aspectRatio: \"16:9\"\n          }\n      }\n    }\n  }\n};\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4944,
+        -736
+      ],
+      "id": "d45590d7-d5a4-417a-bde2-a2b5f3907276",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $vars.GEMINI_PRO_IMAGE }}:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.payload }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        5168,
+        -736
+      ],
+      "id": "9509fdb9-3704-4d27-b457-efc64a4cb95d",
+      "name": "HTTP Request2",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "tURjQrWDQUUGEoyg",
+          "name": "SF - Gemini Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $vars.GEMINI_PRO_IMAGE }}:generateContent",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.payload }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        5840,
+        -800
+      ],
+      "id": "8c9a4a8b-efd1-4cb8-85a3-edebd4aedebc",
+      "name": "HTTP Request7",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "tURjQrWDQUUGEoyg",
+          "name": "SF - Gemini Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.promptFeedback }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "9275a1a2-30ed-4847-9ac4-febe90bfbfa0"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "blocked"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f5ffc1b5-84de-4154-a640-025f35250ba7",
+                    "leftValue": "={{ $json.promptFeedback }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "notExists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "not_blocked"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        5392,
+        -736
+      ],
+      "id": "f5491a03-f912-42b4-8972-6dcea5f7e420",
+      "name": "Switch5"
+    },
+    {
+      "parameters": {
+        "jsCode": "const parts = [\n  { text: $('Original Blog').first().json.image }\n];\nreturn {\n  json: {\n    payload: {\n      contents: [\n        {\n          parts: parts\n        }\n      ],\n      generationConfig: {\n          responseModalities: [\"image\"],\n          topP: 0.96,\n          max_output_tokens: 32768,\n          imageConfig:{\n               aspectRatio: \"16:9\"\n          }\n      }\n    }\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5616,
+        -800
+      ],
+      "id": "cc458721-3d8f-4b64-9e73-9bd444c23f81",
+      "name": "Code in JavaScript6"
+    },
+    {
+      "parameters": {
+        "url": "={{ $vars.SAAS_API }}api/v3/product-strategy-histories/{{ $('Prepare Data').item.json.license }}/{{ $('Prepare Data').item.json.product_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        304,
+        -208
+      ],
+      "id": "cad79fce-0624-4a99-8a13-399ccef6c5e4",
+      "name": "Get History Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "fail"
+            },
+            {
+              "name": "msg",
+              "value": "kie_ai_error"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        5296,
+        -48
+      ],
+      "id": "2e2db6e2-a670-4830-9c89-ca05aac47753",
+      "name": "Send Error KIE AI"
     }
   ],
   "connections": {
@@ -1321,17 +1559,6 @@
         [
           {
             "node": "Check if license is valid",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get History Data": {
-      "main": [
-        [
-          {
-            "node": "Opportunity Input",
             "type": "main",
             "index": 0
           }
@@ -1511,7 +1738,8 @@
             "type": "main",
             "index": 0
           }
-        ]
+        ],
+        []
       ]
     },
     "KIE AI Pooling": {
@@ -1519,6 +1747,13 @@
         [
           {
             "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Error KIE AI",
             "type": "main",
             "index": 0
           }
@@ -1699,6 +1934,78 @@
           }
         ]
       ]
+    },
+    "Convert Relevant Image to Base64": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Switch5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch5": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript6",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Code in JavaScript6": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request7": {
+      "main": [
+        []
+      ]
+    },
+    "Get History Data": {
+      "main": [
+        [
+          {
+            "node": "Opportunity Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -1710,7 +2017,7 @@
     "availableInMCP": false
   },
   "triggerCount": 1,
-  "versionId": "c59a5e83-eea9-4ed8-b24d-95e8553379e7",
+  "versionId": "57f42447-39dd-4828-87eb-7c963bdfa990",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",

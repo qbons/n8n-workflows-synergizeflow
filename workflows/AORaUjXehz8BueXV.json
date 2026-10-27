@@ -1004,7 +1004,7 @@
           "value": "cpk5m2XWVQKwxheC",
           "mode": "list",
           "cachedResultUrl": "/workflow/cpk5m2XWVQKwxheC",
-          "cachedResultName": "SynergizeFlow.v2 — SF _ Product Marketing Agent - URL to Base64"
+          "cachedResultName": "SynergizeFlow.v2 — SF - Product Marketing Agent - URL to Base64"
         },
         "workflowInputs": {
           "mappingMode": "defineBelow",
@@ -2707,7 +2707,7 @@
     "availableInMCP": false
   },
   "triggerCount": 1,
-  "versionId": "fba48a70-2cdb-4b65-b4f8-00c88b1219fe",
+  "versionId": "615f8adf-4704-4bda-98d4-98d67726f876",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",

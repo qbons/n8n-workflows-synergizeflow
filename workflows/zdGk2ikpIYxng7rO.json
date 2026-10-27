@@ -61,7 +61,7 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.2,
       "position": [
-        -624,
+        -416,
         32
       ],
       "id": "65bcb56d-6119-4cf4-af98-49971b566fb2",
@@ -85,7 +85,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -848,
+        -736,
         160
       ],
       "id": "f00c29cd-d8e8-40f7-8ea3-45d40c3565fe",
@@ -145,7 +145,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -400,
+        -192,
         176
       ],
       "id": "44b4c408-f9a8-4851-9f74-9691ebb6f723",
@@ -308,40 +308,12 @@
     },
     {
       "parameters": {
-        "url": "https://static.bayu.uno/sf-dummy-json/onboarding.json",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.4,
-      "position": [
-        -192,
-        -80
-      ],
-      "id": "6a039366-8f6b-4689-a874-b83c8d110089",
-      "name": "Get Website Data"
-    },
-    {
-      "parameters": {
-        "url": "https://static.bayu.uno/sf-dummy-json/history.json",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.4,
-      "position": [
-        -384,
-        -80
-      ],
-      "id": "946fa135-7866-42e0-8457-80b5d565f739",
-      "name": "Get History Data"
-    },
-    {
-      "parameters": {
         "jsCode": "return {\n    \"business_context\": {\n      \"business_identity\": {\n        \"name\": $input.first().json.business_identity.business_name,\n        \"business_type\": $input.first().json.business_identity.business_type,\n        \"industry\": $input.first().json.business_identity.industry,\n        \"business_model\": $input.first().json.business_identity.business_model,\n        \"market\": $input.first().json.business_identity.service_area,\n        \"primary_language\": $input.first().json.business_identity.languages\n      },\n  \n      \"offerings\": $input.first().json.offerings,\n  \n      \"audience\": $input.first().json.audience,\n  \n      \"market_positioning\": $input.first().json.market_positioning,\n  \n      \"business_goals\": $input.first().json.business_goals,\n  \n      \"customer_decision_factors\": $input.first().json.customer_decision_factors\n    },\n    \"selected_strategy\": $('Prepare Data').first().json.selected_strategy,\n    \"content_history\": {\n      \"published_content\": $('Get History Data').first().json.content_history.published_content\n    },\n    \"opportunity_history\": {\n      \"previous_opportunities\": $('Get History Data').first().json.opportunity_history.previous_opportunities\n    }\n  }"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        0,
+        208,
         -80
       ],
       "id": "82faeaca-8f9a-4ded-a746-66259f615721",
@@ -354,7 +326,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        512,
+        720,
         -80
       ],
       "id": "96fcd150-b1a6-4b0b-b5ab-72d74ae474cc",
@@ -385,7 +357,7 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1.2,
       "position": [
-        192,
+        400,
         -80
       ],
       "id": "786b2064-679e-49c5-bc56-99d28ca8378c",
@@ -404,7 +376,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        704,
+        912,
         -80
       ],
       "id": "bb891e49-1e9b-4035-b618-827a2b55b1fc",
@@ -435,7 +407,7 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1.2,
       "position": [
-        912,
+        1120,
         -80
       ],
       "id": "f8b11c1e-cc85-40c1-a0b1-2da20abc7323",
@@ -455,7 +427,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1232,
+        1440,
         -80
       ],
       "id": "1cc01c86-1203-444e-9b01-e17f6ee53362",
@@ -468,7 +440,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1632,
+        1840,
         -80
       ],
       "id": "ca83564f-b750-4f98-b5da-b2a03a20c122",
@@ -500,7 +472,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1424,
+        1632,
         -80
       ],
       "id": "e0f48947-860f-489a-b85a-246a1c6fe3fa",
@@ -531,7 +503,7 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1.2,
       "position": [
-        1872,
+        2080,
         -80
       ],
       "id": "22aa2fef-448d-4b4b-bbdf-d5f53807ab7a",
@@ -550,7 +522,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2208,
+        2416,
         -80
       ],
       "id": "5c8a3d87-cceb-4544-9f6d-acab5fba44e5",
@@ -563,7 +535,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2640,
+        2848,
         -80
       ],
       "id": "b7c469bf-a841-46ed-bb8e-9fbaf410fa52",
@@ -586,7 +558,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        2416,
+        2624,
         -80
       ],
       "id": "6cdfc356-8128-40af-bbe9-02dca2d45778",
@@ -606,7 +578,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2880,
+        3088,
         -80
       ],
       "id": "e61c56f8-6ab6-4cdc-87c0-7b2067fa978a",
@@ -628,7 +600,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3088,
+        3296,
         -80
       ],
       "id": "c000c922-8dbc-48f0-b5e8-f85ea1c59955",
@@ -641,7 +613,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3568,
+        3776,
         -160
       ],
       "id": "a6aa3ca5-33a8-43ab-ac71-566f57291333",
@@ -682,7 +654,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        3552,
+        3760,
         112
       ],
       "id": "7dc8fa12-d500-46c9-aa16-7de8453c58e2",
@@ -705,7 +677,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        3328,
+        3536,
         -80
       ],
       "id": "22ee544d-9ccc-4851-affb-d365ca96edb0",
@@ -772,7 +744,7 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.3,
       "position": [
-        3904,
+        4112,
         -192
       ],
       "id": "0e468df6-f337-43ba-8e8b-af261a5a2035",
@@ -801,7 +773,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        4128,
+        4336,
         -208
       ],
       "id": "2ee11c1c-65a5-44b9-9c20-32c1c223ecf1",
@@ -814,7 +786,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        4336,
+        4544,
         -208
       ],
       "id": "8cc2d684-251e-4656-95de-510a3265b4fa",
@@ -842,7 +814,7 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1,
       "position": [
-        4608,
+        4816,
         -208
       ],
       "id": "8b997620-9579-4dd4-a49a-e30c7e7ef382",
@@ -863,7 +835,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        4976,
+        5184,
         -208
       ],
       "id": "2a32a505-1d23-47d0-a2f9-beca27a6d443",
@@ -875,7 +847,7 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        4752,
+        4960,
         -48
       ],
       "id": "39a8c09e-1c27-4dc9-ac3c-0b3ecd9afe92",
@@ -889,7 +861,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        4464,
+        4672,
         -48
       ],
       "id": "c54b0f0b-d9bb-453b-bb50-43ee45da2657",
@@ -902,7 +874,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        4352,
+        4560,
         384
       ],
       "id": "8143d3d2-aa25-4010-bc94-329ff397c70a",
@@ -922,7 +894,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        5536,
+        5744,
         96
       ],
       "id": "6ae1a633-19b3-40ac-909e-bc243cf73429",
@@ -960,11 +932,12 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
       "position": [
-        5888,
+        6096,
         96
       ],
       "id": "d7f1a58d-50ff-4ccf-ae2b-892c7fcc743c",
-      "name": "KIE AI Pooling"
+      "name": "KIE AI Pooling",
+      "onError": "continueErrorOutput"
     },
     {
       "parameters": {
@@ -1013,7 +986,7 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        6128,
+        6336,
         96
       ],
       "id": "7259dd8a-f87b-4be6-aebb-38fd32befd3f",
@@ -1073,7 +1046,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        6352,
+        6560,
         96
       ],
       "id": "49b67637-71da-4652-a8e2-fdf1b9b695b6",
@@ -1124,7 +1097,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        8048,
+        8256,
         -224
       ],
       "id": "d2b5f682-9c0f-495f-b5ed-617c14e767b1",
@@ -1153,7 +1126,7 @@
       "type": "@n8n/n8n-nodes-langchain.googleGemini",
       "typeVersion": 1,
       "position": [
-        7280,
+        7488,
         -96
       ],
       "id": "b1a5d13c-a017-44e4-b848-7747349b2d9d",
@@ -1198,7 +1171,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        7824,
+        8032,
         -224
       ],
       "id": "aff5ef49-7db5-4ee2-b474-ed47e489238f",
@@ -1211,7 +1184,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        7600,
+        7808,
         -176
       ],
       "id": "27a4e06c-524f-4404-80f2-33aed7b4501e",
@@ -1277,7 +1250,7 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        6912,
+        7120,
         -32
       ],
       "id": "e9cf0bbd-a7bf-485e-98bd-908d91625606",
@@ -1322,7 +1295,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        7312,
+        7520,
         96
       ],
       "id": "b1b69320-c9db-46af-9da2-9cdb954e9419",
@@ -1363,7 +1336,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        6640,
+        6848,
         272
       ],
       "id": "71476b95-13b1-4b80-a9ce-6e38666f43db",
@@ -1374,7 +1347,7 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        7552,
+        7760,
         -384
       ],
       "id": "0bf5e493-7972-4cca-8b8b-77cfde1c754b",
@@ -1409,7 +1382,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        8256,
+        8464,
         -80
       ],
       "id": "3f08c2db-9dd9-444e-afbb-4a66ffcdf4d5",
@@ -1437,7 +1410,7 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1.3,
       "position": [
-        8704,
+        8912,
         -96
       ],
       "id": "daeaf212-700d-44c4-b2ca-cec9bdb5a289",
@@ -1450,7 +1423,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        8512,
+        8720,
         -96
       ],
       "id": "c6b8796f-3c30-4f37-a0fe-07c6299ded50",
@@ -1463,11 +1436,98 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        6624,
+        6832,
         -32
       ],
       "id": "cbf5f338-15af-4e2f-a2f0-ce3247faa0e0",
       "name": "History Data"
+    },
+    {
+      "parameters": {
+        "url": "={{ $vars.SAAS_API }}api/v3/onboarding/{{ $('Prepare Data').item.json.license }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        16,
+        -80
+      ],
+      "id": "572bc64c-4e24-431c-b21f-fc6a0c93b558",
+      "name": "Get Website Data"
+    },
+    {
+      "parameters": {
+        "url": "={{ $vars.SAAS_API }}api/v3/content-strategy-histories/{{ $('Prepare Data').item.json.license }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -176,
+        -80
+      ],
+      "id": "74222185-c89b-4fe0-94e3-c4a993530894",
+      "name": "Get History Data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Prepare Data').item.json.webhook }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Prepare Data').item.json.token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "={{ $('Prepare Data').item.json.agent_id }}"
+            },
+            {
+              "name": "status",
+              "value": "fail"
+            },
+            {
+              "name": "msg",
+              "value": "kie_ai_error"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        6336,
+        320
+      ],
+      "id": "960d670e-3e47-409c-9494-accfaf475deb",
+      "name": "Send Error KIE AI"
     }
   ],
   "connections": {
@@ -1539,28 +1599,6 @@
         [
           {
             "node": "Check if license is valid",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get History Data": {
-      "main": [
-        [
-          {
-            "node": "Get Website Data",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get Website Data": {
-      "main": [
-        [
-          {
-            "node": "Opportunity Input",
             "type": "main",
             "index": 0
           }
@@ -1860,6 +1898,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Send Error KIE AI",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -2027,6 +2072,28 @@
           }
         ]
       ]
+    },
+    "Get History Data": {
+      "main": [
+        [
+          {
+            "node": "Get Website Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Website Data": {
+      "main": [
+        [
+          {
+            "node": "Opportunity Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "settings": {
@@ -2038,7 +2105,7 @@
     "availableInMCP": false
   },
   "triggerCount": 1,
-  "versionId": "135e8ec3-2abd-447f-aea7-b4094b4ecca1",
+  "versionId": "696a622d-9c94-4c31-85a4-03c862336c9f",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",

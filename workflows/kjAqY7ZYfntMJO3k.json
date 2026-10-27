@@ -227,6 +227,19 @@
       ],
       "id": "a59be535-4803-404d-9078-f0bc571569be",
       "name": "Edit Image"
+    },
+    {
+      "parameters": {
+        "errorMessage": "kie_ai_error"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        864,
+        80
+      ],
+      "id": "c8e9b62c-28ff-4390-835c-3bd25836ae8e",
+      "name": "Stop and Error"
     }
   ],
   "connections": {
@@ -257,7 +270,13 @@
             "index": 0
           }
         ],
-        [],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ],
         [
           {
             "node": "Wait",
@@ -339,7 +358,7 @@
     "availableInMCP": false
   },
   "triggerCount": 0,
-  "versionId": "5e136832-95f9-4c1c-bcbe-132be0668048",
+  "versionId": "3c6be798-9ab0-4c5f-8fa8-601423efe404",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",

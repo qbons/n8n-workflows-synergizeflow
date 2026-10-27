@@ -449,7 +449,7 @@
             },
             {
               "name": "status",
-              "value": "={{ $json.status }}"
+              "value": "={{ $('Insert data to website').item.json.status }}"
             },
             {
               "name": "data",
@@ -850,7 +850,7 @@
     "availableInMCP": false
   },
   "triggerCount": 0,
-  "versionId": "1c848126-b3d7-4bba-b056-7e02015cc70b",
+  "versionId": "5266c4bf-449d-4b67-9ac9-59a33cab908f",
   "owner": {
     "type": "team",
     "teamId": "0Cpv1rjP8dogQgcy",
